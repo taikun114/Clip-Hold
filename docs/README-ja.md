@@ -123,7 +123,7 @@ Clip Holdが気に入ったら寄付してくださると嬉しいです。開�
 #### Buy Me a Coffee
 [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_taikun)で緑茶一杯分の金額からサポートしていただけます。
 
-<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="i_am_taikun" data-color="#FFDD00" data-emoji="🍵"  data-font="Inter" data-text="Buy me a green tea (緑茶を奢る)" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+<a href="https://www.buymeacoffee.com/i_am_taikun"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a green tea (緑茶を奢る)&emoji=🍵&slug=i_am_taikun&button_colour=00751d&font_colour=ffffff&font_family=Inter&outline_colour=ffffff&coffee_colour=FFDD00" /></a>
 
 #### PayPal\.Me
 PayPalアカウントをお持ちの方は、[**PayPal**](https://paypal.me/taikun114)で直接寄付していただくこともできます。
