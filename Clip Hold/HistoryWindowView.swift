@@ -137,15 +137,8 @@ struct HistoryWindowView: View {
 
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
-            if #available(macOS 26, *) {
-                Color.clear
-                    .glassEffect(in: .rect(cornerRadius: 16.0))
-                    .ignoresSafeArea()
-            } else {
-                // VisualEffectViewはVisualEffectView.swiftからインポートされます
-                VisualEffectView(material: .menu, blendingMode: .behindWindow)
-                    .ignoresSafeArea()
-            }
+            VisualEffectView(material: .menu, blendingMode: .behindWindow)
+                .ignoresSafeArea()
 
             ZStack { // メインコンテンツを囲むZStack
                 VStack(spacing: 0) {
