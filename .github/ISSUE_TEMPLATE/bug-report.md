@@ -2,7 +2,7 @@
 name: Bug Report
 about: Report a bug you have found.
 title: 'Bug: '
-labels: bug
+labels: bug / バグ
 assignees: taikun114
 
 ---
