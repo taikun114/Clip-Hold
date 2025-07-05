@@ -66,7 +66,7 @@ You can list all standard phrases you have set and all saved history items. You 
 ### Rich Shortcut Keys
 ![Shortcut Keys](docs/images/Shortcuts.png)
 
-Dedicated shortcut keys allow you to quickly copy up to 10 standard phrases and 10 copy history items. You can also open the standard phrases and history windows instantly
+Dedicated shortcut keys allow you to quickly copy up to 10 standard phrases and 10 copy history items. You can also open the standard phrases and history windows instantly.
 
 ### Quickly Paste with Quick Paste
 ![Quick Paste](docs/images/Quick-Paste.gif)
