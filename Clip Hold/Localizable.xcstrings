@@ -2402,18 +2402,18 @@
         }
       }
     },
-    "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。" : {
+    "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to not close the standard phrases window when copying by double-clicking on each item shown in the standard phrases window."
+            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the standard phrases window."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。"
+            "value" : "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。"
           }
         }
       }
@@ -2674,18 +2674,18 @@
         }
       }
     },
-    "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。" : {
+    "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to not close the history window when copying by double-clicking on each item shown in the history window."
+            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the history window."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。"
+            "value" : "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。"
           }
         }
       }
@@ -3447,7 +3447,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Removes a selected standard phrase from the list."
+            "value" : "Delete a selected standard phrase from the list."
           }
         },
         "ja" : {
