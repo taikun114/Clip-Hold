@@ -192,7 +192,8 @@ struct GeneralSettingsView: View {
                     Text("ログイン時に開く")
                     Spacer()
                     Toggle(isOn: $loginItemManager.launchAtLogin) {
-                        EmptyView()
+                        Text("ログイン時に開く")
+                        Text("Clip Holdをログイン時に開くかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -204,7 +205,7 @@ struct GeneralSettingsView: View {
                     Text("履歴を保存する最大数:")
                     Spacer()
 
-                    Picker("", selection: $tempSelectedSaveOption) {
+                    Picker("履歴を保存する最大数", selection: $tempSelectedSaveOption) {
                         ForEach(HistoryOption.presets) { option in
                             Text(option.stringValue)
                                 .tag(option)
@@ -254,7 +255,7 @@ struct GeneralSettingsView: View {
                     Text("メニューに表示する定型文の最大数:")
                     Spacer()
 
-                    Picker("", selection: $tempSelectedPhraseMenuOption) {
+                    Picker("メニューに表示する定型文の最大数", selection: $tempSelectedPhraseMenuOption) {
                         ForEach(HistoryOption.presets) { option in
                             Text(option.stringValue)
                                 .tag(option)
@@ -292,7 +293,7 @@ struct GeneralSettingsView: View {
                     Text("メニューに表示する履歴の最大数:")
                     Spacer()
 
-                    Picker("", selection: $tempSelectedMenuOption) {
+                    Picker("メニューに表示する履歴の最大数", selection: $tempSelectedMenuOption) {
                         ForEach(MenuHistoryOption.presetsAndSameAsSaved.filter { option in
                             if case .sameAsSaved = option {
                                 // tempSelectedSaveOption が .unlimited (無制限) でない場合のみ .sameAsSaved を表示
@@ -342,7 +343,8 @@ struct GeneralSettingsView: View {
                     }
                     Spacer()
                     Toggle(isOn: $quickPaste) {
-                        EmptyView()
+                        Text("クイックペースト")
+                        Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -355,7 +357,8 @@ struct GeneralSettingsView: View {
                     Text("番号を表示する")
                     Spacer()
                     Toggle(isOn: $showLineNumbersInStandardPhraseWindow) {
-                        EmptyView()
+                        Text("定型文ウィンドウに番号を表示する")
+                        Text("定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -366,7 +369,8 @@ struct GeneralSettingsView: View {
                     Text("ダブルクリック時にウィンドウを閉じない")
                     Spacer()
                     Toggle(isOn: $preventStandardPhraseWindowCloseOnDoubleClick) {
-                        EmptyView()
+                        Text("ダブルクリック時に定型文ウィンドウを閉じない")
+                        Text("定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -376,7 +380,8 @@ struct GeneralSettingsView: View {
                     Text("常に最前面に表示")
                     Spacer()
                     Toggle(isOn: $standardPhraseWindowAlwaysOnTop) {
-                        EmptyView()
+                        Text("定型文ウィンドウを常に最前面に表示")
+                        Text("定型文ウィンドウを常に最前面に表示するかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -389,7 +394,8 @@ struct GeneralSettingsView: View {
                     Text("番号を表示する")
                     Spacer()
                     Toggle(isOn: $showLineNumbersInHistoryWindow) {
-                        EmptyView()
+                        Text("履歴ウィンドウに番号を表示する")
+                        Text("履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -400,7 +406,8 @@ struct GeneralSettingsView: View {
                     Text("ダブルクリック時にウィンドウを閉じない")
                     Spacer()
                     Toggle(isOn: $preventWindowCloseOnDoubleClick) {
-                        EmptyView()
+                        Text("ダブルクリック時に履歴ウィンドウを閉じない")
+                        Text("履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -410,7 +417,8 @@ struct GeneralSettingsView: View {
                     Text("常に最前面に表示")
                     Spacer()
                     Toggle(isOn: $historyWindowAlwaysOnTop) {
-                        EmptyView()
+                        Text("履歴ウィンドウを常に最前面に表示")
+                        Text("履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()

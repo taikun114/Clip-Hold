@@ -254,6 +254,22 @@
         }
       }
     },
+    "Clip Holdをログイン時に開くかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle launch at login for Clip Hold."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Holdをログイン時に開くかどうかを切り替えます。"
+          }
+        }
+      }
+    },
     "Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE." : {
       "shouldTranslate" : false
     },
@@ -1682,6 +1698,38 @@
         }
       }
     },
+    "ダブルクリック時に定型文ウィンドウを閉じない" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do not close the standard phrases window on double click"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダブルクリック時に定型文ウィンドウを閉じない"
+          }
+        }
+      }
+    },
+    "ダブルクリック時に履歴ウィンドウを閉じない" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do not close the history window on double click"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダブルクリック時に履歴ウィンドウを閉じない"
+          }
+        }
+      }
+    },
     "ディスカッションページへのリンクを開きます." : {
       "localizations" : {
         "en" : {
@@ -1922,6 +1970,22 @@
         }
       }
     },
+    "メニューに表示する定型文の最大数" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum number of standard phrases to show in the menu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニューに表示する定型文の最大数"
+          }
+        }
+      }
+    },
     "メニューに表示する定型文の最大数:" : {
       "localizations" : {
         "en" : {
@@ -1950,6 +2014,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メニューに表示する定型文の最大数を設定"
+          }
+        }
+      }
+    },
+    "メニューに表示する履歴の最大数" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum number of history items to show in the menu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニューに表示する履歴の最大数"
           }
         }
       }
@@ -2290,6 +2370,86 @@
         }
       }
     },
+    "定型文ウィンドウに番号を表示する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show numbers in the standard phrases window"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文ウィンドウに番号を表示する"
+          }
+        }
+      }
+    },
+    "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle to not close the standard phrases window when copying by double-clicking on each item shown in the standard phrases window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。"
+          }
+        }
+      }
+    },
+    "定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle to show or not show numbers for each item in the standard phrases window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。"
+          }
+        }
+      }
+    },
+    "定型文ウィンドウを常に最前面に表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the standard phrases window always on top"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文ウィンドウを常に最前面に表示"
+          }
+        }
+      }
+    },
+    "定型文ウィンドウを常に最前面に表示するかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle to show the standard phrases window always on top"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文ウィンドウを常に最前面に表示するかどうかを切り替えます。"
+          }
+        }
+      }
+    },
     "定型文ウィンドウを開く" : {
       "localizations" : {
         "en" : {
@@ -2466,6 +2626,86 @@
         }
       }
     },
+    "履歴ウィンドウに番号を表示する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show numbers in the history window"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウに番号を表示する"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle to not close the history window when copying by double-clicking on each item shown in the history window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle to show or not show numbers for each item in the history window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウを常に最前面に表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the history window always on top"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウを常に最前面に表示"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle to show the history window always on top"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。"
+          }
+        }
+      }
+    },
     "履歴ウィンドウを開く" : {
       "localizations" : {
         "en" : {
@@ -2558,6 +2798,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ファイルの読み込みまたは解析に失敗しました: %@"
+          }
+        }
+      }
+    },
+    "履歴を保存する最大数" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum number of history items to save"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴を保存する最大数"
           }
         }
       }
