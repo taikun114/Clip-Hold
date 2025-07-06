@@ -60,6 +60,7 @@ struct StandardPhraseSettingsView: View {
                             VStack(alignment: .leading) {
                                 Text(phrase.title)
                                     .font(.headline)
+
                                 Text(phrase.content)
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
@@ -70,6 +71,8 @@ struct StandardPhraseSettingsView: View {
                         .tag(phrase.id)
                         .contentShape(Rectangle()) // これによりHStack全体がヒットテスト可能になる
                         .help(phrase.content)
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("タイトル: \(phrase.title)、内容: \(phrase.content)")
                     }
                     .onMove(perform: standardPhraseManager.movePhrase)
                     .onDelete { indexSet in
@@ -81,7 +84,7 @@ struct StandardPhraseSettingsView: View {
                 .frame(minHeight: 100)
                 .scrollContentBackground(.hidden)
                 .padding(.bottom, 24)
-
+                .accessibilityLabel("定型文リスト")
                 .overlay(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 0) {
                         Divider()

@@ -1666,6 +1666,22 @@
         }
       }
     },
+    "タイトル: %@、内容: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title: %1$@, Content: %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タイトル: %1$@、内容: %2$@"
+          }
+        }
+      }
+    },
     "タイトルにコンテンツを使用する" : {
       "localizations" : {
         "en" : {
@@ -2558,6 +2574,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文はありません"
+          }
+        }
+      }
+    },
+    "定型文リスト" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard phrases list"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文リスト"
           }
         }
       }
