@@ -315,6 +315,7 @@ struct PrivacySettingsView: View {
                 .frame(minHeight: 100)
                 .scrollContentBackground(.hidden)
                 .padding(.bottom, 24)
+                .accessibilityLabel("除外するアプリリスト")
                 .overlay(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 0) {
                         Divider()
