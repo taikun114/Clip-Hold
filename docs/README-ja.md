@@ -38,7 +38,11 @@ Clip Holdは、macOS用のクリップボードと定型文マネージャーア
 > Clip Holdの開発には生成AIが活用されました。そのため、ベストプラクティスに沿っていなかったり、不安定なコードが含まれていたりする可能性があります。
 
 ### ダウンロード
-Clip Holdは[**リリースページ**](https://github.com/taikun114/Clip-Hold/releases/latest)から無料でダウンロードするか、[**Mac App Store**](https://apps.apple.com/app/)から500円で購入することができます。
+Clip Holdは[**リリースページ**](https://github.com/taikun114/Clip-Hold/releases/latest)から無料でダウンロードするか、[**Mac App Store**](https://apps.apple.com/jp/app/clip-hold/id6748125479)から500円で購入することができます。
+
+<a href="https://apps.apple.com/jp/app/clip-hold/id6748125479?mt=12&itscg=30200&itsct=apps_box_badge&mttnsubad=6748125479" style="display: inline-block;">
+<img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/ja-jp?releaseDate=1751760000" alt="App Storeでダウンロード" style="width: 224px; height: 82px; vertical-align: middle; object-fit: contain;" />
+</a>
 
 ### システム要件
 Clip Holdを実行するには、**macOS Sonoma（14.0）またはそれ以降**が必要です。**Intelプロセッサを搭載したMac**と**Appleシリコンを搭載したMac**に対応しています。

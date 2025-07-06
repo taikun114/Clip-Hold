@@ -32,13 +32,18 @@
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
 ## What is Clip Hold?
-Clip Hold is a clipboard and standard phrase manager application for macOS.
+Clip Hold is a clipboard and standard phrase manager app for macOS.
 
 > [!NOTE]
 > Clip Hold was developed using a generative AI. Therefore, it may not follow best practices or contain unstable code.
 
 ### Download
-Clip Hold can be downloaded for free from the [**release page**](https://github.com/taikun114/Clip-Hold/releases/latest) or purchased from the [**Mac App Store**](https://apps.apple.com/app) for $2.99.
+Clip Hold can be downloaded for free from the [**release page**](https://github.com/taikun114/Clip-Hold/releases/latest) or purchased from the [**Mac App Store**](https://apps.apple.com/app/clip-hold/id6748125479) for $2.99 (it is based on 500 JPY, so the price may change automatically).
+
+
+<a href="https://apps.apple.com/jp/app/clip-hold/id6748125479?mt=12&itscg=30200&itsct=apps_box_badge&mttnsubad=6748125479" style="display: inline-block;">
+<img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1751760000" alt=“Download on the App Store" style="width: 246px; height: 82px; vertical-align: middle; object-fit: contain;" />
+</a>
 
 ### System Requirements
 Clip Hold requires **macOS Sonoma (14.0) or later**. It is compatible with **Intel-based Mac computers** and **Mac computers with Apple silicon**.
