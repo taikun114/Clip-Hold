@@ -3570,6 +3570,22 @@
         }
       }
     },
+    "除外するアプリリスト" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps to exclude list"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外するアプリリスト"
+          }
+        }
+      }
+    },
     "除外するアプリを追加します。" : {
       "localizations" : {
         "en" : {
