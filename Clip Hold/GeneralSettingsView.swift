@@ -370,7 +370,7 @@ struct GeneralSettingsView: View {
                     Spacer()
                     Toggle(isOn: $preventStandardPhraseWindowCloseOnDoubleClick) {
                         Text("ダブルクリック時に定型文ウィンドウを閉じない")
-                        Text("定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。")
+                        Text("定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -407,7 +407,7 @@ struct GeneralSettingsView: View {
                     Spacer()
                     Toggle(isOn: $preventWindowCloseOnDoubleClick) {
                         Text("ダブルクリック時に履歴ウィンドウを閉じない")
-                        Text("履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときに定型文ウィンドウを閉じないようにするかどうかを切り替えます。")
+                        Text("履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
