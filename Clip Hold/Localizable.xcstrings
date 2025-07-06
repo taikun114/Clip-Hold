@@ -2834,6 +2834,22 @@
         }
       }
     },
+    "履歴リスト" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History list"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴リスト"
+          }
+        }
+      }
+    },
     "履歴を保存する最大数" : {
       "localizations" : {
         "en" : {

@@ -230,6 +230,7 @@ struct StandardPhraseWindowView: View {
                                 .tag(phrase.id)
                                 .listRowBackground(Color.clear)
                             }
+                            .accessibilityLabel("定型文リスト")
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
                             .blur(radius: isLoading ? 5 : 0)
