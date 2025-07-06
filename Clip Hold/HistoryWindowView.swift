@@ -243,6 +243,7 @@ struct HistoryWindowView: View {
                                 .tag(item.id)
                                 .listRowBackground(Color.clear)
                             }
+                            .accessibilityLabel("履歴リスト")
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
                             .blur(radius: isLoading ? 5 : 0)
