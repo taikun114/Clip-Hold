@@ -18,6 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Application Lifecycle
     func applicationDidFinishLaunching(_ notification: Notification) {
         print("AppDelegate: finished launching.")
+
         NSApp.setActivationPolicy(.accessory)
         NSApp.delegate = self
 
@@ -60,7 +61,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 print("DEBUG: standardPhraseWindowAlwaysOnTop changed, but standardPhraseWindowController is nil or window is nil.")
             }
         }
-
     }
     
     func applicationWillTerminate(_ notification: Notification) {
@@ -145,6 +145,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             standardPhraseWindowController?.applyWindowCustomizations(window: window)
             window.level = UserDefaults.standard.bool(forKey: "standardPhraseWindowAlwaysOnTop") ? .floating : .normal
         }
+    }
+
+    // MARK: - Application Delegate Methods for Reopening
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        UserDefaults.standard.set(false, forKey: "hideMenuBarExtra")
+        print("AppDelegate: hideMenuBarExtra を false に設定しました。メニューバーアイコンが表示されるようになります。")
+        
+        NSApp.activate(ignoringOtherApps: true)
+        
+        return true
     }
 
     // MARK: - UNUserNotificationCenterDelegate (通知アクションのハンドリング)
