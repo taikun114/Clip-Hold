@@ -38,7 +38,8 @@ struct ClipHoldApp: App {
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
 
-    @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false // 追加
+    @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
+    @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
 
     init() {
         print("ClipHoldApp: Initializing with ClipboardManager and StandardPhraseManager.")
@@ -75,6 +76,12 @@ struct ClipHoldApp: App {
         commandUp.post(tap: .cgSessionEventTap)
     }
 
+    private var menuBarExtraInsertionBinding: Binding<Bool> {
+        Binding<Bool>(
+            get: { !self.hideMenuBarExtra }, // hideMenuBarExtra が true なら非表示 (false)
+            set: { self.hideMenuBarExtra = !$0 } // isInserted の変更で hideMenuBarExtra を反転させる
+        )
+    }
 
     var body: some Scene {
         Settings {
@@ -84,12 +91,16 @@ struct ClipHoldApp: App {
                 .environmentObject(standardPhraseManager)
         }
 
-        MenuBarExtra(content: {
+        MenuBarExtra(
+            "Clip Hold", // <- titleKey
+            image: isClipboardMonitoringPaused ? "Menubar Icon Dimmed" : "Menubar Icon",
+            isInserted: menuBarExtraInsertionBinding
+        ) {
             // --- 定型文セクション ---
             Text("よく使う定型文")
                 .font(.headline)
                 .padding(.bottom, 5)
-
+            
             if standardPhraseManager.standardPhrases.isEmpty {
                 Text("定型文はありません")
             } else {
@@ -115,7 +126,7 @@ struct ClipHoldApp: App {
                 }
             }
             Divider()
-
+            
             // --- コピー履歴セクション ---
             Text("コピー履歴")
                 .font(.headline)
@@ -130,18 +141,18 @@ struct ClipHoldApp: App {
                         formatter.timeStyle = .short
                         return formatter
                     }()
-
+                    
                     let displayText: String = {
                         var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
                         let dateString = itemDateFormatter.string(from: item.date)
-
+                        
                         if displayContent.count > 40 {
                             displayContent = String(displayContent.prefix(40)) + "..."
                         }
-
+                        
                         return "\(displayContent) (\(dateString))"
                     }()
-
+                    
                     Button {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(item.text, forType: .string)
@@ -159,17 +170,17 @@ struct ClipHoldApp: App {
                     }
                 }
             }
-
+            
             Divider()
-
+            
             Button("すべてのコピー履歴を表示...") {
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showHistoryWindow()
                 }
             }
-
+            
             Divider()
-
+            
             SettingsLink {
                 Text("設定...")
             }
@@ -179,14 +190,12 @@ struct ClipHoldApp: App {
             .keyboardShortcut(",", modifiers: .command)
             
             Divider()
-
+            
             Button("終了") {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q", modifiers: .command)
-        }, label: {
-            Label("Clip Hold", image: isClipboardMonitoringPaused ? "Menubar Icon Dimmed" : "Menubar Icon")
-        })
+        }
         .environmentObject(clipboardManager)
         .environmentObject(standardPhraseManager)
     }
