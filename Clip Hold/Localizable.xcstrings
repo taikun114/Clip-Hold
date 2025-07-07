@@ -1202,18 +1202,18 @@
         }
       }
     },
-    "このオプションをオンにすると、メニューバーのアイコンが非表示になります。アプリを終了するには、Clip Holdのウィンドウが最前面の状態でCommand + Qキーを押して終了するか、アクティビティモニタを使用して終了する必要があります。" : {
+    "このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When this option is enabled, the icon in the menu bar will be hidden. To exit the app, you will need to exit by pressing Command + Q while the Clip Hold window is at the top, or by using the Activity Monitor."
+            "value" : "When this option is enabled, the menu bar icon will be temporarily hidden. It will reappear when you reopen the app again."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このオプションをオンにすると、メニューバーのアイコンが非表示になります。アプリを終了するには、Clip Holdのウィンドウが最前面の状態でCommand + Qキーを押して終了するか、アクティビティモニタを使用して終了する必要があります。"
+            "value" : "このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。"
           }
         }
       }
@@ -2098,18 +2098,18 @@
         }
       }
     },
-    "メニューバーアイコンを非表示にする" : {
+    "メニューバーアイコンを一時的に非表示" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hide Menu Bar Icon"
+            "value" : "Temporarily Hide Menu Bar Icon"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メニューバーアイコンを非表示にする"
+            "value" : "メニューバーアイコンを一時的に非表示"
           }
         }
       }

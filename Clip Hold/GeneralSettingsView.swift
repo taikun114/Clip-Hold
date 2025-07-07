@@ -354,15 +354,15 @@ struct GeneralSettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("メニューバーアイコンを非表示にする")
-                        Text("このオプションをオンにすると、メニューバーのアイコンが非表示になります。アプリを終了するには、Clip Holdのウィンドウが最前面の状態でCommand + Qキーを押して終了するか、アクティビティモニタを使用して終了する必要があります。")
+                        Text("メニューバーアイコンを一時的に非表示")
+                        Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $hideMenuBarExtra) {
-                        Text("メニューバーアイコンを非表示にする")
-                        Text("このオプションをオンにすると、メニューバーのアイコンが非表示になります。アプリを終了するには、Clip Holdのウィンドウが最前面の状態でCommand + Qキーを押して終了するか、アクティビティモニタを使用して終了する必要があります。")
+                        Text("メニューバーアイコンを一時的に非表示")
+                        Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
