@@ -1202,6 +1202,22 @@
         }
       }
     },
+    "このオプションをオンにすると、メニューバーのアイコンが非表示になります。アプリを終了するには、Clip Holdのウィンドウが最前面の状態でCommand + Qキーを押して終了するか、アクティビティモニタを使用して終了する必要があります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When this option is enabled, the icon in the menu bar will be hidden. To exit the app, you will need to exit by pressing Command + Q while the Clip Hold window is at the top, or by using the Activity Monitor."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このオプションをオンにすると、メニューバーのアイコンが非表示になります。アプリを終了するには、Clip Holdのウィンドウが最前面の状態でCommand + Qキーを押して終了するか、アクティビティモニタを使用して終了する必要があります。"
+          }
+        }
+      }
+    },
     "このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。" : {
       "localizations" : {
         "en" : {
@@ -2078,6 +2094,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メニューに表示する履歴の最大数を設定"
+          }
+        }
+      }
+    },
+    "メニューバーアイコンを非表示にする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide Menu Bar Icon"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニューバーアイコンを非表示にする"
           }
         }
       }
