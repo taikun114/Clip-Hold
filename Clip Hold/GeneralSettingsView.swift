@@ -90,6 +90,7 @@ struct GeneralSettingsView: View {
     @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
 
     @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
 
     @State private var showingCustomSaveHistorySheet = false
     @State private var showingCustomMenuHistorySheet = false
@@ -345,6 +346,23 @@ struct GeneralSettingsView: View {
                     Toggle(isOn: $quickPaste) {
                         Text("クイックペースト")
                         Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("メニューバーアイコンを非表示にする")
+                        Text("このオプションをオンにすると、メニューバーのアイコンが非表示になります。アプリを終了するには、Clip Holdのウィンドウが最前面の状態でCommand + Qキーを押して終了するか、アクティビティモニタを使用して終了する必要があります。")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $hideMenuBarExtra) {
+                        Text("メニューバーアイコンを非表示にする")
+                        Text("このオプションをオンにすると、メニューバーのアイコンが非表示になります。アプリを終了するには、Clip Holdのウィンドウが最前面の状態でCommand + Qキーを押して終了するか、アクティビティモニタを使用して終了する必要があります。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
