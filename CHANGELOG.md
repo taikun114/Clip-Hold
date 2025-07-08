@@ -4,6 +4,8 @@
 ## 1.1.0 (under development)
 - Add the feature to create a QR Code from copied text
   - Click “Show QR Code” in the item options of the History Window and Standard Phrases Window to generate a QR Code.
+- Add the feature to copy an image that contains a QR code to add the content to the history.
+  - You can use it by enabling “Scan QR Code Image” in the settings.
 
 ## 1.0.1
 - Add accessibility labels
