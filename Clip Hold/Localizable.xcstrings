@@ -1058,6 +1058,22 @@
         }
       }
     },
+    "クリップボードの内容から定型文を追加する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a Standard Phrase from Clipboard Contents"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリップボードの内容から定型文を追加する"
+          }
+        }
+      }
+    },
     "クリップボードの履歴が保存されるようになります。" : {
       "localizations" : {
         "en" : {
@@ -3342,6 +3358,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在、インポートとエクスポートはテキストのみサポートしています。"
+          }
+        }
+      }
+    },
+    "現在のクリップボード内容を使って新しい定型文を追加します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a new standard phrase using the current clipboard contents."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のクリップボード内容を使って新しい定型文を追加します。"
           }
         }
       }

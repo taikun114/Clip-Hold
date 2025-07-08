@@ -9,6 +9,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     var historyWindowController: ClipHoldWindowController?
     var standardPhraseWindowController: ClipHoldWindowController?
 
+    private var addPhraseWindow: NSWindow?
+
     let resumeMonitoringActionID = "RESUME_MONITORING_ACTION"
     let clipboardPausedNotificationCategory = "CLIPBOARD_PAUSED_CATEGORY"
 
@@ -145,6 +147,38 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             standardPhraseWindowController?.applyWindowCustomizations(window: window)
             window.level = UserDefaults.standard.bool(forKey: "standardPhraseWindowAlwaysOnTop") ? .floating : .normal
         }
+    }
+
+    func showAddPhraseWindow(withContent content: String) {
+        // addPhraseWindow が nil または既に閉じられている場合のみ新しいウィンドウを作成
+        if addPhraseWindow == nil || addPhraseWindow?.isVisible == false {
+            let contentView = AddEditPhraseView(mode: .add, initialContent: content) // クリップボードの内容を初期値として渡す
+                .environmentObject(StandardPhraseManager.shared)
+
+            addPhraseWindow = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 350),
+                styleMask: [.titled, .closable, .miniaturizable, .resizable],
+                backing: .buffered, defer: false)
+            
+            addPhraseWindow?.center()
+            addPhraseWindow?.setFrameAutosaveName("AddPhraseWindow")
+            addPhraseWindow?.contentView = NSHostingView(rootView: contentView)
+            addPhraseWindow?.identifier = NSUserInterfaceItemIdentifier("AddPhraseWindow") // 識別子を追加
+            print("AppDelegate: Add Phrase window created.")
+
+        } else {
+            // 既存のウィンドウがある場合は、コンテンツを更新して前面に表示
+            print("AppDelegate: Add Phrase window already exists. Updating content and bringing to front.")
+            if let window = addPhraseWindow {
+                // コンテンツビューを更新して、新しいクリップボードの内容を反映
+                let newContentView = AddEditPhraseView(mode: .add, initialContent: content)
+                    .environmentObject(StandardPhraseManager.shared)
+                window.contentView = NSHostingView(rootView: newContentView)
+            }
+        }
+        // ウィンドウを表示し、アプリをアクティブにする
+        addPhraseWindow?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     // MARK: - Application Delegate Methods for Reopening

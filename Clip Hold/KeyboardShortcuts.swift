@@ -5,6 +5,8 @@ extension KeyboardShortcuts.Name {
     static let showAllStandardPhrases = Self("showAllStandardPhrases", default: .init(.v, modifiers: [.control, .command]))
     static let showAllCopyHistory = Self("showAllCopyHistory", default: .init(.v, modifiers: [.option, .command]))
 
+    static let addStandardPhraseFromClipboard = Self("addStandardPhraseFromClipboard", default: .init(.a, modifiers: [.control, .command]))
+
     static let toggleClipboardMonitoring = Self("toggleClipboardMonitoring", default: .init(.m, modifiers: [.option, .command]))
 
     static let copyStandardPhrase1 = Self("copyStandardPhrase1", default: .init(.one, modifiers: [.control, .command]))

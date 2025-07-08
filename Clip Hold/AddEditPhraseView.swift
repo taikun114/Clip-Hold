@@ -16,14 +16,14 @@ struct AddEditPhraseView: View {
     @State private var content: String
     @State private var useContentAsTitle: Bool = false
 
-    init(mode: Mode, phraseToEdit: StandardPhrase? = nil) {
+    init(mode: Mode, phraseToEdit: StandardPhrase? = nil, initialContent: String = "") {
         self.mode = mode
         _phraseToEdit = State(initialValue: phraseToEdit ?? StandardPhrase(title: "", content: ""))
 
         switch mode {
         case .add:
             _title = State(initialValue: "")
-            _content = State(initialValue: "")
+            _content = State(initialValue: initialContent) // ここで初期コンテンツを設定
             _useContentAsTitle = State(initialValue: false)
         case .edit(let phrase):
             _title = State(initialValue: phrase.title)
