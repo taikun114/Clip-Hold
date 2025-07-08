@@ -30,7 +30,9 @@ struct StandardPhraseItemRow: View {
     @Environment(\.colorScheme) var colorScheme
 
     @Binding var showCopyConfirmation: Bool
-    
+    @Binding var showQRCodeSheet: Bool
+    @Binding var selectedPhraseForQRCode: StandardPhrase?
+
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
 
@@ -62,6 +64,10 @@ struct StandardPhraseItemRow: View {
                 Button("コピー") {
                     copyToClipboard(phrase.content)
                     showCopyConfirmation = true
+                }
+                Button("QRコードを表示") {
+                    selectedPhraseForQRCode = phrase
+                    showQRCodeSheet = true
                 }
                 Button("削除", role: .destructive) {
                     phraseToDelete = phrase
@@ -95,7 +101,8 @@ struct StandardPhraseWindowView: View {
     @State private var searchTask: Task<Void, Never>? = nil
     @State private var showCopyConfirmation: Bool = false
     @State private var currentCopyConfirmationTask: Task<Void, Never>? = nil
-
+    @State private var showQRCodeSheet: Bool = false
+    @State private var selectedPhraseForQRCode: StandardPhrase?
 
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbers: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
@@ -224,6 +231,8 @@ struct StandardPhraseWindowView: View {
                                     showingDeleteConfirmation: $showingDeleteConfirmation,
                                     selectedPhraseID: $selectedPhraseID,
                                     showCopyConfirmation: $showCopyConfirmation,
+                                    showQRCodeSheet: $showQRCodeSheet, // ここにバインディングを渡す
+                                    selectedPhraseForQRCode: $selectedPhraseForQRCode, // ここにバインディングを渡す
                                     lineNumberTextWidth: lineNumberTextWidth,
                                     trailingPaddingForLineNumber: trailingPaddingForLineNumber
                                 )
@@ -248,6 +257,10 @@ struct StandardPhraseWindowView: View {
                                                 showCopyConfirmation = false
                                             }
                                         }
+                                    }
+                                    Button("QRコードを表示") {
+                                        selectedPhraseForQRCode = currentPhrase
+                                        showQRCodeSheet = true
                                     }
                                     Button("削除", role: .destructive) {
                                         phraseToDelete = currentPhrase
@@ -332,6 +345,11 @@ struct StandardPhraseWindowView: View {
             }
         } message: {
             Text("「\(truncateString(phraseToDelete?.title, maxLength: 50))」を本当に削除しますか？")
+        }
+        .sheet(isPresented: $showQRCodeSheet) {
+            if let phrase = selectedPhraseForQRCode {
+                QRCodeView(text: phrase.content)
+            }
         }
         .onAppear {
             performSearch(searchTerm: searchText)
