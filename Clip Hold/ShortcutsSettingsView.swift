@@ -121,6 +121,24 @@ struct ShortcutsSettingsView: View {
                     }
                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 }
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("クリップボードの内容から定型文を追加する")
+                        Text("現在のクリップボード内容を使って新しい定型文を追加します。")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .addStandardPhraseFromClipboard)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.addStandardPhraseFromClipboard)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
             }
             
             Section(header: Text("コピー履歴").font(.headline)) {

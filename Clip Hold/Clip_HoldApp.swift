@@ -233,6 +233,15 @@ struct ClipHoldApp: App {
             print("isClipboardMonitoringPaused の値を \(currentIsPaused) から \(!currentIsPaused) に変更しました。")
         }
 
+        // クリップボードから新しい定型文の追加ショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .addStandardPhraseFromClipboard) {
+            print("「クリップボードから定型文を追加」ショートカットが押されました！")
+            if let delegate = NSApp.delegate as? AppDelegate {
+                let clipboardContent = NSPasteboard.general.string(forType: .string) ?? ""
+                delegate.showAddPhraseWindow(withContent: clipboardContent)
+            }
+        }
+
         // 定型文コピーショートカットの登録
         for i in 0..<KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts.count {
             let shortcutName = KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts[i]
