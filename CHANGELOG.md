@@ -7,6 +7,9 @@
 - Add the feature to copy an image that contains a QR code to add the content to the history.
   - You can use it by enabling “Scan QR Code Image” in the settings.
 - Add the feature to drag and drop an image that contains a QR code into the history window to copy the content
+- Add the feature to create a standard phrase from the clipboard contents.
+  - Added shortcut key to add a standard phrase from the current clipboard contents.
+  - Added the feature to add a standard phrase from an item in the History Window.
 
 ## 1.0.1
 - Add accessibility labels
