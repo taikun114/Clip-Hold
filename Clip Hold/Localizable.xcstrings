@@ -640,6 +640,12 @@
             "state" : "translated",
             "value" : "About QR Code"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードについて"
+          }
         }
       }
     },
@@ -666,6 +672,12 @@
             "state" : "translated",
             "value" : "QR Code is a registered trademark of DENSO WAVE INCORPORATED in Japan and in other countries."
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードは株式会社デンソーウェーブの登録商標です。"
+          }
         }
       }
     },
@@ -681,6 +693,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QRコードを表示"
+          }
+        }
+      }
+    },
+    "QRコード画像をスキャンする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scan QR Code Image"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコード画像をスキャンする"
           }
         }
       }
@@ -1266,6 +1294,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このアプリケーションと使用されているライブラリのライセンス情報を表示します。"
+          }
+        }
+      }
+    },
+    "このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When this option is enabled, copying an image that contains a QR Code will add the contents of the QR Code to the history."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。"
           }
         }
       }
