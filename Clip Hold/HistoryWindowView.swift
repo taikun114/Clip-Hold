@@ -82,14 +82,15 @@ struct HistoryItemRow: View {
                 copyToClipboard(item.text)
                 showCopyConfirmation = true
             }
-            Button("QRコードを表示") {
+            Button("項目から定型文を作成...") {
+                itemForNewPhrase = item // ここでClipboardItemをセット
+            }
+            Button("QRコードを表示...") {
                 showQRCodeSheet = true
                 selectedItemForQRCode = item
             }
-            Button("定型文を作成") {
-                itemForNewPhrase = item // ここでClipboardItemをセット
-            }
-            Button("削除", role: .destructive) {
+            Divider()
+            Button("削除...", role: .destructive) {
                 itemToDelete = item
                 showingDeleteConfirmation = true
             }
@@ -333,14 +334,15 @@ struct HistoryWindowView: View {
                                             }
                                         }
                                     }
-                                    Button("QRコードを表示") {
+                                    Button("項目から定型文を作成...") {
+                                        itemForNewPhrase = currentItem // ここでClipboardItemをセット
+                                    }
+                                    Button("QRコードを表示...") {
                                         showQRCodeSheet = true
                                         selectedItemForQRCode = currentItem
                                     }
-                                    Button("定型文を作成") {
-                                        itemForNewPhrase = currentItem // ここでClipboardItemをセット
-                                    }
-                                    Button("削除", role: .destructive) {
+                                    Divider()
+                                    Button("削除...", role: .destructive) {
                                         itemToDelete = currentItem
                                         showingDeleteConfirmation = true
                                     }

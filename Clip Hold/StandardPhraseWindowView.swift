@@ -69,11 +69,12 @@ struct StandardPhraseItemRow: View {
                 Button("編集...") {
                     phraseToEdit = phrase // 編集対象のフレーズをセット
                 }
-                Button("QRコードを表示") {
+                Button("QRコードを表示...") {
                     selectedPhraseForQRCode = phrase
                     showQRCodeSheet = true
                 }
-                Button("削除", role: .destructive) {
+                Divider()
+                Button("削除...", role: .destructive) {
                     phraseToDelete = phrase
                     showingDeleteConfirmation = true
                 }
@@ -273,11 +274,12 @@ struct StandardPhraseWindowView: View {
                                     Button("編集...") {
                                         phraseToEdit = currentPhrase // 編集対象のフレーズをセット
                                     }
-                                    Button("QRコードを表示") {
+                                    Button("QRコードを表示...") {
                                         selectedPhraseForQRCode = currentPhrase
                                         showQRCodeSheet = true
                                     }
-                                    Button("削除", role: .destructive) {
+                                    Divider()
+                                    Button("削除...", role: .destructive) {
                                         phraseToDelete = currentPhrase
                                         showingDeleteConfirmation = true
                                     }

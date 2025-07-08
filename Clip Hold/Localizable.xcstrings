@@ -681,18 +681,18 @@
         }
       }
     },
-    "QRコードを表示" : {
+    "QRコードを表示..." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show QR Code"
+            "value" : "Show QR Code…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "QRコードを表示"
+            "value" : "QRコードを表示..."
           }
         }
       }
@@ -2514,6 +2514,22 @@
         }
       }
     },
+    "削除..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除..."
+          }
+        }
+      }
+    },
     "動作中" : {
       "localizations" : {
         "en" : {
@@ -2766,22 +2782,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文リスト"
-          }
-        }
-      }
-    },
-    "定型文を作成" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create a Standard Phrase"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "定型文を作成"
           }
         }
       }
@@ -3870,6 +3870,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "除外するアプリを追加します。"
+          }
+        }
+      }
+    },
+    "項目から定型文を作成..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a Standard Phrase from an item..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "項目から定型文を作成..."
           }
         }
       }
