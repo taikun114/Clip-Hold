@@ -633,6 +633,16 @@
         }
       }
     },
+    "QRコードについて" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About QR Code"
+          }
+        }
+      }
+    },
     "QRコードの生成に失敗しました。" : {
       "localizations" : {
         "en" : {
@@ -645,6 +655,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QRコードの生成に失敗しました。"
+          }
+        }
+      }
+    },
+    "QRコードは株式会社デンソーウェーブの登録商標です。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR Code is a registered trademark of DENSO WAVE INCORPORATED in Japan and in other countries."
           }
         }
       }
