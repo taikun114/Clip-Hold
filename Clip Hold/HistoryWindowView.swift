@@ -1,5 +1,7 @@
 import SwiftUI
 import AppKit
+import CoreImage
+import UniformTypeIdentifiers
 
 private let itemDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
@@ -177,6 +179,21 @@ struct HistoryWindowView: View {
         self.filteredHistory = newFilteredHistory
     }
 
+    // QRコードを解析するヘルパー関数
+    private func parseQRCode(from image: NSImage) -> String? {
+        guard let ciImage = CIImage(data: image.tiffRepresentation ?? Data()) else { return nil }
+
+        let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
+        let features = detector?.features(in: ciImage)
+
+        for feature in features ?? [] {
+            if let qrCodeFeature = feature as? CIQRCodeFeature {
+                return qrCodeFeature.messageString
+            }
+        }
+        return nil
+    }
+
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
             VisualEffectView(material: .menu, blendingMode: .behindWindow)
@@ -325,8 +342,27 @@ struct HistoryWindowView: View {
                                     }
                                 }
                             })
-                        }
+                            .onDrop(of: [.image], isTargeted: nil) { providers in
+                                guard let itemProvider = providers.first else { return false }
 
+                                itemProvider.loadObject(ofClass: NSImage.self) { (image, error) in
+                                    DispatchQueue.main.async {
+                                        if let nsImage = image as? NSImage {
+                                            if let qrCodeContent = parseQRCode(from: nsImage) {
+                                                clipboardManager.addHistoryItem(text: qrCodeContent)
+                                                copyToClipboard(qrCodeContent)
+                                            } else {
+                                                // QRコードが見つからなかった場合の処理
+                                                print("QRコードが見つかりませんでした。")
+                                            }
+                                        } else if let error = error {
+                                            print("画像のロードに失敗しました: \(error.localizedDescription)")
+                                        }
+                                    }
+                                }
+                                return true
+                            }
+                        }
                         if isLoading {
                             ProgressView()
                                 .progressViewStyle(.circular)
