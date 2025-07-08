@@ -92,6 +92,8 @@ struct GeneralSettingsView: View {
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
 
+    @AppStorage("scanQRCodeImage") var scanQRCodeImage: Bool = false
+
     @State private var showingCustomSaveHistorySheet = false
     @State private var showingCustomMenuHistorySheet = false
     @State private var showingCustomPhraseMenuSheet = false
@@ -363,6 +365,23 @@ struct GeneralSettingsView: View {
                     Toggle(isOn: $hideMenuBarExtra) {
                         Text("メニューバーアイコンを一時的に非表示")
                         Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("QRコード画像をスキャンする")
+                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $scanQRCodeImage) {
+                        Text("QRコード画像をスキャンする")
+                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()

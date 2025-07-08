@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import SwiftUI
+import CoreImage
 
 class ClipboardManager: ObservableObject {
     static let shared = ClipboardManager()
@@ -13,6 +14,8 @@ class ClipboardManager: ObservableObject {
     }
 
     @AppStorage("maxHistoryToSave") private var maxHistoryToSave: Int = 0 // 無制限を0で表す (GeneralSettingsViewとキーを合わせる)
+
+    @AppStorage("scanQRCodeImage") private var scanQRCodeImage = false
 
     @Published var excludedAppIdentifiers: [String] = []
 
@@ -122,20 +125,55 @@ class ClipboardManager: ObservableObject {
                 }
             }
 
+            var copiedText: String?
+
+            // 1. まずは文字列として取得を試みる
             if let newString = pasteboard.string(forType: .string) {
+                copiedText = newString
+            }
+            // 2. 文字列が取得できなかった場合、画像として取得を試み、QRコードを解析
+            else if scanQRCodeImage, let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
+                print("ClipboardManager: Image detected on pasteboard. Attempting QR code decoding...")
+                if let decodedText = decodeQRCode(from: image) {
+                    copiedText = decodedText
+                    print("ClipboardManager: QR code successfully decoded: \(decodedText.prefix(50))...")
+                } else {
+                    print("ClipboardManager: Image detected but no QR code found or decoding failed.")
+                }
+            }
+
+            if let finalCopiedText = copiedText {
                 // 同じ内容のものが連続してコピーされた場合は追加しない
-                if let lastItem = clipboardHistory.first, lastItem.text == newString {
+                if let lastItem = clipboardHistory.first, lastItem.text == finalCopiedText {
                     return
                 }
 
-                let newItem = ClipboardItem(text: newString, date: Date())
+                let newItem = ClipboardItem(text: finalCopiedText, date: Date())
                 clipboardHistory.insert(newItem, at: 0) // 先頭に追加
                 print("ClipboardManager: New item added. Total history: \(clipboardHistory.count)")
 
                 // 最大履歴数を超過した場合の処理
                 enforceMaxHistoryCount()
+            } else {
+                print("ClipboardManager: No supported content found on pasteboard.")
             }
         }
+    }
+
+    // MARK: - QR Code Decoding
+    private func decodeQRCode(from image: NSImage) -> String? {
+        guard let ciImage = CIImage(data: image.tiffRepresentation!) else { // NSImageをCIImageに変換
+            print("Failed to convert NSImage to CIImage.")
+            return nil
+        }
+
+        let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
+        let features = detector?.features(in: ciImage)
+
+        if let qrFeature = features?.first as? CIQRCodeFeature {
+            return qrFeature.messageString
+        }
+        return nil
     }
 
     // MARK: - History Management
