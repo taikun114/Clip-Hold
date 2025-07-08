@@ -42,6 +42,8 @@ struct HistoryItemRow: View {
     @Binding var showQRCodeSheet: Bool
     @Binding var selectedItemForQRCode: ClipboardItem?
     
+    @Binding var itemForNewPhrase: ClipboardItem?
+
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
 
@@ -55,6 +57,7 @@ struct HistoryItemRow: View {
          showCopyConfirmation: Binding<Bool>,
          showQRCodeSheet: Binding<Bool>,
          selectedItemForQRCode: Binding<ClipboardItem?>,
+         itemForNewPhrase: Binding<ClipboardItem?>,
          lineNumberTextWidth: CGFloat?,
          trailingPaddingForLineNumber: CGFloat) {
         
@@ -68,6 +71,7 @@ struct HistoryItemRow: View {
         _showCopyConfirmation = showCopyConfirmation
         _showQRCodeSheet = showQRCodeSheet
         _selectedItemForQRCode = selectedItemForQRCode
+        _itemForNewPhrase = itemForNewPhrase
         self.lineNumberTextWidth = lineNumberTextWidth
         self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
     }
@@ -81,6 +85,9 @@ struct HistoryItemRow: View {
             Button("QRコードを表示") {
                 showQRCodeSheet = true
                 selectedItemForQRCode = item
+            }
+            Button("定型文を作成") {
+                itemForNewPhrase = item // ここでClipboardItemをセット
             }
             Button("削除", role: .destructive) {
                 itemToDelete = item
@@ -146,6 +153,8 @@ struct HistoryWindowView: View {
     
     @State private var showQRCodeSheet: Bool = false
     @State private var selectedItemForQRCode: ClipboardItem?
+
+    @State private var itemForNewPhrase: ClipboardItem? = nil
 
     @FocusState private var isSearchFieldFocused: Bool
 
@@ -291,6 +300,7 @@ struct HistoryWindowView: View {
                                     showCopyConfirmation: $showCopyConfirmation,
                                     showQRCodeSheet: $showQRCodeSheet,
                                     selectedItemForQRCode: $selectedItemForQRCode,
+                                    itemForNewPhrase: $itemForNewPhrase,
                                     lineNumberTextWidth: lineNumberTextWidth,
                                     trailingPaddingForLineNumber: trailingPaddingForLineNumber
                                 )
@@ -319,6 +329,9 @@ struct HistoryWindowView: View {
                                     Button("QRコードを表示") {
                                         showQRCodeSheet = true
                                         selectedItemForQRCode = currentItem
+                                    }
+                                    Button("定型文を作成") {
+                                        itemForNewPhrase = currentItem // ここでClipboardItemをセット
                                     }
                                     Button("削除", role: .destructive) {
                                         itemToDelete = currentItem
@@ -446,6 +459,10 @@ struct HistoryWindowView: View {
             if let item = selectedItemForQRCode {
                 QRCodeView(text: item.text)
             }
+        }
+        .sheet(item: $itemForNewPhrase) { item in // itemが非nilの時にシートが表示される
+            AddEditPhraseView(mode: .add, initialContent: item.text)
+                .environmentObject(standardPhraseManager)
         }
     }
 }

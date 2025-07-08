@@ -2770,6 +2770,22 @@
         }
       }
     },
+    "定型文を作成" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a Standard Phrase"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文を作成"
+          }
+        }
+      }
+    },
     "定型文を検索" : {
       "localizations" : {
         "en" : {
