@@ -617,6 +617,54 @@
     "PID: %@" : {
       "shouldTranslate" : false
     },
+    "QRコード" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR Code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコード"
+          }
+        }
+      }
+    },
+    "QRコードの生成に失敗しました。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to Generate QR Code."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードの生成に失敗しました。"
+          }
+        }
+      }
+    },
+    "QRコードを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show QR Code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードを表示"
+          }
+        }
+      }
+    },
     "rd_suffix" : {
       "localizations" : {
         "en" : {
@@ -2322,6 +2370,22 @@
         }
       }
     },
+    "入力された情報が長すぎるか、無効な文字が含まれている可能性があります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entered information may be too long or contain invalid characters."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "入力された情報が長すぎるか、無効な文字が含まれている可能性があります。"
+          }
+        }
+      }
+    },
     "内容: %@" : {
       "localizations" : {
         "en" : {
@@ -3214,6 +3278,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在、インポートとエクスポートはテキストのみサポートしています。"
+          }
+        }
+      }
+    },
+    "画像をコピー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Image"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像をコピー"
+          }
+        }
+      }
+    },
+    "画像を保存..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save Image..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像を保存..."
           }
         }
       }

@@ -37,9 +37,55 @@ struct HistoryItemRow: View {
     @Environment(\.colorScheme) var colorScheme
 
     @Binding var showCopyConfirmation: Bool
+    @Binding var showQRCodeSheet: Bool
+    @Binding var selectedItemForQRCode: ClipboardItem?
     
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
+
+    init(item: ClipboardItem,
+         index: Int,
+         showLineNumber: Bool,
+         itemToDelete: Binding<ClipboardItem?>,
+         showingDeleteConfirmation: Binding<Bool>,
+         selectedItemID: Binding<UUID?>,
+         dismissAction: @escaping () -> Void, // クロージャは@escapingをつける
+         showCopyConfirmation: Binding<Bool>,
+         showQRCodeSheet: Binding<Bool>,
+         selectedItemForQRCode: Binding<ClipboardItem?>,
+         lineNumberTextWidth: CGFloat?,
+         trailingPaddingForLineNumber: CGFloat) {
+        
+        self.item = item
+        self.index = index
+        self.showLineNumber = showLineNumber
+        _itemToDelete = itemToDelete
+        _showingDeleteConfirmation = showingDeleteConfirmation
+        _selectedItemID = selectedItemID
+        self.dismissAction = dismissAction
+        _showCopyConfirmation = showCopyConfirmation
+        _showQRCodeSheet = showQRCodeSheet
+        _selectedItemForQRCode = selectedItemForQRCode
+        self.lineNumberTextWidth = lineNumberTextWidth
+        self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
+    }
+
+    private var actionMenuItems: some View {
+        Group {
+            Button("コピー") {
+                copyToClipboard(item.text)
+                showCopyConfirmation = true
+            }
+            Button("QRコードを表示") {
+                showQRCodeSheet = true
+                selectedItemForQRCode = item
+            }
+            Button("削除", role: .destructive) {
+                itemToDelete = item
+                showingDeleteConfirmation = true
+            }
+        }
+    }
 
     var body: some View {
         HStack {
@@ -65,14 +111,7 @@ struct HistoryItemRow: View {
             Spacer()
 
             Menu {
-                Button("コピー") {
-                    copyToClipboard(item.text)
-                    showCopyConfirmation = true
-                }
-                Button("削除", role: .destructive) {
-                    itemToDelete = item
-                    showingDeleteConfirmation = true
-                }
+                actionMenuItems
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .imageScale(.large)
@@ -102,6 +141,9 @@ struct HistoryWindowView: View {
     @State private var searchTask: Task<Void, Never>? = nil
     @State private var showCopyConfirmation: Bool = false
     @State private var currentCopyConfirmationTask: Task<Void, Never>? = nil
+    
+    @State private var showQRCodeSheet: Bool = false
+    @State private var selectedItemForQRCode: ClipboardItem?
 
     @FocusState private var isSearchFieldFocused: Bool
 
@@ -237,6 +279,8 @@ struct HistoryWindowView: View {
                                     selectedItemID: $selectedItemID,
                                     dismissAction: { dismiss() },
                                     showCopyConfirmation: $showCopyConfirmation,
+                                    showQRCodeSheet: $showQRCodeSheet,
+                                    selectedItemForQRCode: $selectedItemForQRCode,
                                     lineNumberTextWidth: lineNumberTextWidth,
                                     trailingPaddingForLineNumber: trailingPaddingForLineNumber
                                 )
@@ -261,6 +305,10 @@ struct HistoryWindowView: View {
                                                 showCopyConfirmation = false
                                             }
                                         }
+                                    }
+                                    Button("QRコードを表示") {
+                                        showQRCodeSheet = true
+                                        selectedItemForQRCode = currentItem
                                     }
                                     Button("削除", role: .destructive) {
                                         itemToDelete = currentItem
@@ -364,6 +412,11 @@ struct HistoryWindowView: View {
             }
         } message: {
             Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？")
+        }
+        .sheet(isPresented: $showQRCodeSheet) {
+            if let item = selectedItemForQRCode {
+                QRCodeView(text: item.text)
+            }
         }
     }
 }
