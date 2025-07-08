@@ -32,6 +32,7 @@ struct StandardPhraseItemRow: View {
     @Binding var showCopyConfirmation: Bool
     @Binding var showQRCodeSheet: Bool
     @Binding var selectedPhraseForQRCode: StandardPhrase?
+    @Binding var phraseToEdit: StandardPhrase?
 
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
@@ -64,6 +65,9 @@ struct StandardPhraseItemRow: View {
                 Button("コピー") {
                     copyToClipboard(phrase.content)
                     showCopyConfirmation = true
+                }
+                Button("編集...") {
+                    phraseToEdit = phrase // 編集対象のフレーズをセット
                 }
                 Button("QRコードを表示") {
                     selectedPhraseForQRCode = phrase
@@ -103,6 +107,7 @@ struct StandardPhraseWindowView: View {
     @State private var currentCopyConfirmationTask: Task<Void, Never>? = nil
     @State private var showQRCodeSheet: Bool = false
     @State private var selectedPhraseForQRCode: StandardPhrase?
+    @State private var phraseToEdit: StandardPhrase? = nil
 
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbers: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
@@ -231,8 +236,9 @@ struct StandardPhraseWindowView: View {
                                     showingDeleteConfirmation: $showingDeleteConfirmation,
                                     selectedPhraseID: $selectedPhraseID,
                                     showCopyConfirmation: $showCopyConfirmation,
-                                    showQRCodeSheet: $showQRCodeSheet, // ここにバインディングを渡す
-                                    selectedPhraseForQRCode: $selectedPhraseForQRCode, // ここにバインディングを渡す
+                                    showQRCodeSheet: $showQRCodeSheet,
+                                    selectedPhraseForQRCode: $selectedPhraseForQRCode,
+                                    phraseToEdit: $phraseToEdit,
                                     lineNumberTextWidth: lineNumberTextWidth,
                                     trailingPaddingForLineNumber: trailingPaddingForLineNumber
                                 )
@@ -257,6 +263,9 @@ struct StandardPhraseWindowView: View {
                                                 showCopyConfirmation = false
                                             }
                                         }
+                                    }
+                                    Button("編集...") {
+                                        phraseToEdit = currentPhrase // 編集対象のフレーズをセット
                                     }
                                     Button("QRコードを表示") {
                                         selectedPhraseForQRCode = currentPhrase
@@ -350,6 +359,10 @@ struct StandardPhraseWindowView: View {
             if let phrase = selectedPhraseForQRCode {
                 QRCodeView(text: phrase.content)
             }
+        }
+        .sheet(item: $phraseToEdit) { phrase in // phraseToEditがnilでない場合にシートが表示される
+            AddEditPhraseView(mode: .edit(phrase)) // 編集モードで表示し、対象のフレーズを渡す
+                .environmentObject(standardPhraseManager)
         }
         .onAppear {
             performSearch(searchTerm: searchText)
