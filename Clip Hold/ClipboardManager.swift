@@ -290,3 +290,19 @@ class ClipboardManager: ObservableObject {
         }
     }
 }
+extension ClipboardManager {
+    func addHistoryItem(text: String) {
+        // 同じ内容のものが連続してコピーされた場合は追加しない
+        if let lastItem = clipboardHistory.first, lastItem.text == text {
+            print("ClipboardManager: Duplicate item detected via addHistoryItem, skipping. Text: \(text.prefix(50))...")
+            return
+        }
+
+        let newItem = ClipboardItem(text: text, date: Date())
+        clipboardHistory.insert(newItem, at: 0) // 先頭に追加
+        print("ClipboardManager: New item added via addHistoryItem. Total history: \(clipboardHistory.count)")
+
+        // 最大履歴数を超過した場合の処理を適用
+        enforceMaxHistoryCount()
+    }
+}
