@@ -2130,6 +2130,22 @@
         }
       }
     },
+    "メニュー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニュー"
+          }
+        }
+      }
+    },
     "メニューに表示する定型文の最大数" : {
       "localizations" : {
         "en" : {
