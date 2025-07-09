@@ -274,14 +274,14 @@ struct GeneralSettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("QRコード画像をスキャンする")
-                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。")
+                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーしたときに、QRコードの内容が履歴に追加されます。")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $scanQRCodeImage) {
                         Text("QRコード画像をスキャンする")
-                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。")
+                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーしたときに、QRコードの内容が履歴に追加されます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
