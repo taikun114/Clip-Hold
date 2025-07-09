@@ -157,10 +157,13 @@ struct HistoryWindowView: View {
 
     @State private var itemForNewPhrase: ClipboardItem? = nil
 
+    @State private var previousClipboardHistoryCount: Int = 0 // 新しく追加
+
     @FocusState private var isSearchFieldFocused: Bool
 
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false // 追加
 
     private var lineNumberTextWidth: CGFloat? {
         guard showLineNumbersInHistoryWindow, !filteredHistory.isEmpty else { return nil }
@@ -279,10 +282,10 @@ struct HistoryWindowView: View {
                             isLoading = false
                         }
                     }
-                    .onChange(of: clipboardManager.clipboardHistory) { _, _ in
-                        performSearch(searchTerm: searchText)
+                    .onChange(of: clipboardManager.clipboardHistory.count) { oldVal, newVal in
+                        performSearch(searchTerm: searchText) // 履歴が変更されたら、検索結果を更新
                     }
-                    
+
                     Spacer(minLength: 10)
 
                     ZStack { // Listまたはメッセージが表示されるZStack
@@ -296,33 +299,60 @@ struct HistoryWindowView: View {
                                 Spacer()
                             }
                         } else {
-                            List(filteredHistory, selection: $selectedItemID) { item in
-                                HistoryItemRow(
-                                    item: item,
-                                    index: filteredHistory.firstIndex(where: { $0.id == item.id }) ?? 0,
-                                    showLineNumber: showLineNumbersInHistoryWindow,
-                                    itemToDelete: $itemToDelete,
-                                    showingDeleteConfirmation: $showingDeleteConfirmation,
-                                    selectedItemID: $selectedItemID,
-                                    dismissAction: { dismiss() },
-                                    showCopyConfirmation: $showCopyConfirmation,
-                                    showQRCodeSheet: $showQRCodeSheet,
-                                    selectedItemForQRCode: $selectedItemForQRCode,
-                                    itemForNewPhrase: $itemForNewPhrase,
-                                    lineNumberTextWidth: lineNumberTextWidth,
-                                    trailingPaddingForLineNumber: trailingPaddingForLineNumber
-                                )
-                                .tag(item.id)
-                                .listRowBackground(Color.clear)
-                            }
-                            .accessibilityLabel("履歴リスト")
-                            .listStyle(.plain)
-                            .scrollContentBackground(.hidden)
-                            .blur(radius: isLoading ? 5 : 0)
-                            .animation(.easeOut(duration: 0.2), value: isLoading)
-                            .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
-                                if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
-                                    Button("コピー") {
+                            ScrollViewReader { scrollViewProxy in // ここにScrollViewReaderを追加
+                                List(filteredHistory, selection: $selectedItemID) { item in
+                                    HistoryItemRow(
+                                        item: item,
+                                        index: filteredHistory.firstIndex(where: { $0.id == item.id }) ?? 0,
+                                        showLineNumber: showLineNumbersInHistoryWindow,
+                                        itemToDelete: $itemToDelete,
+                                        showingDeleteConfirmation: $showingDeleteConfirmation,
+                                        selectedItemID: $selectedItemID,
+                                        dismissAction: { dismiss() },
+                                        showCopyConfirmation: $showCopyConfirmation,
+                                        showQRCodeSheet: $showQRCodeSheet,
+                                        selectedItemForQRCode: $selectedItemForQRCode,
+                                        itemForNewPhrase: $itemForNewPhrase,
+                                        lineNumberTextWidth: lineNumberTextWidth,
+                                        trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                    )
+                                    .tag(item.id)
+                                    .listRowBackground(Color.clear)
+                                }
+                                .accessibilityLabel("履歴リスト")
+                                .listStyle(.plain)
+                                .scrollContentBackground(.hidden)
+                                .blur(radius: isLoading ? 5 : 0)
+                                .animation(.easeOut(duration: 0.2), value: isLoading)
+                                .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
+                                    if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
+                                        Button("コピー") {
+                                            copyToClipboard(currentItem.text)
+                                            showCopyConfirmation = true
+                                            currentCopyConfirmationTask?.cancel()
+                                            currentCopyConfirmationTask = Task { @MainActor in
+                                                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
+                                                guard !Task.isCancelled else { return }
+                                                withAnimation {
+                                                    showCopyConfirmation = false
+                                                }
+                                            }
+                                        }
+                                        Button("項目から定型文を作成...") {
+                                            itemForNewPhrase = currentItem // ここでClipboardItemをセット
+                                        }
+                                        Button("QRコードを表示...") {
+                                            showQRCodeSheet = true
+                                            selectedItemForQRCode = currentItem
+                                        }
+                                        Divider()
+                                        Button("削除...", role: .destructive) {
+                                            itemToDelete = currentItem
+                                            showingDeleteConfirmation = true
+                                        }
+                                    }
+                                }, primaryAction: { selectedIDs in
+                                    if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
                                         copyToClipboard(currentItem.text)
                                         showCopyConfirmation = true
                                         currentCopyConfirmationTask?.cancel()
@@ -333,57 +363,44 @@ struct HistoryWindowView: View {
                                                 showCopyConfirmation = false
                                             }
                                         }
-                                    }
-                                    Button("項目から定型文を作成...") {
-                                        itemForNewPhrase = currentItem // ここでClipboardItemをセット
-                                    }
-                                    Button("QRコードを表示...") {
-                                        showQRCodeSheet = true
-                                        selectedItemForQRCode = currentItem
-                                    }
-                                    Divider()
-                                    Button("削除...", role: .destructive) {
-                                        itemToDelete = currentItem
-                                        showingDeleteConfirmation = true
-                                    }
-                                }
-                            }, primaryAction: { selectedIDs in
-                                if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
-                                    copyToClipboard(currentItem.text)
-                                    showCopyConfirmation = true
-                                    currentCopyConfirmationTask?.cancel()
-                                    currentCopyConfirmationTask = Task { @MainActor in
-                                        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                        guard !Task.isCancelled else { return }
-                                        withAnimation {
-                                            showCopyConfirmation = false
+                                        if !preventWindowCloseOnDoubleClick {
+                                            dismiss()
                                         }
                                     }
-                                    if !preventWindowCloseOnDoubleClick {
-                                        dismiss()
-                                    }
-                                }
-                            })
-                            .onDrop(of: [.image], isTargeted: nil) { providers in
-                                guard let itemProvider = providers.first else { return false }
+                                })
+                                .onDrop(of: [.image], isTargeted: nil) { providers in
+                                    guard let itemProvider = providers.first else { return false }
 
-                                itemProvider.loadObject(ofClass: NSImage.self) { (image, error) in
-                                    DispatchQueue.main.async {
-                                        if let nsImage = image as? NSImage {
-                                            if let qrCodeContent = parseQRCode(from: nsImage) {
-                                                clipboardManager.addHistoryItem(text: qrCodeContent)
-                                                copyToClipboard(qrCodeContent)
-                                            } else {
-                                                // QRコードが見つからなかった場合の処理
-                                                print("QRコードが見つかりませんでした。")
+                                    itemProvider.loadObject(ofClass: NSImage.self) { (image, error) in
+                                        DispatchQueue.main.async {
+                                            if let nsImage = image as? NSImage {
+                                                if let qrCodeContent = parseQRCode(from: nsImage) {
+                                                    clipboardManager.addHistoryItem(text: qrCodeContent)
+                                                    copyToClipboard(qrCodeContent)
+                                                } else {
+                                                    // QRコードが見つからなかった場合の処理
+                                                    print("QRコードが見つかりませんでした。")
+                                                }
+                                            } else if let error = error {
+                                                print("画像のロードに失敗しました: \(error.localizedDescription)")
                                             }
-                                        } else if let error = error {
-                                            print("画像のロードに失敗しました: \(error.localizedDescription)")
                                         }
                                     }
+                                    return true
                                 }
-                                return true
-                            }
+                                .onChange(of: filteredHistory) { _, newValue in
+                                    // filteredHistory が更新され、かつscrollToTopOnUpdateがtrue、かつ検索中でない場合
+                                    // さらに、元の履歴の数が変わった場合のみに限定する
+                                    if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && newValue.count > previousClipboardHistoryCount {
+                                        if let firstId = newValue.first?.id {
+                                            withAnimation {
+                                                scrollViewProxy.scrollTo(firstId, anchor: .top)
+                                            }
+                                        }
+                                    }
+                                    previousClipboardHistoryCount = newValue.count // 現在の履歴数を保存
+                                }
+                            } // ScrollViewReaderの終わり
                         }
                         if isLoading {
                             ProgressView()
