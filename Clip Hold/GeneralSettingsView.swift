@@ -190,6 +190,7 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
+            // MARK: - Clip Holdの設定
             Section(header: Text("Clip Holdの設定").font(.headline)) {
                 HStack {
                     Text("ログイン時に開く")
@@ -253,6 +254,43 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("クイックペースト")
+                        Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $quickPaste) {
+                        Text("クイックペースト")
+                        Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("QRコード画像をスキャンする")
+                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $scanQRCodeImage) {
+                        Text("QRコード画像をスキャンする")
+                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            } // End of Section: Clip Holdの設定
+
+            // MARK: - メニュー
+            Section(header: Text("メニュー").font(.headline)) {
                 // メニューに表示する定型文の最大数
                 HStack {
                     Text("メニューに表示する定型文の最大数:")
@@ -339,23 +377,6 @@ struct GeneralSettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("クイックペースト")
-                        Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $quickPaste) {
-                        Text("クイックペースト")
-                        Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                HStack {
-                    VStack(alignment: .leading) {
                         Text("メニューバーアイコンを一時的に非表示")
                         Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
                             .font(.caption)
@@ -370,25 +391,9 @@ struct GeneralSettingsView: View {
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            } // End of Section: メニュー
 
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("QRコード画像をスキャンする")
-                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $scanQRCodeImage) {
-                        Text("QRコード画像をスキャンする")
-                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーすると、QRコードの内容が履歴に追加されます。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            } // End of Section: Clip Holdの設定
-
+            // MARK: - 定型文ウィンドウ
             Section(header: Text("定型文ウィンドウ").font(.headline)) {
                 HStack {
                     Text("番号を表示する")
@@ -426,6 +431,7 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: 定型文ウィンドウ
 
+            // MARK: - 履歴をウィンドウ
             Section(header: Text("履歴ウィンドウ").font(.headline)) {
                 HStack {
                     Text("番号を表示する")
