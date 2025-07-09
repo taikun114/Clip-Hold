@@ -3266,6 +3266,22 @@
         }
       }
     },
+    "新しい定型文を追加する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a New Standard Phrase"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しい定型文を追加する"
+          }
+        }
+      }
+    },
     "既存: " : {
       "localizations" : {
         "en" : {

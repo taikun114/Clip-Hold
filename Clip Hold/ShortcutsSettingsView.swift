@@ -122,6 +122,19 @@ struct ShortcutsSettingsView: View {
                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 }
                 HStack {
+                    Text("新しい定型文を追加する")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .addSNewtandardPhrase)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.addSNewtandardPhrase)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+                HStack {
                     VStack(alignment: .leading) {
                         Text("クリップボードの内容から定型文を追加する")
                         Text("現在のクリップボード内容を使って新しい定型文を追加します。")
