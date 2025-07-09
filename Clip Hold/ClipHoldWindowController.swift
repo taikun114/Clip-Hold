@@ -10,6 +10,8 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate {
 
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
 
+    var applyTransparentBackground: Bool = true
+
     // MARK: - Initializers
     override init(window: NSWindow?) {
         super.init(window: window)
@@ -19,12 +21,13 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate {
         super.init(coder: coder)
     }
 
-    convenience init(wrappingWindow: NSWindow) {
+    convenience init(wrappingWindow: NSWindow, applyTransparentBackground: Bool = true) {
         self.init(window: wrappingWindow)
         self.window?.delegate = self
+        self.applyTransparentBackground = applyTransparentBackground // プロパティを設定
         print("ClipHoldWindowController: Initialized with window \(wrappingWindow.identifier?.rawValue ?? "unknown").")
         
-        applyWindowCustomizations(window: wrappingWindow)
+        applyWindowCustomizations(window: wrappingWindow) // 初期化時にカスタマイズを適用
     }
 
     // MARK: - NSWindowDelegate
@@ -65,12 +68,27 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate {
         // ドロップシャドウを有効にする (必要に応じて)
         window.hasShadow = true
         
-        // SwiftUIコンテンツの背景レイヤーもクリアに設定 (念のため)
-        if let contentView = window.contentView {
-            contentView.wantsLayer = true // レイヤーを使うことを宣言
-            contentView.layer?.backgroundColor = NSColor.clear.cgColor
-            print("ClipHoldWindowController: Set contentView layer backgroundColor to clear.")
-        }
+        if applyTransparentBackground {
+            // ウィンドウの背景を透明にする
+            window.isOpaque = false
+            window.backgroundColor = .clear
 
+            // SwiftUIコンテンツの背景レイヤーもクリアに設定 (念のため)
+            if let contentView = window.contentView {
+                contentView.wantsLayer = true // レイヤーを使うことを宣言
+                contentView.layer?.backgroundColor = NSColor.clear.cgColor
+                print("ClipHoldWindowController: Set contentView layer backgroundColor to clear.")
+            }
+        } else {
+            // 透明にしない場合 (デフォルトの不透明な背景に戻す)
+            window.isOpaque = true
+            window.backgroundColor = .windowBackgroundColor // システムの標準背景色
+
+            if let contentView = window.contentView {
+                contentView.wantsLayer = true
+                contentView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
+            }
+            print("ClipHoldWindowController: Set window and contentView background to opaque.")
+        }
     }
 }

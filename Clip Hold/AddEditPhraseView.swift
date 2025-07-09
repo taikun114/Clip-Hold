@@ -69,6 +69,7 @@ struct AddEditPhraseView: View {
                     dismiss()
                 }
                 .controlSize(.large)
+                .keyboardShortcut(.cancelAction)
 
                 Spacer()
                 Button(mode == .add ? "追加" : "保存") {
