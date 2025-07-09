@@ -11,6 +11,8 @@
 - Add the feature to create a standard phrase from the clipboard contents.
   - Added shortcut key to add a standard phrase from the current clipboard contents.
   - Added the feature to add a standard phrase from an item in the History Window.
+- Add the feature to automatically scroll to the top when the history list is updated
+  - You can use it by enabling “Scroll to the Top When the List is Updated” in the settings.
 
 ### Bug Fixes and Improvements
 - Improve the context menu in the Standard Phrase Window and History Window
