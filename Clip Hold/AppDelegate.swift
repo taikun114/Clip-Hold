@@ -87,13 +87,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 backing: .buffered,
                 defer: false
             )
-            window.setFrameAutosaveName("HistoryWindow")
-            window.center()
+
             window.identifier = NSUserInterfaceItemIdentifier("HistoryWindow")
 
             window.contentViewController = hostingController
             
-            historyWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: true)
+            historyWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: true, windowFrameAutosaveKey: "HistoryWindowFrame")
             historyWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
@@ -124,13 +123,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 backing: .buffered,
                 defer: false
             )
-            window.setFrameAutosaveName("StandardPhraseWindow")
-            window.center()
+
             window.identifier = NSUserInterfaceItemIdentifier("StandardPhraseWindow")
 
             window.contentViewController = hostingController
             
-            standardPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: true)
+            standardPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: true, windowFrameAutosaveKey: "StandardPhraseWindowFrame")
             standardPhraseWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
