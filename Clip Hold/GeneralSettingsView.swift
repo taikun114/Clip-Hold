@@ -83,6 +83,7 @@ struct GeneralSettingsView: View {
 
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false // 追加
 
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbersInStandardPhraseWindow: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
@@ -462,6 +463,17 @@ struct GeneralSettingsView: View {
                     Toggle(isOn: $historyWindowAlwaysOnTop) {
                         Text("履歴ウィンドウを常に最前面に表示")
                         Text("履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    Text("リストが更新されたら最も上にスクロールする")
+                    Spacer()
+                    Toggle(isOn: $scrollToTopOnUpdate) {
+                        Text("リストが更新されたら最も上にスクロールする")
+                        Text("履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()

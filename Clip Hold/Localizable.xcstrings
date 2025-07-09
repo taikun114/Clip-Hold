@@ -2290,6 +2290,22 @@
         }
       }
     },
+    "リストが更新されたら最も上にスクロールする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll to the Top When the List is Updated"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リストが更新されたら最も上にスクロールする"
+          }
+        }
+      }
+    },
     "リポジトリにスターをつけてくれるととてもうれしいです！" : {
       "localizations" : {
         "en" : {
@@ -3054,6 +3070,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴リスト"
+          }
+        }
+      }
+    },
+    "履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle to automatically scroll to the top when the history list is updated."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。"
           }
         }
       }
