@@ -2,6 +2,7 @@
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
 ## 1.1.0 (under development)
+### New Features
 - Add the feature to create a QR Code from copied text
   - Click “Show QR Code” in the item options of the History Window and Standard Phrases Window to generate a QR Code.
 - Add the feature to copy an image that contains a QR code to add the content to the history.
@@ -10,11 +11,15 @@
 - Add the feature to create a standard phrase from the clipboard contents.
   - Added shortcut key to add a standard phrase from the current clipboard contents.
   - Added the feature to add a standard phrase from an item in the History Window.
+
+### Bug Fixes and Improvements
 - Improve the context menu in the Standard Phrase Window and History Window
   - Items that show an additional screen now have a trailing “...” and added a divider line above “Delete...”.
 - Improve placement in General settings
+- Fix the Standard Phrase Window and the History Window to remember the correct position
 
 ## 1.0.1
+### Bug Fixes and Improvements
 - Add accessibility labels
   - Descriptions have been added to help VoiceOver users understand items.
 - Add option to temporarily hide menu bar icon
