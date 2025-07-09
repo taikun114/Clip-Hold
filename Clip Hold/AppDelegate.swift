@@ -4,12 +4,12 @@ import UserNotifications
 import KeyboardShortcuts
 
 // アプリケーションのデリゲートクラス
-class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, NSWindowDelegate {
 
     var historyWindowController: ClipHoldWindowController?
     var standardPhraseWindowController: ClipHoldWindowController?
 
-    private var addPhraseWindow: NSWindow?
+    private var addPhraseWindowController: ClipHoldWindowController?
 
     let resumeMonitoringActionID = "RESUME_MONITORING_ACTION"
     let clipboardPausedNotificationCategory = "CLIPBOARD_PAUSED_CATEGORY"
@@ -93,7 +93,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
             window.contentViewController = hostingController
             
-            historyWindowController = ClipHoldWindowController(wrappingWindow: window)
+            historyWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: true)
             historyWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
@@ -106,7 +106,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
         
         if let window = historyWindowController?.window {
-            historyWindowController?.applyWindowCustomizations(window: window)
             window.level = UserDefaults.standard.bool(forKey: "historyWindowAlwaysOnTop") ? .floating : .normal
         }
     }
@@ -131,7 +130,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
             window.contentViewController = hostingController
             
-            standardPhraseWindowController = ClipHoldWindowController(wrappingWindow: window)
+            standardPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: true)
             standardPhraseWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
@@ -144,41 +143,80 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
         
         if let window = standardPhraseWindowController?.window {
-            standardPhraseWindowController?.applyWindowCustomizations(window: window)
             window.level = UserDefaults.standard.bool(forKey: "standardPhraseWindowAlwaysOnTop") ? .floating : .normal
         }
     }
 
     func showAddPhraseWindow(withContent content: String) {
-        // addPhraseWindow が nil または既に閉じられている場合のみ新しいウィンドウを作成
-        if addPhraseWindow == nil || addPhraseWindow?.isVisible == false {
-            let contentView = AddEditPhraseView(mode: .add, initialContent: content) // クリップボードの内容を初期値として渡す
+        if addPhraseWindowController == nil || addPhraseWindowController?.window == nil {
+            let contentView = AddEditPhraseView(mode: .add, initialContent: content)
                 .environmentObject(StandardPhraseManager.shared)
 
-            addPhraseWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 350),
-                styleMask: [.titled, .closable, .miniaturizable, .resizable],
-                backing: .buffered, defer: false)
+            let hostingController = NSHostingController(rootView: AnyView(contentView))
+
+            var windowRect = NSRect(x: 0, y: 0, width: 400, height: 350) // ウィンドウの固定サイズを設定
             
-            addPhraseWindow?.center()
-            addPhraseWindow?.setFrameAutosaveName("AddPhraseWindow")
-            addPhraseWindow?.contentView = NSHostingView(rootView: contentView)
-            addPhraseWindow?.identifier = NSUserInterfaceItemIdentifier("AddPhraseWindow") // 識別子を追加
+            if let screenFrame = NSScreen.main?.visibleFrame {
+                // スクリーンの中央に配置するためのX座標とY座標を計算
+                let x = screenFrame.minX + (screenFrame.width - windowRect.width) / 2
+                let y = screenFrame.minY + (screenFrame.height - windowRect.height) / 2
+                windowRect.origin = NSPoint(x: x, y: y) // 計算した座標をウィンドウの原点に設定
+                print("AppDelegate: Calculated window origin: (\(x), \(y)) for screen frame: \(screenFrame)")
+            } else {
+                print("AppDelegate: Could not get main screen frame, falling back to default window position.")
+                // スクリーン情報が取得できない場合のフォールバック（このままでもデフォルトで左上から表示される）
+            }
+
+            let window = NSWindow(
+                contentRect: windowRect,
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered, defer: false)
+
+            window.contentViewController = hostingController
+            window.identifier = NSUserInterfaceItemIdentifier("AddPhraseWindow")
+
+            // ClipHoldWindowController でウィンドウをラップ
+            addPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: false)
+
+            // ウィンドウのデリゲートを設定 (AppDelegateが最終的なデリゲートになる)
+            addPhraseWindowController?.window?.delegate = self
+
             print("AppDelegate: Add Phrase window created.")
 
         } else {
             // 既存のウィンドウがある場合は、コンテンツを更新して前面に表示
             print("AppDelegate: Add Phrase window already exists. Updating content and bringing to front.")
-            if let window = addPhraseWindow {
-                // コンテンツビューを更新して、新しいクリップボードの内容を反映
+            if let window = addPhraseWindowController?.window { // Controller 経由でウィンドウにアクセス
+                // newContentView を、if/else ブロックの外側に移動し、両方からアクセス可能にする
                 let newContentView = AddEditPhraseView(mode: .add, initialContent: content)
                     .environmentObject(StandardPhraseManager.shared)
-                window.contentView = NSHostingView(rootView: newContentView)
+
+                // 既存の NSHostingController の rootView を AnyView としてキャストし、新しい AnyView で更新
+                if let existingHostingController = window.contentViewController as? NSHostingController<AnyView> {
+                    existingHostingController.rootView = AnyView(newContentView)
+                } else {
+                    // もし contentViewController が期待する型でない場合は、新しいものに置き換える
+                    window.contentViewController = NSHostingController(rootView: AnyView(newContentView))
+                }
             }
         }
         // ウィンドウを表示し、アプリをアクティブにする
-        addPhraseWindow?.makeKeyAndOrderFront(nil)
+        addPhraseWindowController?.showWindow(nil) // Controller 経由で表示
+        addPhraseWindowController?.window?.makeKeyAndOrderFront(nil) // 最前面に表示
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    // MARK: - NSWindowDelegate
+    func windowWillClose(_ notification: Notification) {
+        if let closedWindow = notification.object as? NSWindow, closedWindow == addPhraseWindowController?.window {
+            print("AppDelegate: Add Phrase window will close. Setting addPhraseWindowController to nil (async).")
+            // ここで参照をnilにするのを遅延させ、システムがウィンドウのクローズ処理を完了する時間を確保する
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.addPhraseWindowController = nil
+                print("AppDelegate: addPhraseWindowController set to nil asynchronously.")
+            }
+        }
     }
 
     // MARK: - Application Delegate Methods for Reopening
