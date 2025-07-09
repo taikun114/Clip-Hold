@@ -12,6 +12,7 @@
   - Added the feature to add a standard phrase from an item in the History Window.
 - Improve the context menu in the Standard Phrase Window and History Window
   - Items that show an additional screen now have a trailing “...” and added a divider line above “Delete...”.
+- Improve placement in General settings
 
 ## 1.0.1
 - Add accessibility labels
