@@ -18,6 +18,8 @@
 - Improve the context menu in the Standard Phrase Window and History Window
   - Items that show an additional screen now have a trailing “...” and added a divider line above “Delete...”.
 - Improve placement in General settings
+- Improve the Standard Phrases Window to be able to reorder items.
+  - You can reorder only if you are not searching.
 - Fix the Standard Phrase Window and the History Window to remember the correct position
 
 ## 1.0.1
