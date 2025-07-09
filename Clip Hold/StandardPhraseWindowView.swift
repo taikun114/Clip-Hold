@@ -143,6 +143,13 @@ struct StandardPhraseWindowView: View {
         self.filteredPhrases = newFilteredPhrases
     }
 
+    private func movePhrases(from source: IndexSet, to destination: Int) {
+        // 検索中の場合は並び替えを許可しない
+        if searchText.isEmpty {
+            standardPhraseManager.movePhrase(from: source, to: destination)
+        }
+    }
+
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
             if #available(macOS 26, *) {
@@ -234,23 +241,47 @@ struct StandardPhraseWindowView: View {
                                 Spacer()
                             }
                         } else {
-                            List(filteredPhrases, selection: $selectedPhraseID) { phrase in
-                                StandardPhraseItemRow(
-                                    phrase: phrase,
-                                    index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                    showLineNumber: showLineNumbers,
-                                    phraseToDelete: $phraseToDelete,
-                                    showingDeleteConfirmation: $showingDeleteConfirmation,
-                                    selectedPhraseID: $selectedPhraseID,
-                                    showCopyConfirmation: $showCopyConfirmation,
-                                    showQRCodeSheet: $showQRCodeSheet,
-                                    selectedPhraseForQRCode: $selectedPhraseForQRCode,
-                                    phraseToEdit: $phraseToEdit,
-                                    lineNumberTextWidth: lineNumberTextWidth,
-                                    trailingPaddingForLineNumber: trailingPaddingForLineNumber
-                                )
-                                .tag(phrase.id)
-                                .listRowBackground(Color.clear)
+                            List(selection: $selectedPhraseID) {
+                                if searchText.isEmpty {
+                                    ForEach(filteredPhrases) { phrase in
+                                        StandardPhraseItemRow(
+                                            phrase: phrase,
+                                            index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
+                                            showLineNumber: showLineNumbers,
+                                            phraseToDelete: $phraseToDelete,
+                                            showingDeleteConfirmation: $showingDeleteConfirmation,
+                                            selectedPhraseID: $selectedPhraseID,
+                                            showCopyConfirmation: $showCopyConfirmation,
+                                            showQRCodeSheet: $showQRCodeSheet,
+                                            selectedPhraseForQRCode: $selectedPhraseForQRCode,
+                                            phraseToEdit: $phraseToEdit,
+                                            lineNumberTextWidth: lineNumberTextWidth,
+                                            trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                        )
+                                        .tag(phrase.id)
+                                        .listRowBackground(Color.clear)
+                                    }
+                                    .onMove(perform: movePhrases)
+                                } else {
+                                    ForEach(filteredPhrases) { phrase in
+                                        StandardPhraseItemRow(
+                                            phrase: phrase,
+                                            index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
+                                            showLineNumber: showLineNumbers,
+                                            phraseToDelete: $phraseToDelete,
+                                            showingDeleteConfirmation: $showingDeleteConfirmation,
+                                            selectedPhraseID: $selectedPhraseID,
+                                            showCopyConfirmation: $showCopyConfirmation,
+                                            showQRCodeSheet: $showQRCodeSheet,
+                                            selectedPhraseForQRCode: $selectedPhraseForQRCode,
+                                            phraseToEdit: $phraseToEdit,
+                                            lineNumberTextWidth: lineNumberTextWidth,
+                                            trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                        )
+                                        .tag(phrase.id)
+                                        .listRowBackground(Color.clear)
+                                    }
+                                }
                             }
                             .accessibilityLabel("定型文リスト")
                             .listStyle(.plain)
