@@ -4,15 +4,15 @@
 ![Clip Hold Clipboard and Standard Phrase Manager](docs/images/Clip-Hold_Banner.png)
 
 <p align="center">
-  <a href=“https://github.com/taikun114/Clip-Hold">
+  <a href="https://github.com/taikun114/Clip-Hold">
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/taikun114/Clip-Hold?style=for-the-badge&labelColor=131838&color=f2f4ff">
   </a>
   &nbsp;
-  <a href=“https://github.com/taikun114/Clip-Hold/releases/latest">
+  <a href="https://github.com/taikun114/Clip-Hold/releases/latest">
     <img alt="GitHub Release" src="https://img.shields.io/github/v/release/taikun114/Clip-Hold?sort=semver&display_name=tag&style=for-the-badge&labelColor=131838&color=f2f4ff">
   </a>
   &nbsp;
-  <a href=“https://github.com/taikun114/Clip-Hold/releases/latest">
+  <a href="https://github.com/taikun114/Clip-Hold/releases/latest">
     <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/taikun114/Clip-Hold/total?style=for-the-badge&labelColor=131838&color=f2f4ff">
   </a>
 </p>
@@ -56,7 +56,7 @@ Clip Hold can be downloaded for free from the [**release page**](https://github.
 
 
 <a href="https://apps.apple.com/jp/app/clip-hold/id6748125479?mt=12&itscg=30200&itsct=apps_box_badge&mttnsubad=6748125479" style="display: inline-block;">
-<img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1751760000" alt=“Download on the App Store" style="width: 246px; height: 82px; vertical-align: middle; object-fit: contain;" />
+<img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?releaseDate=1751760000" alt="Download on the App Store" style="width: 246px; height: 82px; vertical-align: middle; object-fit: contain;" />
 </a>
 
 ### System Requirements
@@ -90,7 +90,7 @@ Dedicated shortcut keys allow you to quickly copy up to 10 standard phrases and 
 ### Quickly Paste with Quick Paste
 ![Quick Paste](docs/images/Quick-Paste.gif)
 
-With the “Quick Paste” feature, when you copy an item from the menu or use a shortcut key, the copied content is immediately pasted. You don't need to paste it yourself.
+With the "Quick Paste” feature, when you copy an item from the menu or use a shortcut key, the copied content is immediately pasted. You don't need to paste it yourself.
 
 ### Import and Export Features
 ![Import and Export Features](docs/images/Import-Export.png)
@@ -99,7 +99,7 @@ Standard phrases and clipboard history can be imported and exported. You can sha
 
 ### Perfect Privacy
 Clip Hold does **not collect any user-related information**.\
-While usage data and crash reports may be shared if users have enabled “Share with app developers” under “Analytics & Improvements” in the System Settings' “Privacy & Security” section, the **app itself is entirely devoid of any functionality to collect or send user-related information**. Even if you are concerned about privacy, you can use it with confidence.
+While usage data and crash reports may be shared if users have enabled "Share with app developers” under "Analytics & Improvements” in the System Settings' "Privacy & Security” section, the **app itself is entirely devoid of any functionality to collect or send user-related information**. Even if you are concerned about privacy, you can use it with confidence.
 
 Below is an introduction of the privacy features included in the app.
 
@@ -122,7 +122,7 @@ If you find a bug or a behavior problem, please check the [**Issues**](https://g
 To make bug tracking easier, if you want to report more than one issue, please open a separate Issue for each problem. In other words, if you want to report two bugs, you must open two Issues.
 
 ### Feedback
-If you do not have a GitHub account and would like to report a bug, share an idea, or send a message to the developer (me), you can click [**this link**](mailto:contact.taikun@gmail.com?subject=Clip%20Hold%20Feedback:%20&body=Please%20describe%20your%20feedback%20in%20detail:%0D%0A%0D%0A%0D%0ASystem%20Information:%0D%0A%0D%0A-%20System%20%0D%0APlease%20enter%20your%20Mac%20model.%0D%0A%0D%0A%0D%0A-%20macOS%20Version%20%0D%0AIf%20you%20are%20experiencing%20problems,%20please%20enter%20the%20macOS%20version.%0D%0A%0D%0A%0D%0A-%20App%20Version%0D%0AIf%20you%20are%20experiencing%20problems,%20please%20enter%20the%20app%20version.%0D%0A%0D%0A) or click the “Send Feedback” button in the “Information” tab in the app settings to send an email (please note that I may not be able to reply to all messages).\
+If you do not have a GitHub account and would like to report a bug, share an idea, or send a message to the developer (me), you can click [**this link**](mailto:contact.taikun@gmail.com?subject=Clip%20Hold%20Feedback:%20&body=Please%20describe%20your%20feedback%20in%20detail:%0D%0A%0D%0A%0D%0ASystem%20Information:%0D%0A%0D%0A-%20System%20%0D%0APlease%20enter%20your%20Mac%20model.%0D%0A%0D%0A%0D%0A-%20macOS%20Version%20%0D%0AIf%20you%20are%20experiencing%20problems,%20please%20enter%20the%20macOS%20version.%0D%0A%0D%0A%0D%0A-%20App%20Version%0D%0AIf%20you%20are%20experiencing%20problems,%20please%20enter%20the%20app%20version.%0D%0A%0D%0A) or click the "Send Feedback” button in the "Information” tab in the app settings to send an email (please note that I may not be able to reply to all messages).\
 When you open the Send Email window from the button in the app, necessary information, such as Mac system information (Model ID, CPU architecture type, macOS version information) and app version information, will be pre-filled, so sending feedback from there is recommended.
 
 ### Community
@@ -131,7 +131,7 @@ Please use the page as a place to exchange information. I often look in on the p
 
 ## Support Developer
 ### Give It a Star to the Repository
-I would be so glad if you could open [**this page**](https://github.com/taikun114/Clip-Hold) and give it a star by clicking the “Star” button in the upper right corner!\
+I would be so glad if you could open [**this page**](https://github.com/taikun114/Clip-Hold) and give it a star by clicking the "Star” button in the upper right corner!\
 This button is like a upvote button, and it motivates me to continue development! This feature is free, so if you like Clip Hold, please give it a star!
 
 ### Donation
