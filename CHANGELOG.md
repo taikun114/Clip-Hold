@@ -1,7 +1,7 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
-## 1.1.0 (under development)
+## 1.1.0
 ### New Features
 - Add the feature to create a QR Code from copied text
   - Click “Show QR Code” in the item options of the History Window and Standard Phrases Window to generate a QR Code.
