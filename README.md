@@ -3,6 +3,20 @@
 
 ![Clip Hold Clipboard and Standard Phrase Manager](docs/images/Clip-Hold_Banner.png)
 
+<p align="center">
+  <a href=“https://github.com/taikun114/Clip-Hold">
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/taikun114/Clip-Hold?style=for-the-badge&labelColor=131838&color=f2f4ff">
+  </a>
+  &nbsp;
+  <a href=“https://github.com/taikun114/Clip-Hold/releases/latest">
+    <img alt="GitHub Release" src="https://img.shields.io/github/v/release/taikun114/Clip-Hold?sort=semver&display_name=tag&style=for-the-badge&labelColor=131838&color=f2f4ff">
+  </a>
+  &nbsp;
+  <a href=“https://github.com/taikun114/Clip-Hold/releases/latest">
+    <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/taikun114/Clip-Hold/total?style=for-the-badge&labelColor=131838&color=f2f4ff">
+  </a>
+</p>
+
 ## Table of Contents
 - [What is Clip Hold?](#what-is-clip-hold)
   - [Download](#download)
