@@ -1,3 +1,4 @@
+// HistoryWindowView.swift
 import SwiftUI
 import AppKit
 import CoreImage
@@ -21,8 +22,8 @@ private func copyToClipboard(_ item: ClipboardItem) {
     var success = false
 
     if let filePath = item.filePath {
+        // ファイルパスが存在する場合、ファイルとしてクリップボードにコピーを試みる
         // Option 1: NSURLオブジェクトを書き込む（既存の方法）
-        // これは引き続き試みますが、もしうまくいかなければ次へ
         let nsURL = filePath as NSURL
         if NSPasteboard.general.writeObjects([nsURL]) {
             print("クリップボードにファイルがコピーされました (NSURL): \(filePath.lastPathComponent)")
