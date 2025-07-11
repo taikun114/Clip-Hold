@@ -68,6 +68,16 @@
         }
       }
     },
+    "%lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld %2$@"
+          }
+        }
+      }
+    },
     "%lld." : {
       "shouldTranslate" : false
     },
@@ -974,6 +984,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カスタム: %lld"
+          }
+        }
+      }
+    },
+    "カスタム: %lld %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "カスタム: %1$lld %2$@"
           }
         }
       }
@@ -2018,6 +2038,15 @@
         }
       }
     },
+    "ファイル1つあたりの最大容量" : {
+
+    },
+    "ファイル1つあたりの最大容量:" : {
+
+    },
+    "ファイル1つあたりの最大容量を設定" : {
+
+    },
     "ファイルの選択に失敗しました: %@" : {
       "localizations" : {
         "en" : {
@@ -2465,6 +2494,9 @@
           }
         }
       }
+    },
+    "値を調整" : {
+
     },
     "入力エラー" : {
       "localizations" : {

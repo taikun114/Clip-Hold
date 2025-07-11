@@ -142,6 +142,85 @@ enum MenuHistoryOption: Hashable, Identifiable, CaseIterable {
     }
 }
 
+enum DataSizeUnit: String, CaseIterable, Identifiable, Hashable {
+    case bytes = "B"
+    case kilobytes = "KB"
+    case megabytes = "MB"
+    case gigabytes = "GB"
+
+    var id: String { self.rawValue }
+    var label: String { self.rawValue }
+
+    func byteValue(for value: Int) -> Int {
+        switch self {
+        case .bytes: return value
+        case .kilobytes: return value * 1000
+        case .megabytes: return value * 1000 * 1000
+        case .gigabytes: return value * 1000 * 1000 * 1000
+        }
+    }
+}
+
+// MARK: - DataSizeOption Enum
+enum DataSizeOption: Hashable, Identifiable, CaseIterable {
+    case preset(Int, DataSizeUnit) // value, unit
+    case custom(Int?, DataSizeUnit?) // value, unit (nil for "カスタム..." initial state)
+    case unlimited
+
+    var id: String {
+        switch self {
+        case .preset(let value, let unit): return "preset_\(value)_\(unit.rawValue)"
+        case .custom(let value, let unit):
+            if let val = value, let u = unit {
+                return "custom_value_\(val)_\(u.rawValue)"
+            } else {
+                return "custom_nil"
+            }
+        case .unlimited: return "unlimited"
+        }
+    }
+
+    var stringValue: LocalizedStringKey {
+        switch self {
+        case .preset(let value, let unit): return LocalizedStringKey("\(value) \(unit.label)")
+        case .custom(let value, let unit):
+            if let val = value, let u = unit {
+                return LocalizedStringKey("\(val) \(u.label)")
+            } else {
+                return "カスタム..."
+            }
+        case .unlimited: return "無制限"
+        }
+    }
+
+    // This property returns the byte value for the option.
+    var byteValue: Int? {
+        switch self {
+        case .preset(let value, let unit): return unit.byteValue(for: value)
+        case .custom(let value, let unit):
+            if let val = value, let u = unit {
+                return u.byteValue(for: val)
+            }
+            return nil // For custom(nil, nil)
+        case .unlimited: return 0 // Unlimited is represented as 0 bytes
+        }
+    }
+
+    static let presets: [DataSizeOption] = [
+        .preset(1, .megabytes),
+        .preset(50, .megabytes),
+        .preset(500, .megabytes),
+        .preset(1, .gigabytes)
+    ]
+
+    static var allCases: [DataSizeOption] {
+        var cases = DataSizeOption.presets
+        cases.append(.unlimited)
+        cases.append(.custom(nil, nil))
+        return cases
+    }
+}
+
 extension Hashable where Self: Identifiable {
     func isEqual(to other: Self) -> Bool {
         return self.id == other.id && self.hashValue == other.hashValue
