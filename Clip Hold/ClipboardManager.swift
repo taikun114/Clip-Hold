@@ -1,3 +1,4 @@
+// ClipboardManager.swift
 import Foundation
 import AppKit
 import SwiftUI
@@ -125,6 +126,82 @@ class ClipboardManager: ObservableObject {
         }
     }
 
+    // ヘルパー関数: ファイルの属性（サイズと変更日時）を取得
+    private func getFileAttributes(_ url: URL) -> (fileSize: UInt64?, modificationDate: Date?) {
+        do {
+            let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+            let fileSize = (attributes[.size] as? NSNumber)?.uint64Value
+            let modificationDate = attributes[.modificationDate] as? Date
+            return (fileSize, modificationDate)
+        } catch {
+            print("ClipboardManager: Error getting attributes for \(url.lastPathComponent): \(error.localizedDescription)")
+            return (nil, nil)
+        }
+    }
+
+    // ヘルパー関数: 元のファイル名を抽出
+    private func extractOriginalFileName(from fileName: String) -> String {
+        if let range = fileName.range(of: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-", options: .regularExpression) {
+            return String(fileName[range.upperBound...])
+        } else {
+            return fileName
+        }
+    }
+
+    // ヘルパー関数: ファイルURLからClipboardItemを作成（物理的な重複コピー防止ロジックを含む）
+    private func createClipboardItemForFileURL(_ fileURL: URL) -> ClipboardItem? {
+        let filesDirectory = createClipboardFilesDirectoryIfNeeded()
+        let filesDirectoryPath = filesDirectory?.path ?? ""
+        
+        if fileURL.path.hasPrefix(filesDirectoryPath) {
+            // 内部ファイルの場合（履歴から再コピーされたケースなど）
+            print("ClipboardManager: Detected file from our sandbox: \(fileURL.lastPathComponent)")
+            let displayName = extractOriginalFileName(from: fileURL.lastPathComponent)
+            return ClipboardItem(text: displayName, date: Date(), filePath: fileURL)
+        } else {
+            // 外部ファイルの場合（Finderなどからコピーされたケース）
+            print("ClipboardManager: External file detected: \(fileURL.lastPathComponent)")
+            
+            let externalFileAttributes = getFileAttributes(fileURL) // 外部ファイルの属性を取得
+            
+            // サンドボックス内の既存ファイルを走査し、重複をチェック
+            if let filesDirectory = filesDirectory { // filesDirectory が nil でないことを確認
+                do {
+                    let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                    
+                    for sandboxedFileURL in sandboxedFileContents {
+                        let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
+                        
+                        // ファイルサイズと最終変更日時が一致する場合、重複とみなす
+                        if let externalSize = externalFileAttributes.fileSize,
+                           let externalModDate = externalFileAttributes.modificationDate,
+                           let sandboxedSize = sandboxedFileAttributes.fileSize,
+                           let sandboxedModDate = sandboxedFileAttributes.modificationDate,
+                           externalSize == sandboxedSize && externalModDate == sandboxedModDate {
+                            
+                            print("ClipboardManager: Found potential duplicate in sandbox based on size/date: \(sandboxedFileURL.lastPathComponent)")
+                            // 重複が見つかった場合、既存のサンドボックスファイルを参照する新しいアイテムを返す
+                            let displayName = extractOriginalFileName(from: fileURL.lastPathComponent) // 表示名はFinderからコピーされた元のファイル名を使用
+                            return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL)
+                        }
+                    }
+                } catch {
+                    print("ClipboardManager: Error getting contents of sandbox directory for duplicate check: \(error.localizedDescription)")
+                }
+            }
+            
+            // 重複ファイルが見つからなかった場合、ファイルをサンドボックスにコピーして新しいアイテムを返す
+            if let copiedFileURL = copyFileToAppSandbox(from: fileURL) {
+                let displayName = extractOriginalFileName(from: fileURL.lastPathComponent)
+                return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL)
+            } else {
+                print("ClipboardManager: Failed to copy external file to sandbox: \(fileURL.lastPathComponent).")
+                return nil
+            }
+        }
+    }
+
+
     // MARK: - Clipboard Monitoring
     func startMonitoringPasteboard() {
         // 新しいタイマーを起動する前に、確実に既存のタイマーを無効化しnilにする
@@ -165,9 +242,7 @@ class ClipboardManager: ObservableObject {
         } else {
             print("DEBUG: stopMonitoringPasteboard: No active timer to stop.")
         }
-        // isMonitoringはobserverによって更新されるため、ここで明示的に設定する必要はないかもしれませんが、
-        // stopMonitoringPasteboardが呼び出された際の意図を明確にするために残します。
-        isMonitoring = false // observerが設定するためコメントアウト
+        isMonitoring = false
         print("ClipboardManager: Monitoring stopped. isMonitoring: \(self.isMonitoring)")
     }
 
@@ -191,101 +266,71 @@ class ClipboardManager: ObservableObject {
                 }
             }
 
-            var itemProcessed = false // いずれかのアイテムタイプが正常に処理されたかどうかを示すフラグ
-
-            // ファイルURLを処理するためのヘルパー関数
-            func processFileURL(_ fileURL: URL) {
-                let filesDirectory = createClipboardFilesDirectoryIfNeeded()
-                let filesDirectoryPath = filesDirectory?.path ?? ""
-                
-                // ファイルがアプリのサンドボックス内に既に存在するかどうかを判定
-                if fileURL.path.hasPrefix(filesDirectoryPath) {
-                    // 内部ファイルの場合
-                    print("ClipboardManager: Detected file from our sandbox: \(fileURL.lastPathComponent)")
-                    
-                    // 「移動」ではなく「追加」を希望されているため、既存アイテムの移動は行わない。
-                    // 代わりに、既存のサンドボックスファイルを参照する新しいClipboardItemを作成する。
-                    let displayName = extractOriginalFileName(from: fileURL.lastPathComponent)
-                    let newItem = ClipboardItem(text: displayName, date: Date(), filePath: fileURL)
-                    
-                    // 履歴に同じfilePathを持つアイテムが既に存在するかのチェックは、
-                    // 「追加」の意図を尊重し、ここでは行わない。
-                    // ただし、全く同じ内容の重複を避けるためのチェックは別途検討してもよい。
-                    
-                    // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
-                    self.objectWillChange.send()
-                    clipboardHistory.insert(newItem, at: 0)
-                    print("ClipboardManager: New ClipboardItem created for existing sandboxed file (added to history): \(displayName)")
-                    itemProcessed = true
-                } else {
-                    // 外部ファイルの場合、サンドボックスにコピー
-                    print("ClipboardManager: External file detected: \(fileURL.lastPathComponent)")
-                    if let copiedFileURL = copyFileToAppSandbox(from: fileURL) {
-                        let displayName = extractOriginalFileName(from: fileURL.lastPathComponent)
-                        let newItem = ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL)
-
-                        // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
-                        self.objectWillChange.send()
-                        clipboardHistory.insert(newItem, at: 0)
-                        print("ClipboardManager: External file copied and new ClipboardItem created: \(copiedFileURL.path)")
-                        itemProcessed = true
-                    } else {
-                        print("ClipboardManager: Failed to copy external file to sandbox: \(fileURL.lastPathComponent).")
-                    }
-                }
-            }
-
-            // 元のファイル名を抽出するためのヘルパー関数
-            func extractOriginalFileName(from fileName: String) -> String {
-                if let range = fileName.range(of: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-", options: .regularExpression) {
-                    return String(fileName[range.upperBound...])
-                } else {
-                    return fileName
-                }
-            }
-
-            // まずファイルURLを読み込もうとする
+            var newItemToConsider: ClipboardItem? = nil
+            
+            // 1. ファイルURLを読み込もうとする
             if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL],
                let firstFileURL = fileURLs.first {
-                processFileURL(firstFileURL)
+                newItemToConsider = createClipboardItemForFileURL(firstFileURL)
             } else if pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.fileURL.rawValue]),
                       let stringURL = pasteboard.string(forType: .fileURL),
                       let url = URL(string: stringURL) {
-                processFileURL(url)
+                newItemToConsider = createClipboardItemForFileURL(url)
             }
             
-            // ファイルが処理されなかった場合のみ、文字列として処理を試みる
-            if !itemProcessed, let newString = pasteboard.string(forType: .string) {
-                // 同じ内容のものが連続してコピーされた場合は追加しない
-                if let lastItem = clipboardHistory.first, lastItem.text == newString && lastItem.filePath == nil {
-                    print("ClipboardManager: Duplicate text item detected, skipping.")
-                    // 重複によりスキップされた場合、itemProcessedはtrueに設定しない
-                } else {
-                    // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
-                    self.objectWillChange.send()
-                    let newItem = ClipboardItem(text: newString, date: Date(), filePath: nil)
-                    clipboardHistory.insert(newItem, at: 0)
-                    print("ClipboardManager: Text detected and new ClipboardItem created.")
-                    itemProcessed = true
-                }
+            // 2. ファイルでなかった場合、文字列として処理を試みる
+            if newItemToConsider == nil, let newString = pasteboard.string(forType: .string) {
+                newItemToConsider = ClipboardItem(text: newString, date: Date(), filePath: nil)
             }
             
-            // ファイルも文字列も処理されなかった場合のみ、画像として処理しQRコードを解析
-            if !itemProcessed, scanQRCodeImage, let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
+            // 3. ファイルも文字列もなかった場合、QRコードスキャンが有効なら画像として処理
+            if newItemToConsider == nil, scanQRCodeImage, let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
                 print("ClipboardManager: Image detected on pasteboard. Attempting QR code decoding...")
                 if let decodedText = decodeQRCode(from: image) {
-                    // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
-                    self.objectWillChange.send()
-                    let newItem = ClipboardItem(text: decodedText, date: Date(), filePath: nil)
-                    clipboardHistory.insert(newItem, at: 0)
+                    newItemToConsider = ClipboardItem(text: decodedText, date: Date(), filePath: nil)
                     print("ClipboardManager: QR code successfully decoded: \(decodedText.prefix(50))...")
-                    itemProcessed = true
                 } else {
                     print("ClipboardManager: Image detected but no QR code found or decoding failed.")
                 }
             }
 
-            // いずれかの変更があった後に常に最大履歴数を調整
+            // --- 統合された重複チェックと履歴への追加 ---
+            if let newItem = newItemToConsider {
+                if let lastItem = clipboardHistory.first {
+                    var isDuplicate = false
+                    
+                    // 両方がファイルアイテムの場合
+                    if let newFilePath = newItem.filePath, let lastFilePath = lastItem.filePath {
+                        if newFilePath == lastFilePath {
+                            isDuplicate = true
+                            print("ClipboardManager: Duplicate file item detected (same path), skipping history addition.")
+                        }
+                    }
+                    // 両方がテキストアイテムの場合 (filePathがnil)
+                    else if newItem.filePath == nil && lastItem.filePath == nil {
+                        if newItem.text == lastItem.text {
+                            isDuplicate = true
+                            print("ClipboardManager: Duplicate text item detected, skipping history addition.")
+                        }
+                    }
+                    // 上記以外の場合（例：一方がファイルで他方がテキスト、または内容が異なる）は重複とみなさない
+                    
+                    if !isDuplicate {
+                        self.objectWillChange.send() // UI更新を促す
+                        clipboardHistory.insert(newItem, at: 0) // 先頭に追加
+                        print("ClipboardManager: New item added to history: \(newItem.text.prefix(50))...")
+                    }
+                } else {
+                    // 履歴が空の場合、最初の項目として常に追加
+                    self.objectWillChange.send() // UI更新を促す
+                    clipboardHistory.insert(newItem, at: 0) // 先頭に追加
+                    print("ClipboardManager: First item added to history: \(newItem.text.prefix(50))...")
+                }
+            } else {
+                print("ClipboardManager: No supported item type found on pasteboard or failed to process.")
+            }
+
+            // 最大履歴数を超過した場合の処理を適用
             enforceMaxHistoryCount()
         }
     }
@@ -340,9 +385,6 @@ class ClipboardManager: ObservableObject {
             guard let self = self else { return }
 
             // インポートされたアイテムのファイルパスを検証し、存在しないファイルを削除
-            // これは、エクスポートされた履歴ファイルが別の環境でインポートされ、
-            // ファイルが存在しない場合に備えるためのオプションの処理です。
-            // 今回のユースケースでは不要かもしれませんが、堅牢性のため考慮。
             let validItems = items.filter { item in
                 if let filePath = item.filePath {
                     return FileManager.default.fileExists(atPath: filePath.path)
@@ -364,7 +406,6 @@ class ClipboardManager: ObservableObject {
                 self.clipboardHistory.append(contentsOf: newItems)
 
                 // 3. 全体を日付（date）の降順でソート
-                // （新しいものが先頭に来るように）
                 self.clipboardHistory.sort { $0.date > $1.date }
 
                 // 4. 最大履歴数を超過した場合の処理
@@ -422,7 +463,7 @@ class ClipboardManager: ObservableObject {
             }
             
             let encoder = JSONEncoder()
-            // JSONEncoder には dateEncodingStrategy を使用
+            // JSONEncoder には dateEncodingStrategy を使用します。
             encoder.dateEncodingStrategy = .iso8601 // 日付のエンコード形式を合わせる (ClipboardHistoryDocumentと一致させる)
             encoder.outputFormatting = .prettyPrinted // 可読性のために整形 (Optional)
 
@@ -452,7 +493,7 @@ class ClipboardManager: ObservableObject {
         do {
             let data = try Data(contentsOf: fileURL)
             let decoder = JSONDecoder()
-            // JSONDecoder には dateDecodingStrategy を使用
+            // JSONDecoder には dateDecodingStrategy を使用します。
             decoder.dateDecodingStrategy = .iso8601 // 日付のデコード形式を合わせる (ClipboardHistoryDocumentと一致させる)
             
             var loadedHistory = try decoder.decode([ClipboardItem].self, from: data)
@@ -467,8 +508,6 @@ class ClipboardManager: ObservableObject {
                 }
                 return false // 履歴に残す
             }
-            // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
-            self.objectWillChange.send()
             self.clipboardHistory = loadedHistory
             print("ClipboardManager: Clipboard history loaded from file. Count: \(clipboardHistory.count), Size: \(data.count) bytes.")
         } catch {
@@ -482,12 +521,11 @@ extension ClipboardManager {
     func addTextItem(text: String) {
         // 同じ内容のものが連続して追加された場合はスキップ (ファイルパスがないテキストアイテムとしてのみチェック)
         if let lastItem = clipboardHistory.first, lastItem.text == text, lastItem.filePath == nil {
-            print("ClipboardManager: Duplicate text item detected via addTextItem, skipping. Text: \(text.prefix(50))...\n") // 改行を追加
+            print("ClipboardManager: Duplicate text item detected via addTextItem, skipping. Text: \(text.prefix(50))...\n")
             return
         }
         
-        // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
-        self.objectWillChange.send()
+        self.objectWillChange.send() // UI更新を促す
         let newItem = ClipboardItem(text: text, date: Date(), filePath: nil) // ファイルパスはnil
         clipboardHistory.insert(newItem, at: 0) // 先頭に追加
         print("ClipboardManager: New text item added via addTextItem. Total history: \(clipboardHistory.count)")
