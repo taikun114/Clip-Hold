@@ -10,9 +10,50 @@ private let itemDateFormatter: DateFormatter = {
     return formatter
 }()
 
-private func copyToClipboard(_ text: String) {
+private func copyToClipboard(_ item: ClipboardItem) {
+    let clipboardManager = ClipboardManager.shared
+
+    clipboardManager.isPerformingInternalCopy = true
+    print("DEBUG: copyToClipboard: isPerformingInternalCopy = true")
+
     NSPasteboard.general.clearContents()
-    NSPasteboard.general.setString(text, forType: .string)
+
+    var success = false
+
+    if let filePath = item.filePath {
+        // Option 1: NSURLオブジェクトを書き込む（既存の方法）
+        // これは引き続き試みますが、もしうまくいかなければ次へ
+        let nsURL = filePath as NSURL
+        if NSPasteboard.general.writeObjects([nsURL]) {
+            print("クリップボードにファイルがコピーされました (NSURL): \(filePath.lastPathComponent)")
+            success = true
+        } else {
+            print("クリップボードにファイル (NSURL) をコピーできませんでした: \(filePath.lastPathComponent)")
+            
+            // Option 2: ファイルURLの文字列 (.fileURL タイプ) を書き込む
+            // こちらの方が明示的でうまくいく場合があります
+            if NSPasteboard.general.setString(filePath.absoluteString, forType: .fileURL) {
+                print("クリップボードにファイルURL文字列がコピーされました (.fileURL): \(filePath.lastPathComponent)")
+                success = true
+            } else {
+                print("クリップボードにファイルURL文字列 (.fileURL) をコピーできませんでした: \(filePath.lastPathComponent)")
+            }
+        }
+    }
+
+    // ファイルコピーが成功しなかった、またはファイルパスが元々ない場合、テキストをコピー
+    if !success {
+        if NSPasteboard.general.setString(item.text, forType: .string) {
+            print("代わりにテキストがクリップボードにコピーされました: \(item.text.prefix(50))...")
+        } else {
+            print("ファイルとテキストの両方をクリップボードにコピーできませんでした。")
+        }
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        clipboardManager.isPerformingInternalCopy = false
+        print("DEBUG: copyToClipboard: isPerformingInternalCopy = false (after delay)")
+    }
 }
 
 // 文字列を安全に切り詰めるヘルパー関数
@@ -79,7 +120,7 @@ struct HistoryItemRow: View {
     private var actionMenuItems: some View {
         Group {
             Button("コピー") {
-                copyToClipboard(item.text)
+                copyToClipboard(item)
                 showCopyConfirmation = true
             }
             Button("項目から定型文を作成...") {
@@ -224,7 +265,10 @@ struct HistoryWindowView: View {
                         scrollToTopOnUpdate: scrollToTopOnUpdate,
                         lineNumberTextWidth: lineNumberTextWidth,
                         trailingPaddingForLineNumber: trailingPaddingForLineNumber,
-                        searchText: searchText // searchTextを渡す
+                        searchText: searchText, // searchTextを渡す
+                        onCopyAction: { itemToCopy in
+                            copyToClipboard(itemToCopy)
+                        }
                     )
                 }
             } // メインコンテンツを囲むZStackの終わり

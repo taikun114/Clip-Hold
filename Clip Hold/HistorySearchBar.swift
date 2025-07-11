@@ -1,11 +1,3 @@
-//
-//  HistorySearchBar.swift
-//  Clip Hold
-//
-//  Created by 今浦大雅 on 2025/07/11.
-//
-
-
 import SwiftUI
 
 struct HistorySearchBar: View {

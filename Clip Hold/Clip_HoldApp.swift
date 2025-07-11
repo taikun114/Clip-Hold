@@ -285,13 +285,25 @@ struct ClipHoldApp: App {
                 if clipboardManager.clipboardHistory.indices.contains(i) {
                     let historyItem = clipboardManager.clipboardHistory[i]
                     NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(historyItem.text, forType: .string)
 
-                    print("\(i+1)個前の履歴「\(historyItem.text.prefix(20))...」がショートカットでコピーされました。")
+                    // MARK: - ファイルパスの有無でコピー方法を分岐
+                    if let filePath = historyItem.filePath {
+                        let nsURL = filePath as NSURL
+                        if NSPasteboard.general.writeObjects([nsURL]) {
+                            print("ショートカットでファイルがクリップボードにコピーされました: \(filePath.lastPathComponent)")
+                        } else {
+                            print("ショートカットでファイルをクリップボードにコピーできませんでした: \(filePath.lastPathComponent). 代わりにテキストをコピーします。")
+                            NSPasteboard.general.setString(historyItem.text, forType: .string)
+                        }
+                    } else {
+                        // ファイルパスがない場合はこれまで通りテキストをコピー
+                        NSPasteboard.general.setString(historyItem.text, forType: .string)
+                        print("\(i+1)個前の履歴「\(historyItem.text.prefix(20))...」がショートカットでコピーされました。")
+                    }
 
-                    if quickPaste { // static context で取得した quickPaste を使用
+                    if quickPaste {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                            performPaste() // static メソッドとして呼び出し
+                            performPaste()
                             print("performPaste")
                         }
                     }

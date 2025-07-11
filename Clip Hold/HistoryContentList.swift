@@ -1,11 +1,3 @@
-//
-//  HistoryContentList.swift
-//  Clip Hold
-//
-//  Created by 今浦大雅 on 2025/07/11.
-//
-
-
 import SwiftUI
 import AppKit
 
@@ -33,10 +25,8 @@ struct HistoryContentList: View {
     let trailingPaddingForLineNumber: CGFloat
     let searchText: String // searchTextを追加
 
-    private func copyToClipboard(_ text: String) {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(text, forType: .string)
-    }
+    var onCopyAction: (ClipboardItem) -> Void // ClipboardItemを受け取り、何も返さないクロージャ
+
 
     private func parseQRCode(from image: NSImage) -> String? {
         guard let ciImage = CIImage(data: image.tiffRepresentation ?? Data()) else { return nil }
@@ -92,7 +82,7 @@ struct HistoryContentList: View {
                     .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
                             Button("コピー") {
-                                copyToClipboard(currentItem.text)
+                                onCopyAction(currentItem)
                                 showCopyConfirmation = true
                                 currentCopyConfirmationTask?.cancel()
                                 currentCopyConfirmationTask = Task { @MainActor in
@@ -118,7 +108,7 @@ struct HistoryContentList: View {
                         }
                     }, primaryAction: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
-                            copyToClipboard(currentItem.text)
+                            onCopyAction(currentItem)
                             showCopyConfirmation = true
                             currentCopyConfirmationTask?.cancel()
                             currentCopyConfirmationTask = Task { @MainActor in
@@ -142,12 +132,19 @@ struct HistoryContentList: View {
                         itemProvider.loadObject(ofClass: NSImage.self) { (image, error) in
                             DispatchQueue.main.async {
                                 if let nsImage = image as? NSImage {
-                                    if let qrCodeContent = parseQRCode(from: nsImage) {
-                                        // 修正後の行: キャプチャしたmanagerを使用
-                                        manager.addHistoryItem(text: qrCodeContent)
-                                        copyToClipboard(qrCodeContent)
+                                    if let qrCodeContent = manager.decodeQRCode(from: nsImage) {
+                                        manager.addTextItem(text: qrCodeContent)
+                                        
+                                        // ★ここを変更: ClipboardManager経由でコピーするか、ClipboardItemを作成してonCopyActionを呼ぶ★
+                                        // A. ClipboardManagerにコピー関数がある場合 (推奨、ClipboardManagerが自身の責任でコピー処理をする)
+                                        // manager.copyItemToPasteboard(ClipboardItem(text: qrCodeContent)) // ClipboardManagerにこのようなメソッドを追加
+                                        
+                                        // B. onCopyActionを使用する場合
+                                        let newItemToCopy = ClipboardItem(text: qrCodeContent) // 新しいClipboardItemを作成
+                                        onCopyAction(newItemToCopy) // onCopyActionを呼び出す
+                                        
+                                        showCopyConfirmation = true // 必要に応じて表示
                                     } else {
-                                        // QRコードが見つからなかった場合の処理
                                         print("QRコードが見つかりませんでした。")
                                     }
                                 } else if let error = error {
