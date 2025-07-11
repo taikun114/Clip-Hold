@@ -1,6 +1,9 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+## 1.2.0 (under development)
+- Support for saving file copy history
+
 ## 1.1.0
 ### New Features
 - Add the feature to create a QR Code from copied text
