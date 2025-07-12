@@ -19,9 +19,22 @@ private func copyToClipboard(_ item: ClipboardItem) {
     NSPasteboard.general.clearContents()
 
     var success = false
-
-    if let filePath = item.filePath {
-        // ファイルパスが存在する場合、ファイルとしてクリップボードにコピーを試みる
+    
+    // 1. 画像パスが存在する場合、画像としてコピーを試みる
+    if let imagePath = item.imagePath {
+        if let nsImage = NSImage(contentsOf: imagePath) {
+            if NSPasteboard.general.writeObjects([nsImage]) {
+                print("クリップボードに画像がコピーされました: \(imagePath.lastPathComponent)")
+                success = true
+            } else {
+                print("クリップボードに画像 (NSImage) をコピーできませんでした: \(imagePath.lastPathComponent)")
+            }
+        } else {
+            print("画像ファイルのロードに失敗しました: \(imagePath.lastPathComponent)")
+        }
+    }
+    // 2. 画像パスがなく、ファイルパスが存在する場合、ファイルとしてコピーを試みる
+    else if let filePath = item.filePath {
         // Option 1: NSURLオブジェクトを書き込む（既存の方法）
         let nsURL = filePath as NSURL
         if NSPasteboard.general.writeObjects([nsURL]) {
@@ -31,7 +44,6 @@ private func copyToClipboard(_ item: ClipboardItem) {
             print("クリップボードにファイル (NSURL) をコピーできませんでした: \(filePath.lastPathComponent)")
             
             // Option 2: ファイルURLの文字列 (.fileURL タイプ) を書き込む
-            // こちらの方が明示的でうまくいく場合があります
             if NSPasteboard.general.setString(filePath.absoluteString, forType: .fileURL) {
                 print("クリップボードにファイルURL文字列がコピーされました (.fileURL): \(filePath.lastPathComponent)")
                 success = true
@@ -41,18 +53,16 @@ private func copyToClipboard(_ item: ClipboardItem) {
         }
     }
 
-    // ファイルコピーが成功しなかった、またはファイルパスが元々ない場合、テキストをコピー
+    // 3. どちらのパスもない場合、テキストとしてコピー
     if !success {
-        if NSPasteboard.general.setString(item.text, forType: .string) {
-            print("代わりにテキストがクリップボードにコピーされました: \(item.text.prefix(50))...")
-        } else {
-            print("ファイルとテキストの両方をクリップボードにコピーできませんでした。")
-        }
+        NSPasteboard.general.setString(item.text, forType: .string)
+        print("クリップボードにテキストがコピーされました: \(item.text.prefix(50))...")
     }
 
+    // 遅延してフラグをリセット
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
         clipboardManager.isPerformingInternalCopy = false
-        print("DEBUG: copyToClipboard: isPerformingInternalCopy = false (after delay)")
+        print("DEBUG: copyToClipboard: isPerformingInternalCopy = false")
     }
 }
 
