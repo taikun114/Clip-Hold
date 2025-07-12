@@ -7,10 +7,28 @@ import CoreImage // QRコード解析用
 class ClipboardManager: ObservableObject {
     static let shared = ClipboardManager()
 
-    @Published var clipboardHistory: [ClipboardItem] = [] {
-        didSet {
-            // clipboardHistoryが変更されたら自動的に保存
-            saveClipboardHistory()
+    @Published var clipboardHistory: [ClipboardItem] = []
+
+    private var saveTask: Task<Void, Never>?
+
+    private func scheduleSaveClipboardHistory() {
+        // 既存のタスクをキャンセル
+        saveTask?.cancel()
+        
+        // 1秒後に保存を実行する新しいタスクをスケジュール
+        saveTask = Task {
+            do {
+                try await Task.sleep(for: .seconds(1))
+                // Taskがキャンセルされていたら実行しない
+                guard !Task.isCancelled else { return }
+                
+                // メインアクターで保存を実行
+                await MainActor.run {
+                    self.saveClipboardHistory()
+                }
+            } catch {
+                // キャンセルされた場合、エラーは無視する
+            }
         }
     }
 
@@ -332,6 +350,10 @@ class ClipboardManager: ObservableObject {
 
             // 最大履歴数を超過した場合の処理を適用
             enforceMaxHistoryCount()
+            
+            if newItemToConsider != nil {
+                scheduleSaveClipboardHistory()
+            }
         }
     }
 
@@ -375,6 +397,8 @@ class ClipboardManager: ObservableObject {
             self.objectWillChange.send()
             clipboardHistory.remove(at: index)
             print("ClipboardManager: Item deleted. Total history: \(clipboardHistory.count)")
+            
+            scheduleSaveClipboardHistory()
         }
     }
     
@@ -412,6 +436,8 @@ class ClipboardManager: ObservableObject {
                 self.enforceMaxHistoryCount()
                 
                 print("ClipboardManager: 履歴をインポートしました。追加された項目数: \(newItems.count), 総履歴数: \(self.clipboardHistory.count)")
+                
+                self.scheduleSaveClipboardHistory()
             }
         }
     }
@@ -532,5 +558,7 @@ extension ClipboardManager {
 
         // 最大履歴数を超過した場合の処理を適用
         enforceMaxHistoryCount()
+        
+        scheduleSaveClipboardHistory()
     }
 }

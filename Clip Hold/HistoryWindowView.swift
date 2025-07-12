@@ -88,6 +88,9 @@ struct HistoryItemRow: View {
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
 
+    @State private var iconImage: NSImage?
+    @State private var iconLoadTask: Task<Void, Never>?
+
     init(item: ClipboardItem,
          index: Int,
          showLineNumber: Bool,
@@ -149,9 +152,8 @@ struct HistoryItemRow: View {
             }
             
             // アイコンを表示するロジック
-            if let filePath = item.filePath {
-                let nsImage = NSWorkspace.shared.icon(forFile: filePath.path)
-                Image(nsImage: nsImage)
+            if let icon = iconImage {
+                Image(nsImage: icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20, height: 20)
@@ -190,6 +192,26 @@ struct HistoryItemRow: View {
         .padding(.leading, 5)
         .contentShape(Rectangle())
         .help(item.text)
+        .onAppear {
+            if let filePath = item.filePath {
+                // 既存のタスクをキャンセルして新しいタスクを開始
+                iconLoadTask?.cancel()
+                iconLoadTask = Task.detached {
+                    let nsImage = NSWorkspace.shared.icon(forFile: filePath.path)
+                    // メインスレッドでUIを更新
+                    await MainActor.run {
+                        self.iconImage = nsImage
+                    }
+                }
+            } else {
+                // ファイルでない場合はアイコンをnilにリセット
+                iconImage = nil
+            }
+        }
+        .onDisappear {
+            // ビューが非表示になったらタスクをキャンセルしてメモリを解放
+            iconLoadTask?.cancel()
+        }
     }
 }
 
