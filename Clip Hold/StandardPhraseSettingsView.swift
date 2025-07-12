@@ -60,6 +60,7 @@ struct StandardPhraseSettingsView: View {
                             VStack(alignment: .leading) {
                                 Text(phrase.title)
                                     .font(.headline)
+                                    .lineLimit(1)
 
                                 Text(phrase.content)
                                     .font(.subheadline)
