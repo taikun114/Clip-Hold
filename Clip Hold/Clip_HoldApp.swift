@@ -4,6 +4,7 @@ import Carbon
 import UserNotifications
 import KeyboardShortcuts
 
+// PreAction機能を持つPrimitiveButtonStyle
 struct PreActionButtonStyle: PrimitiveButtonStyle {
     var preAction: () -> Void
 
@@ -46,7 +47,7 @@ struct ClipHoldApp: App {
         
         ClipHoldApp.setupGlobalShortcuts()
     }
-
+    
     // MARK: - キーボード操作をシミュレートする関数
     static func performPaste() {
         let delay: TimeInterval = 0.01
@@ -82,7 +83,43 @@ struct ClipHoldApp: App {
             set: { self.hideMenuBarExtra = !$0 } // isInserted の変更で hideMenuBarExtra を反転させる
         )
     }
-
+    
+    // MARK: - クリップボードに項目をコピーするヘルパー関数
+    private func copyToClipboard(_ item: ClipboardItem) {
+        clipboardManager.isPerformingInternalCopy = true
+        print("DEBUG: copyToClipboard: isPerformingInternalCopy = true")
+        
+        NSPasteboard.general.clearContents()
+        
+        if let filePath = item.filePath {
+            // ファイルの場合、ファイルURLをクリップボードに書き込む
+            let nsURL = filePath as NSURL
+            if NSPasteboard.general.writeObjects([nsURL]) {
+                print("メニューバーからクリップボードにファイルがコピーされました (NSURL): \(filePath.lastPathComponent)")
+            } else {
+                print("メニューバーからクリップボードにファイル (NSURL) をコピーできませんでした: \(filePath.lastPathComponent). 代わりにテキストをコピーします。")
+                
+                // ファイルコピー失敗時は、ファイル名（テキスト）をコピーする
+                if NSPasteboard.general.setString(item.text, forType: .string) {
+                    print("メニューバーからクリップボードにファイルURL文字列がコピーされました (.fileURL): \(filePath.lastPathComponent)")
+                }
+            }
+        } else {
+            // テキストの場合、文字列をクリップボードに書き込む
+            if NSPasteboard.general.setString(item.text, forType: .string) {
+                print("メニューバーからクリップボードにテキストがコピーされました: \(item.text.prefix(50))...")
+            }
+        }
+        
+        // 最後に、内部コピーのフラグをリセット
+        // この遅延は、`checkPasteboard`が新しいペーストボードの変更を監視する前に、
+        // 完了したことを保証するためのもの
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.clipboardManager.isPerformingInternalCopy = false
+            print("DEBUG: copyToClipboard: isPerformingInternalCopy = false")
+        }
+    }
+    
     var body: some Scene {
         Settings {
             SettingsView()
@@ -143,27 +180,17 @@ struct ClipHoldApp: App {
             } else {
                 let displayLimit = min(clipboardManager.clipboardHistory.count, maxHistoryInMenu)
                 ForEach(clipboardManager.clipboardHistory.prefix(displayLimit)) { item in
-                    let itemDateFormatter: DateFormatter = {
-                        let formatter = DateFormatter()
-                        formatter.dateStyle = .short
-                        formatter.timeStyle = .short
-                        return formatter
-                    }()
                     
                     let displayText: String = {
                         var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
-                        let dateString = itemDateFormatter.string(from: item.date)
-                        
                         if displayContent.count > 40 {
                             displayContent = String(displayContent.prefix(40)) + "..."
                         }
-                        
-                        return "\(displayContent) (\(dateString))"
+                        return displayContent
                     }()
                     
                     Button {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(item.text, forType: .string)
+                        copyToClipboard(item)
                         
                         if quickPaste {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -171,10 +198,28 @@ struct ClipHoldApp: App {
                             }
                         }
                     } label: {
-                        Text(displayText)
-                            .font(.body)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
+                        HStack(spacing: 8) {
+                            if let filePath = item.filePath {
+                                // ファイルアイコンを表示
+                                let nsImage = NSWorkspace.shared.icon(forFile: filePath.path)
+                                Image(nsImage: nsImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 16, height: 16)
+                            } else {
+                                // テキストアイテムの場合は汎用的なアイコンを表示
+                                Image(systemName: "text.page") // ここを"text.page"に修正
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 16, height: 16)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            Text(displayText)
+                                .font(.body)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
                     }
                 }
             }

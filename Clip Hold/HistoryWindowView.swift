@@ -1,4 +1,3 @@
-// HistoryWindowView.swift
 import SwiftUI
 import AppKit
 import CoreImage
@@ -102,7 +101,7 @@ struct HistoryItemRow: View {
          itemForNewPhrase: Binding<ClipboardItem?>,
          lineNumberTextWidth: CGFloat?,
          trailingPaddingForLineNumber: CGFloat) {
-        
+            
         self.item = item
         self.index = index
         self.showLineNumber = showLineNumber
@@ -140,13 +139,28 @@ struct HistoryItemRow: View {
     }
 
     var body: some View {
-        HStack {
+        HStack(spacing: 8) { // アイコンとの間に少しスペースを空ける
             if showLineNumber {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
                     .foregroundColor(.secondary)
                     .frame(width: lineNumberTextWidth, alignment: .trailing)
                     .padding(.trailing, trailingPaddingForLineNumber)
+            }
+            
+            // アイコンを表示するロジック
+            if let filePath = item.filePath {
+                let nsImage = NSWorkspace.shared.icon(forFile: filePath.path)
+                Image(nsImage: nsImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+            } else {
+                Image(systemName: "text.page")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(.secondary)
             }
 
             VStack(alignment: .leading) {
