@@ -2,7 +2,14 @@
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
 ## 1.2.0 (under development)
+### New Features
 - Support for saving file copy history
+
+## 1.1.1
+### Bug Fixes and Improvements
+- Add limit to number of characters displayed in standard phrases as well
+  - Standard phrases displayed in menus, list items in standard phrase settings, and shortcut settings will not be too long.
+
 
 ## 1.1.0
 ### New Features
