@@ -4,12 +4,15 @@
 ## 1.2.0 (under development)
 ### New Features
 - Support for saving file copy history
+- Support for Quick Look of files in the History Window
+
+### Bug Fixes and Improvements
+- Add icons to history items in menu and History Window
 
 ## 1.1.1
 ### Bug Fixes and Improvements
 - Add limit to number of characters displayed in standard phrases as well
   - Standard phrases displayed in menus, list items in standard phrase settings, and shortcut settings will not be too long.
-
 
 ## 1.1.0
 ### New Features
