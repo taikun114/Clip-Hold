@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Quartz
 
 struct HistoryContentList: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
@@ -17,6 +18,8 @@ struct HistoryContentList: View {
     @Binding var selectedItemForQRCode: ClipboardItem?
     @Binding var itemForNewPhrase: ClipboardItem?
     @Binding var previousClipboardHistoryCount: Int
+
+    @State private var quickLookManager = QuickLookManager()
 
     let showLineNumbersInHistoryWindow: Bool
     let preventWindowCloseOnDoubleClick: Bool
@@ -54,7 +57,7 @@ struct HistoryContentList: View {
                     Spacer()
                 }
             } else {
-                ScrollViewReader { scrollViewProxy in // ここにScrollViewReaderを追加
+                ScrollViewReader { scrollViewProxy in
                     List(filteredHistory, selection: $selectedItemID) { item in
                         HistoryItemRow(
                             item: item,
@@ -73,6 +76,49 @@ struct HistoryContentList: View {
                         )
                         .tag(item.id)
                         .listRowBackground(Color.clear)
+                    }
+                    .onKeyPress(.space) {
+                        guard let selectedID = selectedItemID,
+                              let selectedItem = filteredHistory.first(where: { $0.id == selectedID }),
+                              let filePath = selectedItem.filePath else {
+                            // ファイルが選択されていないか、ファイルパスがない場合は何もしない
+                            return .ignored
+                        }
+                        
+                        // このビューに関連付けられたNSViewを一時的に取得
+                        if let window = NSApp.keyWindow, let contentView = window.contentView {
+                            quickLookManager.showQuickLook(for: filePath, sourceView: contentView)
+                        }
+                        
+                        return .handled
+                    }
+                    .onChange(of: selectedItemID) { oldID, newID in
+                        // 新しい項目が選択されていない場合は何もしない
+                        guard let newID = newID else {
+                            // 選択が解除された場合、Quick Lookパネルを閉じる
+                            quickLookManager.hideQuickLook()
+                            return
+                        }
+                        
+                        // 選択された新しい項目を取得
+                        guard let selectedItem = filteredHistory.first(where: { $0.id == newID }) else {
+                            return
+                        }
+
+                        // Quick Lookパネルが表示されているか確認
+                        guard QLPreviewPanel.sharedPreviewPanelExists() && QLPreviewPanel.shared().isVisible else {
+                            return
+                        }
+
+                        // 選択された項目にファイルパスがあるか確認
+                        if let filePath = selectedItem.filePath {
+                            // ファイルが選択された場合、パネルの内容を更新
+                            quickLookManager.quickLookURL = filePath
+                            QLPreviewPanel.shared().reloadData()
+                        } else {
+                            // プレーンテキストが選択された場合、パネルを閉じる
+                            quickLookManager.hideQuickLook()
+                        }
                     }
                     .accessibilityLabel("履歴リスト")
                     .listStyle(.plain)
