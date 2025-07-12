@@ -106,7 +106,15 @@ struct ClipHoldApp: App {
             } else {
                 let displayLimit = min(standardPhraseManager.standardPhrases.count, maxPhrasesInMenu)
                 ForEach(standardPhraseManager.standardPhrases.prefix(displayLimit)) { phrase in
-                    Button(phrase.title) {
+                    let displayText: String = {
+                        let displayContent = phrase.title.replacingOccurrences(of: "\n", with: " ")
+                        if displayContent.count > 40 {
+                            return String(displayContent.prefix(40)) + "..."
+                        }
+                        return displayContent
+                    }()
+                    
+                    Button(displayText) {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(phrase.content, forType: .string)
                         

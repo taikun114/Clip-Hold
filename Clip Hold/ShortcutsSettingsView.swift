@@ -84,6 +84,7 @@ struct ShortcutsSettingsView: View {
                                 Text("「\(standardPhraseManager.standardPhrases[index].title)」")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
+                                    .lineLimit(1)
                             } else {
                                 Text("定型文が設定されていません")
                                     .font(.caption)
