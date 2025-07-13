@@ -236,7 +236,7 @@ class ClipboardManager: ObservableObject {
                     let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
                     if let sandboxedSize = sandboxedFileAttributes.fileSize, sandboxedSize == newImageSize {
                         print("ClipboardManager: Found duplicate image in sandbox based on file size: \(sandboxedFileURL.lastPathComponent)")
-                        return ClipboardItem(text: "画像ファイル", date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize)
+                        return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize)
                     }
                 }
             }
@@ -251,7 +251,7 @@ class ClipboardManager: ObservableObject {
         do {
             try imageData.write(to: destinationURL)
             print("ClipboardManager: New image saved to sandbox as \(destinationURL.lastPathComponent)")
-            return ClipboardItem(text: "画像ファイル", date: Date(), filePath: destinationURL, fileSize: newImageSize)
+            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: newImageSize)
         } catch {
             print("ClipboardManager: Error saving new image to sandbox: \(error.localizedDescription)")
             return nil

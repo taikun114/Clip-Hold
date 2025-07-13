@@ -76,7 +76,8 @@
             "value" : "%1$lld %2$@"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
     },
     "%lld." : {
       "shouldTranslate" : false
@@ -486,6 +487,22 @@
     },
     "Hello, world!" : {
       "shouldTranslate" : false
+    },
+    "Image File" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像ファイル"
+          }
+        }
+      }
     },
     "KeyboardShortcuts by Sindre Sorhus" : {
       "shouldTranslate" : false
@@ -992,8 +1009,14 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "カスタム: %1$lld %2$@"
+            "state" : "translated",
+            "value" : "Custom: %1$lld %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム: %lld %@"
           }
         }
       }
@@ -2039,13 +2062,52 @@
       }
     },
     "ファイル1つあたりの最大容量" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum size per file"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル1つあたりの最大容量"
+          }
+        }
+      }
     },
     "ファイル1つあたりの最大容量:" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum Size per File:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル1つあたりの最大容量:"
+          }
+        }
+      }
     },
     "ファイル1つあたりの最大容量を設定" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Maximum Size per File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル1つあたりの最大容量を設定"
+          }
+        }
+      }
     },
     "ファイルの選択に失敗しました: %@" : {
       "localizations" : {
@@ -2496,7 +2558,20 @@
       }
     },
     "値を調整" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adjust value"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "値を調整"
+          }
+        }
+      }
     },
     "入力エラー" : {
       "localizations" : {
