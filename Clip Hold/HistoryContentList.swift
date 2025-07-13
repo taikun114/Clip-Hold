@@ -159,9 +159,11 @@ struct HistoryContentList: View {
                             Button("項目から定型文を作成...") {
                                 itemForNewPhrase = currentItem // ここでClipboardItemをセット
                             }
-                            Button("QRコードを表示...") {
-                                showQRCodeSheet = true
-                                selectedItemForQRCode = currentItem
+                            if currentItem.filePath == nil {
+                                Button("QRコードを表示...") {
+                                    showQRCodeSheet = true
+                                    selectedItemForQRCode = currentItem
+                                }
                             }
                             Divider()
                             Button("削除...", role: .destructive) {
