@@ -5,6 +5,7 @@
 ### New Features
 - Support for saving file and image copy history
 - Support for Quick Look of files in the History Window
+  - You can Quick Look by pressing the space key with an item selected or by clicking on “Quick Look” from the menu.
 - Add “Maximum Size per File” option
   - If you set a size, files larger than the set size will not be saved in the copy history.
 - Add “Copy QR Code Contents” option to the menu of image items containing QR Code in the History window.
