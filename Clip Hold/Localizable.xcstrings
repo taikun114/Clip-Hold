@@ -1359,18 +1359,18 @@
         }
       }
     },
-    "ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。" : {
+    "ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only when a file smaller than the size set here is copied will it be saved in the history."
+            "value" : "Only when a file smaller than the size set here is copied will it be saved in the history. Previous history items are not affected."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。"
+            "value" : "ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。"
           }
         }
       }
@@ -1723,22 +1723,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのコピー履歴を表示..."
-          }
-        }
-      }
-    },
-    "すべての保存されたファイルを削除" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete All Saved Files"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての保存されたファイルを削除"
           }
         }
       }
@@ -2207,6 +2191,22 @@
         }
       }
     },
+    "ファイルやフォルダをコピーしたときにデータが保存されるフォルダを管理します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manages folders where data is saved when you copy a file or folder."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルやフォルダをコピーしたときにデータが保存されるフォルダを管理します。"
+          }
+        }
+      }
+    },
     "フィードバックのメール送信画面を開いてもよろしいですか？" : {
       "localizations" : {
         "en" : {
@@ -2607,38 +2607,6 @@
         }
       }
     },
-    "保存されたファイルの総容量:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Total Size of Saved Files:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存されたファイルの総容量:"
-          }
-        }
-      }
-    },
-    "保存されたファイル数:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Number of Files Saved:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存されたファイル数:"
-          }
-        }
-      }
-    },
     "保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。" : {
       "localizations" : {
         "en" : {
@@ -2651,6 +2619,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。"
+          }
+        }
+      }
+    },
+    "保存フォルダの管理" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manages Saved Folder"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存フォルダの管理"
+          }
+        }
+      }
+    },
+    "保存フォルダの総容量:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Size of the Saved Folder:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存フォルダの総容量:"
+          }
+        }
+      }
+    },
+    "保存フォルダの項目数:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Items in Saved Folder:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存フォルダの項目数:"
+          }
+        }
+      }
+    },
+    "保存フォルダを空にする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empty the Saved Folder"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存フォルダを空にする"
           }
         }
       }
@@ -3199,18 +3231,18 @@
         }
       }
     },
-    "履歴に保存されたすべてのファイルを削除しますか？保存されたファイルを必要とする履歴も削除されます。この操作は元に戻せません。" : {
+    "履歴に保存されたすべてのファイルとフォルダを削除しますか？関連する履歴も削除されます。この操作は元に戻せません。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete all files saved in the history? The history that requires the saved files will also be deleted. This cannot be undone."
+            "value" : "Are you sure you want to delete all files and folders saved in the history? Related history will also be deleted. This cannot be undone."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "履歴に保存されたすべてのファイルを削除しますか？保存されたファイルを必要とする履歴も削除されます。この操作は元に戻せません。"
+            "value" : "履歴に保存されたすべてのファイルとフォルダを削除しますか？関連する履歴も削除されます。この操作は元に戻せません。"
           }
         }
       }
@@ -3275,22 +3307,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の管理"
-          }
-        }
-      }
-    },
-    "履歴の統計" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "History Statistics"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴の統計"
           }
         }
       }

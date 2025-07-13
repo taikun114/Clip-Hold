@@ -28,8 +28,8 @@ struct CopyHistorySettingsView: View {
     @State private var isShowingImportSheet: Bool = false
     @State private var isShowingExportSheet: Bool = false
 
-    @State private var fileCount: Int = 0
-    @State private var totalSize: UInt64 = 0
+    @State private var itemCount: Int = 0
+    @State private var totalFolderSize: UInt64 = 0
     
     // MARK: - Initialization
     init() {
@@ -160,7 +160,7 @@ struct CopyHistorySettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("ファイル1つあたりの最大容量:")
-                        Text("ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。")
+                        Text("ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -263,20 +263,20 @@ struct CopyHistorySettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: 履歴の管理
             
-            // MARK: - 履歴の統計
-            Section(header: Text("履歴の統計").font(.headline)) {
+            // MARK: - 保存フォルダの管理
+            Section {
                 HStack {
-                    Text("保存されたファイル数:")
+                    Text("保存フォルダの項目数:")
                     Spacer()
-                    Text("\(fileCount)個")
+                    Text("\(itemCount)個")
                         .foregroundColor(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
+                
                 HStack {
-                    Text("保存されたファイルの総容量:")
+                    Text("保存フォルダの総容量:")
                     Spacer()
-                    Text(ByteCountFormatter.string(fromByteCount: Int64(totalSize), countStyle: .file))
+                    Text(ByteCountFormatter.string(fromByteCount: Int64(totalFolderSize), countStyle: .file))
                         .foregroundColor(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
@@ -300,18 +300,29 @@ struct CopyHistorySettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "trash")
-                            Text("すべての保存されたファイルを削除")
+                            Text("保存フォルダを空にする")
                         }
-                        .if(fileCount > 0) { view in
+                        .if(itemCount > 0) { view in
                             view.foregroundStyle(.red)
                         }
                     }
                     .buttonStyle(.bordered)
-                    .disabled(fileCount == 0)
+                    .disabled(itemCount == 0)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
-            } // End of Section: 履歴の統計
+            } header: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("保存フォルダの管理")
+                        .font(.headline)
+                    
+                    Text("ファイルやフォルダをコピーしたときにデータが保存されるフォルダを管理します。")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.bottom, 4)
+            } // End of Section: 保存フォルダの管理
 
         } // End of Form
         .formStyle(.grouped)
@@ -419,7 +430,7 @@ struct CopyHistorySettingsView: View {
         } message: {
             Text("すべてのクリップボード履歴を本当に削除しますか？この操作は元に戻せません。")
         }
-        .alert("すべての保存されたファイルを削除", isPresented: $showingClearFilesConfirmation) {
+        .alert("保存フォルダを空にする", isPresented: $showingClearFilesConfirmation) {
             Button("削除", role: .destructive) {
                 clearAllSavedFiles()
             }
@@ -427,7 +438,7 @@ struct CopyHistorySettingsView: View {
                 // 何もしない
             }
         } message: {
-            Text("履歴に保存されたすべてのファイルを削除しますか？保存されたファイルを必要とする履歴も削除されます。この操作は元に戻せません。")
+            Text("履歴に保存されたすべてのファイルとフォルダを削除しますか？関連する履歴も削除されます。この操作は元に戻せません。")
         }
     }
     
@@ -462,8 +473,7 @@ struct CopyHistorySettingsView: View {
                 
                 // メインスレッドでUIを更新
                 DispatchQueue.main.async {
-                    self.clipboardManager.loadClipboardHistory() // 履歴を再読み込みして、ファイルが削除されたことを反映
-                    // 削除後、統計情報を再計算してUIを更新
+                    self.clipboardManager.loadClipboardHistory()
                     self.calculateStatistics()
                     print("DEBUG: All saved files cleared and clipboard history reloaded.")
                 }
@@ -476,12 +486,11 @@ struct CopyHistorySettingsView: View {
     private func calculateStatistics() {
         // バックグラウンドスレッドで処理を実行
         DispatchQueue.global(qos: .background).async {
-            var count: Int = 0
-            var size: UInt64 = 0
+            var itemCount: Int = 0
+            var totalFolderSize: UInt64 = 0
 
             let fileManager = FileManager.default
             
-            // App-specific directoryのパスを取得
             guard let appSpecificDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("ClipHold") else {
                 return
             }
@@ -489,28 +498,29 @@ struct CopyHistorySettingsView: View {
 
             guard fileManager.fileExists(atPath: filesDirectory.path) else {
                 DispatchQueue.main.async {
-                    self.fileCount = 0
-                    self.totalSize = 0
+                    self.itemCount = 0
+                    self.totalFolderSize = 0
                 }
                 return
             }
 
             do {
-                let fileURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles)
+                // ファイルとフォルダの合計数をカウント
+                let fileURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                itemCount = fileURLs.count
                 
-                count = fileURLs.count
-                
-                for fileURL in fileURLs {
-                    let attributes = try fileManager.attributesOfItem(atPath: fileURL.path)
-                    if let fileSize = attributes[.size] as? NSNumber {
-                        size += fileSize.uint64Value
+                // フォルダ全体のサイズを再帰的に計算
+                if let enumerator = fileManager.enumerator(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) {
+                    for case let fileURL as URL in enumerator {
+                        if let fileSize = (try? fileURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
+                            totalFolderSize += UInt64(fileSize)
+                        }
                     }
                 }
-                
-                // メインスレッドでUIを更新
+
                 DispatchQueue.main.async {
-                    self.fileCount = count
-                    self.totalSize = size
+                    self.itemCount = itemCount
+                    self.totalFolderSize = totalFolderSize
                 }
             } catch {
                 print("Error calculating clipboard file statistics: \(error.localizedDescription)")
@@ -521,7 +531,6 @@ struct CopyHistorySettingsView: View {
 
 // MARK: - DataSizeOption のヘルパー拡張
 extension DataSizeOption {
-    // バイト値からDataSizeOptionの表示値と単位を逆算するヘルパー
     func extractValueAndUnitFromByteValue(byteValue: Int) -> (value: Int, unit: DataSizeUnit) {
         let gigabyteValue = 1_000_000_000
         let megabyteValue = 1_000_000
