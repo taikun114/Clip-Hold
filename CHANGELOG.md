@@ -7,6 +7,8 @@
 - Support for Quick Look of files in the History Window
 - Add “Maximum Size per File” option
   - If you set a size, files larger than the set size will not be saved in the copy history.
+- Add “Copy QR Code Contents” option to the menu of image items containing QR Code in the History window.
+  - With this change, the “Scan QR Code Image” setting has been removed, as the QR Code is now automatically scanned when the image is copied.
 
 ### Bug Fixes and Improvements
 - Add icons to history items in menu and History Window
