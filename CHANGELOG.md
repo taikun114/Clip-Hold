@@ -3,8 +3,10 @@
 
 ## 1.2.0 (under development)
 ### New Features
-- Support for saving file copy history
+- Support for saving file and image copy history
 - Support for Quick Look of files in the History Window
+- Add “Maximum Size per File” option
+  - If you set a size, files larger than the set size will not be saved in the copy history.
 
 ### Bug Fixes and Improvements
 - Add icons to history items in menu and History Window
