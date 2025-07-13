@@ -12,6 +12,9 @@
 
 ### Bug Fixes and Improvements
 - Add icons to history items in menu and History Window
+- Add new “Copy History” tab
+  - Settings related to copy history have been moved to a new tab.
+- Change description of “Apps to Exclude” setting
 
 ## 1.1.1
 ### Bug Fixes and Improvements
