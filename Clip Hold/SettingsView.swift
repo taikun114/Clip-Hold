@@ -22,6 +22,12 @@ struct SettingsView: View {
                 }
                 .tag("standardPhrases")
 
+            CopyHistorySettingsView()
+                .tabItem {
+                    Label("コピー履歴", systemImage: "list.clipboard")
+                }
+                .tag("copyHistory")
+
             ShortcutsSettingsView()
                 .tabItem {
                     Label("ショートカット", systemImage: "command")

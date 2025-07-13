@@ -584,7 +584,7 @@ class ClipboardManager: ObservableObject {
     }
 
     // MARK: - History Loading (ファイルシステムからロード)
-    private func loadClipboardHistory() {
+    public func loadClipboardHistory() {
         guard let appSpecificDirectory = getAppSpecificDirectory() else {
             print("ClipboardManager: Could not get app-specific directory for loading.")
             return

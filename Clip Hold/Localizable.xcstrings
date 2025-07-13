@@ -82,6 +82,40 @@
     "%lld." : {
       "shouldTranslate" : false
     },
+    "%lld個" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Item"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Items"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld個"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld個の定型文" : {
       "localizations" : {
         "en" : {
@@ -1693,6 +1727,22 @@
         }
       }
     },
+    "すべての保存されたファイルを削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Saved Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての保存されたファイルを削除"
+          }
+        }
+      }
+    },
     "すべての定型文をJSONファイルとして書き出します。" : {
       "localizations" : {
         "en" : {
@@ -2105,6 +2155,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイル1つあたりの最大容量を設定"
+          }
+        }
+      }
+    },
+    "ファイルの保存先フォルダをFinderで開きます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the folder where the file is saved in the Finder."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルの保存先フォルダをFinderで開きます。"
           }
         }
       }
@@ -2541,6 +2607,38 @@
         }
       }
     },
+    "保存されたファイルの総容量:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Size of Saved Files:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存されたファイルの総容量:"
+          }
+        }
+      }
+    },
+    "保存されたファイル数:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number of Files Saved:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存されたファイル数:"
+          }
+        }
+      }
+    },
     "保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。" : {
       "localizations" : {
         "en" : {
@@ -2553,6 +2651,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。"
+          }
+        }
+      }
+    },
+    "保存フォルダを開く" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Saved Folder"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存フォルダを開く"
           }
         }
       }
@@ -3085,6 +3199,22 @@
         }
       }
     },
+    "履歴に保存されたすべてのファイルを削除しますか？保存されたファイルを必要とする履歴も削除されます。この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete all files saved in the history? The history that requires the saved files will also be deleted. This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴に保存されたすべてのファイルを削除しますか？保存されたファイルを必要とする履歴も削除されます。この操作は元に戻せません。"
+          }
+        }
+      }
+    },
     "履歴のエクスポートに失敗しました: %@" : {
       "localizations" : {
         "en" : {
@@ -3129,6 +3259,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の削除"
+          }
+        }
+      }
+    },
+    "履歴の管理" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage History"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の管理"
+          }
+        }
+      }
+    },
+    "履歴の統計" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History Statistics"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の統計"
+          }
+        }
+      }
+    },
+    "履歴の設定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の設定"
           }
         }
       }

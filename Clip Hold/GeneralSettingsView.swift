@@ -69,14 +69,6 @@ class LoginItemManager: ObservableObject {
 struct GeneralSettingsView: View {
     @StateObject private var loginItemManager = LoginItemManager()
 
-    @AppStorage("maxHistoryToSave") var maxHistoryToSave: Int = 0 // 無制限を0で表す
-    @State private var tempSelectedSaveOption: HistoryOption
-    @State private var initialSaveOption: HistoryOption
-
-    @AppStorage("maxFileSizeToSave") var maxFileSizeToSave: Int = 1_000_000_000 // デフォルト1GB (1,000,000,000バイト)
-    @State private var tempSelectedFileSizeOption: DataSizeOption
-    @State private var initialFileSizeOption: DataSizeOption
-
     @AppStorage("maxHistoryInMenu") var maxHistoryInMenu: Int = 10
     @State private var tempSelectedMenuOption: MenuHistoryOption
     @State private var initialMenuOption: MenuHistoryOption
@@ -97,88 +89,21 @@ struct GeneralSettingsView: View {
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
 
-    @State private var showingCustomSaveHistorySheet = false
     @State private var showingCustomMenuHistorySheet = false
     @State private var showingCustomPhraseMenuSheet = false
-    @State private var showingCustomFileSizeSheet = false
 
-    @State private var tempCustomSaveHistoryValue: Int = 20
     @State private var tempCustomMenuHistoryValue: Int = 10
     @State private var tempCustomPhrasesInMenuValue: Int = 5
 
-    @State private var tempCustomFileSizeValue: Int = 1
-    @State private var tempCustomFileSizeUnit: DataSizeUnit = .megabytes
-
     init() {
-        let savedMaxHistoryToSave = UserDefaults.standard.integer(forKey: "maxHistoryToSave")
-        var savedMaxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryInMenu")
-        var savedMaxPhrasesInMenu = UserDefaults.standard.integer(forKey: "maxPhrasesInMenu")
-        let savedMaxFileSizeToSave = UserDefaults.standard.integer(forKey: "maxFileSizeToSave")
+        let savedMaxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryInMenu")
+        let savedMaxPhrasesInMenu = UserDefaults.standard.integer(forKey: "maxPhrasesInMenu")
 
         // DEBUG print for initial values from UserDefaults (accessing AppStorage directly here is fine)
-        print("DEBUG: init() - savedMaxHistoryToSave: \(savedMaxHistoryToSave)")
         print("DEBUG: init() - savedMaxHistoryInMenu: \(savedMaxHistoryInMenu)")
-        print("DEBUG: init() - savedMaxFileSizeToSave: \(savedMaxFileSizeToSave)")
 
 
         // MARK: - ローカル変数を宣言し、それらの値を決定するロジック
-        // tempSelectedSaveOption の値を決定
-        let determinedTempSelectedSaveOption: HistoryOption
-        var determinedTempCustomSaveHistoryValue: Int
-
-        if savedMaxHistoryToSave == 0 {
-            determinedTempSelectedSaveOption = .unlimited
-            determinedTempCustomSaveHistoryValue = 20
-            // maxHistoryToSaveが0（無制限）で、maxHistoryInMenuも0（不正な状態）の場合の修正
-            if savedMaxHistoryInMenu == 0 {
-                savedMaxHistoryInMenu = 10 // UI表示と整合性を取るため一時変数を10に設定
-                UserDefaults.standard.set(10, forKey: "maxHistoryInMenu") // UserDefaultsも更新して次回起動時も正しくなるように
-            }
-        } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == savedMaxHistoryToSave }) {
-            determinedTempSelectedSaveOption = savedPreset
-            determinedTempCustomSaveHistoryValue = savedMaxHistoryToSave
-        } else {
-            determinedTempSelectedSaveOption = .custom(savedMaxHistoryToSave)
-            determinedTempCustomSaveHistoryValue = savedMaxHistoryToSave
-        }
-    
-        // tempSelectedFileSizeOption の値を決定
-        let determinedTempSelectedFileSizeOption: DataSizeOption
-        var determinedTempCustomFileSizeValue: Int = 1
-        var determinedTempCustomFileSizeUnit: DataSizeUnit = .megabytes
-
-        if savedMaxFileSizeToSave == 0 { // 0は無制限として扱う
-            determinedTempSelectedFileSizeOption = .unlimited
-        } else {
-            // presets から一致するものを探す (バイト値で比較)
-            if let preset = DataSizeOption.presets.first(where: { $0.byteValue == savedMaxFileSizeToSave }) {
-                determinedTempSelectedFileSizeOption = preset
-            } else {
-                // カスタム値の場合、単位と値を逆算
-                // まずGBで試行
-                if savedMaxFileSizeToSave % (1000 * 1000 * 1000) == 0 {
-                    determinedTempCustomFileSizeValue = savedMaxFileSizeToSave / (1000 * 1000 * 1000)
-                    determinedTempCustomFileSizeUnit = .gigabytes
-                }
-                // 次にMBで試行
-                else if savedMaxFileSizeToSave % (1000 * 1000) == 0 {
-                    determinedTempCustomFileSizeValue = savedMaxFileSizeToSave / (1000 * 1000)
-                    determinedTempCustomFileSizeUnit = .megabytes
-                }
-                // 次にKBで試行
-                else if savedMaxFileSizeToSave % 1000 == 0 {
-                    determinedTempCustomFileSizeValue = savedMaxFileSizeToSave / 1000
-                    determinedTempCustomFileSizeUnit = .kilobytes
-                }
-                // それ以外はバイト
-                else {
-                    determinedTempCustomFileSizeValue = savedMaxFileSizeToSave
-                    determinedTempCustomFileSizeUnit = .bytes
-                }
-                determinedTempSelectedFileSizeOption = .custom(determinedTempCustomFileSizeValue, determinedTempCustomFileSizeUnit)
-            }
-        }
-
         // tempSelectedMenuOption の値を決定
         let determinedTempSelectedMenuOption: MenuHistoryOption
         var determinedTempCustomMenuHistoryValue: Int
@@ -187,7 +112,7 @@ struct GeneralSettingsView: View {
             determinedTempSelectedMenuOption = .preset(10)
             determinedTempCustomMenuHistoryValue = 10
             UserDefaults.standard.set(10, forKey: "maxHistoryInMenu") // UserDefaultsも確実に10に設定
-        } else if savedMaxHistoryInMenu == savedMaxHistoryToSave && savedMaxHistoryToSave != 0 {
+        } else if savedMaxHistoryInMenu == UserDefaults.standard.integer(forKey: "maxHistoryToSave") && UserDefaults.standard.integer(forKey: "maxHistoryToSave") != 0 {
             determinedTempSelectedMenuOption = .sameAsSaved
             determinedTempCustomMenuHistoryValue = savedMaxHistoryInMenu
         } else if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == savedMaxHistoryInMenu }) {
@@ -205,26 +130,20 @@ struct GeneralSettingsView: View {
 
         // savedMaxPhrasesInMenu が 0 の場合、デフォルト値の 5 を使用する
         if savedMaxPhrasesInMenu == 0 {
-            savedMaxPhrasesInMenu = 5
-            UserDefaults.standard.set(5, forKey: "maxPhrasesInMenu") // UserDefaultsも更新
+            // savedMaxPhrasesInMenu はletなので変更できない
+            determinedTempCustomPhrasesInMenuValue = 5
+            UserDefaults.standard.set(5, forKey: "maxPhrasesInMenu") // UserDefaultsは更新
+        } else {
+            determinedTempCustomPhrasesInMenuValue = savedMaxPhrasesInMenu
         }
     
-        if let preset = HistoryOption.presets.first(where: { $0.intValue == savedMaxPhrasesInMenu }) {
+        if let preset = HistoryOption.presets.first(where: { $0.intValue == determinedTempCustomPhrasesInMenuValue }) {
             determinedTempSelectedPhraseMenuOption = preset
-            determinedTempCustomPhrasesInMenuValue = savedMaxPhrasesInMenu
         } else {
-            determinedTempSelectedPhraseMenuOption = .custom(savedMaxPhrasesInMenu)
-            determinedTempCustomPhrasesInMenuValue = savedMaxPhrasesInMenu
+            determinedTempSelectedPhraseMenuOption = .custom(determinedTempCustomPhrasesInMenuValue)
         }
 
         // MARK: - すべての @State プロパティの初期化を一括で行う
-        _tempSelectedSaveOption = State(initialValue: determinedTempSelectedSaveOption)
-        _tempCustomSaveHistoryValue = State(initialValue: determinedTempCustomSaveHistoryValue)
-
-        _tempSelectedFileSizeOption = State(initialValue: determinedTempSelectedFileSizeOption)
-        _tempCustomFileSizeValue = State(initialValue: determinedTempCustomFileSizeValue)
-        _tempCustomFileSizeUnit = State(initialValue: determinedTempCustomFileSizeUnit)
-
         _tempSelectedMenuOption = State(initialValue: determinedTempSelectedMenuOption)
         _tempCustomMenuHistoryValue = State(initialValue: determinedTempCustomMenuHistoryValue)
 
@@ -232,8 +151,6 @@ struct GeneralSettingsView: View {
         _tempCustomPhrasesInMenuValue = State(initialValue: determinedTempCustomPhrasesInMenuValue)
 
         // initialオプションは、対応するtempオプションが確定した後に初期化
-        _initialSaveOption = State(initialValue: determinedTempSelectedSaveOption)
-        _initialFileSizeOption = State(initialValue: determinedTempSelectedFileSizeOption) // 新しく追加
         _initialMenuOption = State(initialValue: determinedTempSelectedMenuOption)
         _initialPhraseMenuOption = State(initialValue: determinedTempSelectedPhraseMenuOption)
     }
@@ -251,104 +168,6 @@ struct GeneralSettingsView: View {
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                // 履歴を保存する最大数
-                HStack {
-                    Text("履歴を保存する最大数:")
-                    Spacer()
-
-                    Picker("履歴を保存する最大数", selection: $tempSelectedSaveOption) {
-                        ForEach(HistoryOption.presets) { option in
-                            Text(option.stringValue)
-                                .tag(option)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        Text("無制限")
-                            .tag(HistoryOption.unlimited)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Text("カスタム...")
-                            .tag(HistoryOption.custom(nil))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        if !HistoryOption.presets.contains(where: { $0.intValue == maxHistoryToSave }) && maxHistoryToSave != 0 && tempSelectedSaveOption != .custom(nil) {
-                            Divider()
-                            Text("カスタム: \(maxHistoryToSave)")
-                                .tag(HistoryOption.custom(maxHistoryToSave))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .onChange(of: tempSelectedSaveOption) {
-                        if case .custom(nil) = tempSelectedSaveOption {
-                            tempCustomSaveHistoryValue = maxHistoryToSave // 現在の値をカスタムシートの初期値に
-                            showingCustomSaveHistorySheet = true
-                        } else if tempSelectedSaveOption == .unlimited {
-                            maxHistoryToSave = 0 // 無制限を0として保存
-                        } else if let intValue = tempSelectedSaveOption.intValue {
-                            maxHistoryToSave = intValue
-                        }
-                        // 保存数の変更がメニュー表示数に影響する場合の処理（例：メニュー表示が「履歴の保存数に合わせる」の場合）
-                        if tempSelectedMenuOption == .sameAsSaved {
-                            maxHistoryInMenu = maxHistoryToSave
-                        }
-                        // ★修正: 保存数が無制限に設定された場合、かつメニュー表示が「保存数に合わせる」ならデフォルト値に戻す
-                        if tempSelectedSaveOption == .unlimited && tempSelectedMenuOption == .sameAsSaved {
-                            tempSelectedMenuOption = .preset(10) // デフォルト値（10個）に設定
-                            maxHistoryInMenu = 10
-                        }
-                    }
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("ファイル1つあたりの最大容量:")
-                        Text("ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Picker("ファイル1つあたりの最大容量", selection: $tempSelectedFileSizeOption) {
-                        ForEach(DataSizeOption.presets) { option in
-                            Text(option.stringValue)
-                                .tag(option)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        Text("無制限")
-                            .tag(DataSizeOption.unlimited)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("カスタム...")
-                            .tag(DataSizeOption.custom(nil, nil))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        if case let .custom(val, unit) = tempSelectedFileSizeOption,
-                           let value = val, let unit = unit,
-                           !DataSizeOption.presets.contains(where: { $0.byteValue == maxFileSizeToSave }) {
-                            Divider()
-                            Text("カスタム: \(value) \(unit.label)")
-                                .tag(DataSizeOption.custom(value, unit)) // tagを正しく設定
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .onChange(of: tempSelectedFileSizeOption) {
-                        if case .custom(nil, nil) = tempSelectedFileSizeOption {
-                            // 現在のバイト値をカスタムシートの初期値に変換
-                            let (value, unit) = tempSelectedFileSizeOption.extractValueAndUnitFromByteValue(byteValue: maxFileSizeToSave)
-                            tempCustomFileSizeValue = value
-                            tempCustomFileSizeUnit = unit
-                            showingCustomFileSizeSheet = true
-                        } else if tempSelectedFileSizeOption == .unlimited {
-                            maxFileSizeToSave = 0 // 無制限は0として保存
-                        } else if let byteValue = tempSelectedFileSizeOption.byteValue {
-                            maxFileSizeToSave = byteValue
-                        }
-                    }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
@@ -416,8 +235,8 @@ struct GeneralSettingsView: View {
                     Picker("メニューに表示する履歴の最大数", selection: $tempSelectedMenuOption) {
                         ForEach(MenuHistoryOption.presetsAndSameAsSaved.filter { option in
                             if case .sameAsSaved = option {
-                                // tempSelectedSaveOption が .unlimited (無制限) でない場合のみ .sameAsSaved を表示
-                                return tempSelectedSaveOption != .unlimited
+                                // UserDefaults.standard.integer(forKey: "maxHistoryToSave") が 0 (無制限) でない場合のみ .sameAsSaved を表示
+                                return UserDefaults.standard.integer(forKey: "maxHistoryToSave") != 0
                             }
                             return true // その他のプリセットは常に表示
                         }) { option in
@@ -447,7 +266,7 @@ struct GeneralSettingsView: View {
                             tempCustomMenuHistoryValue = maxHistoryInMenu
                             showingCustomMenuHistorySheet = true
                         } else if tempSelectedMenuOption == .sameAsSaved {
-                            maxHistoryInMenu = maxHistoryToSave
+                            maxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryToSave")
                         } else if let intValue = tempSelectedMenuOption.intValue {
                             maxHistoryInMenu = intValue
                         }
@@ -565,37 +384,6 @@ struct GeneralSettingsView: View {
             // View が表示されるたびにログイン項目の状態を最新にする
             loginItemManager.refreshLoginItemStatus()
         }
-        .sheet(isPresented: $showingCustomSaveHistorySheet) {
-            CustomNumberInputSheet(
-                title: Text("履歴を保存する最大数を設定"),
-                description: Text("保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。"),
-                currentValue: $tempCustomSaveHistoryValue,
-                onSave: { newValue in
-                    maxHistoryToSave = newValue
-
-                    if newValue == 0 {
-                        tempSelectedSaveOption = .unlimited
-                    } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == newValue }) {
-                        tempSelectedSaveOption = savedPreset
-                    } else {
-                        tempSelectedSaveOption = .custom(newValue)
-                    }
-
-                    if tempSelectedMenuOption == .sameAsSaved {
-                        maxHistoryInMenu = maxHistoryToSave
-                    }
-                },
-                onCancel: {
-                    if maxHistoryToSave == 0 {
-                        tempSelectedSaveOption = .unlimited
-                    } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxHistoryToSave }) {
-                        tempSelectedSaveOption = savedPreset
-                    } else {
-                        tempSelectedSaveOption = .custom(maxHistoryToSave)
-                    }
-                }
-            )
-        }
         .sheet(isPresented: $showingCustomMenuHistorySheet) {
             CustomNumberInputSheet(
                 title: Text("メニューに表示する履歴の最大数を設定"),
@@ -604,7 +392,7 @@ struct GeneralSettingsView: View {
                 onSave: { newValue in
                     maxHistoryInMenu = newValue
 
-                    if newValue == maxHistoryToSave {
+                    if newValue == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
                         tempSelectedMenuOption = .sameAsSaved
                     } else if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == newValue }) {
                         tempSelectedMenuOption = savedPreset
@@ -615,7 +403,7 @@ struct GeneralSettingsView: View {
                 onCancel: {
                     if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == maxHistoryInMenu }) {
                         tempSelectedMenuOption = savedPreset
-                    } else if maxHistoryInMenu == maxHistoryToSave {
+                    } else if maxHistoryInMenu == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
                         tempSelectedMenuOption = .sameAsSaved
                     } else {
                         tempSelectedMenuOption = .custom(maxHistoryInMenu)
@@ -645,59 +433,6 @@ struct GeneralSettingsView: View {
                     }
                 }
             )
-        }
-        .sheet(isPresented: $showingCustomFileSizeSheet) {
-            CustomNumberInputSheet(
-                title: Text("ファイル1つあたりの最大容量を設定"),
-                description: nil,
-                currentValue: $tempCustomFileSizeValue,
-                selectedUnit: Binding<DataSizeUnit?>(get: { tempCustomFileSizeUnit }, set: { tempCustomFileSizeUnit = $0 ?? .megabytes }), // Explicitly convert Binding<DataSizeUnit> to Binding<DataSizeUnit?>
-                onSave: { newValue in
-                    let newByteValue = tempCustomFileSizeUnit.byteValue(for: newValue)
-                    maxFileSizeToSave = newByteValue
-
-                    if newByteValue == 0 { // 0は無制限として扱う
-                        tempSelectedFileSizeOption = .unlimited
-                    } else if let savedPreset = DataSizeOption.presets.first(where: { $0.byteValue == newByteValue }) {
-                        tempSelectedFileSizeOption = savedPreset
-                    } else {
-                        tempSelectedFileSizeOption = .custom(newValue, tempCustomFileSizeUnit)
-                    }
-                },
-                onCancel: {
-                    if maxFileSizeToSave == 0 { // 0は無制限として扱う
-                        tempSelectedFileSizeOption = .unlimited
-                    } else if let savedPreset = DataSizeOption.presets.first(where: { $0.byteValue == maxFileSizeToSave }) {
-                        tempSelectedFileSizeOption = savedPreset
-                    } else {
-                        // 既存の値をカスタムとして設定し直す
-                        let (value, unit) = DataSizeOption.custom(maxFileSizeToSave, nil).extractValueAndUnitFromByteValue(byteValue: maxFileSizeToSave)
-                        tempCustomFileSizeValue = value
-                        tempCustomFileSizeUnit = unit
-                        tempSelectedFileSizeOption = .custom(value, unit)
-                    }
-                }
-            )
-        }
-    }
-}
-
-// MARK: - DataSizeOption のヘルパー拡張
-extension DataSizeOption {
-    // バイト値からDataSizeOptionの表示値と単位を逆算するヘルパー
-    func extractValueAndUnitFromByteValue(byteValue: Int) -> (value: Int, unit: DataSizeUnit) {
-        let gigabyteValue = 1_000_000_000
-        let megabyteValue = 1_000_000
-        let kilobyteValue = 1_000
-
-        if byteValue >= gigabyteValue && byteValue % gigabyteValue == 0 {
-            return (byteValue / gigabyteValue, .gigabytes)
-        } else if byteValue >= megabyteValue && byteValue % megabyteValue == 0 {
-            return (byteValue / megabyteValue, .megabytes)
-        } else if byteValue >= kilobyteValue && byteValue % kilobyteValue == 0 {
-            return (byteValue / kilobyteValue, .kilobytes)
-        } else {
-            return (byteValue, .bytes)
         }
     }
 }
