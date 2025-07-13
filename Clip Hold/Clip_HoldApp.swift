@@ -163,22 +163,26 @@ struct ClipHoldApp: App {
                         }
                     } label: {
                         HStack(spacing: 8) {
-                            if let filePath = item.filePath {
-                                // ファイルアイコンを表示
+                            if let cachedImage = item.cachedThumbnailImage {
+                                Image(nsImage: cachedImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 16, height: 16)
+                            } else if let filePath = item.filePath {
+                                // キャッシュがない場合は、従来のファイルアイコンを表示
                                 let nsImage = NSWorkspace.shared.icon(forFile: filePath.path)
                                 Image(nsImage: nsImage)
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 16, height: 16)
                             } else {
-                                // テキストアイテムの場合は汎用的なアイコンを表示
-                                Image(systemName: "text.page") // ここを"text.page"に修正
+                                Image(systemName: "text.page")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 16, height: 16)
                                     .foregroundColor(.secondary)
                             }
-                            
+
                             Text(displayText)
                                 .font(.body)
                                 .lineLimit(1)

@@ -3,12 +3,13 @@ import AppKit
 import SwiftUI
 import CoreImage // QRコード解析用
 import UniformTypeIdentifiers // UTTypeのチェック用
+import QuickLookThumbnailing
 
 class ClipboardManager: ObservableObject {
     static let shared = ClipboardManager()
     
     @Published var clipboardHistory: [ClipboardItem] = []
-    
+
     private var saveTask: Task<Void, Never>?
     
     private var temporaryFileUrls: Set<URL> = []
@@ -281,6 +282,10 @@ class ClipboardManager: ObservableObject {
         clipboardHistory.insert(newItem, at: 0)
         print("ClipboardManager: New item added to history: \(newItem.text.prefix(50))...")
         
+        if let filePath = newItem.filePath {
+            generateThumbnail(for: newItem, at: filePath)
+        }
+
         // 最大履歴数を超過した場合の処理を適用
         enforceMaxHistoryCount()
         
@@ -288,7 +293,25 @@ class ClipboardManager: ObservableObject {
         scheduleSaveClipboardHistory()
     }
     
-    
+    // MARK: - Thumbnail Generation
+    private func generateThumbnail(for item: ClipboardItem, at fileURL: URL) {
+        let thumbnailSize = CGSize(width: 40, height: 40) // メニューバーの表示サイズに合わせる
+        let request = QLThumbnailGenerator.Request(fileAt: fileURL, size: thumbnailSize, scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
+        
+        Task.detached {
+            do {
+                let thumbnail = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
+                await MainActor.run {
+                    item.cachedThumbnailImage = thumbnail.nsImage
+                    // MenuBarExtraを更新するため、マネージャー全体を更新通知
+                    self.objectWillChange.send()
+                }
+            } catch {
+                print("Failed to generate thumbnail for \(fileURL.lastPathComponent): \(error.localizedDescription)")
+            }
+        }
+    }
+
     // MARK: - Clipboard Monitoring
     func startMonitoringPasteboard() {
         // 新しいタイマーを起動する前に、確実に既存のタイマーを無効化しnilにする
@@ -519,6 +542,10 @@ class ClipboardManager: ObservableObject {
                 // 4. 最大履歴数を超過した場合の処理
                 self.enforceMaxHistoryCount()
                 
+                for item in self.clipboardHistory where item.filePath != nil {
+                    self.generateThumbnail(for: item, at: item.filePath!)
+                }
+
                 print("ClipboardManager: 履歴をインポートしました。追加された項目数: \(newItems.count), 総履歴数: \(self.clipboardHistory.count)")
                 
                 self.scheduleSaveClipboardHistory()
@@ -621,6 +648,11 @@ class ClipboardManager: ObservableObject {
             }
             
             self.clipboardHistory = loadedHistory
+            
+            for item in self.clipboardHistory where item.filePath != nil {
+                generateThumbnail(for: item, at: item.filePath!)
+            }
+
             print("ClipboardManager: Clipboard history loaded from file. Count: \(clipboardHistory.count), Size: \(data.count) bytes.")
         } catch {
             print("ClipboardManager: Error loading clipboard history from file: \(error.localizedDescription)")

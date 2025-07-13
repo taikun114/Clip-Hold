@@ -3,6 +3,7 @@ import AppKit
 import CoreImage
 import UniformTypeIdentifiers
 import Quartz
+import QuickLookThumbnailing
 
 private let itemDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
@@ -170,13 +171,24 @@ struct HistoryItemRow: View {
         .help(item.text)
         .onAppear {
             if let filePath = item.filePath {
-                // 既存のタスクをキャンセルして新しいタスクを開始
                 iconLoadTask?.cancel()
-                iconLoadTask = Task.detached {
-                    let nsImage = NSWorkspace.shared.icon(forFile: filePath.path)
-                    // メインスレッドでUIを更新
-                    await MainActor.run {
-                        self.iconImage = nsImage
+                
+                // QLThumbnailGeneratorを使用して非同期でサムネイルを生成
+                iconLoadTask = Task {
+                    let thumbnailSize = CGSize(width: 40, height: 40)
+                    let request = QLThumbnailGenerator.Request(fileAt: filePath, size: thumbnailSize, scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
+                    
+                    do {
+                        let thumbnail = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
+                        await MainActor.run {
+                            self.iconImage = thumbnail.nsImage
+                        }
+                    } catch {
+                        print("Failed to generate thumbnail for \(filePath.lastPathComponent): \(error.localizedDescription)")
+                        // サムネイル生成に失敗した場合は、デフォルトアイコンに戻す
+                        await MainActor.run {
+                            self.iconImage = NSWorkspace.shared.icon(forFile: filePath.path)
+                        }
                     }
                 }
             } else {
@@ -185,7 +197,6 @@ struct HistoryItemRow: View {
             }
         }
         .onDisappear {
-            // ビューが非表示になったらタスクをキャンセルしてメモリを解放
             iconLoadTask?.cancel()
         }
     }

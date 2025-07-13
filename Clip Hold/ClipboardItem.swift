@@ -1,18 +1,22 @@
-// ClipboardItem.swift
 import Foundation
+import SwiftUI
 
-struct ClipboardItem: Identifiable, Codable, Equatable {
+class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     var id: UUID
-    let text: String // テキストとして表示される内容 (ファイルのパスや画像の内容の一部など)
-    var date: Date
-    var filePath: URL?
-    var fileSize: UInt64?
-    var qrCodeContent: String? // 追加: QRコードの内容を格納するプロパティ
+    @Published var text: String
+    @Published var date: Date
+    @Published var filePath: URL?
+    @Published var fileSize: UInt64?
+    @Published var qrCodeContent: String?
 
+    // Codableではないため @Published にできない。
+    // UIの自動更新は、このプロパティの変更後に親のObservableObject (ClipboardManager) の変更を通知することで実現
+    var cachedThumbnailImage: NSImage?
+    
     static func == (lhs: ClipboardItem, rhs: ClipboardItem) -> Bool {
         lhs.id == rhs.id
     }
-
+    
     // 新しいClipboardItemを作成するためのイニシャライザ (テキストのみ)
     init(text: String, date: Date = Date(), qrCodeContent: String? = nil) {
         self.id = UUID()
@@ -34,21 +38,17 @@ struct ClipboardItem: Identifiable, Codable, Equatable {
     }
 
     // CodableのためのDecodableイニシャライザ
-    enum CodingKeys: String, CodingKey {
-        case id, text, date, filePath, fileSize, qrCodeContent
-    }
-
-    init(from decoder: Decoder) throws {
+    required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
-        text = try container.decode(String.self, forKey: .text)
-        date = try container.decode(Date.self, forKey: .date)
-        filePath = try container.decodeIfPresent(URL.self, forKey: .filePath)
-        fileSize = try container.decodeIfPresent(UInt64.self, forKey: .fileSize)
-        qrCodeContent = try container.decodeIfPresent(String.self, forKey: .qrCodeContent)
+        self.id = try container.decode(UUID.self, forKey: .id)
+        self.text = try container.decode(String.self, forKey: .text)
+        self.date = try container.decode(Date.self, forKey: .date)
+        self.filePath = try container.decodeIfPresent(URL.self, forKey: .filePath)
+        self.fileSize = try container.decodeIfPresent(UInt64.self, forKey: .fileSize)
+        self.qrCodeContent = try container.decodeIfPresent(String.self, forKey: .qrCodeContent)
     }
     
-    // Encoded func (required for Codable)
+    // CodableのためのEncoded関数
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
@@ -57,5 +57,9 @@ struct ClipboardItem: Identifiable, Codable, Equatable {
         try container.encodeIfPresent(filePath, forKey: .filePath)
         try container.encodeIfPresent(fileSize, forKey: .fileSize)
         try container.encodeIfPresent(qrCodeContent, forKey: .qrCodeContent)
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id, text, date, filePath, fileSize, qrCodeContent
     }
 }
