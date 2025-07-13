@@ -1119,6 +1119,22 @@
         }
       }
     },
+    "クイックルック" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Look"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックルック"
+          }
+        }
+      }
+    },
     "クリップボード" : {
       "localizations" : {
         "en" : {

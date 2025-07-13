@@ -2,6 +2,7 @@ import SwiftUI
 import AppKit
 import CoreImage
 import UniformTypeIdentifiers
+import Quartz
 
 private let itemDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
@@ -39,6 +40,8 @@ struct HistoryItemRow: View {
     
     @Binding var itemForNewPhrase: ClipboardItem?
 
+    let quickLookManager: QuickLookManager
+
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
 
@@ -56,6 +59,7 @@ struct HistoryItemRow: View {
          showQRCodeSheet: Binding<Bool>,
          selectedItemForQRCode: Binding<ClipboardItem?>,
          itemForNewPhrase: Binding<ClipboardItem?>,
+         quickLookManager: QuickLookManager,
          lineNumberTextWidth: CGFloat?,
          trailingPaddingForLineNumber: CGFloat) {
             
@@ -70,6 +74,7 @@ struct HistoryItemRow: View {
         _showQRCodeSheet = showQRCodeSheet
         _selectedItemForQRCode = selectedItemForQRCode
         _itemForNewPhrase = itemForNewPhrase
+        self.quickLookManager = quickLookManager
         self.lineNumberTextWidth = lineNumberTextWidth
         self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
     }
@@ -88,6 +93,13 @@ struct HistoryItemRow: View {
                 }
             }
             Divider()
+            if let filePath = item.filePath {
+                Button("クイックルック") {
+                    if let sourceView = NSApp.keyWindow?.contentView {
+                        quickLookManager.showQuickLook(for: filePath, sourceView: sourceView)
+                    }
+                }
+            }
             Button("項目から定型文を作成...") {
                 itemForNewPhrase = item // ここでClipboardItemをセット
             }

@@ -71,6 +71,7 @@ struct HistoryContentList: View {
                             showQRCodeSheet: $showQRCodeSheet,
                             selectedItemForQRCode: $selectedItemForQRCode,
                             itemForNewPhrase: $itemForNewPhrase,
+                            quickLookManager: quickLookManager,
                             lineNumberTextWidth: lineNumberTextWidth,
                             trailingPaddingForLineNumber: trailingPaddingForLineNumber
                         )
@@ -156,6 +157,13 @@ struct HistoryContentList: View {
                                 }
                             }
                             Divider()
+                            if let filePath = currentItem.filePath {
+                                Button("クイックルック") {
+                                    if let sourceView = NSApp.keyWindow?.contentView {
+                                        quickLookManager.showQuickLook(for: filePath, sourceView: sourceView)
+                                    }
+                                }
+                            }
                             Button("項目から定型文を作成...") {
                                 itemForNewPhrase = currentItem // ここでClipboardItemをセット
                             }
