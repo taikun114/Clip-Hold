@@ -134,27 +134,7 @@ class ClipboardManager: ObservableObject {
             return nil
         }
     }
-
-    private func copyImageToAppSandbox(image: NSImage, originalFileName: String) -> URL? {
-        guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
-        
-        let uniqueFileName = "\(UUID().uuidString)-\(originalFileName)"
-        let destinationURL = filesDirectory.appendingPathComponent(uniqueFileName)
-        
-        if let tiff = image.tiffRepresentation, let imgRep = NSBitmapImageRep(data: tiff) {
-            let imageData = imgRep.representation(using: .png, properties: [:])
-            do {
-                try imageData?.write(to: destinationURL)
-                print("ClipboardManager: Copied image to sandbox as \(destinationURL.lastPathComponent)")
-                return destinationURL
-            } catch {
-                print("ClipboardManager: Error saving image to sandbox: \(error.localizedDescription)")
-                return nil
-            }
-        }
-        return nil
-    }
-
+    
     private func deleteFileFromSandbox(at fileURL: URL) {
         do {
             if FileManager.default.fileExists(atPath: fileURL.path) {
@@ -188,41 +168,29 @@ class ClipboardManager: ObservableObject {
         }
     }
     
-    // ヘルパー関数: URLが画像ファイルかどうかを判断
-    private func isImage(url: URL) -> Bool {
-        guard let uti = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType else {
-            return false
-        }
-        return uti.conforms(to: .image)
-    }
-
-
     // ヘルパー関数: ファイルURLからClipboardItemを作成（物理的な重複コピー防止ロジックを含む）
     private func createClipboardItemForFileURL(_ fileURL: URL) -> ClipboardItem? {
         let filesDirectory = createClipboardFilesDirectoryIfNeeded()
 
+        // 外部ファイルの属性を取得
+        let externalFileAttributes = getFileAttributes(fileURL)
+
         // サンドボックス内の既存ファイルを走査し、重複をチェック
-        if let filesDirectory = filesDirectory { // filesDirectory が nil でないことを確認
+        if let filesDirectory = filesDirectory {
             do {
                 let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey], options: .skipsHiddenFiles)
-                
-                // 外部ファイルの属性を取得
-                let externalFileAttributes = getFileAttributes(fileURL)
                 
                 for sandboxedFileURL in sandboxedFileContents {
                     let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
 
-                    // ファイルサイズと最終変更日時が一致する場合、重複とみなす
+                    // MARK: - ファイルサイズが完全に一致するかどうかのみを比較
                     if let externalSize = externalFileAttributes.fileSize,
-                       let externalModDate = externalFileAttributes.modificationDate,
                        let sandboxedSize = sandboxedFileAttributes.fileSize,
-                       let sandboxedModDate = sandboxedFileAttributes.modificationDate,
-                       externalSize == sandboxedSize && externalModDate == sandboxedModDate {
-                        
-                        print("ClipboardManager: Found potential duplicate in sandbox based on size/date: \(sandboxedFileURL.lastPathComponent)")
+                       externalSize == sandboxedSize {
+                        print("ClipboardManager: Found potential duplicate in sandbox based on file size: \(sandboxedFileURL.lastPathComponent)")
                         // 重複が見つかった場合、既存のサンドボックスファイルを参照する新しいアイテムを返す
                         let displayName = extractOriginalFileName(from: sandboxedFileURL.lastPathComponent)
-                        return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL)
+                        return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize) // 新しいアイテムにもファイルサイズをセット
                     }
                 }
             } catch {
@@ -233,11 +201,79 @@ class ClipboardManager: ObservableObject {
         // 重複ファイルが見つからなかった場合、ファイルをサンドボックスにコピーして新しいアイテムを返す
         if let copiedFileURL = copyFileToAppSandbox(from: fileURL) {
             let displayName = fileURL.lastPathComponent
-            return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL)
+            return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: externalFileAttributes.fileSize) // 新しいアイテムにもファイルサイズをセット
         }
 
         print("ClipboardManager: Failed to copy external item to sandbox: \(fileURL.lastPathComponent).")
         return nil
+    }
+
+    // MARK: - New Helper function for image duplication check and saving
+    private func createClipboardItemFromImageData(_ imageData: Data) -> ClipboardItem? {
+        guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
+
+        let newImageSize = UInt64(imageData.count)
+        
+        do {
+            let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles)
+            
+            for sandboxedFileURL in sandboxedFileContents {
+                if sandboxedFileURL.lastPathComponent.hasSuffix("-image.png") {
+                    let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
+                    if let sandboxedSize = sandboxedFileAttributes.fileSize, sandboxedSize == newImageSize {
+                        print("ClipboardManager: Found duplicate image in sandbox based on file size: \(sandboxedFileURL.lastPathComponent)")
+                        return ClipboardItem(text: "画像ファイル", date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize)
+                    }
+                }
+            }
+        } catch {
+            print("ClipboardManager: Error getting contents of sandbox directory for image duplicate check: \(error.localizedDescription)")
+        }
+        
+        // 重複が見つからなかった場合、新しい画像を保存
+        let uniqueFileName = "\(UUID().uuidString)-image.png"
+        let destinationURL = filesDirectory.appendingPathComponent(uniqueFileName)
+        
+        do {
+            try imageData.write(to: destinationURL)
+            print("ClipboardManager: New image saved to sandbox as \(destinationURL.lastPathComponent)")
+            return ClipboardItem(text: "画像ファイル", date: Date(), filePath: destinationURL, fileSize: newImageSize)
+        } catch {
+            print("ClipboardManager: Error saving new image to sandbox: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    // MARK: - Helper function for duplication check
+    private func isDuplicate(_ newItem: ClipboardItem, of existingItem: ClipboardItem) -> Bool {
+        // ファイルアイテムの場合、ファイルサイズで重複を判定
+        if newItem.filePath != nil && existingItem.filePath != nil && newItem.fileSize != nil && newItem.fileSize == existingItem.fileSize {
+            return true
+        }
+        // テキストアイテムの場合、テキスト内容で重複を判定
+        if newItem.filePath == nil && existingItem.filePath == nil && newItem.text == existingItem.text {
+            return true
+        }
+        return false
+    }
+
+    // MARK: - Helper function to add and save a new item
+    private func addAndSaveItem(_ newItem: ClipboardItem) {
+        // 先頭の項目と重複している場合はスキップ
+        if let firstItem = clipboardHistory.first, isDuplicate(newItem, of: firstItem) {
+            print("ClipboardManager: Item is a duplicate of the first item, skipping addition.")
+            return
+        }
+
+        self.objectWillChange.send()
+        clipboardHistory.insert(newItem, at: 0)
+        print("ClipboardManager: New item added to history: \(newItem.text.prefix(50))...")
+        
+        // 最大履歴数を超過した場合の処理を適用
+        enforceMaxHistoryCount()
+        
+        // 履歴を保存
+        scheduleSaveClipboardHistory()
     }
 
 
@@ -317,57 +353,44 @@ class ClipboardManager: ObservableObject {
                 newItemToConsider = createClipboardItemForFileURL(url)
             }
             
-            // 2. ファイルURLがなければ、NSImageを読み込もうとする
-            if newItemToConsider == nil, let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
-                print("ClipboardManager: Image detected on pasteboard. Saving to history...")
-                if let newImageURL = copyImageToAppSandbox(image: image, originalFileName: "image.png") {
-                    newItemToConsider = ClipboardItem(text: "画像ファイル", date: Date(), filePath: newImageURL)
+            // ファイルが処理された場合は、以降の画像やテキストの処理をスキップ
+            if newItemToConsider != nil {
+                addAndSaveItem(newItemToConsider!)
+                return
+            }
+            
+            // 2. ファイルURLがなければ、画像データを直接読み込もうとする
+            var imageDataFromPasteboard: Data?
+            
+            // ネイティブな画像データを優先して読み込む
+            if let tiffData = pasteboard.data(forType: .tiff) {
+                imageDataFromPasteboard = tiffData
+                print("ClipboardManager: Image data detected on pasteboard (TIFF).")
+            } else if let pngData = pasteboard.data(forType: .png) {
+                imageDataFromPasteboard = pngData
+                print("ClipboardManager: Image data detected on pasteboard (PNG).")
+            } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
+                // どちらも見つからない場合、一般的なNSImageオブジェクトのTIFF表現を試みる
+                imageDataFromPasteboard = image.tiffRepresentation
+                if imageDataFromPasteboard != nil {
+                    print("ClipboardManager: Image data detected on pasteboard (from generic NSImage).")
                 }
+            }
+            
+            if let imageData = imageDataFromPasteboard {
+                newItemToConsider = createClipboardItemFromImageData(imageData)
             }
             
             // 3. ファイルも画像もなかった場合、文字列として処理を試みる
             if newItemToConsider == nil, let newString = pasteboard.string(forType: .string) {
-                newItemToConsider = ClipboardItem(text: newString, date: Date(), filePath: nil)
+                newItemToConsider = ClipboardItem(text: newString, date: Date(), filePath: nil, fileSize: nil)
             }
 
-
-            // --- 統合された重複チェックと履歴への追加 ---
+            // --- 重複チェックと履歴への追加 ---
             if let newItem = newItemToConsider {
-                // 新しい重複チェックロジック:
-                // 1. 履歴が空の場合は無条件に追加
-                // 2. 履歴の先頭と完全に重複する場合のみ、追加をスキップする
-                //    - ファイルパスがある場合はパスを比較
-                //    - ファイルパスがない場合はテキストを比較
-                var isDuplicateOfFirstItem = false
-                if let firstItem = clipboardHistory.first {
-                    if let newPath = newItem.filePath, let firstPath = firstItem.filePath {
-                        if newPath == firstPath {
-                            isDuplicateOfFirstItem = true
-                        }
-                    } else if newItem.filePath == nil && firstItem.filePath == nil {
-                        if newItem.text == firstItem.text {
-                            isDuplicateOfFirstItem = true
-                        }
-                    }
-                }
-                
-                if !isDuplicateOfFirstItem {
-                    self.objectWillChange.send() // UI更新を促す
-                    clipboardHistory.insert(newItem, at: 0) // 先頭に追加
-                    print("ClipboardManager: New item added to history: \(newItem.text.prefix(50))...")
-                } else {
-                    print("ClipboardManager: Item is a duplicate of the first item in history, skipping addition.")
-                }
+                addAndSaveItem(newItem)
             } else {
                 print("ClipboardManager: No supported item type found on pasteboard or failed to process.")
-            }
-
-
-            // 最大履歴数を超過した場合の処理を適用
-            enforceMaxHistoryCount()
-
-            if newItemToConsider != nil {
-                scheduleSaveClipboardHistory()
             }
         }
     }
@@ -576,7 +599,7 @@ extension ClipboardManager {
         }
 
         self.objectWillChange.send() // UI更新を促す
-        let newItem = ClipboardItem(text: text, date: Date(), filePath: nil) // ファイルパスはnil
+        let newItem = ClipboardItem(text: text, date: Date(), filePath: nil, fileSize: nil) // ファイルパスとサイズはnil
         clipboardHistory.insert(newItem, at: 0) // 先頭に追加
         print("ClipboardManager: New text item added via addTextItem. Total history: \(clipboardHistory.count)")
 

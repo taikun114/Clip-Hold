@@ -19,22 +19,9 @@ private func copyToClipboard(_ item: ClipboardItem) {
     NSPasteboard.general.clearContents()
 
     var success = false
-    
-    // 1. 画像パスが存在する場合、画像としてコピーを試みる
-    if let imagePath = item.imagePath {
-        if let nsImage = NSImage(contentsOf: imagePath) {
-            if NSPasteboard.general.writeObjects([nsImage]) {
-                print("クリップボードに画像がコピーされました: \(imagePath.lastPathComponent)")
-                success = true
-            } else {
-                print("クリップボードに画像 (NSImage) をコピーできませんでした: \(imagePath.lastPathComponent)")
-            }
-        } else {
-            print("画像ファイルのロードに失敗しました: \(imagePath.lastPathComponent)")
-        }
-    }
-    // 2. 画像パスがなく、ファイルパスが存在する場合、ファイルとしてコピーを試みる
-    else if let filePath = item.filePath {
+
+    if let filePath = item.filePath {
+        // ファイルパスが存在する場合、ファイルとしてクリップボードにコピーを試みる
         // Option 1: NSURLオブジェクトを書き込む（既存の方法）
         let nsURL = filePath as NSURL
         if NSPasteboard.general.writeObjects([nsURL]) {
@@ -44,6 +31,7 @@ private func copyToClipboard(_ item: ClipboardItem) {
             print("クリップボードにファイル (NSURL) をコピーできませんでした: \(filePath.lastPathComponent)")
             
             // Option 2: ファイルURLの文字列 (.fileURL タイプ) を書き込む
+            // こちらの方が明示的でうまくいく場合があります
             if NSPasteboard.general.setString(filePath.absoluteString, forType: .fileURL) {
                 print("クリップボードにファイルURL文字列がコピーされました (.fileURL): \(filePath.lastPathComponent)")
                 success = true
@@ -53,17 +41,16 @@ private func copyToClipboard(_ item: ClipboardItem) {
         }
     }
 
-    // 3. どちらのパスもない場合、テキストとしてコピー
+    // ファイルコピーが失敗した場合、またはファイルパスがそもそも存在しない場合、テキストをコピーする
     if !success {
-        NSPasteboard.general.setString(item.text, forType: .string)
-        print("クリップボードにテキストがコピーされました: \(item.text.prefix(50))...")
+        if let string = item.text.data(using: .utf8) {
+            NSPasteboard.general.setData(string, forType: .string)
+            print("クリップボードにテキストがコピーされました: \(item.text.prefix(20))...")
+        }
     }
 
-    // 遅延してフラグをリセット
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-        clipboardManager.isPerformingInternalCopy = false
-        print("DEBUG: copyToClipboard: isPerformingInternalCopy = false")
-    }
+    clipboardManager.isPerformingInternalCopy = false
+    print("DEBUG: copyToClipboard: isPerformingInternalCopy = false")
 }
 
 // 文字列を安全に切り詰めるヘルパー関数
