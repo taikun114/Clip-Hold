@@ -34,6 +34,8 @@ class ClipboardManager: ObservableObject {
     }
 
     @AppStorage("maxHistoryToSave") private var maxHistoryToSave: Int = 0 // 無制限を0で表す (GeneralSettingsViewとキーを合わせる)
+    // MARK: - 新しく追加するAppStorageプロパティ
+    @AppStorage("maxFileSizeToSave") private var maxFileSizeToSave: Int = 0 // 無制限を0で表す (GeneralSettingsViewとキーを合わせる)
 
     @AppStorage("scanQRCodeImage") private var scanQRCodeImage = false
 
@@ -174,6 +176,12 @@ class ClipboardManager: ObservableObject {
 
         // 外部ファイルの属性を取得
         let externalFileAttributes = getFileAttributes(fileURL)
+        
+        // MARK: - ファイルサイズチェックを追加
+        if let fileSize = externalFileAttributes.fileSize, maxFileSizeToSave > 0 && fileSize > maxFileSizeToSave {
+            print("ClipboardManager: File not saved due to size limit. File size: \(fileSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
+            return nil // サイズ制限を超えているためnilを返す
+        }
 
         // サンドボックス内の既存ファイルを走査し、重複をチェック
         if let filesDirectory = filesDirectory {
@@ -214,6 +222,12 @@ class ClipboardManager: ObservableObject {
 
         let newImageSize = UInt64(imageData.count)
         
+        // MARK: - 画像サイズチェックを追加
+        if maxFileSizeToSave > 0 && newImageSize > maxFileSizeToSave {
+            print("ClipboardManager: Image not saved due to size limit. Image size: \(newImageSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
+            return nil // サイズ制限を超えているためnilを返す
+        }
+
         do {
             let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles)
             
@@ -341,22 +355,21 @@ class ClipboardManager: ObservableObject {
                 }
             }
 
-            var newItemToConsider: ClipboardItem? = nil
-
             // 1. ファイルURLを読み込もうとする（最優先）
+            // readObjectsがNSURLを返す場合と、stringがfileURLを返す場合を両方チェック
             if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL],
                let firstFileURL = fileURLs.first {
-                newItemToConsider = createClipboardItemForFileURL(firstFileURL)
+                if let newItem = createClipboardItemForFileURL(firstFileURL) {
+                    addAndSaveItem(newItem)
+                }
+                return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
             } else if pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.fileURL.rawValue]),
                       let stringURL = pasteboard.string(forType: .fileURL),
                       let url = URL(string: stringURL) {
-                newItemToConsider = createClipboardItemForFileURL(url)
-            }
-            
-            // ファイルが処理された場合は、以降の画像やテキストの処理をスキップ
-            if newItemToConsider != nil {
-                addAndSaveItem(newItemToConsider!)
-                return
+                if let newItem = createClipboardItemForFileURL(url) {
+                    addAndSaveItem(newItem)
+                }
+                return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
             }
             
             // 2. ファイルURLがなければ、画像データを直接読み込もうとする
@@ -378,20 +391,20 @@ class ClipboardManager: ObservableObject {
             }
             
             if let imageData = imageDataFromPasteboard {
-                newItemToConsider = createClipboardItemFromImageData(imageData)
+                if let newItem = createClipboardItemFromImageData(imageData) {
+                    addAndSaveItem(newItem)
+                }
+                return // 画像の有無に関わらず、画像データのチェックが完了したので終了
             }
             
             // 3. ファイルも画像もなかった場合、文字列として処理を試みる
-            if newItemToConsider == nil, let newString = pasteboard.string(forType: .string) {
-                newItemToConsider = ClipboardItem(text: newString, date: Date(), filePath: nil, fileSize: nil)
-            }
-
-            // --- 重複チェックと履歴への追加 ---
-            if let newItem = newItemToConsider {
+            if let newString = pasteboard.string(forType: .string) {
+                let newItem = ClipboardItem(text: newString, date: Date(), filePath: nil, fileSize: nil)
                 addAndSaveItem(newItem)
-            } else {
-                print("ClipboardManager: No supported item type found on pasteboard or failed to process.")
+                return
             }
+            
+            print("ClipboardManager: No supported item type found on pasteboard.")
         }
     }
 
