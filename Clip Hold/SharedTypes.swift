@@ -213,11 +213,41 @@ enum DataSizeOption: Hashable, Identifiable, CaseIterable {
         .preset(1, .gigabytes)
     ]
 
+    // CaseIterableの要件を満たすために、すべてのケースを定義
     static var allCases: [DataSizeOption] {
         var cases = DataSizeOption.presets
         cases.append(.unlimited)
         cases.append(.custom(nil, nil))
         return cases
+    }
+
+    // IdentifiableとHashableの要件を満たすために、== と hash(into:) を実装
+    static func == (lhs: DataSizeOption, rhs: DataSizeOption) -> Bool {
+        switch (lhs, rhs) {
+        case (.preset(let lv, let lu), .preset(let rv, let ru)):
+            return lv == rv && lu == ru
+        case (.custom(let lv, let lu), .custom(let rv, let ru)):
+            return lv == rv && lu == ru
+        case (.unlimited, .unlimited):
+            return true
+        default:
+            return false
+        }
+    }
+
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .preset(let value, let unit):
+            hasher.combine(0)
+            hasher.combine(value)
+            hasher.combine(unit)
+        case .custom(let value, let unit):
+            hasher.combine(1)
+            hasher.combine(value)
+            hasher.combine(unit)
+        case .unlimited:
+            hasher.combine(2)
+        }
     }
 }
 

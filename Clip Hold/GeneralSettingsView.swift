@@ -143,7 +143,7 @@ struct GeneralSettingsView: View {
             determinedTempSelectedSaveOption = .custom(savedMaxHistoryToSave)
             determinedTempCustomSaveHistoryValue = savedMaxHistoryToSave
         }
-        
+    
         // tempSelectedFileSizeOption の値を決定
         let determinedTempSelectedFileSizeOption: DataSizeOption
         var determinedTempCustomFileSizeValue: Int = 1
@@ -210,7 +210,7 @@ struct GeneralSettingsView: View {
             savedMaxPhrasesInMenu = 5
             UserDefaults.standard.set(5, forKey: "maxPhrasesInMenu") // UserDefaultsも更新
         }
-        
+    
         if let preset = HistoryOption.presets.first(where: { $0.intValue == savedMaxPhrasesInMenu }) {
             determinedTempSelectedPhraseMenuOption = preset
             determinedTempCustomPhrasesInMenuValue = savedMaxPhrasesInMenu
@@ -307,7 +307,12 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 HStack {
-                    Text("ファイル1つあたりの最大容量:")
+                    VStack(alignment: .leading) {
+                        Text("ファイル1つあたりの最大容量:")
+                        Text("ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                     Spacer()
                     Picker("ファイル1つあたりの最大容量", selection: $tempSelectedFileSizeOption) {
                         ForEach(DataSizeOption.presets) { option in
@@ -322,13 +327,12 @@ struct GeneralSettingsView: View {
                             .tag(DataSizeOption.custom(nil, nil))
                             .frame(maxWidth: .infinity, alignment: .leading)
 
-                        // 現在のmaxFileSizeToSaveがプリセットになく、カスタムでもない場合に表示
-                        if !DataSizeOption.presets.contains(where: { $0.byteValue == maxFileSizeToSave }) && maxFileSizeToSave != 0 && tempSelectedFileSizeOption != .custom(nil, nil) {
+                        if case let .custom(val, unit) = tempSelectedFileSizeOption,
+                           let value = val, let unit = unit,
+                           !DataSizeOption.presets.contains(where: { $0.byteValue == maxFileSizeToSave }) {
                             Divider()
-                            // カスタム値と単位を逆算して表示
-                            let (value, unit) = DataSizeOption.custom(maxFileSizeToSave, nil).extractValueAndUnitFromByteValue(byteValue: maxFileSizeToSave)
                             Text("カスタム: \(value) \(unit.label)")
-                                .tag(DataSizeOption.custom(maxFileSizeToSave, nil))
+                                .tag(DataSizeOption.custom(value, unit)) // tagを正しく設定
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
@@ -412,14 +416,12 @@ struct GeneralSettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .onChange(of: tempSelectedMenuOption) {
-                        if case .custom(nil) = tempSelectedMenuOption {
-                            tempCustomMenuHistoryValue = maxHistoryInMenu
-                            showingCustomMenuHistorySheet = true
-                        } else if tempSelectedMenuOption == .sameAsSaved {
-                            maxHistoryInMenu = maxHistoryToSave
-                        } else if let intValue = tempSelectedMenuOption.intValue {
-                            maxHistoryInMenu = intValue
+                    .onChange(of: tempSelectedPhraseMenuOption) { // ここを tempSelectedPhraseMenuOption に修正
+                        if case .custom(nil) = tempSelectedPhraseMenuOption {
+                            tempCustomPhrasesInMenuValue = maxPhrasesInMenu // 現在の値をカスタムシートの初期値に
+                            showingCustomPhraseMenuSheet = true
+                        } else if let intValue = tempSelectedPhraseMenuOption.intValue {
+                            maxPhrasesInMenu = intValue
                         }
                     }
                 }
@@ -459,17 +461,18 @@ struct GeneralSettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .onChange(of: tempSelectedPhraseMenuOption) { // ここは $tempSelectedPhraseMenuOption の onChange が正しい
-                        if case .custom(nil) = tempSelectedPhraseMenuOption {
-                            tempCustomPhrasesInMenuValue = maxPhrasesInMenu // 現在の値をカスタムシートの初期値に
-                            showingCustomPhraseMenuSheet = true
-                        } else if let intValue = tempSelectedPhraseMenuOption.intValue {
-                            maxPhrasesInMenu = intValue
+                    .onChange(of: tempSelectedMenuOption) { // ここを tempSelectedMenuOption に修正
+                        if case .custom(nil) = tempSelectedMenuOption {
+                            tempCustomMenuHistoryValue = maxHistoryInMenu
+                            showingCustomMenuHistorySheet = true
+                        } else if tempSelectedMenuOption == .sameAsSaved {
+                            maxHistoryInMenu = maxHistoryToSave
+                        } else if let intValue = tempSelectedMenuOption.intValue {
+                            maxHistoryInMenu = intValue
                         }
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
 
                 HStack {
                     VStack(alignment: .leading) {

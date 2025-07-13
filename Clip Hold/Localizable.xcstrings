@@ -1325,6 +1325,22 @@
         }
       }
     },
+    "ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only when a file smaller than the size set here is copied will it be saved in the history."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。"
+          }
+        }
+      }
+    },
     "ここに追加したアプリはクリップボード監視の対象外となります。" : {
       "localizations" : {
         "en" : {
