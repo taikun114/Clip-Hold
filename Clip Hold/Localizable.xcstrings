@@ -1375,18 +1375,18 @@
         }
       }
     },
-    "ここに追加したアプリはクリップボード監視の対象外となります。" : {
+    "ここに追加したアプリが最前面にあるときはコピー履歴に追加されません。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Apps added here are excluded from clipboard monitoring."
+            "value" : "When apps added here are in the foreground, it will not be added to the copy history."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ここに追加したアプリはクリップボード監視の対象外となります。"
+            "value" : "ここに追加したアプリが最前面にあるときはコピー履歴に追加されません。"
           }
         }
       }

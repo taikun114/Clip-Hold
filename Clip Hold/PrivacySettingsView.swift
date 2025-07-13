@@ -386,7 +386,7 @@ struct PrivacySettingsView: View {
                     Text("除外するアプリ")
                         .font(.headline)
                     
-                    Text("ここに追加したアプリはクリップボード監視の対象外となります。")
+                    Text("ここに追加したアプリが最前面にあるときはコピー履歴に追加されません。")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
