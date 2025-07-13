@@ -1,4 +1,3 @@
-// ClipboardManager.swift
 import Foundation
 import AppKit
 import SwiftUI
@@ -12,7 +11,7 @@ class ClipboardManager: ObservableObject {
     
     private var saveTask: Task<Void, Never>?
     
-    private var temporaryFileUrls: Set<URL> = [] // 新しく追加
+    private var temporaryFileUrls: Set<URL> = []
     
     private func scheduleSaveClipboardHistory() {
         // 既存のタスクをキャンセル
@@ -35,8 +34,8 @@ class ClipboardManager: ObservableObject {
         }
     }
     
-    @AppStorage("maxHistoryToSave") private var maxHistoryToSave: Int = 0 // 無制限を0で表す (GeneralSettingsViewとキーを合わせる)
-    @AppStorage("maxFileSizeToSave") private var maxFileSizeToSave: Int = 0 // 無制限を0で表す (GeneralSettingsViewとキーを合わせる)
+    @AppStorage("maxHistoryToSave") private var maxHistoryToSave: Int = 0
+    @AppStorage("maxFileSizeToSave") private var maxFileSizeToSave: Int = 1_000_000_000
     
     @Published var excludedAppIdentifiers: [String] = []
     
