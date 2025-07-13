@@ -123,6 +123,14 @@ struct HistoryItemRow: View {
                 copyToClipboard(item)
                 showCopyConfirmation = true
             }
+            if let qrContent = item.qrCodeContent {
+                Button("QRコードの内容をコピー") {
+                    let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil) // 新しいアイテムを作成
+                    copyToClipboard(newItem)
+                    showCopyConfirmation = true
+                }
+            }
+            Divider()
             Button("項目から定型文を作成...") {
                 itemForNewPhrase = item // ここでClipboardItemをセット
             }

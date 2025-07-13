@@ -34,10 +34,7 @@ class ClipboardManager: ObservableObject {
     }
 
     @AppStorage("maxHistoryToSave") private var maxHistoryToSave: Int = 0 // 無制限を0で表す (GeneralSettingsViewとキーを合わせる)
-    // MARK: - 新しく追加するAppStorageプロパティ
     @AppStorage("maxFileSizeToSave") private var maxFileSizeToSave: Int = 0 // 無制限を0で表す (GeneralSettingsViewとキーを合わせる)
-
-    @AppStorage("scanQRCodeImage") private var scanQRCodeImage = false
 
     @Published var excludedAppIdentifiers: [String] = []
 
@@ -171,7 +168,7 @@ class ClipboardManager: ObservableObject {
     }
     
     // ヘルパー関数: ファイルURLからClipboardItemを作成（物理的な重複コピー防止ロジックを含む）
-    private func createClipboardItemForFileURL(_ fileURL: URL) -> ClipboardItem? {
+    private func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil) -> ClipboardItem? {
         let filesDirectory = createClipboardFilesDirectoryIfNeeded()
 
         // 外部ファイルの属性を取得
@@ -198,7 +195,7 @@ class ClipboardManager: ObservableObject {
                         print("ClipboardManager: Found potential duplicate in sandbox based on file size: \(sandboxedFileURL.lastPathComponent)")
                         // 重複が見つかった場合、既存のサンドボックスファイルを参照する新しいアイテムを返す
                         let displayName = extractOriginalFileName(from: sandboxedFileURL.lastPathComponent)
-                        return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize) // 新しいアイテムにもファイルサイズをセット
+                        return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent) // 新しいアイテムにもファイルサイズをセット
                     }
                 }
             } catch {
@@ -209,7 +206,7 @@ class ClipboardManager: ObservableObject {
         // 重複ファイルが見つからなかった場合、ファイルをサンドボックスにコピーして新しいアイテムを返す
         if let copiedFileURL = copyFileToAppSandbox(from: fileURL) {
             let displayName = fileURL.lastPathComponent
-            return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: externalFileAttributes.fileSize) // 新しいアイテムにもファイルサイズをセット
+            return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: externalFileAttributes.fileSize, qrCodeContent: qrCodeContent) // 新しいアイテムにもファイルサイズをセット
         }
 
         print("ClipboardManager: Failed to copy external item to sandbox: \(fileURL.lastPathComponent).")
@@ -217,7 +214,7 @@ class ClipboardManager: ObservableObject {
     }
 
     // MARK: - New Helper function for image duplication check and saving
-    private func createClipboardItemFromImageData(_ imageData: Data) -> ClipboardItem? {
+    private func createClipboardItemFromImageData(_ imageData: Data, qrCodeContent: String?) -> ClipboardItem? {
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
 
         let newImageSize = UInt64(imageData.count)
@@ -236,7 +233,7 @@ class ClipboardManager: ObservableObject {
                     let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
                     if let sandboxedSize = sandboxedFileAttributes.fileSize, sandboxedSize == newImageSize {
                         print("ClipboardManager: Found duplicate image in sandbox based on file size: \(sandboxedFileURL.lastPathComponent)")
-                        return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize)
+                        return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent)
                     }
                 }
             }
@@ -251,7 +248,7 @@ class ClipboardManager: ObservableObject {
         do {
             try imageData.write(to: destinationURL)
             print("ClipboardManager: New image saved to sandbox as \(destinationURL.lastPathComponent)")
-            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: newImageSize)
+            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: newImageSize, qrCodeContent: qrCodeContent)
         } catch {
             print("ClipboardManager: Error saving new image to sandbox: \(error.localizedDescription)")
             return nil
@@ -359,14 +356,35 @@ class ClipboardManager: ObservableObject {
             // readObjectsがNSURLを返す場合と、stringがfileURLを返す場合を両方チェック
             if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL],
                let firstFileURL = fileURLs.first {
-                if let newItem = createClipboardItemForFileURL(firstFileURL) {
+                
+                var qrCodeContent: String? = nil
+                
+                // コピーされたファイルが画像であるかチェック
+                if let fileUTI = try? firstFileURL.resourceValues(forKeys: [.contentTypeKey]).contentType,
+                   fileUTI.conforms(to: .image) {
+                    if let image = NSImage(contentsOf: firstFileURL) {
+                        qrCodeContent = decodeQRCode(from: image)
+                    }
+                }
+                
+                if let newItem = createClipboardItemForFileURL(firstFileURL, qrCodeContent: qrCodeContent) {
                     addAndSaveItem(newItem)
                 }
                 return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
             } else if pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.fileURL.rawValue]),
                       let stringURL = pasteboard.string(forType: .fileURL),
                       let url = URL(string: stringURL) {
-                if let newItem = createClipboardItemForFileURL(url) {
+
+                var qrCodeContent: String? = nil
+                
+                if let fileUTI = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType,
+                   fileUTI.conforms(to: .image) {
+                    if let image = NSImage(contentsOf: url) {
+                        qrCodeContent = decodeQRCode(from: image)
+                    }
+                }
+
+                if let newItem = createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent) {
                     addAndSaveItem(newItem)
                 }
                 return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
@@ -374,24 +392,30 @@ class ClipboardManager: ObservableObject {
             
             // 2. ファイルURLがなければ、画像データを直接読み込もうとする
             var imageDataFromPasteboard: Data?
+            var imageFromPasteboard: NSImage?
             
             // ネイティブな画像データを優先して読み込む
             if let tiffData = pasteboard.data(forType: .tiff) {
                 imageDataFromPasteboard = tiffData
+                imageFromPasteboard = NSImage(data: tiffData)
                 print("ClipboardManager: Image data detected on pasteboard (TIFF).")
             } else if let pngData = pasteboard.data(forType: .png) {
                 imageDataFromPasteboard = pngData
+                imageFromPasteboard = NSImage(data: pngData)
                 print("ClipboardManager: Image data detected on pasteboard (PNG).")
             } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
                 // どちらも見つからない場合、一般的なNSImageオブジェクトのTIFF表現を試みる
                 imageDataFromPasteboard = image.tiffRepresentation
+                imageFromPasteboard = image
                 if imageDataFromPasteboard != nil {
                     print("ClipboardManager: Image data detected on pasteboard (from generic NSImage).")
                 }
             }
             
-            if let imageData = imageDataFromPasteboard {
-                if let newItem = createClipboardItemFromImageData(imageData) {
+            if let imageData = imageDataFromPasteboard, let image = imageFromPasteboard {
+                let qrCodeContent = decodeQRCode(from: image)
+                
+                if let newItem = createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent) {
                     addAndSaveItem(newItem)
                 }
                 return // 画像の有無に関わらず、画像データのチェックが完了したので終了
@@ -577,7 +601,7 @@ class ClipboardManager: ObservableObject {
         do {
             let data = try Data(contentsOf: fileURL)
             let decoder = JSONDecoder()
-            // JSONDecoder には dateDecodingStrategy を使用します。
+            // JSONDecoder には dateEncodingStrategy を使用します。
             decoder.dateDecodingStrategy = .iso8601 // 日付のデコード形式を合わせる (ClipboardHistoryDocumentと一致させる)
             
             var loadedHistory = try decoder.decode([ClipboardItem].self, from: data)

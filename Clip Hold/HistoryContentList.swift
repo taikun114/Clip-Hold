@@ -139,6 +139,23 @@ struct HistoryContentList: View {
                                     }
                                 }
                             }
+                            if let qrContent = currentItem.qrCodeContent {
+                                Button("QRコードの内容をコピー") {
+                                    // qrCodeContent をテキストとして新しい ClipboardItem を作成し、onCopyAction を呼び出す
+                                    let newItemToCopy = ClipboardItem(text: qrContent)
+                                    onCopyAction(newItemToCopy)
+                                    showCopyConfirmation = true
+                                    currentCopyConfirmationTask?.cancel()
+                                    currentCopyConfirmationTask = Task { @MainActor in
+                                        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
+                                        guard !Task.isCancelled else { return }
+                                        withAnimation {
+                                            showCopyConfirmation = false
+                                        }
+                                    }
+                                }
+                            }
+                            Divider()
                             Button("項目から定型文を作成...") {
                                 itemForNewPhrase = currentItem // ここでClipboardItemをセット
                             }

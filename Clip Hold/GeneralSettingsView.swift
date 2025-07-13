@@ -97,8 +97,6 @@ struct GeneralSettingsView: View {
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
 
-    @AppStorage("scanQRCodeImage") var scanQRCodeImage: Bool = false
-
     @State private var showingCustomSaveHistorySheet = false
     @State private var showingCustomMenuHistorySheet = false
     @State private var showingCustomPhraseMenuSheet = false
@@ -365,23 +363,6 @@ struct GeneralSettingsView: View {
                     Toggle(isOn: $quickPaste) {
                         Text("クイックペースト")
                         Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("QRコード画像をスキャンする")
-                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーしたときに、QRコードの内容が履歴に追加されます。")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $scanQRCodeImage) {
-                        Text("QRコード画像をスキャンする")
-                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーしたときに、QRコードの内容が履歴に追加されます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
