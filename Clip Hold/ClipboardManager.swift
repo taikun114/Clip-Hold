@@ -7,11 +7,13 @@ import UniformTypeIdentifiers // UTTypeのチェック用
 
 class ClipboardManager: ObservableObject {
     static let shared = ClipboardManager()
-
+    
     @Published var clipboardHistory: [ClipboardItem] = []
-
+    
     private var saveTask: Task<Void, Never>?
-
+    
+    private var temporaryFileUrls: Set<URL> = [] // 新しく追加
+    
     private func scheduleSaveClipboardHistory() {
         // 既存のタスクをキャンセル
         saveTask?.cancel()
@@ -32,23 +34,23 @@ class ClipboardManager: ObservableObject {
             }
         }
     }
-
+    
     @AppStorage("maxHistoryToSave") private var maxHistoryToSave: Int = 0 // 無制限を0で表す (GeneralSettingsViewとキーを合わせる)
     @AppStorage("maxFileSizeToSave") private var maxFileSizeToSave: Int = 0 // 無制限を0で表す (GeneralSettingsViewとキーを合わせる)
-
+    
     @Published var excludedAppIdentifiers: [String] = []
-
+    
     private var pasteboardMonitorTimer: Timer?
     private var lastChangeCount: Int = 0
     private let historyFileName = "clipboardHistory.json"
     private let filesDirectoryName = "ClipboardFiles" // ファイル保存用のサブディレクトリ名
-
+    
     @Published var isMonitoring: Bool = false
-    @Published var isPerformingInternalCopy: Bool = false // <--- 新しく追加するプロパティ
-
+    @Published var isPerformingInternalCopy: Bool = false
+    
     private var isClipboardMonitoringPausedObserver: NSKeyValueObservation?
-
-
+    
+    
     // MARK: - Initialization
     private init() {
         // ファイル保存ディレクトリの準備
@@ -57,20 +59,20 @@ class ClipboardManager: ObservableObject {
         loadClipboardHistory()
         
         print("ClipboardManager: Initialized with history count: \(clipboardHistory.count)")
-
+        
         // 既存の除外アプリ識別子をロード（UserDefaultsから）
         if let data = UserDefaults.standard.data(forKey: "excludedAppIdentifiersData"),
            let identifiers = try? JSONDecoder().decode([String].self, from: data) {
             self.excludedAppIdentifiers = identifiers
         }
-
+        
         isClipboardMonitoringPausedObserver = UserDefaults.standard.observe(\.isClipboardMonitoringPaused, options: [.initial, .new]) { [weak self] defaults, change in
             guard let self = self else { return }
             let isPaused = defaults.isClipboardMonitoringPaused
-
+            
             // @Published isMonitoring の状態を更新
             self.isMonitoring = !isPaused // isPausedがtrueならisMonitoringはfalse
-
+            
             // 監視状態に応じてタイマーを制御
             if isPaused {
                 self.stopMonitoringPasteboard() // UserDefaultsが停止状態ならタイマーを停止
@@ -80,13 +82,13 @@ class ClipboardManager: ObservableObject {
             print("DEBUG: ClipboardManager: UserDefaults.isClipboardMonitoringPaused changed to \(isPaused). isMonitoring set to \(self.isMonitoring).")
         }
     }
-
+    
     // オブジェクト破棄時に監視を停止する
     deinit {
         isClipboardMonitoringPausedObserver?.invalidate()
         print("DEBUG: ClipboardManager: isClipboardMonitoringPausedObserver invalidated.")
     }
-
+    
     // MARK: - File Management Helpers
     private func getAppSpecificDirectory() -> URL? {
         guard let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
@@ -95,11 +97,11 @@ class ClipboardManager: ObservableObject {
         }
         return directory.appendingPathComponent("ClipHold")
     }
-
+    
     private func createClipboardFilesDirectoryIfNeeded() -> URL? {
         guard let appSpecificDirectory = getAppSpecificDirectory() else { return nil }
         let filesDirectory = appSpecificDirectory.appendingPathComponent(filesDirectoryName, isDirectory: true)
-
+        
         if !FileManager.default.fileExists(atPath: filesDirectory.path) {
             do {
                 try FileManager.default.createDirectory(at: filesDirectory, withIntermediateDirectories: true, attributes: nil)
@@ -111,7 +113,7 @@ class ClipboardManager: ObservableObject {
         }
         return filesDirectory
     }
-
+    
     private func copyFileToAppSandbox(from sourceURL: URL) -> URL? {
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
         
@@ -144,7 +146,7 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: Error deleting file from sandbox: \(error.localizedDescription)")
         }
     }
-
+    
     // ヘルパー関数: ファイルの属性（サイズと変更日時）を取得
     private func getFileAttributes(_ url: URL) -> (fileSize: UInt64?, modificationDate: Date?) {
         do {
@@ -157,7 +159,7 @@ class ClipboardManager: ObservableObject {
             return (nil, nil)
         }
     }
-
+    
     // ヘルパー関数: 元のファイル名を抽出
     private func extractOriginalFileName(from fileName: String) -> String {
         if let range = fileName.range(of: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-", options: .regularExpression) {
@@ -170,7 +172,7 @@ class ClipboardManager: ObservableObject {
     // ヘルパー関数: ファイルURLからClipboardItemを作成（物理的な重複コピー防止ロジックを含む）
     private func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil) -> ClipboardItem? {
         let filesDirectory = createClipboardFilesDirectoryIfNeeded()
-
+        
         // 外部ファイルの属性を取得
         let externalFileAttributes = getFileAttributes(fileURL)
         
@@ -179,7 +181,7 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: File not saved due to size limit. File size: \(fileSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
             return nil // サイズ制限を超えているためnilを返す
         }
-
+        
         // サンドボックス内の既存ファイルを走査し、重複をチェック
         if let filesDirectory = filesDirectory {
             do {
@@ -187,7 +189,7 @@ class ClipboardManager: ObservableObject {
                 
                 for sandboxedFileURL in sandboxedFileContents {
                     let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
-
+                    
                     // MARK: - ファイルサイズが完全に一致するかどうかのみを比較
                     if let externalSize = externalFileAttributes.fileSize,
                        let sandboxedSize = sandboxedFileAttributes.fileSize,
@@ -208,15 +210,15 @@ class ClipboardManager: ObservableObject {
             let displayName = fileURL.lastPathComponent
             return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: externalFileAttributes.fileSize, qrCodeContent: qrCodeContent) // 新しいアイテムにもファイルサイズをセット
         }
-
+        
         print("ClipboardManager: Failed to copy external item to sandbox: \(fileURL.lastPathComponent).")
         return nil
     }
-
+    
     // MARK: - New Helper function for image duplication check and saving
     private func createClipboardItemFromImageData(_ imageData: Data, qrCodeContent: String?) -> ClipboardItem? {
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
-
+        
         let newImageSize = UInt64(imageData.count)
         
         // MARK: - 画像サイズチェックを追加
@@ -224,7 +226,7 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: Image not saved due to size limit. Image size: \(newImageSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
             return nil // サイズ制限を超えているためnilを返す
         }
-
+        
         do {
             let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles)
             
@@ -254,7 +256,7 @@ class ClipboardManager: ObservableObject {
             return nil
         }
     }
-
+    
     // MARK: - Helper function for duplication check
     private func isDuplicate(_ newItem: ClipboardItem, of existingItem: ClipboardItem) -> Bool {
         // ファイルアイテムの場合、ファイルサイズで重複を判定
@@ -267,7 +269,7 @@ class ClipboardManager: ObservableObject {
         }
         return false
     }
-
+    
     // MARK: - Helper function to add and save a new item
     private func addAndSaveItem(_ newItem: ClipboardItem) {
         // 先頭の項目と重複している場合はスキップ
@@ -275,7 +277,7 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: Item is a duplicate of the first item, skipping addition.")
             return
         }
-
+        
         self.objectWillChange.send()
         clipboardHistory.insert(newItem, at: 0)
         print("ClipboardManager: New item added to history: \(newItem.text.prefix(50))...")
@@ -286,8 +288,8 @@ class ClipboardManager: ObservableObject {
         // 履歴を保存
         scheduleSaveClipboardHistory()
     }
-
-
+    
+    
     // MARK: - Clipboard Monitoring
     func startMonitoringPasteboard() {
         // 新しいタイマーを起動する前に、確実に既存のタイマーを無効化しnilにする
@@ -319,7 +321,7 @@ class ClipboardManager: ObservableObject {
         isMonitoring = true
         print("ClipboardManager: クリップボード監視を開始しました。isMonitoring: \(isMonitoring)")
     }
-
+    
     func stopMonitoringPasteboard() {
         if let timer = pasteboardMonitorTimer {
             timer.invalidate()
@@ -331,7 +333,7 @@ class ClipboardManager: ObservableObject {
         isMonitoring = false
         print("ClipboardManager: Monitoring stopped. isMonitoring: \(self.isMonitoring)")
     }
-
+    
     private func checkPasteboard() {
         guard isMonitoring else {
             print("DEBUG: checkPasteboard: isMonitoring is false, returning.")
@@ -345,13 +347,13 @@ class ClipboardManager: ObservableObject {
         let pasteboard = NSPasteboard.general
         if pasteboard.changeCount != lastChangeCount {
             lastChangeCount = pasteboard.changeCount
-
+            
             if let activeAppBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier {
                 guard !excludedAppIdentifiers.contains(activeAppBundleIdentifier) else {
                     return // 除外アプリからのコピーは無視
                 }
             }
-
+            
             // 1. ファイルURLを読み込もうとする（最優先）
             // readObjectsがNSURLを返す場合と、stringがfileURLを返す場合を両方チェック
             if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL],
@@ -374,7 +376,7 @@ class ClipboardManager: ObservableObject {
             } else if pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.fileURL.rawValue]),
                       let stringURL = pasteboard.string(forType: .fileURL),
                       let url = URL(string: stringURL) {
-
+                
                 var qrCodeContent: String? = nil
                 
                 if let fileUTI = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType,
@@ -383,7 +385,7 @@ class ClipboardManager: ObservableObject {
                         qrCodeContent = decodeQRCode(from: image)
                     }
                 }
-
+                
                 if let newItem = createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent) {
                     addAndSaveItem(newItem)
                 }
@@ -431,15 +433,15 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: No supported item type found on pasteboard.")
         }
     }
-
-
+    
+    
     // MARK: - QR Code Decoding
     public func decodeQRCode(from image: NSImage) -> String? {
         guard let ciImage = CIImage(data: image.tiffRepresentation!) else {
             print("Failed to convert NSImage to CIImage.")
             return nil
         }
-
+        
         let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
         let features = detector?.features(in: ciImage)
         
@@ -448,7 +450,7 @@ class ClipboardManager: ObservableObject {
         }
         return nil
     }
-
+    
     // MARK: - History Management
     func clearAllHistory() {
         // 関連するファイルをすべて削除
@@ -462,7 +464,7 @@ class ClipboardManager: ObservableObject {
         clipboardHistory = []
         print("ClipboardManager: All history cleared.")
     }
-
+    
     func deleteItem(id: UUID) {
         if let index = clipboardHistory.firstIndex(where: { $0.id == id }) {
             let itemToDelete = clipboardHistory[index]
@@ -475,16 +477,18 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: Item deleted. Total history: \(clipboardHistory.count)")
 
             scheduleSaveClipboardHistory()
+            
+            cleanUpTemporaryFiles()
         }
     }
-
-
+    
+    
     // MARK: - History Import/Export (ClipboardHistoryImporterExporterが使うメソッドを定義)
     func importHistory(from items: [ClipboardItem]) {
         // バックグラウンドで処理することでUIのブロックを防ぐ
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self = self else { return }
-
+            
             // インポートされたアイテムのファイルパスが指すファイルが実際に存在するかを確認し、存在しない場合は削除
             let validItems = items.filter { item in
                 if let filePath = item.filePath {
@@ -503,27 +507,27 @@ class ClipboardManager: ObservableObject {
                 let pathComponent = item.filePath?.lastPathComponent ?? "nil"
                 return !existingItemsSet.contains("\(item.text)-\(pathComponent)")
             }
-
+            
             // 2. 既存の履歴に新しいアイテムを追加 (メインスレッドでPublishedプロパティを更新)
             DispatchQueue.main.async {
                 // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
                 self.objectWillChange.send()
                 self.clipboardHistory.append(contentsOf: newItems)
-
+                
                 // 3. 全体を日付（date）の降順でソート
                 self.clipboardHistory.sort { $0.date > $1.date }
-
+                
                 // 4. 最大履歴数を超過した場合の処理
                 self.enforceMaxHistoryCount()
-
+                
                 print("ClipboardManager: 履歴をインポートしました。追加された項目数: \(newItems.count), 総履歴数: \(self.clipboardHistory.count)")
-
+                
                 self.scheduleSaveClipboardHistory()
             }
         }
     }
-
-
+    
+    
     // MARK: - Max History Count Enforcement
     func enforceMaxHistoryCount() {
         print("DEBUG: enforceMaxHistoryCount() - maxHistoryToSave: \(self.maxHistoryToSave), 現在の履歴数: \(self.clipboardHistory.count)")
@@ -543,7 +547,7 @@ class ClipboardManager: ObservableObject {
             print("DEBUG: enforceMaxHistoryCount() - 無制限設定のため調整なし。")
         }
     }
-
+    
     // MARK: - Excluded App Management
     func updateExcludedAppIdentifiers(_ identifiers: [String]) {
         // 現在のリストと新しいリストが同じでなければ更新する
@@ -554,16 +558,16 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: Excluded app identifiers updated. Count: \(identifiers.count)")
         }
     }
-
+    
     // MARK: - History Persistence (ファイルシステムに保存)
     private func saveClipboardHistory() {
         guard let appSpecificDirectory = getAppSpecificDirectory() else {
             print("ClipboardManager: Could not get app-specific directory for saving.")
             return
         }
-
+        
         let fileURL = appSpecificDirectory.appendingPathComponent(historyFileName)
-
+        
         do {
             // ディレクトリが存在しない場合は作成 (getAppSpecificDirectoryとcreateClipboardFilesDirectoryIfNeededで既に作成されるはずだが念のため)
             if !FileManager.default.fileExists(atPath: appSpecificDirectory.path) {
@@ -574,7 +578,7 @@ class ClipboardManager: ObservableObject {
             // JSONEncoder には dateEncodingStrategy を使用します。
             encoder.dateEncodingStrategy = .iso8601 // 日付のエンコード形式を合わせる (ClipboardHistoryDocumentと一致させる)
             encoder.outputFormatting = .prettyPrinted // 可読性のために整形 (Optional)
-
+            
             let data = try encoder.encode(clipboardHistory)
             try data.write(to: fileURL)
             print("ClipboardManager: Clipboard history saved to file: \(fileURL.path)")
@@ -582,14 +586,14 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: Error saving clipboard history to file: \(error.localizedDescription)")
         }
     }
-
+    
     // MARK: - History Loading (ファイルシステムからロード)
     public func loadClipboardHistory() {
         guard let appSpecificDirectory = getAppSpecificDirectory() else {
             print("ClipboardManager: Could not get app-specific directory for loading.")
             return
         }
-
+        
         let fileURL = appSpecificDirectory.appendingPathComponent(historyFileName)
         
         // ファイルが存在しない場合は早期リターン
@@ -597,7 +601,7 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: Clipboard history file not found, starting with empty history.")
             return
         }
-
+        
         do {
             let data = try Data(contentsOf: fileURL)
             let decoder = JSONDecoder()
@@ -622,6 +626,92 @@ class ClipboardManager: ObservableObject {
         } catch {
             print("ClipboardManager: Error loading clipboard history from file: \(error.localizedDescription)")
         }
+    }
+    
+    func copyItemToClipboard(_ item: ClipboardItem) {
+        // 古い一時ファイルをすべて削除する
+        cleanUpTemporaryFiles()
+
+        isPerformingInternalCopy = true
+        print("DEBUG: copyItemToClipboard: isPerformingInternalCopy = true")
+        
+        NSPasteboard.general.clearContents()
+        var success = false
+        
+        if let filePath = item.filePath {
+            // ファイルパスが存在する場合
+            if let tempURL = createTemporaryCopy(for: item) {
+                // 一時的なファイルリンクのURLをクリップボードに書き込む
+                if NSPasteboard.general.writeObjects([tempURL as NSURL]) {
+                    print("クリップボードにファイルがコピーされました (元のファイル名): \(tempURL.lastPathComponent)")
+                    success = true
+                } else {
+                    print("クリップボードに一時ファイル (NSURL) をコピーできませんでした。")
+                    // フォールバックとして、元のサンドボックスURLをコピー
+                    if NSPasteboard.general.writeObjects([filePath as NSURL]) {
+                        print("フォールバック: サンドボックス内のファイルがコピーされました。")
+                        success = true
+                    }
+                }
+            }
+        }
+        
+        if !success {
+            // ファイルコピーが失敗した場合、またはファイルパスがない場合、テキストをコピー
+            // item.text は非オプショナルなので、直接使用する
+            if NSPasteboard.general.setString(item.text, forType: .string) {
+                print("クリップボードにテキストがコピーされました: \(item.text.prefix(20))...")
+                success = true
+            }
+        }
+        
+        isPerformingInternalCopy = false
+        print("DEBUG: copyItemToClipboard: isPerformingInternalCopy = false")
+    }
+
+    // MARK: - ファイルコピーのためのヘルパー
+    // 元のファイル名で一時的なファイルを作成する
+    private func createTemporaryCopy(for item: ClipboardItem) -> URL? {
+        guard let originalFilePath = item.filePath else {
+            return nil
+        }
+        
+        let originalFileName = extractOriginalFileName(from: originalFilePath.lastPathComponent)
+        
+        let tempDirectoryURL = FileManager.default.temporaryDirectory
+        let tempFileURL = tempDirectoryURL.appendingPathComponent(originalFileName)
+        
+        // 既存のファイルがあれば削除
+        if FileManager.default.fileExists(atPath: tempFileURL.path) {
+            try? FileManager.default.removeItem(at: tempFileURL)
+        }
+        
+        do {
+            try FileManager.default.copyItem(at: originalFilePath, to: tempFileURL)
+            print("ClipboardManager: Temporary file created at \(tempFileURL.path) from original file \(originalFilePath.path)")
+            
+            // 追跡リストに追加
+            temporaryFileUrls.insert(tempFileURL)
+            
+            return tempFileURL
+        } catch {
+            print("ClipboardManager: Error creating temporary file copy: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    // MARK: - 一時ファイルクリーンアップ
+    private func cleanUpTemporaryFiles() {
+        print("ClipboardManager: Cleaning up \(temporaryFileUrls.count) temporary files.")
+        for fileURL in temporaryFileUrls {
+            do {
+                try FileManager.default.removeItem(at: fileURL)
+                print("ClipboardManager: Removed temporary file: \(fileURL.lastPathComponent)")
+            } catch {
+                print("ClipboardManager: Error removing temporary file \(fileURL.lastPathComponent): \(error.localizedDescription)")
+            }
+        }
+        temporaryFileUrls.removeAll()
     }
 }
 

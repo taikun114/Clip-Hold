@@ -10,49 +10,6 @@ private let itemDateFormatter: DateFormatter = {
     return formatter
 }()
 
-private func copyToClipboard(_ item: ClipboardItem) {
-    let clipboardManager = ClipboardManager.shared
-
-    clipboardManager.isPerformingInternalCopy = true
-    print("DEBUG: copyToClipboard: isPerformingInternalCopy = true")
-
-    NSPasteboard.general.clearContents()
-
-    var success = false
-
-    if let filePath = item.filePath {
-        // ファイルパスが存在する場合、ファイルとしてクリップボードにコピーを試みる
-        // Option 1: NSURLオブジェクトを書き込む（既存の方法）
-        let nsURL = filePath as NSURL
-        if NSPasteboard.general.writeObjects([nsURL]) {
-            print("クリップボードにファイルがコピーされました (NSURL): \(filePath.lastPathComponent)")
-            success = true
-        } else {
-            print("クリップボードにファイル (NSURL) をコピーできませんでした: \(filePath.lastPathComponent)")
-            
-            // Option 2: ファイルURLの文字列 (.fileURL タイプ) を書き込む
-            // こちらの方が明示的でうまくいく場合があります
-            if NSPasteboard.general.setString(filePath.absoluteString, forType: .fileURL) {
-                print("クリップボードにファイルURL文字列がコピーされました (.fileURL): \(filePath.lastPathComponent)")
-                success = true
-            } else {
-                print("クリップボードにファイルURL文字列 (.fileURL) をコピーできませんでした: \(filePath.lastPathComponent)")
-            }
-        }
-    }
-
-    // ファイルコピーが失敗した場合、またはファイルパスがそもそも存在しない場合、テキストをコピーする
-    if !success {
-        if let string = item.text.data(using: .utf8) {
-            NSPasteboard.general.setData(string, forType: .string)
-            print("クリップボードにテキストがコピーされました: \(item.text.prefix(20))...")
-        }
-    }
-
-    clipboardManager.isPerformingInternalCopy = false
-    print("DEBUG: copyToClipboard: isPerformingInternalCopy = false")
-}
-
 // 文字列を安全に切り詰めるヘルパー関数
 private func truncateString(_ text: String?, maxLength: Int) -> String {
     guard let text = text else { return "" }
@@ -120,13 +77,13 @@ struct HistoryItemRow: View {
     private var actionMenuItems: some View {
         Group {
             Button("コピー") {
-                copyToClipboard(item)
+                clipboardManager.copyItemToClipboard(item)
                 showCopyConfirmation = true
             }
             if let qrContent = item.qrCodeContent {
                 Button("QRコードの内容をコピー") {
                     let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil) // 新しいアイテムを作成
-                    copyToClipboard(newItem)
+                    clipboardManager.copyItemToClipboard(newItem)
                     showCopyConfirmation = true
                 }
             }
@@ -310,8 +267,8 @@ struct HistoryWindowView: View {
                         lineNumberTextWidth: lineNumberTextWidth,
                         trailingPaddingForLineNumber: trailingPaddingForLineNumber,
                         searchText: searchText, // searchTextを渡す
-                        onCopyAction: { itemToCopy in
-                            copyToClipboard(itemToCopy)
+                        onCopyAction: { item in
+                            ClipboardManager.shared.copyItemToClipboard(item)
                         }
                     )
                 }

@@ -83,43 +83,7 @@ struct ClipHoldApp: App {
             set: { self.hideMenuBarExtra = !$0 } // isInserted の変更で hideMenuBarExtra を反転させる
         )
     }
-    
-    // MARK: - クリップボードに項目をコピーするヘルパー関数
-    private func copyToClipboard(_ item: ClipboardItem) {
-        clipboardManager.isPerformingInternalCopy = true
-        print("DEBUG: copyToClipboard: isPerformingInternalCopy = true")
         
-        NSPasteboard.general.clearContents()
-        
-        if let filePath = item.filePath {
-            // ファイルの場合、ファイルURLをクリップボードに書き込む
-            let nsURL = filePath as NSURL
-            if NSPasteboard.general.writeObjects([nsURL]) {
-                print("メニューバーからクリップボードにファイルがコピーされました (NSURL): \(filePath.lastPathComponent)")
-            } else {
-                print("メニューバーからクリップボードにファイル (NSURL) をコピーできませんでした: \(filePath.lastPathComponent). 代わりにテキストをコピーします。")
-                
-                // ファイルコピー失敗時は、ファイル名（テキスト）をコピーする
-                if NSPasteboard.general.setString(item.text, forType: .string) {
-                    print("メニューバーからクリップボードにファイルURL文字列がコピーされました (.fileURL): \(filePath.lastPathComponent)")
-                }
-            }
-        } else {
-            // テキストの場合、文字列をクリップボードに書き込む
-            if NSPasteboard.general.setString(item.text, forType: .string) {
-                print("メニューバーからクリップボードにテキストがコピーされました: \(item.text.prefix(50))...")
-            }
-        }
-        
-        // 最後に、内部コピーのフラグをリセット
-        // この遅延は、`checkPasteboard`が新しいペーストボードの変更を監視する前に、
-        // 完了したことを保証するためのもの
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.clipboardManager.isPerformingInternalCopy = false
-            print("DEBUG: copyToClipboard: isPerformingInternalCopy = false")
-        }
-    }
-    
     var body: some Scene {
         Settings {
             SettingsView()
@@ -190,8 +154,8 @@ struct ClipHoldApp: App {
                     }()
                     
                     Button {
-                        copyToClipboard(item)
-                        
+                        clipboardManager.copyItemToClipboard(item)
+
                         if quickPaste {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                 ClipHoldApp.performPaste()
@@ -339,20 +303,7 @@ struct ClipHoldApp: App {
                     let historyItem = clipboardManager.clipboardHistory[i]
                     NSPasteboard.general.clearContents()
 
-                    // MARK: - ファイルパスの有無でコピー方法を分岐
-                    if let filePath = historyItem.filePath {
-                        let nsURL = filePath as NSURL
-                        if NSPasteboard.general.writeObjects([nsURL]) {
-                            print("ショートカットでファイルがクリップボードにコピーされました: \(filePath.lastPathComponent)")
-                        } else {
-                            print("ショートカットでファイルをクリップボードにコピーできませんでした: \(filePath.lastPathComponent). 代わりにテキストをコピーします。")
-                            NSPasteboard.general.setString(historyItem.text, forType: .string)
-                        }
-                    } else {
-                        // ファイルパスがない場合はこれまで通りテキストをコピー
-                        NSPasteboard.general.setString(historyItem.text, forType: .string)
-                        print("\(i+1)個前の履歴「\(historyItem.text.prefix(20))...」がショートカットでコピーされました。")
-                    }
+                    clipboardManager.copyItemToClipboard(historyItem)
 
                     if quickPaste {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
