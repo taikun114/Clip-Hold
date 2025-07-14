@@ -6,6 +6,8 @@
 - Support for saving file and image copy history
 - Support for Quick Look of files in the History Window
   - You can Quick Look by pressing the space key with an item selected or by clicking on “Quick Look” from the menu.
+- Add filtering and sorting options to the History Window
+  - You can filter by file type and sort by date or file size.
 - Add “Maximum Size per File” option
   - If you set a size, files larger than the set size will not be saved in the copy history.
 - Add “Copy QR Code Contents” option to the menu of image items containing QR Code in the History window.
@@ -16,6 +18,7 @@
 - Add new “Copy History” tab
   - Settings related to copy history have been moved to a new tab.
 - Change description of “Apps to Exclude” setting
+- Add file size next to the date if the item on the History Window is a file
 
 ## 1.1.1
 ### Bug Fixes and Improvements
