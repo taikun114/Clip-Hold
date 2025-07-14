@@ -231,6 +231,9 @@ struct HistoryWindowView: View {
     @State private var showCopyConfirmation: Bool = false
     @State private var currentCopyConfirmationTask: Task<Void, Never>?
     
+    @State private var copyConfirmationTask: Task<Void, Never>? = nil
+    @State private var historyUpdateTask: Task<Void, Never>? = nil
+
     @State private var showQRCodeSheet: Bool = false
     @State private var selectedItemForQRCode: ClipboardItem?
 
@@ -263,17 +266,17 @@ struct HistoryWindowView: View {
     private let trailingPaddingForLineNumber: CGFloat = 5
 
     // 検索、フィルタリング、並び替えを統合したタスク実行関数
-    private func performUpdate() {
-        // UIがすぐに更新されるように、isLoadingをtrueに設定し、filteredHistoryを空にする
-        isLoading = true
-        filteredHistory = []
-        
-        // 既存のタスクをキャンセル
-        if let task = currentCopyConfirmationTask {
-            task.cancel()
+    private func performUpdate(isIncrementalUpdate: Bool = false) {
+        // 検索やフィルタリング時のみ、isLoadingをtrueに設定し、filteredHistoryを空にする
+        if !isIncrementalUpdate {
+            isLoading = true
+            filteredHistory = []
         }
+        
+        // 既存の履歴更新タスクをキャンセル
+        historyUpdateTask?.cancel()
 
-        currentCopyConfirmationTask = Task { @MainActor in
+        historyUpdateTask = Task { @MainActor in
             // タスクがキャンセルされたら終了
             guard !Task.isCancelled else {
                 isLoading = false
