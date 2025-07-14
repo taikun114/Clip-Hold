@@ -96,31 +96,5 @@ struct HistorySearchBar: View {
         }
         .padding(.horizontal, 8)
         .padding(.bottom, 5)
-        .onChange(of: searchText) { _, newValue in
-            searchTask?.cancel()
-            
-            searchTask = Task { @MainActor in
-                let initialDelayNanoseconds: UInt64 = 150_000_000
-                try? await Task.sleep(nanoseconds: initialDelayNanoseconds)
-
-                guard !Task.isCancelled else {
-                    return
-                }
-                
-                isLoading = true
-
-                let remainingDebounceNanoseconds: UInt64 = 150_000_000
-                try? await Task.sleep(nanoseconds: remainingDebounceNanoseconds)
-
-                guard !Task.isCancelled else {
-                    isLoading = false
-                    return
-                }
-
-                isLoading = false
-            }
-        }
-        .onChange(of: clipboardHistoryCount) { _, _ in
-        }
     }
 }

@@ -244,6 +244,8 @@ struct HistoryWindowView: View {
     @State private var selectedFilter: ItemFilter = .all
     @State private var selectedSort: ItemSort = .newest
 
+    @State private var searchDebounceTask: Task<Void, Never>? = nil
+
     @FocusState private var isSearchFieldFocused: Bool
 
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
@@ -381,9 +383,17 @@ struct HistoryWindowView: View {
             dismiss()
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
-        .onChange(of: searchText) { _, _ in performUpdate() }
+        .onChange(of: searchText) { _, _ in
+            searchDebounceTask?.cancel()
+            searchDebounceTask = Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(300)) // 300msのデバウンス
+                guard !Task.isCancelled else { return }
+                performUpdate()
+            }
+        }
         .onChange(of: selectedFilter) { _, _ in performUpdate() }
         .onChange(of: selectedSort) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
         .onAppear {
             performUpdate()
             DispatchQueue.main.async {

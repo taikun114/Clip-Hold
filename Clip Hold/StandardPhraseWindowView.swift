@@ -287,7 +287,7 @@ struct StandardPhraseWindowView: View {
                             .listStyle(.plain)
                             .scrollContentBackground(.hidden)
                             .blur(radius: isLoading ? 5 : 0)
-                            .animation(.easeOut(duration: 0.2), value: isLoading)
+                            .animation(.easeOut(duration: 0.1), value: isLoading)
                             .contextMenu(forSelectionType: StandardPhrase.ID.self, menu: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
                                     Button("コピー") {

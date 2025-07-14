@@ -125,7 +125,7 @@ struct HistoryContentList: View {
                     .listStyle(.plain)
                     .scrollContentBackground(.hidden)
                     .blur(radius: isLoading ? 5 : 0)
-                    .animation(.easeOut(duration: 0.2), value: isLoading)
+                    .animation(.easeOut(duration: 0.1), value: isLoading)
                     .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
                             Button("コピー") {
@@ -207,16 +207,10 @@ struct HistoryContentList: View {
                                 if let nsImage = image as? NSImage {
                                     if let qrCodeContent = manager.decodeQRCode(from: nsImage) {
                                         manager.addTextItem(text: qrCodeContent)
-                                        
-                                        // ★ここを変更: ClipboardManager経由でコピーするか、ClipboardItemを作成してonCopyActionを呼ぶ★
-                                        // A. ClipboardManagerにコピー関数がある場合 (推奨、ClipboardManagerが自身の責任でコピー処理をする)
-                                        // manager.copyItemToPasteboard(ClipboardItem(text: qrCodeContent)) // ClipboardManagerにこのようなメソッドを追加
-                                        
-                                        // B. onCopyActionを使用する場合
                                         let newItemToCopy = ClipboardItem(text: qrCodeContent) // 新しいClipboardItemを作成
                                         onCopyAction(newItemToCopy) // onCopyActionを呼び出す
                                         
-                                        showCopyConfirmation = true // 必要に応じて表示
+                                        showCopyConfirmation = true
                                     } else {
                                         print("QRコードが見つかりませんでした。")
                                     }
