@@ -21,6 +21,14 @@ private func truncateString(_ text: String?, maxLength: Int) -> String {
     return text
 }
 
+// バイト数を読みやすい文字列に変換するヘルパー関数
+private func formatFileSize(_ byteCount: UInt64) -> String {
+    let formatter = ByteCountFormatter()
+    formatter.countStyle = .file
+    return formatter.string(fromByteCount: Int64(byteCount))
+}
+
+// MARK: - HistoryItemRow
 struct HistoryItemRow: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     
@@ -148,9 +156,16 @@ struct HistoryItemRow: View {
                     .font(.body)
                     .truncationMode(.tail)
                     .foregroundColor(.primary)
-                Text(item.date, formatter: itemDateFormatter)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                HStack(spacing: 4) {
+                    Text(item.date, formatter: itemDateFormatter)
+                    
+                    if let fileSize = item.fileSize, item.filePath != nil {
+                        Text("-")
+                        Text(formatFileSize(fileSize))
+                    }
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
 
             Spacer()
