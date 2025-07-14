@@ -251,6 +251,43 @@ enum DataSizeOption: Hashable, Identifiable, CaseIterable {
     }
 }
 
+// MARK: - Filter and Sort Options
+enum ItemFilter: String, CaseIterable, Identifiable {
+    case all
+    case textOnly
+    case fileOnly
+    case imageOnly
+
+    var id: String { self.rawValue }
+
+    var displayName: LocalizedStringKey {
+        switch self {
+        case .all: return "すべての項目"
+        case .textOnly: return "テキストのみ"
+        case .fileOnly: return "ファイルのみ"
+        case .imageOnly: return "画像のみ"
+        }
+    }
+}
+
+enum ItemSort: String, CaseIterable, Identifiable {
+    case newest
+    case oldest
+    case largestFileSize
+    case smallestFileSize
+
+    var id: String { self.rawValue }
+
+    var displayName: LocalizedStringKey {
+        switch self {
+        case .newest: return "新しい順"
+        case .oldest: return "古い順"
+        case .largestFileSize: return "ファイルサイズが大きい順"
+        case .smallestFileSize: return "ファイルサイズが小さい順"
+        }
+    }
+}
+
 extension Hashable where Self: Identifiable {
     func isEqual(to other: Self) -> Bool {
         return self.id == other.id && self.hashValue == other.hashValue

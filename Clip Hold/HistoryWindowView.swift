@@ -238,6 +238,9 @@ struct HistoryWindowView: View {
 
     @State private var previousClipboardHistoryCount: Int = 0
 
+    @State private var selectedFilter: ItemFilter = .all
+    @State private var selectedSort: ItemSort = .newest
+
     @FocusState private var isSearchFieldFocused: Bool
 
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
@@ -259,16 +262,64 @@ struct HistoryWindowView: View {
 
     private let trailingPaddingForLineNumber: CGFloat = 5
 
-    private func performSearch(searchTerm: String) {
-        let newFilteredHistory: [ClipboardItem]
-        if searchTerm.isEmpty {
-            newFilteredHistory = clipboardManager.clipboardHistory
-        } else {
-            newFilteredHistory = clipboardManager.clipboardHistory.filter { item in
-                item.text.localizedCaseInsensitiveContains(searchTerm)
-            }
+    // 検索、フィルタリング、並び替えを統合したタスク実行関数
+    private func performUpdate() {
+        // UIがすぐに更新されるように、isLoadingをtrueに設定し、filteredHistoryを空にする
+        isLoading = true
+        filteredHistory = []
+        
+        // 既存のタスクをキャンセル
+        if let task = currentCopyConfirmationTask {
+            task.cancel()
         }
-        self.filteredHistory = newFilteredHistory
+
+        currentCopyConfirmationTask = Task { @MainActor in
+            // タスクがキャンセルされたら終了
+            guard !Task.isCancelled else {
+                isLoading = false
+                return
+            }
+
+            // 履歴をコピーしてバックグラウンドスレッドで処理
+            let historyCopy = clipboardManager.clipboardHistory
+            
+            // フィルタリング
+            let filtered = historyCopy.filter { item in
+                let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
+
+                let matchesFilter: Bool
+                switch selectedFilter {
+                case .all:
+                    matchesFilter = true
+                case .textOnly:
+                    matchesFilter = item.filePath == nil
+                case .fileOnly:
+                    matchesFilter = item.filePath != nil
+                case .imageOnly:
+                    matchesFilter = item.isImage
+                }
+
+                return matchesSearchText && matchesFilter
+            }
+
+            // 並び替え
+            let sorted = filtered.sorted { item1, item2 in
+                switch selectedSort {
+                case .newest:
+                    return item1.date > item2.date
+                case .oldest:
+                    return item1.date < item2.date
+                case .largestFileSize:
+                    return (item1.fileSize ?? 0) > (item2.fileSize ?? 0)
+                case .smallestFileSize:
+                    return (item1.fileSize ?? 0) < (item2.fileSize ?? 0)
+                }
+            }
+
+            // UIを更新
+            filteredHistory = sorted
+            isLoading = false
+        }
     }
 
     var body: some View {
@@ -281,8 +332,9 @@ struct HistoryWindowView: View {
                         searchText: $searchText,
                         isLoading: $isLoading,
                         isSearchFieldFocused: _isSearchFieldFocused,
-                        performSearchAction: performSearch,
-                        clipboardHistoryCount: clipboardManager.clipboardHistory.count
+                        clipboardHistoryCount: clipboardManager.clipboardHistory.count,
+                        selectedFilter: $selectedFilter,
+                        selectedSort: $selectedSort
                     )
 
                     Spacer(minLength: 10)
@@ -326,8 +378,11 @@ struct HistoryWindowView: View {
             dismiss()
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
+        .onChange(of: searchText) { _, _ in performUpdate() }
+        .onChange(of: selectedFilter) { _, _ in performUpdate() }
+        .onChange(of: selectedSort) { _, _ in performUpdate() }
         .onAppear {
-            performSearch(searchTerm: searchText)
+            performUpdate()
             DispatchQueue.main.async {
                 isSearchFieldFocused = true
             }

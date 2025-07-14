@@ -9,6 +9,19 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     @Published var fileSize: UInt64?
     @Published var qrCodeContent: String?
 
+    // ファイルが画像かどうかを判断するヘルパープロパティ
+    var isImage: Bool {
+        guard let filePath = filePath else { return false }
+        if filePath.isFileURL {
+            let pathExtension = filePath.pathExtension.lowercased()
+            let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "bmp", "heic", "webp", "tiff", "tif"]
+            if imageExtensions.contains(pathExtension) {
+                return true
+            }
+        }
+        return false
+    }
+
     // Codableではないため @Published にできない。
     // UIの自動更新は、このプロパティの変更後に親のObservableObject (ClipboardManager) の変更を通知することで実現
     var cachedThumbnailImage: NSImage?

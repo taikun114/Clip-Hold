@@ -4,6 +4,9 @@
     "" : {
       "shouldTranslate" : false
     },
+    "-" : {
+      "shouldTranslate" : false
+    },
     "「%@」" : {
       "localizations" : {
         "en" : {
@@ -1871,6 +1874,22 @@
         }
       }
     },
+    "すべての項目" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Items"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての項目"
+          }
+        }
+      }
+    },
     "タイトル" : {
       "localizations" : {
         "en" : {
@@ -1995,6 +2014,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ディスカッションページへのリンクを開きます."
+          }
+        }
+      }
+    },
+    "テキストのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストのみ"
           }
         }
       }
@@ -2155,6 +2190,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイル1つあたりの最大容量を設定"
+          }
+        }
+      }
+    },
+    "ファイルサイズが大きい順" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Largest to Smallest File Sizes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルサイズが大きい順"
+          }
+        }
+      }
+    },
+    "ファイルサイズが小さい順" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smallest to Largest File Sizes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルサイズが小さい順"
+          }
+        }
+      }
+    },
+    "ファイルのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルのみ"
           }
         }
       }
@@ -2843,6 +2926,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "動作中"
+          }
+        }
+      }
+    },
+    "古い順" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oldest to Newest"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "古い順"
           }
         }
       }
@@ -3631,6 +3730,22 @@
         }
       }
     },
+    "新しい順" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Newest to Oldest"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しい順"
+          }
+        }
+      }
+    },
     "既存: " : {
       "localizations" : {
         "en" : {
@@ -3771,6 +3886,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在のクリップボード内容を使って新しい定型文を追加します。"
+          }
+        }
+      }
+    },
+    "画像のみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only Images"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像のみ"
           }
         }
       }
