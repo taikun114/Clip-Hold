@@ -5,218 +5,7 @@ import UniformTypeIdentifiers
 import Quartz
 import QuickLookThumbnailing
 
-private let itemDateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .short
-    return formatter
-}()
-
-// 文字列を安全に切り詰めるヘルパー関数
-private func truncateString(_ text: String?, maxLength: Int) -> String {
-    guard let text = text else { return "" }
-    if text.count > maxLength {
-        return String(text.prefix(maxLength)) + "..."
-    }
-    return text
-}
-
-// バイト数を読みやすい文字列に変換するヘルパー関数
-private func formatFileSize(_ byteCount: UInt64) -> String {
-    let formatter = ByteCountFormatter()
-    formatter.countStyle = .file
-    return formatter.string(fromByteCount: Int64(byteCount))
-}
-
-// MARK: - HistoryItemRow
-struct HistoryItemRow: View {
-    @EnvironmentObject var clipboardManager: ClipboardManager
-    
-    let item: ClipboardItem
-    let index: Int
-    let showLineNumber: Bool
-    @Binding var itemToDelete: ClipboardItem?
-    @Binding var showingDeleteConfirmation: Bool
-    @Binding var selectedItemID: UUID?
-    var dismissAction: () -> Void
-    @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
-
-    @Environment(\.colorScheme) var colorScheme
-
-    @Binding var showCopyConfirmation: Bool
-    @Binding var showQRCodeSheet: Bool
-    @Binding var selectedItemForQRCode: ClipboardItem?
-    
-    @Binding var itemForNewPhrase: ClipboardItem?
-
-    let quickLookManager: QuickLookManager
-
-    let lineNumberTextWidth: CGFloat?
-    let trailingPaddingForLineNumber: CGFloat
-
-    @State private var iconImage: NSImage?
-    @State private var iconLoadTask: Task<Void, Never>?
-
-    init(item: ClipboardItem,
-         index: Int,
-         showLineNumber: Bool,
-         itemToDelete: Binding<ClipboardItem?>,
-         showingDeleteConfirmation: Binding<Bool>,
-         selectedItemID: Binding<UUID?>,
-         dismissAction: @escaping () -> Void, // クロージャは@escapingをつける
-         showCopyConfirmation: Binding<Bool>,
-         showQRCodeSheet: Binding<Bool>,
-         selectedItemForQRCode: Binding<ClipboardItem?>,
-         itemForNewPhrase: Binding<ClipboardItem?>,
-         quickLookManager: QuickLookManager,
-         lineNumberTextWidth: CGFloat?,
-         trailingPaddingForLineNumber: CGFloat) {
-            
-        self.item = item
-        self.index = index
-        self.showLineNumber = showLineNumber
-        _itemToDelete = itemToDelete
-        _showingDeleteConfirmation = showingDeleteConfirmation
-        _selectedItemID = selectedItemID
-        self.dismissAction = dismissAction
-        _showCopyConfirmation = showCopyConfirmation
-        _showQRCodeSheet = showQRCodeSheet
-        _selectedItemForQRCode = selectedItemForQRCode
-        _itemForNewPhrase = itemForNewPhrase
-        self.quickLookManager = quickLookManager
-        self.lineNumberTextWidth = lineNumberTextWidth
-        self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
-    }
-
-    private var actionMenuItems: some View {
-        Group {
-            Button("コピー") {
-                clipboardManager.copyItemToClipboard(item)
-                showCopyConfirmation = true
-            }
-            if let qrContent = item.qrCodeContent {
-                Button("QRコードの内容をコピー") {
-                    let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil) // 新しいアイテムを作成
-                    clipboardManager.copyItemToClipboard(newItem)
-                    showCopyConfirmation = true
-                }
-            }
-            Divider()
-            if let filePath = item.filePath {
-                Button("クイックルック") {
-                    if let sourceView = NSApp.keyWindow?.contentView {
-                        quickLookManager.showQuickLook(for: filePath, sourceView: sourceView)
-                    }
-                }
-            }
-            Button("項目から定型文を作成...") {
-                itemForNewPhrase = item // ここでClipboardItemをセット
-            }
-            if item.filePath == nil {
-                Button("QRコードを表示...") {
-                    showQRCodeSheet = true
-                    selectedItemForQRCode = item
-                }
-            }
-            Divider()
-            Button("削除...", role: .destructive) {
-                itemToDelete = item
-                showingDeleteConfirmation = true
-            }
-        }
-    }
-
-    var body: some View {
-        HStack(spacing: 8) { // アイコンとの間に少しスペースを空ける
-            if showLineNumber {
-                Text("\(index + 1).")
-                    .font(.caption.monospacedDigit())
-                    .foregroundColor(.secondary)
-                    .frame(width: lineNumberTextWidth, alignment: .trailing)
-                    .padding(.trailing, trailingPaddingForLineNumber)
-            }
-            
-            // アイコンを表示するロジック
-            if let icon = iconImage {
-                Image(nsImage: icon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-            } else {
-                Image(systemName: "text.page")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(.secondary)
-            }
-
-            VStack(alignment: .leading) {
-                Text(item.text)
-                    .lineLimit(1)
-                    .font(.body)
-                    .truncationMode(.tail)
-                    .foregroundColor(.primary)
-                HStack(spacing: 4) {
-                    Text(item.date, formatter: itemDateFormatter)
-                    
-                    if let fileSize = item.fileSize, item.filePath != nil {
-                        Text("-")
-                        Text(formatFileSize(fileSize))
-                    }
-                }
-                .font(.caption)
-                .foregroundColor(.secondary)
-            }
-
-            Spacer()
-
-            Menu {
-                actionMenuItems
-            } label: {
-                Image(systemName: "ellipsis.circle")
-                    .imageScale(.large)
-                    .foregroundColor(.primary)
-            }
-            .menuStyle(.borderlessButton)
-            .fixedSize()
-        }
-        .padding(.vertical, 4)
-        .padding(.leading, 5)
-        .contentShape(Rectangle())
-        .help(item.text)
-        .onAppear {
-            if let filePath = item.filePath {
-                iconLoadTask?.cancel()
-                
-                // QLThumbnailGeneratorを使用して非同期でサムネイルを生成
-                iconLoadTask = Task {
-                    let thumbnailSize = CGSize(width: 40, height: 40)
-                    let request = QLThumbnailGenerator.Request(fileAt: filePath, size: thumbnailSize, scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
-                    
-                    do {
-                        let thumbnail = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
-                        await MainActor.run {
-                            self.iconImage = thumbnail.nsImage
-                        }
-                    } catch {
-                        print("Failed to generate thumbnail for \(filePath.lastPathComponent): \(error.localizedDescription)")
-                        // サムネイル生成に失敗した場合は、デフォルトアイコンに戻す
-                        await MainActor.run {
-                            self.iconImage = NSWorkspace.shared.icon(forFile: filePath.path)
-                        }
-                    }
-                }
-            } else {
-                // ファイルでない場合はアイコンをnilにリセット
-                iconImage = nil
-            }
-        }
-        .onDisappear {
-            iconLoadTask?.cancel()
-        }
-    }
-}
-
+// MARK: - HistoryWindowView
 struct HistoryWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
@@ -267,28 +56,32 @@ struct HistoryWindowView: View {
 
     private let trailingPaddingForLineNumber: CGFloat = 5
 
+    // 文字列を安全に切り詰めるヘルパー関数
+    private func truncateString(_ text: String?, maxLength: Int) -> String {
+        guard let text = text else { return "" }
+        if text.count > maxLength {
+            return String(text.prefix(maxLength)) + "..."
+        }
+        return text
+    }
+
     // 検索、フィルタリング、並び替えを統合したタスク実行関数
     private func performUpdate(isIncrementalUpdate: Bool = false) {
-        // 検索やフィルタリング時のみ、isLoadingをtrueに設定し、filteredHistoryを空にする
         if !isIncrementalUpdate {
             isLoading = true
             filteredHistory = []
         }
         
-        // 既存の履歴更新タスクをキャンセル
         historyUpdateTask?.cancel()
 
         historyUpdateTask = Task { @MainActor in
-            // タスクがキャンセルされたら終了
             guard !Task.isCancelled else {
                 isLoading = false
                 return
             }
 
-            // 履歴をコピーしてバックグラウンドスレッドで処理
             let historyCopy = clipboardManager.clipboardHistory
             
-            // フィルタリング
             let filtered = historyCopy.filter { item in
                 let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
 
@@ -307,7 +100,6 @@ struct HistoryWindowView: View {
                 return matchesSearchText && matchesFilter
             }
 
-            // 並び替え
             let sorted = filtered.sorted { item1, item2 in
                 switch selectedSort {
                 case .newest:
@@ -321,7 +113,6 @@ struct HistoryWindowView: View {
                 }
             }
 
-            // UIを更新
             filteredHistory = sorted
             isLoading = false
         }
@@ -331,7 +122,7 @@ struct HistoryWindowView: View {
         ZStack {
             HistoryWindowBackground()
 
-            ZStack { // メインコンテンツを囲むZStack
+            ZStack {
                 VStack(spacing: 0) {
                     HistorySearchBar(
                         searchText: $searchText,
@@ -361,21 +152,19 @@ struct HistoryWindowView: View {
                         scrollToTopOnUpdate: scrollToTopOnUpdate,
                         lineNumberTextWidth: lineNumberTextWidth,
                         trailingPaddingForLineNumber: trailingPaddingForLineNumber,
-                        searchText: searchText, // searchTextを渡す
+                        searchText: searchText,
                         onCopyAction: { item in
                             ClipboardManager.shared.copyItemToClipboard(item)
                         }
                     )
                 }
-            } // メインコンテンツを囲むZStackの終わり
+            }
             
             HistoryCopyConfirmation(showCopyConfirmation: $showCopyConfirmation)
                 .onAppear {
-                    // onAppearからはタイマー設定ロジックを削除。
-                    // ここは単にビューの出現アニメーションに使用
+                    currentCopyConfirmationTask?.cancel()
                 }
                 .onDisappear {
-                    // ビューが非表示になる際にタスクをキャンセル (念のため)
                     currentCopyConfirmationTask?.cancel()
                 }
         }
@@ -386,7 +175,7 @@ struct HistoryWindowView: View {
         .onChange(of: searchText) { _, _ in
             searchDebounceTask?.cancel()
             searchDebounceTask = Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(300)) // 300msのデバウンス
+                try? await Task.sleep(for: .milliseconds(300))
                 guard !Task.isCancelled else { return }
                 performUpdate()
             }
@@ -417,7 +206,7 @@ struct HistoryWindowView: View {
             Button("削除", role: .destructive) {
                 if let item = itemToDelete {
                     clipboardManager.deleteItem(id: item.id)
-                    clipboardManager.loadClipboardHistory() // 削除後に履歴を再読み込み
+                    clipboardManager.loadClipboardHistory()
                     print("DEBUG: Item deleted and history reloaded.")
                     itemToDelete = nil
                     selectedItemID = nil
