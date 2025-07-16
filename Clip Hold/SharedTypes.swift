@@ -251,6 +251,108 @@ enum DataSizeOption: Hashable, Identifiable, CaseIterable {
     }
 }
 
+enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
+    case preset(Int, DataSizeUnit)
+    case custom(Int?, DataSizeUnit?)
+    case noAlert // アラートを表示しない
+
+    var id: String {
+        switch self {
+        case .preset(let value, let unit): return "preset_\(value)_\(unit.rawValue)"
+        case .custom(let value, let unit):
+            if let val = value, let u = unit {
+                return "custom_value_\(val)_\(u.rawValue)"
+            } else {
+                return "custom_nil"
+            }
+        case .noAlert: return "no_alert"
+        }
+    }
+
+    var stringValue: LocalizedStringKey {
+        switch self {
+        case .preset(let value, let unit): return LocalizedStringKey("\(value) \(unit.label)")
+        case .custom(let value, let unit):
+            if let val = value, let u = unit {
+                return LocalizedStringKey("\(val) \(u.label)")
+            } else {
+                return "カスタム..."
+            }
+        case .noAlert: return "表示しない"
+        }
+    }
+
+    var byteValue: Int? {
+        switch self {
+        case .preset(let value, let unit): return unit.byteValue(for: value)
+        case .custom(let value, let unit):
+            if let val = value, let u = unit {
+                return u.byteValue(for: val)
+            }
+            return nil
+        case .noAlert: return 0 // アラートを表示しない場合は0として保存
+        }
+    }
+    
+    // Stringカタログでローカライズ可能な文字列
+    var localizedString: LocalizedStringKey {
+        switch self {
+        case .noAlert:
+            return "表示しない"
+        case .custom(let value, let unit):
+            if let val = value, let u = unit {
+                return LocalizedStringKey("\(val) \(u.label)")
+            } else {
+                return "カスタム..."
+            }
+        case .preset(let value, let unit):
+            return LocalizedStringKey("\(value) \(unit.label)")
+        }
+    }
+
+    static let presets: [DataSizeAlertOption] = [
+        .preset(1, .gigabytes),
+        .preset(2, .gigabytes),
+        .preset(5, .gigabytes),
+        .preset(10, .gigabytes)
+    ]
+    
+    static var allCases: [DataSizeAlertOption] {
+        var cases = DataSizeAlertOption.presets
+        cases.append(.noAlert)
+        cases.append(.custom(nil, nil))
+        return cases
+    }
+    
+    static func == (lhs: DataSizeAlertOption, rhs: DataSizeAlertOption) -> Bool {
+        switch (lhs, rhs) {
+        case (.preset(let lv, let lu), .preset(let rv, let ru)):
+            return lv == rv && lu == ru
+        case (.custom(let lv, let lu), .custom(let rv, let ru)):
+            return lv == rv && lu == ru
+        case (.noAlert, .noAlert):
+            return true
+        default:
+            return false
+        }
+    }
+
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .preset(let value, let unit):
+            hasher.combine(0)
+            hasher.combine(value)
+            hasher.combine(unit)
+        case .custom(let value, let unit):
+            hasher.combine(1)
+            hasher.combine(value)
+            hasher.combine(unit)
+        case .noAlert:
+            hasher.combine(2)
+        }
+    }
+}
+
 // MARK: - Filter and Sort Options
 enum ItemFilter: String, CaseIterable, Identifiable {
     case all

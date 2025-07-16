@@ -15,6 +15,14 @@ struct CopyHistorySettingsView: View {
     @State private var tempSelectedFileSizeOption: DataSizeOption
     @State private var initialFileSizeOption: DataSizeOption
 
+    @AppStorage("largeFileAlertThreshold") var largeFileAlertThreshold: Int = 1_000_000_000
+    @State private var tempSelectedAlertOption: DataSizeAlertOption
+    @State private var initialAlertOption: DataSizeAlertOption
+    @State private var showingCustomAlertSheet = false
+
+    @State private var tempCustomAlertValue: Int = 1 // カスタム入力シート用の値
+    @State private var tempCustomAlertUnit: DataSizeUnit = .gigabytes // カスタム入力シート用の単位
+
     @State private var showingCustomSaveHistorySheet = false
     @State private var showingCustomFileSizeSheet = false
     @State private var showingClearHistoryConfirmation = false
@@ -30,80 +38,116 @@ struct CopyHistorySettingsView: View {
 
     @State private var itemCount: Int = 0
     @State private var totalFolderSize: UInt64 = 0
-    
+
     // MARK: - Initialization
     init() {
         let savedMaxHistoryToSave = UserDefaults.standard.integer(forKey: "maxHistoryToSave")
         let savedMaxFileSizeToSave = UserDefaults.standard.integer(forKey: "maxFileSizeToSave")
+        let savedLargeFileAlertThreshold = UserDefaults.standard.integer(forKey: "largeFileAlertThreshold")
 
         // DEBUG print for initial values from UserDefaults (accessing AppStorage directly here is fine)
         print("DEBUG: init() - savedMaxHistoryToSave: \(savedMaxHistoryToSave)")
         print("DEBUG: init() - savedMaxFileSizeToSave: \(savedMaxFileSizeToSave)")
+        print("DEBUG: init() - savedLargeFileAlertThreshold: \(savedLargeFileAlertThreshold)")
 
-        // MARK: - ローカル変数を宣言し、それらの値を決定するロジック
-        // tempSelectedSaveOption の値を決定
-        let determinedTempSelectedSaveOption: HistoryOption
-        var determinedTempCustomSaveHistoryValue: Int
+        // Initialize tempSelectedSaveOption and tempCustomSaveHistoryValue
+        let determinedSaveOptions = Self.determineHistorySaveOptions(savedMaxHistoryToSave: savedMaxHistoryToSave)
+        _tempSelectedSaveOption = State(initialValue: determinedSaveOptions.option)
+        _tempCustomSaveHistoryValue = State(initialValue: determinedSaveOptions.customValue)
 
+        // Initialize tempSelectedFileSizeOption, tempCustomFileSizeValue, and tempCustomFileSizeUnit
+        let determinedFileSizeOptions = Self.determineFileSizeOptions(savedMaxFileSizeToSave: savedMaxFileSizeToSave)
+        _tempSelectedFileSizeOption = State(initialValue: determinedFileSizeOptions.option)
+        _tempCustomFileSizeValue = State(initialValue: determinedFileSizeOptions.customValue)
+        _tempCustomFileSizeUnit = State(initialValue: determinedFileSizeOptions.customUnit)
+
+        // Initialize tempSelectedAlertOption, tempCustomAlertValue, and tempCustomAlertUnit
+        let determinedAlertOptions = Self.determineAlertOptions(savedLargeFileAlertThreshold: savedLargeFileAlertThreshold)
+        _tempSelectedAlertOption = State(initialValue: determinedAlertOptions.option)
+        _tempCustomAlertValue = State(initialValue: determinedAlertOptions.customValue)
+        _tempCustomAlertUnit = State(initialValue: determinedAlertOptions.customUnit)
+
+        // Initialize initial options after temp options are determined
+        _initialSaveOption = State(initialValue: determinedSaveOptions.option)
+        _initialFileSizeOption = State(initialValue: determinedFileSizeOptions.option)
+        _initialAlertOption = State(initialValue: determinedAlertOptions.option)
+    }
+
+    // MARK: - Helper methods for initialization logic
+    private static func determineHistorySaveOptions(savedMaxHistoryToSave: Int) -> (option: HistoryOption, customValue: Int) {
         if savedMaxHistoryToSave == 0 {
-            determinedTempSelectedSaveOption = .unlimited
-            determinedTempCustomSaveHistoryValue = 20
+            return (.unlimited, 20)
         } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == savedMaxHistoryToSave }) {
-            determinedTempSelectedSaveOption = savedPreset
-            determinedTempCustomSaveHistoryValue = savedMaxHistoryToSave
+            return (savedPreset, savedMaxHistoryToSave)
         } else {
-            determinedTempSelectedSaveOption = .custom(savedMaxHistoryToSave)
-            determinedTempCustomSaveHistoryValue = savedMaxHistoryToSave
+            return (.custom(savedMaxHistoryToSave), savedMaxHistoryToSave)
         }
-    
-        // tempSelectedFileSizeOption の値を決定
-        let determinedTempSelectedFileSizeOption: DataSizeOption
-        var determinedTempCustomFileSizeValue: Int = 1
-        var determinedTempCustomFileSizeUnit: DataSizeUnit = .megabytes
+    }
 
-        if savedMaxFileSizeToSave == 0 { // 0は無制限として扱う
-            determinedTempSelectedFileSizeOption = .unlimited
+    private static func determineFileSizeOptions(savedMaxFileSizeToSave: Int) -> (option: DataSizeOption, customValue: Int, customUnit: DataSizeUnit) {
+        if savedMaxFileSizeToSave == 0 {
+            return (.unlimited, 1, .megabytes)
         } else {
-            // presets から一致するものを探す (バイト値で比較)
             if let preset = DataSizeOption.presets.first(where: { $0.byteValue == savedMaxFileSizeToSave }) {
-                determinedTempSelectedFileSizeOption = preset
+                return (preset, 1, .megabytes) // Custom values not relevant for presets
             } else {
-                // カスタム値の場合、単位と値を逆算
-                // まずGBで試行
-                if savedMaxFileSizeToSave % (1000 * 1000 * 1000) == 0 {
-                    determinedTempCustomFileSizeValue = savedMaxFileSizeToSave / (1000 * 1000 * 1000)
-                    determinedTempCustomFileSizeUnit = .gigabytes
-                }
-                // 次にMBで試行
-                else if savedMaxFileSizeToSave % (1000 * 1000) == 0 {
-                    determinedTempCustomFileSizeValue = savedMaxFileSizeToSave / (1000 * 1000)
-                    determinedTempCustomFileSizeUnit = .megabytes
-                }
-                // 次にKBで試行
-                else if savedMaxFileSizeToSave % 1000 == 0 {
-                    determinedTempCustomFileSizeValue = savedMaxFileSizeToSave / 1000
-                    determinedTempCustomFileSizeUnit = .kilobytes
-                }
-                // それ以外はバイト
-                else {
-                    determinedTempCustomFileSizeValue = savedMaxFileSizeToSave
-                    determinedTempCustomFileSizeUnit = .bytes
-                }
-                determinedTempSelectedFileSizeOption = .custom(determinedTempCustomFileSizeValue, determinedTempCustomFileSizeUnit)
+                let (value, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: savedMaxFileSizeToSave)
+                return (.custom(value, unit), value, unit)
             }
         }
+    }
 
-        // MARK: - すべての @State プロパティの初期化を一括で行う
-        _tempSelectedSaveOption = State(initialValue: determinedTempSelectedSaveOption)
-        _tempCustomSaveHistoryValue = State(initialValue: determinedTempCustomSaveHistoryValue)
+    private static func determineAlertOptions(savedLargeFileAlertThreshold: Int) -> (option: DataSizeAlertOption, customValue: Int, customUnit: DataSizeUnit) {
+        if savedLargeFileAlertThreshold == 0 {
+            return (.noAlert, 1, .gigabytes)
+        } else {
+            if let preset = DataSizeAlertOption.presets.first(where: { $0.byteValue == savedLargeFileAlertThreshold }) {
+                return (preset, 1, .gigabytes) // Custom values not relevant for presets
+            } else {
+                let (value, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: savedLargeFileAlertThreshold)
+                return (.custom(value, unit), value, unit)
+            }
+        }
+    }
 
-        _tempSelectedFileSizeOption = State(initialValue: determinedTempSelectedFileSizeOption)
-        _tempCustomFileSizeValue = State(initialValue: determinedTempCustomFileSizeValue)
-        _tempCustomFileSizeUnit = State(initialValue: determinedTempCustomFileSizeUnit)
+    // MARK: - Helper methods for Picker custom option display
+    private func getCustomFileSizeOptionDisplay() -> (value: Int, unit: DataSizeUnit)? {
+        let (val, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: maxFileSizeToSave)
+        if !DataSizeOption.presets.contains(where: { $0.byteValue == maxFileSizeToSave }) && maxFileSizeToSave != 0 {
+            return (val, unit)
+        }
+        return nil
+    }
 
-        // initialオプションは、対応するtempオプションが確定した後に初期化
-        _initialSaveOption = State(initialValue: determinedTempSelectedSaveOption)
-        _initialFileSizeOption = State(initialValue: determinedTempSelectedFileSizeOption) // 新しく追加
+    private func getCustomAlertOptionDisplay() -> (value: Int, unit: DataSizeUnit)? {
+        let (val, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: largeFileAlertThreshold)
+        if !DataSizeAlertOption.presets.contains(where: { $0.byteValue == largeFileAlertThreshold }) && largeFileAlertThreshold != 0 {
+            return (val, unit)
+        }
+        return nil
+    }
+
+    // MARK: - Picker Custom Option Views
+    private var fileSizeCustomOptionView: some View {
+        Group {
+            if let customOption = getCustomFileSizeOptionDisplay() {
+                Divider()
+                Text("カスタム: \(customOption.value) \(customOption.unit.label)")
+                    .tag(DataSizeOption.custom(customOption.value, customOption.unit))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    private var alertCustomOptionView: some View {
+        Group {
+            if let customOption = getCustomAlertOptionDisplay() {
+                Divider()
+                Text("カスタム: \(customOption.value) \(customOption.unit.label)")
+                    .tag(DataSizeAlertOption.custom(customOption.value, customOption.unit))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
     }
 
     var body: some View {
@@ -127,7 +171,8 @@ struct CopyHistorySettingsView: View {
                             .tag(HistoryOption.custom(nil))
                             .frame(maxWidth: .infinity, alignment: .leading)
 
-                        if !HistoryOption.presets.contains(where: { $0.intValue == maxHistoryToSave }) && maxHistoryToSave != 0 && tempSelectedSaveOption != .custom(nil) {
+                        // If the current maxHistoryToSave is a custom value not in presets, show it
+                        if !HistoryOption.presets.contains(where: { $0.intValue == maxHistoryToSave }) && maxHistoryToSave != 0 {
                             Divider()
                             Text("カスタム: \(maxHistoryToSave)")
                                 .tag(HistoryOption.custom(maxHistoryToSave))
@@ -136,23 +181,9 @@ struct CopyHistorySettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .onChange(of: tempSelectedSaveOption) {
-                        if case .custom(nil) = tempSelectedSaveOption {
-                            tempCustomSaveHistoryValue = maxHistoryToSave // 現在の値をカスタムシートの初期値に
-                            showingCustomSaveHistorySheet = true
-                        } else if tempSelectedSaveOption == .unlimited {
-                            maxHistoryToSave = 0 // 無制限を0として保存
-                        } else if let intValue = tempSelectedSaveOption.intValue {
-                            maxHistoryToSave = intValue
-                        }
-                        // 保存数の変更がメニュー表示数に影響する場合の処理（例：メニュー表示が「履歴の保存数に合わせる」の場合）
-                        if UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
-                            UserDefaults.standard.set(maxHistoryToSave, forKey: "maxHistoryInMenu")
-                        }
-                        // ★修正: 保存数が無制限に設定された場合、かつメニュー表示が「保存数に合わせる」ならデフォルト値に戻す
-                        if tempSelectedSaveOption == .unlimited && UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
-                            UserDefaults.standard.set(10, forKey: "maxHistoryInMenu")
-                        }
+                    // Updated onChange syntax to use a two-parameter closure
+                    .onChange(of: tempSelectedSaveOption) { _, newValue in
+                        handleSaveOptionChange(newValue: newValue)
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
@@ -178,29 +209,47 @@ struct CopyHistorySettingsView: View {
                             .tag(DataSizeOption.custom(nil, nil))
                             .frame(maxWidth: .infinity, alignment: .leading)
 
-                        if case let .custom(val, unit) = tempSelectedFileSizeOption,
-                           let value = val, let unit = unit,
-                           !DataSizeOption.presets.contains(where: { $0.byteValue == maxFileSizeToSave }) {
-                            Divider()
-                            Text("カスタム: \(value) \(unit.label)")
-                                .tag(DataSizeOption.custom(value, unit)) // tagを正しく設定
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
+                        // Use the extracted custom option view
+                        fileSizeCustomOptionView
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .onChange(of: tempSelectedFileSizeOption) {
-                        if case .custom(nil, nil) = tempSelectedFileSizeOption {
-                            // 現在のバイト値をカスタムシートの初期値に変換
-                            let (value, unit) = tempSelectedFileSizeOption.extractValueAndUnitFromByteValue(byteValue: maxFileSizeToSave)
-                            tempCustomFileSizeValue = value
-                            tempCustomFileSizeUnit = unit
-                            showingCustomFileSizeSheet = true
-                        } else if tempSelectedFileSizeOption == .unlimited {
-                            maxFileSizeToSave = 0 // 無制限は0として保存
-                        } else if let byteValue = tempSelectedFileSizeOption.byteValue {
-                            maxFileSizeToSave = byteValue
+                    // Updated onChange syntax to use a two-parameter closure
+                    .onChange(of: tempSelectedFileSizeOption) { _, newValue in
+                        handleFileSizeOptionChange(newValue: newValue)
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("次の容量より大きいファイルコピー時にアラートを表示:")
+                        Text("ここで設定した容量よりも大きいファイルをコピーしようとした際に、コピーしたファイルを履歴に保存するかどうかを求めるアラートが表示されます。")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Picker("この容量より大きいファイルコピー時にアラートを表示", selection: $tempSelectedAlertOption) {
+                        ForEach(DataSizeAlertOption.presets) { option in
+                            Text(option.stringValue)
+                                .tag(option)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        Text("表示しない")
+                            .tag(DataSizeAlertOption.noAlert)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text("カスタム...")
+                            .tag(DataSizeAlertOption.custom(nil, nil))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        // Use the extracted custom option view
+                        alertCustomOptionView
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    // Updated onChange syntax to use a two-parameter closure
+                    .onChange(of: tempSelectedAlertOption) { _, newValue in
+                        handleAlertOptionChange(newValue: newValue)
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
@@ -241,7 +290,7 @@ struct CopyHistorySettingsView: View {
                     .help("すべてのクリップボード履歴をJSONファイルとして書き出します。")
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
+
                 HStack {
                     Text("\(clipboardManager.clipboardHistory.count)個の履歴")
                         .foregroundColor(.secondary)
@@ -262,7 +311,7 @@ struct CopyHistorySettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: 履歴の管理
-            
+
             // MARK: - 保存フォルダの管理
             Section {
                 HStack {
@@ -272,7 +321,7 @@ struct CopyHistorySettingsView: View {
                         .foregroundColor(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
+
                 HStack {
                     Text("保存フォルダの総容量:")
                     Spacer()
@@ -280,7 +329,7 @@ struct CopyHistorySettingsView: View {
                         .foregroundColor(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
+
                 HStack {
                     Button(action: {
                         openClipboardFilesFolderInFinder()
@@ -292,9 +341,9 @@ struct CopyHistorySettingsView: View {
                     }
                     .buttonStyle(.bordered)
                     .help("ファイルの保存先フォルダをFinderで開きます。")
-                    
+
                     Spacer()
-                    
+
                     Button(action: {
                         showingClearFilesConfirmation = true
                     }) {
@@ -315,7 +364,7 @@ struct CopyHistorySettingsView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("保存フォルダの管理")
                         .font(.headline)
-                    
+
                     Text("ファイルやフォルダをコピーしたときにデータが保存されるフォルダを管理します。")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -329,6 +378,7 @@ struct CopyHistorySettingsView: View {
         .onAppear {
             calculateStatistics()
         }
+        // Updated onChange syntax to use a zero-parameter closure
         .onChange(of: clipboardManager.clipboardHistory) {
             calculateStatistics()
         }
@@ -337,30 +387,8 @@ struct CopyHistorySettingsView: View {
                 title: Text("履歴を保存する最大数を設定"),
                 description: Text("保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。"),
                 currentValue: $tempCustomSaveHistoryValue,
-                onSave: { newValue in
-                    maxHistoryToSave = newValue
-
-                    if newValue == 0 {
-                        tempSelectedSaveOption = .unlimited
-                    } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == newValue }) {
-                        tempSelectedSaveOption = savedPreset
-                    } else {
-                        tempSelectedSaveOption = .custom(newValue)
-                    }
-
-                    if UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
-                        UserDefaults.standard.set(maxHistoryToSave, forKey: "maxHistoryInMenu")
-                    }
-                },
-                onCancel: {
-                    if maxHistoryToSave == 0 {
-                        tempSelectedSaveOption = .unlimited
-                    } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxHistoryToSave }) {
-                        tempSelectedSaveOption = savedPreset
-                    } else {
-                        tempSelectedSaveOption = .custom(maxHistoryToSave)
-                    }
-                }
+                onSave: handleCustomSaveHistorySheetSave,
+                onCancel: handleCustomSaveHistorySheetCancel
             )
         }
         .sheet(isPresented: $showingCustomFileSizeSheet) {
@@ -368,32 +396,19 @@ struct CopyHistorySettingsView: View {
                 title: Text("ファイル1つあたりの最大容量を設定"),
                 description: nil,
                 currentValue: $tempCustomFileSizeValue,
-                selectedUnit: Binding<DataSizeUnit?>(get: { tempCustomFileSizeUnit }, set: { tempCustomFileSizeUnit = $0 ?? .megabytes }), // Explicitly convert Binding<DataSizeUnit> to Binding<DataSizeUnit?>
-                onSave: { newValue in
-                    let newByteValue = tempCustomFileSizeUnit.byteValue(for: newValue)
-                    maxFileSizeToSave = newByteValue
-
-                    if newByteValue == 0 { // 0は無制限として扱う
-                        tempSelectedFileSizeOption = .unlimited
-                    } else if let savedPreset = DataSizeOption.presets.first(where: { $0.byteValue == newByteValue }) {
-                        tempSelectedFileSizeOption = savedPreset
-                    } else {
-                        tempSelectedFileSizeOption = .custom(newValue, tempCustomFileSizeUnit)
-                    }
-                },
-                onCancel: {
-                    if maxFileSizeToSave == 0 { // 0は無制限として扱う
-                        tempSelectedFileSizeOption = .unlimited
-                    } else if let savedPreset = DataSizeOption.presets.first(where: { $0.byteValue == maxFileSizeToSave }) {
-                        tempSelectedFileSizeOption = savedPreset
-                    } else {
-                        // 既存の値をカスタムとして設定し直す
-                        let (value, unit) = DataSizeOption.custom(maxFileSizeToSave, nil).extractValueAndUnitFromByteValue(byteValue: maxFileSizeToSave)
-                        tempCustomFileSizeValue = value
-                        tempCustomFileSizeUnit = unit
-                        tempSelectedFileSizeOption = .custom(value, unit)
-                    }
-                }
+                selectedUnit: Binding<DataSizeUnit?>(get: { tempCustomFileSizeUnit }, set: { tempCustomFileSizeUnit = $0 ?? .megabytes }),
+                onSave: handleCustomFileSizeSheetSave,
+                onCancel: handleCustomFileSizeSheetCancel
+            )
+        }
+        .sheet(isPresented: $showingCustomAlertSheet) {
+            CustomNumberInputSheet(
+                title: Text("アラートを表示する容量を設定"),
+                description: nil,
+                currentValue: $tempCustomAlertValue,
+                selectedUnit: Binding<DataSizeUnit?>(get: { tempCustomAlertUnit }, set: { tempCustomAlertUnit = $0 ?? .megabytes }),
+                onSave: handleCustomAlertSheetSave,
+                onCancel: handleCustomAlertSheetCancel
             )
         }
         .fileExporter(
@@ -441,7 +456,138 @@ struct CopyHistorySettingsView: View {
             Text("履歴に保存されたすべてのファイルとフォルダを削除しますか？関連する履歴も削除されます。この操作は元に戻せません。")
         }
     }
-    
+
+    // MARK: - Picker onChange Handlers
+    // Modified to accept a single newValue parameter, as oldValue is not used in the logic
+    private func handleSaveOptionChange(newValue: HistoryOption) {
+        if case .custom(nil) = newValue {
+            tempCustomSaveHistoryValue = maxHistoryToSave // 現在の値をカスタムシートの初期値に
+            showingCustomSaveHistorySheet = true
+        } else if newValue == .unlimited {
+            maxHistoryToSave = 0 // 無制限を0として保存
+        } else if let intValue = newValue.intValue {
+            maxHistoryToSave = intValue
+        }
+        // 保存数の変更がメニュー表示数に影響する場合の処理（例：メニュー表示が「履歴の保存数に合わせる」の場合）
+        if UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
+            UserDefaults.standard.set(maxHistoryToSave, forKey: "maxHistoryInMenu")
+        }
+        // ★修正: 保存数が無制限に設定された場合、かつメニュー表示が「保存数に合わせる」ならデフォルト値に戻す
+        if newValue == .unlimited && UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
+            UserDefaults.standard.set(10, forKey: "maxHistoryInMenu")
+        }
+    }
+
+    // Modified to accept a single newValue parameter, as oldValue is not used in the logic
+    private func handleFileSizeOptionChange(newValue: DataSizeOption) {
+        if case .custom(nil, nil) = newValue {
+            // 現在のバイト値をカスタムシートの初期値に変換
+            let (value, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: maxFileSizeToSave)
+            tempCustomFileSizeValue = value
+            tempCustomFileSizeUnit = unit
+            showingCustomFileSizeSheet = true
+        } else if newValue == .unlimited {
+            maxFileSizeToSave = 0 // 無制限は0として保存
+        } else if let byteValue = newValue.byteValue {
+            maxFileSizeToSave = byteValue
+        }
+    }
+
+    // Modified to accept a single newValue parameter, as oldValue is not used in the logic
+    private func handleAlertOptionChange(newValue: DataSizeAlertOption) {
+        if case .custom(nil, nil) = newValue {
+            let (value, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: largeFileAlertThreshold)
+            tempCustomAlertValue = value
+            tempCustomAlertUnit = unit
+            showingCustomAlertSheet = true
+        } else if newValue == .noAlert {
+            largeFileAlertThreshold = 0
+        } else if let byteValue = newValue.byteValue {
+            largeFileAlertThreshold = byteValue
+        }
+    }
+
+    // MARK: - Custom Sheet Save/Cancel Handlers
+    private func handleCustomSaveHistorySheetSave(newValue: Int) {
+        maxHistoryToSave = newValue
+
+        if newValue == 0 {
+            tempSelectedSaveOption = .unlimited
+        } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == newValue }) {
+            tempSelectedSaveOption = savedPreset
+        } else {
+            tempSelectedSaveOption = .custom(newValue)
+        }
+
+        if UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
+            UserDefaults.standard.set(maxHistoryToSave, forKey: "maxHistoryInMenu")
+        }
+    }
+
+    private func handleCustomSaveHistorySheetCancel() {
+        if maxHistoryToSave == 0 {
+            tempSelectedSaveOption = .unlimited
+        } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxHistoryToSave }) {
+            tempSelectedSaveOption = savedPreset
+        } else {
+            tempSelectedSaveOption = .custom(maxHistoryToSave)
+        }
+    }
+
+    private func handleCustomFileSizeSheetSave(newValue: Int) {
+        let newByteValue = tempCustomFileSizeUnit.byteValue(for: newValue)
+        maxFileSizeToSave = newByteValue
+
+        if newByteValue == 0 { // 0は無制限として扱う
+            tempSelectedFileSizeOption = .unlimited
+        } else if let savedPreset = DataSizeOption.presets.first(where: { $0.byteValue == newByteValue }) {
+            tempSelectedFileSizeOption = savedPreset
+        } else {
+            tempSelectedFileSizeOption = .custom(newValue, tempCustomFileSizeUnit)
+        }
+    }
+
+    private func handleCustomFileSizeSheetCancel() {
+        if maxFileSizeToSave == 0 { // 0は無制限として扱う
+            tempSelectedFileSizeOption = .unlimited
+        } else if let savedPreset = DataSizeOption.presets.first(where: { $0.byteValue == maxFileSizeToSave }) {
+            tempSelectedFileSizeOption = savedPreset
+        } else {
+            // 既存の値をカスタムとして設定し直す
+            let (value, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: maxFileSizeToSave)
+            tempCustomFileSizeValue = value
+            tempCustomFileSizeUnit = unit
+            tempSelectedFileSizeOption = .custom(value, unit)
+        }
+    }
+
+    private func handleCustomAlertSheetSave(newValue: Int) {
+        let newByteValue = tempCustomAlertUnit.byteValue(for: newValue)
+        largeFileAlertThreshold = newByteValue
+
+        if newByteValue == 0 {
+            tempSelectedAlertOption = .noAlert
+        } else if let savedPreset = DataSizeAlertOption.presets.first(where: { $0.byteValue == newByteValue }) {
+            tempSelectedAlertOption = savedPreset
+        } else {
+            tempSelectedAlertOption = .custom(newValue, tempCustomAlertUnit)
+        }
+    }
+
+    private func handleCustomAlertSheetCancel() {
+        if largeFileAlertThreshold == 0 {
+            tempSelectedAlertOption = .noAlert
+        } else if let savedPreset = DataSizeAlertOption.presets.first(where: { $0.byteValue == largeFileAlertThreshold }) {
+            tempSelectedAlertOption = savedPreset
+        } else {
+            let (value, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: largeFileAlertThreshold)
+            tempCustomAlertValue = value
+            tempCustomAlertUnit = unit
+            tempSelectedAlertOption = .custom(value, unit)
+        }
+    }
+
+    // MARK: - File Management
     private func openClipboardFilesFolderInFinder() {
         guard let appSpecificDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("ClipHold") else {
             return
@@ -454,7 +600,7 @@ struct CopyHistorySettingsView: View {
         // バックグラウンドスレッドで処理を実行
         DispatchQueue.global(qos: .background).async {
             let fileManager = FileManager.default
-            
+
             guard let appSpecificDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("ClipHold") else {
                 return
             }
@@ -466,7 +612,7 @@ struct CopyHistorySettingsView: View {
 
             do {
                 let fileURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-                
+
                 for fileURL in fileURLs {
                     try fileManager.removeItem(at: fileURL)
                 }
@@ -482,7 +628,7 @@ struct CopyHistorySettingsView: View {
             }
         }
     }
-    
+
     private func calculateStatistics() {
         // バックグラウンドスレッドで処理を実行
         DispatchQueue.global(qos: .background).async {
@@ -490,7 +636,7 @@ struct CopyHistorySettingsView: View {
             var totalFolderSize: UInt64 = 0
 
             let fileManager = FileManager.default
-            
+
             guard let appSpecificDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("ClipHold") else {
                 return
             }
@@ -531,7 +677,7 @@ struct CopyHistorySettingsView: View {
 
 // MARK: - DataSizeOption のヘルパー拡張
 extension DataSizeOption {
-    func extractValueAndUnitFromByteValue(byteValue: Int) -> (value: Int, unit: DataSizeUnit) {
+    static func extractValueAndUnitFromByteValue(byteValue: Int) -> (value: Int, unit: DataSizeUnit) {
         let gigabyteValue = 1_000_000_000
         let megabyteValue = 1_000_000
         let kilobyteValue = 1_000

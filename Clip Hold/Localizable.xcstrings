@@ -39,6 +39,22 @@
         }
       }
     },
+    "%@を超えるファイルがコピーされました。履歴に保存してもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A file has been copied that is larger than %@. Are you sure you want to save it in the history?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@を超えるファイルがコピーされました。履歴に保存してもよろしいですか？"
+          }
+        }
+      }
+    },
     "%@定型文をコピーする" : {
       "localizations" : {
         "en" : {
@@ -67,6 +83,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@履歴をコピーする"
+          }
+        }
+      }
+    },
+    "%1$@を超えるファイル（%2$@）がコピーされました。履歴に保存してもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A file (%2$@) has been copied that is greater than %1$@. Are you sure you want to save it in the history?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@を超えるファイル（%2$@）がコピーされました。履歴に保存してもよろしいですか？"
           }
         }
       }
@@ -876,6 +908,38 @@
         }
       }
     },
+    "アラートを表示する容量を設定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the size to show an alert"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アラートを表示する容量を設定"
+          }
+        }
+      }
+    },
+    "いいえ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "いいえ"
+          }
+        }
+      }
+    },
     "インポート" : {
       "localizations" : {
         "en" : {
@@ -1378,6 +1442,22 @@
         }
       }
     },
+    "ここで設定した容量よりも大きいファイルをコピーしようとした際に、コピーしたファイルを履歴に保存するかどうかを求めるアラートが表示されます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you copy a file that is larger than the size set here, you will get an alert asking if you want to save the copied file in the history or not."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ここで設定した容量よりも大きいファイルをコピーしようとした際に、コピーしたファイルを履歴に保存するかどうかを求めるアラートが表示されます。"
+          }
+        }
+      }
+    },
     "ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。" : {
       "localizations" : {
         "en" : {
@@ -1470,6 +1550,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このまま追加"
+          }
+        }
+      }
+    },
+    "この容量より大きいファイルコピー時にアラートを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show alert when copying a file larger than this size"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この容量より大きいファイルコピー時にアラートを表示"
           }
         }
       }
@@ -2110,6 +2206,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バージョン: %@ (%@)"
+          }
+        }
+      }
+    },
+    "はい" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "はい"
           }
         }
       }
@@ -2942,6 +3054,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "古い順"
+          }
+        }
+      }
+    },
+    "大容量ファイルのコピー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copying a Large File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大容量ファイルのコピー"
           }
         }
       }
@@ -3842,6 +3970,22 @@
         }
       }
     },
+    "次の容量より大きいファイルコピー時にアラートを表示:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show alert when copying a file larger than:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次の容量より大きいファイルコピー時にアラートを表示:"
+          }
+        }
+      }
+    },
     "無制限" : {
       "localizations" : {
         "en" : {
@@ -4030,6 +4174,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集…"
+          }
+        }
+      }
+    },
+    "表示しない" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Don't Show"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示しない"
           }
         }
       }
