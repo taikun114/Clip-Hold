@@ -186,26 +186,26 @@ class ClipboardManager: ObservableObject {
     }
     
     // ヘルパー関数: ファイルURLからClipboardItemを作成（物理的な重複コピー防止ロジックを含む）
-    private func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil) -> ClipboardItem? {
+    private func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil, isFromAlertConfirmation: Bool = false) -> ClipboardItem? {
         let filesDirectory = createClipboardFilesDirectoryIfNeeded()
 
         // 外部ファイルの属性を取得
         let externalFileAttributes = getFileAttributes(fileURL)
 
-        // MARK: - Add file size check (only if not an internal copy)
-        if !isPerformingInternalCopy { // 内部コピーでない場合のみアラートを表示
+        // MARK: - ファイルサイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
+        if !isPerformingInternalCopy && !isFromAlertConfirmation { // 内部コピーでなく、アラート確認からでない場合のみアラートを表示
             if let fileSize = externalFileAttributes.fileSize {
-                // Check if it exceeds the size limit or the alert threshold
+                // サイズ制限またはアラートしきい値を超えているかチェック
                 if maxFileSizeToSave > 0 && fileSize > maxFileSizeToSave {
                     print("ClipboardManager: File not saved due to size limit. File size: \(fileSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
-                    return nil // Return nil if it exceeds the size limit
+                    return nil // サイズ制限を超えている場合はnilを返す
                 } else if largeFileAlertThreshold > 0 && fileSize > largeFileAlertThreshold {
-                    // If it exceeds the alert threshold, request an alert display
+                    // アラートしきい値を超えている場合、アラート表示を要求
                     DispatchQueue.main.async {
                         self.pendingLargeFileItem = (fileURL, qrCodeContent)
-                        self.showingLargeFileAlert = true // didSet will trigger NSAlert
+                        self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
                     }
-                    return nil // Do not save yet, wait for user confirmation via alert
+                    return nil // まだ保存せず、ユーザーのアラート確認を待つ
                 }
             }
         }
@@ -244,23 +244,23 @@ class ClipboardManager: ObservableObject {
     }
 
     // MARK: - New Helper function for image duplication check and saving
-    private func createClipboardItemFromImageData(_ imageData: Data, qrCodeContent: String?) -> ClipboardItem? {
+    private func createClipboardItemFromImageData(_ imageData: Data, qrCodeContent: String?, isFromAlertConfirmation: Bool = false) -> ClipboardItem? {
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
 
         let newImageSize = UInt64(imageData.count)
 
-        // MARK: - Add image size check (only if not an internal copy)
-        if !isPerformingInternalCopy { // 内部コピーでない場合のみアラートを表示
+        // MARK: - 画像サイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
+        if !isPerformingInternalCopy && !isFromAlertConfirmation { // 内部コピーでなく、アラート確認からでない場合のみアラートを表示
             if maxFileSizeToSave > 0 && newImageSize > maxFileSizeToSave {
                 print("ClipboardManager: Image not saved due to size limit. Image size: \(newImageSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
-                return nil // Return nil if it exceeds the size limit
+                return nil // サイズ制限を超えている場合はnilを返す
                 } else if largeFileAlertThreshold > 0 && newImageSize > largeFileAlertThreshold {
-                // If it exceeds the alert threshold, request an alert display
+                // アラートしきい値を超えている場合、アラート表示を要求
                 DispatchQueue.main.async {
                     self.pendingLargeImageData = (imageData, qrCodeContent)
-                    self.showingLargeFileAlert = true // didSet will trigger NSAlert
+                    self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
                 }
-                return nil // Do not save yet, wait for user confirmation via alert
+                return nil // まだ保存せず、ユーザーのアラート確認を待つ
             }
         }
 
@@ -673,7 +673,7 @@ class ClipboardManager: ObservableObject {
         do {
             let data = try Data(contentsOf: fileURL)
             let decoder = JSONDecoder()
-            // JSONDecoder には dateEncodingStrategy を使用します。
+            // JSONDecoder には dateDecodingStrategy を使用します。
             decoder.dateDecodingStrategy = .iso8601 // 日付のデコード形式を合わせる (ClipboardHistoryDocumentと一致させる)
 
             var loadedHistory = try decoder.decode([ClipboardItem].self, from: data)
@@ -830,31 +830,25 @@ class ClipboardManager: ObservableObject {
     func handleLargeFileAlertConfirmation(shouldSave: Bool) {
         if shouldSave {
             if let pendingItem = pendingLargeFileItem {
-                // If user allows saving, copy the file to sandbox and add to history
-                if let copiedFileURL = copyFileToAppSandbox(from: pendingItem.fileURL) {
-                    let displayName = pendingItem.fileURL.lastPathComponent
-                    let newItem = ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: getFileAttributes(copiedFileURL).fileSize, qrCodeContent: pendingItem.qrCodeContent)
+                // ユーザーが保存を許可した場合、ファイルをサンドボックスにコピーし、履歴に追加
+                // ここで createClipboardItemForFileURL を呼び出すことで重複検知ロジックが適用される
+                // アラート確認からの呼び出しであることを示すフラグをtrueにする
+                if let newItem = createClipboardItemForFileURL(pendingItem.fileURL, qrCodeContent: pendingItem.qrCodeContent, isFromAlertConfirmation: true) {
                     addAndSaveItem(newItem)
                 }
             } else if let pendingImageData = pendingLargeImageData {
-                // If user allows saving the image, copy the image to sandbox and add to history
-                if let filesDirectory = createClipboardFilesDirectoryIfNeeded() {
-                    let uniqueFileName = "\(UUID().uuidString)-image.png"
-                    let destinationURL = filesDirectory.appendingPathComponent(uniqueFileName)
-                    do {
-                        try pendingImageData.imageData.write(to: destinationURL)
-                        let newItem = ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: UInt64(pendingImageData.imageData.count), qrCodeContent: pendingImageData.qrCodeContent)
-                        addAndSaveItem(newItem)
-                    } catch {
-                        print("ClipboardManager: Error saving large image after confirmation: \(error.localizedDescription)")
-                    }
+                // ユーザーが画像の保存を許可した場合、画像をサンドボックスにコピーし、履歴に追加
+                // ここで createClipboardItemFromImageData を呼び出すことで重複検知ロジックが適用される
+                // アラート確認からの呼び出しであることを示すフラグをtrueにする
+                if let newItem = createClipboardItemFromImageData(pendingImageData.imageData, qrCodeContent: pendingImageData.qrCodeContent, isFromAlertConfirmation: true) {
+                    addAndSaveItem(newItem)
                 }
             }
         }
-        // Reset alert state
+        // アラートの状態をリセット
         pendingLargeFileItem = nil
         pendingLargeImageData = nil
-        // Set showingLargeFileAlert to false to prevent didSet from triggering NSAlert again
+        // showingLargeFileAlert を false に設定して、didSet が再度NSAlertをトリガーするのを防ぐ
         if showingLargeFileAlert {
             showingLargeFileAlert = false
         }
@@ -876,7 +870,7 @@ extension ClipboardManager {
         clipboardHistory.insert(newItem, at: 0) // 先頭に追加
         print("ClipboardManager: New text item added via addTextItem. Total history: \(clipboardHistory.count)")
 
-        // Apply logic if it exceeds the maximum history count
+        // 最大履歴数を超過した場合の処理を適用
         enforceMaxHistoryCount()
 
         scheduleSaveClipboardHistory()
