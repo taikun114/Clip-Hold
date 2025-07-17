@@ -154,7 +154,12 @@ struct ClipHoldApp: App {
                     }()
                     
                     Button {
+                        // 内部コピーフラグをtrueに設定
+                        clipboardManager.isPerformingInternalCopy = true
                         clipboardManager.copyItemToClipboard(item)
+                        // 内部コピーフラグをfalseにリセット
+                        // copyItemToClipboard内でディレイしてリセットされるため、ここでは不要
+                        // clipboardManager.isPerformingInternalCopy = false
 
                         if quickPaste {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -307,7 +312,12 @@ struct ClipHoldApp: App {
                     let historyItem = clipboardManager.clipboardHistory[i]
                     NSPasteboard.general.clearContents()
 
+                    // 内部コピーフラグをtrueに設定
+                    clipboardManager.isPerformingInternalCopy = true
                     clipboardManager.copyItemToClipboard(historyItem)
+                    // 内部コピーフラグをfalseにリセット
+                    // copyItemToClipboard内でディレイしてリセットされるため、ここでは不要
+                    // clipboardManager.isPerformingInternalCopy = false
 
                     if quickPaste {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {

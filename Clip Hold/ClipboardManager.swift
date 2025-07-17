@@ -192,23 +192,31 @@ class ClipboardManager: ObservableObject {
         // 外部ファイルの属性を取得
         let externalFileAttributes = getFileAttributes(fileURL)
 
+        print("DEBUG: createClipboardItemForFileURL - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
+
         // MARK: - ファイルサイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
-        if !isPerformingInternalCopy && !isFromAlertConfirmation { // 内部コピーでなく、アラート確認からでない場合のみアラートを表示
-            if let fileSize = externalFileAttributes.fileSize {
-                // サイズ制限またはアラートしきい値を超えているかチェック
-                if maxFileSizeToSave > 0 && fileSize > maxFileSizeToSave {
-                    print("ClipboardManager: File not saved due to size limit. File size: \(fileSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
-                    return nil // サイズ制限を超えている場合はnilを返す
-                } else if largeFileAlertThreshold > 0 && fileSize > largeFileAlertThreshold {
-                    // アラートしきい値を超えている場合、アラート表示を要求
-                    DispatchQueue.main.async {
-                        self.pendingLargeFileItem = (fileURL, qrCodeContent)
-                        self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
+        // isPerformingInternalCopy が true の場合は、アラート表示を完全にスキップして保存処理に進む
+        if !isPerformingInternalCopy { // 内部コピーでない場合のみ、アラート表示の可能性を考慮
+            if !isFromAlertConfirmation { // かつ、アラート確認からでない場合のみアラートを表示
+                if let fileSize = externalFileAttributes.fileSize {
+                    // サイズ制限またはアラートしきい値を超えているかチェック
+                    if maxFileSizeToSave > 0 && fileSize > maxFileSizeToSave {
+                        print("ClipboardManager: File not saved due to size limit. File size: \(fileSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
+                        return nil // サイズ制限を超えている場合はnilを返す
+                    } else if largeFileAlertThreshold > 0 && fileSize > largeFileAlertThreshold {
+                        // アラートしきい値を超えている場合、アラート表示を要求
+                        DispatchQueue.main.async {
+                            self.pendingLargeFileItem = (fileURL, qrCodeContent)
+                            self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
+                            print("DEBUG: createClipboardItemForFileURL - Setting showingLargeFileAlert to true for file: \(fileURL.lastPathComponent)")
+                        }
+                        return nil // まだ保存せず、ユーザーのアラート確認を待つ
                     }
-                    return nil // まだ保存せず、ユーザーのアラート確認を待つ
                 }
             }
         }
+        // ここに到達した場合は、アラート表示が不要（内部コピー、またはアラート確認済み、またはサイズ制限内）なので、
+        // そのまま保存ロジックに進む
         
         // サンドボックス内の既存ファイルを走査し、重複をチェック
         if let filesDirectory = filesDirectory {
@@ -249,20 +257,28 @@ class ClipboardManager: ObservableObject {
 
         let newImageSize = UInt64(imageData.count)
 
+        print("DEBUG: createClipboardItemFromImageData - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
+
         // MARK: - 画像サイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
-        if !isPerformingInternalCopy && !isFromAlertConfirmation { // 内部コピーでなく、アラート確認からでない場合のみアラートを表示
-            if maxFileSizeToSave > 0 && newImageSize > maxFileSizeToSave {
-                print("ClipboardManager: Image not saved due to size limit. Image size: \(newImageSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
-                return nil // サイズ制限を超えている場合はnilを返す
-                } else if largeFileAlertThreshold > 0 && newImageSize > largeFileAlertThreshold {
-                // アラートしきい値を超えている場合、アラート表示を要求
-                DispatchQueue.main.async {
-                    self.pendingLargeImageData = (imageData, qrCodeContent)
-                    self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
+        // isPerformingInternalCopy が true の場合は、アラート表示を完全にスキップして保存処理に進む
+        if !isPerformingInternalCopy { // 内部コピーでない場合のみ、アラート表示の可能性を考慮
+            if !isFromAlertConfirmation { // かつ、アラート確認からでない場合のみアラートを表示
+                if maxFileSizeToSave > 0 && newImageSize > maxFileSizeToSave {
+                    print("ClipboardManager: Image not saved due to size limit. Image size: \(newImageSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
+                    return nil // サイズ制限を超えている場合はnilを返す
+                    } else if largeFileAlertThreshold > 0 && newImageSize > largeFileAlertThreshold {
+                    // アラートしきい値を超えている場合、アラート表示を要求
+                    DispatchQueue.main.async {
+                        self.pendingLargeImageData = (imageData, qrCodeContent)
+                        self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
+                        print("DEBUG: createClipboardItemFromImageData - Setting showingLargeFileAlert to true for image data (size: \(newImageSize))")
+                    }
+                    return nil // まだ保存せず、ユーザーのアラート確認を待つ
                 }
-                return nil // まだ保存せず、ユーザーのアラート確認を待つ
             }
         }
+        // ここに到達した場合は、アラート表示が不要（内部コピー、またはアラート確認済み、またはサイズ制限内）なので、
+        // そのまま保存ロジックに進む
 
         do {
             let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles)
@@ -398,22 +414,28 @@ class ClipboardManager: ObservableObject {
             print("DEBUG: checkPasteboard: isMonitoring is false, returning.")
             return
         }
-        // isPerformingInternalCopy が true の場合は、アラート表示をスキップ
-        guard !isPerformingInternalCopy else {
-            print("DEBUG: checkPasteboard: isPerformingInternalCopy is true, skipping monitoring for large file alert.")
-            // 内部コピーの場合は、アラート表示をスキップし、フラグをリセットして通常処理を続行
-            // ここで return すると、内部コピーされたアイテムが履歴に追加されないため、
-            // isPerformingInternalCopy を false にリセットして、通常処理を続行させる
-            isPerformingInternalCopy = false
-            return
-        }
-
+        
         let pasteboard = NSPasteboard.general
         if pasteboard.changeCount != lastChangeCount {
             lastChangeCount = pasteboard.changeCount
+            print("DEBUG: checkPasteboard - Pasteboard change detected. New changeCount: \(lastChangeCount)")
+
+            // 内部コピー操作中の場合は、この変更をスキップし、フラグをリセットする
+            // isPerformingInternalCopy の状態をこのチェックの最初にキャプチャする
+            let wasInternalCopyInitially = isPerformingInternalCopy
+            if wasInternalCopyInitially {
+                print("DEBUG: checkPasteboard: Internal copy in progress. Will process content and reset flag at the end.")
+                // ここでは isPerformingInternalCopy をリセットしない
+            }
 
             if let activeAppBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier {
                 guard !excludedAppIdentifiers.contains(activeAppBundleIdentifier) else {
+                    print("DEBUG: checkPasteboard - Excluded app detected: \(activeAppBundleIdentifier). Skipping.")
+                    // 内部コピーフラグが設定されていた場合、ここでリセット
+                    if wasInternalCopyInitially {
+                        isPerformingInternalCopy = false
+                        print("DEBUG: checkPasteboard: Excluded app detected during internal copy. isPerformingInternalCopy reset to false.")
+                    }
                     return // 除外アプリからのコピーは無視
                 }
             }
@@ -422,6 +444,7 @@ class ClipboardManager: ObservableObject {
             // readObjectsがNSURLを返す場合と、stringがfileURLを返す場合を両方チェック
             if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL],
                let firstFileURL = fileURLs.first {
+                print("DEBUG: checkPasteboard - File URL detected: \(firstFileURL.lastPathComponent)")
 
                 var qrCodeContent: String? = nil
 
@@ -436,10 +459,16 @@ class ClipboardManager: ObservableObject {
                 if let newItem = createClipboardItemForFileURL(firstFileURL, qrCodeContent: qrCodeContent) {
                     addAndSaveItem(newItem)
                 }
+                // 処理が完了したので、内部コピーフラグをリセット
+                if wasInternalCopyInitially {
+                    isPerformingInternalCopy = false
+                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after file URL processing.")
+                }
                 return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
             } else if pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.fileURL.rawValue]),
                       let stringURL = pasteboard.string(forType: .fileURL),
                       let url = URL(string: stringURL) {
+                print("DEBUG: checkPasteboard - File URL (string) detected: \(url.lastPathComponent)")
 
                 var qrCodeContent: String? = nil
 
@@ -453,6 +482,11 @@ class ClipboardManager: ObservableObject {
                 if let newItem = createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent) {
                     addAndSaveItem(newItem)
                 }
+                // 処理が完了したので、内部コピーフラグをリセット
+                if wasInternalCopyInitially {
+                    isPerformingInternalCopy = false
+                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after file URL (string) processing.")
+                }
                 return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
             }
 
@@ -464,17 +498,17 @@ class ClipboardManager: ObservableObject {
             if let tiffData = pasteboard.data(forType: .tiff) {
                 imageDataFromPasteboard = tiffData
                 imageFromPasteboard = NSImage(data: tiffData)
-                print("ClipboardManager: Image data detected on pasteboard (TIFF).")
+                print("DEBUG: checkPasteboard - Image data detected on pasteboard (TIFF).")
             } else if let pngData = pasteboard.data(forType: .png) {
                 imageDataFromPasteboard = pngData
                 imageFromPasteboard = NSImage(data: pngData)
-                print("ClipboardManager: Image data detected on pasteboard (PNG).")
+                print("DEBUG: checkPasteboard - Image data detected on pasteboard (PNG).")
             } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
                 // どちらも見つからない場合、一般的なNSImageオブジェクトのTIFF表現を試みる
                 imageDataFromPasteboard = image.tiffRepresentation
                 imageFromPasteboard = image
                 if imageDataFromPasteboard != nil {
-                    print("ClipboardManager: Image data detected on pasteboard (from generic NSImage).")
+                    print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage).")
                 }
             }
 
@@ -484,17 +518,33 @@ class ClipboardManager: ObservableObject {
                 if let newItem = createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent) {
                     addAndSaveItem(newItem)
                 }
+                // 処理が完了したので、内部コピーフラグをリセット
+                if wasInternalCopyInitially {
+                    isPerformingInternalCopy = false
+                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after image data processing.")
+                }
                 return // 画像の有無に関わらず、画像データのチェックが完了したので終了
             }
 
             // 3. ファイルも画像もなかった場合、文字列として処理を試みる
             if let newString = pasteboard.string(forType: .string) {
+                print("DEBUG: checkPasteboard - String detected: \(newString.prefix(50))...")
                 let newItem = ClipboardItem(text: newString, date: Date(), filePath: nil, fileSize: nil)
                 addAndSaveItem(newItem)
+                // 処理が完了したので、内部コピーフラグをリセット
+                if wasInternalCopyInitially {
+                    isPerformingInternalCopy = false
+                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after string processing.")
+                }
                 return
             }
 
             print("ClipboardManager: No supported item type found on pasteboard.")
+            // どのタイプも処理されなかった場合でも、内部コピーフラグをリセット
+            if wasInternalCopyInitially {
+                isPerformingInternalCopy = false
+                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false as no supported item type found.")
+            }
         }
     }
 
@@ -643,7 +693,6 @@ class ClipboardManager: ObservableObject {
             }
 
             let encoder = JSONEncoder()
-            // JSONEncoder には dateEncodingStrategy を使用します。
             encoder.dateEncodingStrategy = .iso8601 // 日付のエンコード形式を合わせる (ClipboardHistoryDocumentと一致させる)
             encoder.outputFormatting = .prettyPrinted // 可読性のために整形 (Optional)
 
@@ -738,10 +787,11 @@ class ClipboardManager: ObservableObject {
             }
         }
 
-        // isPerformingInternalCopy を false にリセットする前に、checkPasteboard が実行されるのを待つために少し遅延させる
-        // ただし、checkPasteboard 内でこのフラグをリセットするロジックを追加したため、ここでは即座にfalseに戻す
-        isPerformingInternalCopy = false
-        print("DEBUG: copyItemToClipboard: isPerformingInternalCopy = false")
+        // isPerformingInternalCopy のリセットは checkPasteboard() 内で行うため、ここでは削除
+        // DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        //     self.isPerformingInternalCopy = false
+        //     print("DEBUG: copyItemToClipboard: isPerformingInternalCopy = false (after delay)")
+        // }
     }
 
     // MARK: - ファイルコピーのためのヘルパー
@@ -820,6 +870,7 @@ class ClipboardManager: ObservableObject {
             alert.addButton(withTitle: NSLocalizedString("いいえ", comment: "")) // NSAlertSecondButtonReturn (1001)
 
             let response = alert.runModal()
+            print("DEBUG: presentLargeFileConfirmationAlert - Alert dismissed. Response: \(response.rawValue)")
 
             // NSAlertFirstButtonReturn corresponds to "Yes", NSAlertSecondButtonReturn to "No"
             let shouldSave = (response == .alertFirstButtonReturn)
@@ -828,11 +879,13 @@ class ClipboardManager: ObservableObject {
     }
 
     func handleLargeFileAlertConfirmation(shouldSave: Bool) {
+        print("DEBUG: handleLargeFileAlertConfirmation - shouldSave: \(shouldSave)")
         if shouldSave {
             if let pendingItem = pendingLargeFileItem {
                 // ユーザーが保存を許可した場合、ファイルをサンドボックスにコピーし、履歴に追加
                 // ここで createClipboardItemForFileURL を呼び出すことで重複検知ロジックが適用される
                 // アラート確認からの呼び出しであることを示すフラグをtrueにする
+                print("DEBUG: handleLargeFileAlertConfirmation - Attempting to add pending file item.")
                 if let newItem = createClipboardItemForFileURL(pendingItem.fileURL, qrCodeContent: pendingItem.qrCodeContent, isFromAlertConfirmation: true) {
                     addAndSaveItem(newItem)
                 }
@@ -840,10 +893,13 @@ class ClipboardManager: ObservableObject {
                 // ユーザーが画像の保存を許可した場合、画像をサンドボックスにコピーし、履歴に追加
                 // ここで createClipboardItemFromImageData を呼び出すことで重複検知ロジックが適用される
                 // アラート確認からの呼び出しであることを示すフラグをtrueにする
+                print("DEBUG: handleLargeFileAlertConfirmation - Attempting to add pending image data.")
                 if let newItem = createClipboardItemFromImageData(pendingImageData.imageData, qrCodeContent: pendingImageData.qrCodeContent, isFromAlertConfirmation: true) {
                     addAndSaveItem(newItem)
                 }
             }
+        } else {
+            print("DEBUG: handleLargeFileAlertConfirmation - User chose NOT to save the large file/image.")
         }
         // アラートの状態をリセット
         pendingLargeFileItem = nil
@@ -851,6 +907,7 @@ class ClipboardManager: ObservableObject {
         // showingLargeFileAlert を false に設定して、didSet が再度NSAlertをトリガーするのを防ぐ
         if showingLargeFileAlert {
             showingLargeFileAlert = false
+            print("DEBUG: handleLargeFileAlertConfirmation - Reset showingLargeFileAlert to false.")
         }
     }
 }

@@ -154,6 +154,8 @@ struct HistoryWindowView: View {
                         trailingPaddingForLineNumber: trailingPaddingForLineNumber,
                         searchText: searchText,
                         onCopyAction: { item in
+                            // 内部コピーフラグをtrueに設定
+                            clipboardManager.isPerformingInternalCopy = true
                             ClipboardManager.shared.copyItemToClipboard(item)
                         }
                     )

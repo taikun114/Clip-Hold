@@ -82,12 +82,16 @@ struct HistoryItemRow: View {
     private var actionMenuItems: some View {
         Group {
             Button("コピー") {
+                // 内部コピーフラグをtrueに設定
+                clipboardManager.isPerformingInternalCopy = true
                 clipboardManager.copyItemToClipboard(item)
                 showCopyConfirmation = true
             }
             if let qrContent = item.qrCodeContent {
                 Button("QRコードの内容をコピー") {
                     let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil)
+                    // 内部コピーフラグをtrueに設定
+                    clipboardManager.isPerformingInternalCopy = true
                     clipboardManager.copyItemToClipboard(newItem)
                     showCopyConfirmation = true
                 }

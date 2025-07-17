@@ -129,6 +129,8 @@ struct HistoryContentList: View {
                     .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
                             Button("コピー") {
+                                // 内部コピーフラグをtrueに設定
+                                clipboardManager.isPerformingInternalCopy = true
                                 onCopyAction(currentItem)
                                 showCopyConfirmation = true
                                 currentCopyConfirmationTask?.cancel()
@@ -142,9 +144,10 @@ struct HistoryContentList: View {
                             }
                             if let qrContent = currentItem.qrCodeContent {
                                 Button("QRコードの内容をコピー") {
-                                    // qrCodeContent をテキストとして新しい ClipboardItem を作成し、onCopyAction を呼び出す
-                                    let newItemToCopy = ClipboardItem(text: qrContent)
-                                    onCopyAction(newItemToCopy)
+                                    let newItemToCopy = ClipboardItem(text: qrContent) // 新しいClipboardItemを作成
+                                    // 内部コピーフラグをtrueに設定
+                                    clipboardManager.isPerformingInternalCopy = true
+                                    onCopyAction(newItemToCopy) // onCopyActionを呼び出す
                                     showCopyConfirmation = true
                                     currentCopyConfirmationTask?.cancel()
                                     currentCopyConfirmationTask = Task { @MainActor in
@@ -181,6 +184,8 @@ struct HistoryContentList: View {
                         }
                     }, primaryAction: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
+                            // 内部コピーフラグをtrueに設定
+                            clipboardManager.isPerformingInternalCopy = true
                             onCopyAction(currentItem)
                             showCopyConfirmation = true
                             currentCopyConfirmationTask?.cancel()
@@ -208,6 +213,8 @@ struct HistoryContentList: View {
                                     if let qrCodeContent = manager.decodeQRCode(from: nsImage) {
                                         manager.addTextItem(text: qrCodeContent)
                                         let newItemToCopy = ClipboardItem(text: qrCodeContent) // 新しいClipboardItemを作成
+                                        // 内部コピーフラグをtrueに設定
+                                        manager.isPerformingInternalCopy = true
                                         onCopyAction(newItemToCopy) // onCopyActionを呼び出す
                                         
                                         showCopyConfirmation = true
