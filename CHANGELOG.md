@@ -10,6 +10,8 @@
   - You can filter by file type and sort by date or file size.
 - Add “Maximum Size per File” option
   - If you set a size, files larger than the set size will not be saved in the copy history.
+- Add “Show alert when copying a file larger than” option
+  - If you set a size, an alert will be shown asking if you want to save the file to history when you copy a file larger than the size you set.
 - Add “Copy QR Code Contents” option to the menu of image items containing QR Code in the History window.
   - With this change, the “Scan QR Code Image” setting has been removed, as the QR Code is now automatically scanned when the image is copied.
 
@@ -17,8 +19,8 @@
 - Add icons to history items in menu and History Window
 - Add new “Copy History” tab
   - Settings related to copy history have been moved to a new tab.
-- Change description of “Apps to Exclude” setting
 - Add file size next to the date if the item on the History Window is a file
+- Change description of “Apps to Exclude” setting
 
 ## 1.1.1
 ### Bug Fixes and Improvements
