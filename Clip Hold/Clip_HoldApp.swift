@@ -145,12 +145,22 @@ struct ClipHoldApp: App {
                 let displayLimit = min(clipboardManager.clipboardHistory.count, maxHistoryInMenu)
                 ForEach(clipboardManager.clipboardHistory.prefix(displayLimit)) { item in
                     
+                    let itemDateFormatter: DateFormatter = {
+                        let formatter = DateFormatter()
+                        formatter.dateStyle = .short
+                        formatter.timeStyle = .short
+                        return formatter
+                    }()
+                     
                     let displayText: String = {
                         var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
+                        let dateString = itemDateFormatter.string(from: item.date)
+                                                 
                         if displayContent.count > 40 {
                             displayContent = String(displayContent.prefix(40)) + "..."
                         }
-                        return displayContent
+                                                 
+                        return "\(displayContent) (\(dateString))"
                     }()
                     
                     Button {
