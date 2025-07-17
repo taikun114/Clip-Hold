@@ -167,10 +167,6 @@ struct ClipHoldApp: App {
                         // 内部コピーフラグをtrueに設定
                         clipboardManager.isPerformingInternalCopy = true
                         clipboardManager.copyItemToClipboard(item)
-                        // 内部コピーフラグをfalseにリセット
-                        // copyItemToClipboard内でディレイしてリセットされるため、ここでは不要
-                        // clipboardManager.isPerformingInternalCopy = false
-
                         if quickPaste {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                 ClipHoldApp.performPaste()
