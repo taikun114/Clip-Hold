@@ -62,7 +62,8 @@ struct HistorySearchBar: View {
                 }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
-                    .foregroundColor(.secondary)
+                    // フィルターがデフォルト以外の場合はアクセントカラーを適用
+                    .tint(selectedFilter != .all ? .accentColor : .secondary)
                     .contentShape(Rectangle())
             }
             .menuStyle(.borderlessButton)
@@ -86,7 +87,8 @@ struct HistorySearchBar: View {
                 }
             } label: {
                 Image(systemName: "arrow.up.arrow.down")
-                    .foregroundColor(.secondary)
+                    // 並び替えがデフォルト以外の場合はアクセントカラーを適用
+                    .tint(selectedSort != .newest ? .accentColor : .secondary)
                     .contentShape(Rectangle())
             }
             .menuStyle(.borderlessButton)
