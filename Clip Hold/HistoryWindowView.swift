@@ -204,6 +204,14 @@ struct HistoryWindowView: View {
                 }
             }
         }
+        .onDisappear {
+            // ウインドウが閉じる際に実行中のタスクをキャンセルしてメモリを解放
+            searchDebounceTask?.cancel()
+            searchDebounceTask = nil // タスクの参照をnilに設定
+            
+            historyUpdateTask?.cancel()
+            historyUpdateTask = nil // タスクの参照をnilに設定
+        }
         .alert("履歴の削除", isPresented: $showingDeleteConfirmation) {
             Button("削除", role: .destructive) {
                 if let item = itemToDelete {
