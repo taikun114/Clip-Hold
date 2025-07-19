@@ -46,7 +46,7 @@ struct HistoryContentList: View {
     }
 
     var body: some View {
-        ZStack { // Listまたはメッセージが表示されるZStack
+        ZStack { // Tableまたはメッセージが表示されるZStack
             if filteredHistory.isEmpty && !isLoading {
                 VStack { // VStackで囲み、Spacerで中央に配置
                     Spacer()
@@ -58,26 +58,30 @@ struct HistoryContentList: View {
                 }
             } else {
                 ScrollViewReader { scrollViewProxy in
-                    List(filteredHistory, selection: $selectedItemID) { item in
-                        HistoryItemRow(
-                            item: item,
-                            index: filteredHistory.firstIndex(where: { $0.id == item.id }) ?? 0,
-                            showLineNumber: showLineNumbersInHistoryWindow,
-                            itemToDelete: $itemToDelete,
-                            showingDeleteConfirmation: $showingDeleteConfirmation,
-                            selectedItemID: $selectedItemID,
-                            dismissAction: { dismiss() },
-                            showCopyConfirmation: $showCopyConfirmation,
-                            showQRCodeSheet: $showQRCodeSheet,
-                            selectedItemForQRCode: $selectedItemForQRCode,
-                            itemForNewPhrase: $itemForNewPhrase,
-                            quickLookManager: quickLookManager,
-                            lineNumberTextWidth: lineNumberTextWidth,
-                            trailingPaddingForLineNumber: trailingPaddingForLineNumber
-                        )
-                        .tag(item.id)
-                        .listRowBackground(Color.clear)
+                    Table(filteredHistory, selection: $selectedItemID) {
+                        TableColumn("") { item in
+                            HistoryItemRow(
+                                item: item,
+                                index: filteredHistory.firstIndex(where: { $0.id == item.id }) ?? 0,
+                                showLineNumber: showLineNumbersInHistoryWindow,
+                                itemToDelete: $itemToDelete,
+                                showingDeleteConfirmation: $showingDeleteConfirmation,
+                                selectedItemID: $selectedItemID,
+                                dismissAction: { dismiss() },
+                                showCopyConfirmation: $showCopyConfirmation,
+                                showQRCodeSheet: $showQRCodeSheet,
+                                selectedItemForQRCode: $selectedItemForQRCode,
+                                itemForNewPhrase: $itemForNewPhrase,
+                                quickLookManager: quickLookManager,
+                                lineNumberTextWidth: lineNumberTextWidth,
+                                trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                            )
+                            .tag(item.id)
+                        }
                     }
+                    .tableColumnHeaders(.hidden)
+                    .tableStyle(.inset(alternatesRowBackgrounds: false))
+                    .animation(.default, value: filteredHistory)
                     .onKeyPress(.space) {
                         guard let selectedID = selectedItemID,
                               let selectedItem = filteredHistory.first(where: { $0.id == selectedID }),
@@ -122,7 +126,6 @@ struct HistoryContentList: View {
                         }
                     }
                     .accessibilityLabel("履歴リスト")
-                    .listStyle(.plain)
                     .scrollContentBackground(.hidden)
                     .blur(radius: isLoading ? 5 : 0)
                     .animation(.easeOut(duration: 0.1), value: isLoading)
