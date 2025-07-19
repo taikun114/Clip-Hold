@@ -41,14 +41,24 @@ struct CopyHistorySettingsView: View {
 
     // MARK: - Initialization
     init() {
-        let savedMaxHistoryToSave = UserDefaults.standard.integer(forKey: "maxHistoryToSave")
-        let savedMaxFileSizeToSave = UserDefaults.standard.integer(forKey: "maxFileSizeToSave")
-        let savedLargeFileAlertThreshold = UserDefaults.standard.integer(forKey: "largeFileAlertThreshold")
+        // UserDefaultsから現在の設定値を取得 (Optional Intとして取得し、未設定と0を区別する)
+        let savedMaxHistoryToSaveRaw = UserDefaults.standard.object(forKey: "maxHistoryToSave") as? Int
+        let savedMaxFileSizeToSaveRaw = UserDefaults.standard.object(forKey: "maxFileSizeToSave") as? Int
+        let savedLargeFileAlertThresholdRaw = UserDefaults.standard.object(forKey: "largeFileAlertThreshold") as? Int
 
-        // DEBUG print for initial values from UserDefaults (accessing AppStorage directly here is fine)
-        print("DEBUG: init() - savedMaxHistoryToSave: \(savedMaxHistoryToSave)")
-        print("DEBUG: init() - savedMaxFileSizeToSave: \(savedMaxFileSizeToSave)")
-        print("DEBUG: init() - savedLargeFileAlertThreshold: \(savedLargeFileAlertThreshold)")
+        // maxHistoryToSaveは0が無制限を表すため、raw値をそのまま使用。nilの場合は0をデフォルトとする。
+        let savedMaxHistoryToSave = savedMaxHistoryToSaveRaw ?? 0
+
+        // maxFileSizeToSaveとlargeFileAlertThresholdは、UserDefaultsに値がない場合（nil）にAppStorageのデフォルト値（1GB）を使用。
+        // 0が明示的に設定されている場合は0として扱う。
+        let savedMaxFileSizeToSave = savedMaxFileSizeToSaveRaw ?? 1_000_000_000
+        let savedLargeFileAlertThreshold = savedLargeFileAlertThresholdRaw ?? 1_000_000_000
+
+
+        // DEBUG print for initial values from UserDefaults
+        print("DEBUG: init() - savedMaxHistoryToSaveRaw: \(savedMaxHistoryToSaveRaw ?? -1) (using \(savedMaxHistoryToSave))")
+        print("DEBUG: init() - savedMaxFileSizeToSaveRaw: \(savedMaxFileSizeToSaveRaw ?? -1) (using \(savedMaxFileSizeToSave))")
+        print("DEBUG: init() - savedLargeFileAlertThresholdRaw: \(savedLargeFileAlertThresholdRaw ?? -1) (using \(savedLargeFileAlertThreshold))")
 
         // Initialize tempSelectedSaveOption and tempCustomSaveHistoryValue
         let determinedSaveOptions = Self.determineHistorySaveOptions(savedMaxHistoryToSave: savedMaxHistoryToSave)
@@ -75,6 +85,7 @@ struct CopyHistorySettingsView: View {
 
     // MARK: - Helper methods for initialization logic
     private static func determineHistorySaveOptions(savedMaxHistoryToSave: Int) -> (option: HistoryOption, customValue: Int) {
+        // maxHistoryToSaveは0が無制限を表すため、このロジックは変更しない
         if savedMaxHistoryToSave == 0 {
             return (.unlimited, 20)
         } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == savedMaxHistoryToSave }) {
@@ -85,6 +96,7 @@ struct CopyHistorySettingsView: View {
     }
 
     private static func determineFileSizeOptions(savedMaxFileSizeToSave: Int) -> (option: DataSizeOption, customValue: Int, customUnit: DataSizeUnit) {
+        // savedMaxFileSizeToSaveが0の場合、それはユーザーが明示的に「無制限」を選択したことを意味する
         if savedMaxFileSizeToSave == 0 {
             return (.unlimited, 1, .megabytes)
         } else {
@@ -98,6 +110,7 @@ struct CopyHistorySettingsView: View {
     }
 
     private static func determineAlertOptions(savedLargeFileAlertThreshold: Int) -> (option: DataSizeAlertOption, customValue: Int, customUnit: DataSizeUnit) {
+        // savedLargeFileAlertThresholdが0の場合、それはユーザーが明示的に「表示しない」を選択したことを意味する
         if savedLargeFileAlertThreshold == 0 {
             return (.noAlert, 1, .gigabytes)
         } else {
