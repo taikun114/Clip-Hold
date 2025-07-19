@@ -2699,6 +2699,22 @@
         }
       }
     },
+    "リンクを開く..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Link…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクを開く…"
+          }
+        }
+      }
+    },
     "ログイン時に開く" : {
       "localizations" : {
         "en" : {

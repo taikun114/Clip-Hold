@@ -86,6 +86,11 @@ struct HistoryItemRow: View {
                 clipboardManager.copyItemToClipboard(item)
                 showCopyConfirmation = true
             }
+            if item.isURL, let url = URL(string: item.text) {
+                Button("リンクを開く...") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
             if let qrContent = item.qrCodeContent {
                 Button("QRコードの内容をコピー") {
                     let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil)

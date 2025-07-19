@@ -146,6 +146,11 @@ struct HistoryContentList: View {
                                     }
                                 }
                             }
+                            if currentItem.isURL, let url = URL(string: currentItem.text) {
+                                Button("リンクを開く...") {
+                                    NSWorkspace.shared.open(url)
+                                }
+                            }
                             if let qrContent = currentItem.qrCodeContent {
                                 Button("QRコードの内容をコピー") {
                                     let newItemToCopy = ClipboardItem(text: qrContent) // 新しいClipboardItemを作成

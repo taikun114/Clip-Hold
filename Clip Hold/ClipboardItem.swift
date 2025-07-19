@@ -22,6 +22,16 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         return false
     }
 
+    // テキストが有効なURLであるかどうかを判断するヘルパープロパティ
+    var isURL: Bool {
+        guard !text.isEmpty,
+              let url = URL(string: text) else {
+            return false
+        }
+        // URLスキームがhttpまたはhttpsであることを確認
+        return url.scheme == "http" || url.scheme == "https"
+    }
+
     // Codableではないため @Published にできない。
     // UIの自動更新は、このプロパティの変更後に親のObservableObject (ClipboardManager) の変更を通知することで実現
     var cachedThumbnailImage: NSImage?
