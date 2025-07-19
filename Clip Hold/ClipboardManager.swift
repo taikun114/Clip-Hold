@@ -601,6 +601,8 @@ class ClipboardManager: ObservableObject {
         self.objectWillChange.send()
         clipboardHistory = []
         print("ClipboardManager: All history cleared.")
+        // 履歴をクリアした際に、一時ファイルもクリーンアップ
+        cleanUpTemporaryFiles()
     }
 
     func deleteItem(id: UUID) {
@@ -615,8 +617,6 @@ class ClipboardManager: ObservableObject {
             print("ClipboardManager: Item deleted. Total history: \(clipboardHistory.count)")
 
             scheduleSaveClipboardHistory()
-
-            cleanUpTemporaryFiles()
         }
     }
 
@@ -854,15 +854,27 @@ class ClipboardManager: ObservableObject {
 
     // MARK: - 一時ファイルクリーンアップ
     private func cleanUpTemporaryFiles() {
-        print("ClipboardManager: Cleaning up \(temporaryFileUrls.count) temporary files.")
-        for fileURL in temporaryFileUrls {
-            do {
-                try FileManager.default.removeItem(at: fileURL)
-                print("ClipboardManager: Removed temporary file: \(fileURL.lastPathComponent)")
-            } catch {
-                print("ClipboardManager: Error removing temporary file \(fileURL.lastPathComponent): \(error.localizedDescription)")
+        let fileManager = FileManager.default
+        let tempDirectoryURL = fileManager.temporaryDirectory
+        print("ClipboardManager: Attempting to clean up temporary files in \(tempDirectoryURL.path)")
+
+        do {
+            let tempContents = try fileManager.contentsOfDirectory(at: tempDirectoryURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            var cleanedCount = 0
+            for fileURL in tempContents {
+                do {
+                    try fileManager.removeItem(at: fileURL)
+                    print("ClipboardManager: Removed temporary file: \(fileURL.lastPathComponent)")
+                    cleanedCount += 1
+                } catch {
+                    print("ClipboardManager: Error removing temporary file \(fileURL.lastPathComponent): \(error.localizedDescription)")
+                }
             }
+            print("ClipboardManager: Cleaned up \(cleanedCount) temporary files.")
+        } catch {
+            print("ClipboardManager: Error getting contents of temporary directory: \(error.localizedDescription)")
         }
+        // temporaryFileUrls セットもクリアする
         temporaryFileUrls.removeAll()
     }
 
