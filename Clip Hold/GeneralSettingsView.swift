@@ -87,6 +87,8 @@ struct GeneralSettingsView: View {
     @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
 
     @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
+
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
 
     @State private var showingCustomMenuHistorySheet = false
@@ -185,6 +187,24 @@ struct GeneralSettingsView: View {
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("テキストのみ")
+                        Text("このオプションをオンにすると、テキストのみがクイックペーストの対象となります。")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $textOnlyQuickPaste) {
+                        Text("テキストのみ")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                    // quickPasteがオフの時にグレイアウトする
+                    .disabled(!quickPaste)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: Clip Holdの設定

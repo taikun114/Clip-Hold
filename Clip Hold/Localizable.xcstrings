@@ -1506,6 +1506,22 @@
         }
       }
     },
+    "このオプションをオンにすると、テキストのみがクイックペーストの対象となります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When this option is enabled, Quick Paste will only be applied to text."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このオプションをオンにすると、テキストのみがクイックペーストの対象となります。"
+          }
+        }
+      }
+    },
     "このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。" : {
       "localizations" : {
         "en" : {

@@ -35,6 +35,7 @@ struct ClipHoldApp: App {
     @AppStorage("maxHistoryInMenu") var maxHistoryInMenu: Int = 10
     @AppStorage("maxPhrasesInMenu") var maxPhrasesInMenu: Int = 5
     @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
 
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
@@ -119,6 +120,7 @@ struct ClipHoldApp: App {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(phrase.content, forType: .string)
                         
+                        // quickPaste がオンの場合、定型文は常にテキストなのでそのままペースト
                         if quickPaste {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                 ClipHoldApp.performPaste()
@@ -167,9 +169,23 @@ struct ClipHoldApp: App {
                         // 内部コピーフラグをtrueに設定
                         clipboardManager.isPerformingInternalCopy = true
                         clipboardManager.copyItemToClipboard(item)
+                        
+                        // quickPaste がオンの場合、かつ textOnlyQuickPaste がオンの場合は文字列のみペースト
                         if quickPaste {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                ClipHoldApp.performPaste()
+                            let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste") // ここで最新の値を取得
+                            if textOnlyQuickPaste {
+                                // ファイルパスがなく、かつ画像でもない場合にのみペーストを実行
+                                if item.filePath == nil && !item.isImage {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                        ClipHoldApp.performPaste()
+                                    }
+                                } else {
+                                    print("textOnlyQuickPasteがオンのため、テキスト以外のコンテンツはペーストされません。")
+                                }
+                            } else {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    ClipHoldApp.performPaste()
+                                }
                             }
                         }
                     } label: {
@@ -232,10 +248,7 @@ struct ClipHoldApp: App {
         .environmentObject(standardPhraseManager)
     }
     
-    static func setupGlobalShortcuts() {
-        // quickPaste の値は UserDefaults から直接読み込む
-        let quickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
-        
+    static func setupGlobalShortcuts() {        
         KeyboardShortcuts.onKeyDown(for: .showAllStandardPhrases) {
             print("「すべての定型文を表示」ショートカットが押されました！")
             if let delegate = NSApp.delegate as? AppDelegate {
@@ -295,7 +308,11 @@ struct ClipHoldApp: App {
                     NSPasteboard.general.setString(phrase.content, forType: .string)
                     print("定型文「\(phrase.title)」がショートカットでコピーされました。")
 
-                    if quickPaste { // static context で取得した quickPaste を使用
+                    // quickPaste の最新の値を取得
+                    let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                    
+                    // quickPaste がオンの場合、定型文は常にテキストなのでそのままペースト
+                    if currentQuickPaste {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                             performPaste() // static メソッドとして呼び出し
                             print("performPaste")
@@ -321,14 +338,27 @@ struct ClipHoldApp: App {
                     // 内部コピーフラグをtrueに設定
                     clipboardManager.isPerformingInternalCopy = true
                     clipboardManager.copyItemToClipboard(historyItem)
-                    // 内部コピーフラグをfalseにリセット
-                    // copyItemToClipboard内でディレイしてリセットされるため、ここでは不要
-                    // clipboardManager.isPerformingInternalCopy = false
 
-                    if quickPaste {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                            performPaste()
-                            print("performPaste")
+                    // quickPaste と textOnlyQuickPaste の最新の値を取得
+                    let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                    let currentTextOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
+
+                    // quickPaste がオンの場合、かつ textOnlyQuickPaste がオンの場合は、ファイルパスがなく、かつ画像でもない場合にのみペースト
+                    if currentQuickPaste {
+                        if currentTextOnlyQuickPaste {
+                            if historyItem.filePath == nil && !historyItem.isImage {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    performPaste()
+                                    print("performPaste")
+                                }
+                            } else {
+                                print("textOnlyQuickPasteがオンのため、テキスト以外のコンテンツはペーストされません。")
+                            }
+                        } else {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                performPaste()
+                                print("performPaste")
+                            }
                         }
                     }
                 } else {
