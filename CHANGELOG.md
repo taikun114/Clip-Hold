@@ -14,7 +14,8 @@
   - If you set a size, files larger than the set size will not be saved in the copy history.
 - **Add “Show alert when copying a file larger than” option**
   - If you set a size, an alert will be shown asking if you want to save the file to history when you copy a file larger than the size you set.
-- **Add “Copy QR Code Contents” option to the menu of image items containing QR Code in the History window**
+- **Add “Open Link...” option to the menu of text items containing website URL in the History Window**
+- **Add “Copy QR Code Contents” option to the menu of image items containing QR Code in the History Window**
   - With this change, the “Scan QR Code Image” setting has been removed, as the QR Code is now automatically scanned when the image is copied.
 
 ### Bug Fixes and Improvements
