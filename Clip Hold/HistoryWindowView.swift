@@ -133,7 +133,7 @@ struct HistoryWindowView: View {
                         selectedSort: $selectedSort
                     )
 
-                    Spacer(minLength: 10)
+                    Spacer(minLength: 0)
 
                     HistoryContentList(
                         filteredHistory: $filteredHistory,

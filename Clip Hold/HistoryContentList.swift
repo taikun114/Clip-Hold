@@ -80,7 +80,8 @@ struct HistoryContentList: View {
                         }
                     }
                     .tableColumnHeaders(.hidden)
-                    .tableStyle(.inset(alternatesRowBackgrounds: false))
+                    .tableStyle(.inset)
+                    .alternatingRowBackgrounds(.disabled)
                     .animation(.default, value: filteredHistory)
                     .onKeyPress(.space) {
                         guard let selectedID = selectedItemID,
@@ -254,4 +255,9 @@ struct HistoryContentList: View {
             }
         }
     }
+}
+
+#Preview {
+    HistoryWindowView()
+        .environmentObject(ClipboardManager.shared)
 }

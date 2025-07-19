@@ -228,7 +228,7 @@ struct StandardPhraseWindowView: View {
                         performSearch(searchTerm: searchText)
                     }
                     
-                    Spacer(minLength: 10)
+                    Spacer(minLength: 0)
                     
                     ZStack {
                         if filteredPhrases.isEmpty && !isLoading {
@@ -284,7 +284,7 @@ struct StandardPhraseWindowView: View {
                                 }
                             }
                             .accessibilityLabel("定型文リスト")
-                            .listStyle(.plain)
+                            .listStyle(.inset)
                             .scrollContentBackground(.hidden)
                             .blur(radius: isLoading ? 5 : 0)
                             .animation(.easeOut(duration: 0.1), value: isLoading)
