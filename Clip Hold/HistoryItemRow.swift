@@ -45,7 +45,6 @@ struct HistoryItemRow: View {
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
 
-    @State private var iconImage: NSImage?
     @State private var iconLoadTask: Task<Void, Never>?
 
     init(item: ClipboardItem,
@@ -131,12 +130,20 @@ struct HistoryItemRow: View {
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
             
-            if let icon = iconImage {
-                Image(nsImage: icon)
+            // item.cachedThumbnailImage が存在すればそれを使用
+            if let cachedIcon = item.cachedThumbnailImage {
+                Image(nsImage: cachedIcon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+            } else if let filePath = item.filePath {
+                // キャッシュがない場合は、従来のファイルアイコンを表示し、サムネイル生成を試みる
+                Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
                     .resizable()
                     .scaledToFit()
                     .frame(width: 20, height: 20)
             } else {
+                // ファイルパスもキャッシュもなければテキストアイコン
                 Image(systemName: "text.page")
                     .resizable()
                     .scaledToFit()
@@ -179,9 +186,10 @@ struct HistoryItemRow: View {
         .contentShape(Rectangle())
         .help(item.text)
         .onAppear {
-            if let filePath = item.filePath {
-                iconLoadTask?.cancel()
-                
+            // cachedThumbnailImage が nil の場合のみサムネイル生成を試みる
+            if item.cachedThumbnailImage == nil, let filePath = item.filePath {
+                iconLoadTask?.cancel() // 既存のタスクをキャンセル
+
                 iconLoadTask = Task {
                     let thumbnailSize = CGSize(width: 40, height: 40)
                     let request = QLThumbnailGenerator.Request(fileAt: filePath, size: thumbnailSize, scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
@@ -189,21 +197,25 @@ struct HistoryItemRow: View {
                     do {
                         let thumbnail = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
                         await MainActor.run {
-                            self.iconImage = thumbnail.nsImage
+                            item.cachedThumbnailImage = thumbnail.nsImage // item の cachedThumbnailImage を更新
                         }
                     } catch {
                         print("Failed to generate thumbnail for \(filePath.lastPathComponent): \(error.localizedDescription)")
+                        // エラー時はデフォルトのファイルアイコンをセット
                         await MainActor.run {
-                            self.iconImage = NSWorkspace.shared.icon(forFile: filePath.path)
+                            item.cachedThumbnailImage = NSWorkspace.shared.icon(forFile: filePath.path)
                         }
                     }
                 }
-            } else {
-                iconImage = nil
             }
         }
         .onDisappear {
             iconLoadTask?.cancel()
         }
     }
+}
+
+#Preview {
+    HistoryWindowView()
+        .environmentObject(ClipboardManager.shared)
 }
