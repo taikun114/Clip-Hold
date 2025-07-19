@@ -135,19 +135,20 @@ struct HistoryItemRow: View {
                 Image(nsImage: cachedIcon)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 20, height: 20)
+                    .frame(width: 30, height: 30)
             } else if let filePath = item.filePath {
                 // キャッシュがない場合は、従来のファイルアイコンを表示し、サムネイル生成を試みる
                 Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 20, height: 20)
+                    .frame(width: 30, height: 30)
             } else {
                 // ファイルパスもキャッシュもなければテキストアイコン
                 Image(systemName: "text.page")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 20, height: 20)
+                    .padding(4)
+                    .frame(width: 30, height: 30)
                     .foregroundColor(.secondary)
             }
 
@@ -191,7 +192,7 @@ struct HistoryItemRow: View {
                 iconLoadTask?.cancel() // 既存のタスクをキャンセル
 
                 iconLoadTask = Task {
-                    let thumbnailSize = CGSize(width: 40, height: 40)
+                    let thumbnailSize = CGSize(width: 60, height: 60)
                     let request = QLThumbnailGenerator.Request(fileAt: filePath, size: thumbnailSize, scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
                     
                     do {
