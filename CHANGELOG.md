@@ -19,7 +19,8 @@
   - With this change, the “Scan QR Code Image” setting has been removed, as the QR Code is now automatically scanned when the image is copied.
 
 ### Bug Fixes and Improvements
-- **Add icons to history items in menu and History Window**
+- **Add icons to each item in the menu and history items in the History Window**
+  - Some icons for menu items will appear on macOS Tahoe or later.
 - **Add new “Copy History” tab**
   - Settings related to copy history have been moved to a new tab.
 - **Add file size next to the date if the item on the History Window is a file**
