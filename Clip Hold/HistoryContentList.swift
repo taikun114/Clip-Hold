@@ -132,7 +132,7 @@ struct HistoryContentList: View {
                     .animation(.easeOut(duration: 0.1), value: isLoading)
                     .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
-                            Button("コピー") {
+                            Button {
                                 // 内部コピーフラグをtrueに設定
                                 clipboardManager.isPerformingInternalCopy = true
                                 onCopyAction(currentItem)
@@ -145,14 +145,18 @@ struct HistoryContentList: View {
                                         showCopyConfirmation = false
                                     }
                                 }
+                            } label: {
+                                Label("コピー", systemImage: "document.on.document")
                             }
                             if currentItem.isURL, let url = URL(string: currentItem.text) {
-                                Button("リンクを開く...") {
+                                Button {
                                     NSWorkspace.shared.open(url)
+                                } label: {
+                                    Label("リンクを開く...", systemImage: "paperclip")
                                 }
                             }
                             if let qrContent = currentItem.qrCodeContent {
-                                Button("QRコードの内容をコピー") {
+                                Button {
                                     let newItemToCopy = ClipboardItem(text: qrContent) // 新しいClipboardItemを作成
                                     // 内部コピーフラグをtrueに設定
                                     clipboardManager.isPerformingInternalCopy = true
@@ -166,29 +170,39 @@ struct HistoryContentList: View {
                                             showCopyConfirmation = false
                                         }
                                     }
+                                } label: {
+                                    Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
                                 }
                             }
                             Divider()
                             if let filePath = currentItem.filePath {
-                                Button("クイックルック") {
+                                Button {
                                     if let sourceView = NSApp.keyWindow?.contentView {
                                         quickLookManager.showQuickLook(for: filePath, sourceView: sourceView)
                                     }
+                                } label: {
+                                    Label("クイックルック", systemImage: "eye")
                                 }
                             }
-                            Button("項目から定型文を作成...") {
+                            Button {
                                 itemForNewPhrase = currentItem // ここでClipboardItemをセット
+                            } label: {
+                                Label("項目から定型文を作成...", systemImage: "pencil")
                             }
                             if currentItem.filePath == nil {
-                                Button("QRコードを表示...") {
+                                Button {
                                     showQRCodeSheet = true
                                     selectedItemForQRCode = currentItem
+                                } label: {
+                                    Label("QRコードを表示...", systemImage: "qrcode")
                                 }
                             }
                             Divider()
-                            Button("削除...", role: .destructive) {
+                            Button(role: .destructive) {
                                 itemToDelete = currentItem
                                 showingDeleteConfirmation = true
+                            } label: {
+                                Label("削除...", systemImage: "trash")
                             }
                         }
                     }, primaryAction: { selectedIDs in

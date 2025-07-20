@@ -62,21 +62,30 @@ struct StandardPhraseItemRow: View {
             Spacer()
             
             Menu {
-                Button("コピー") {
+                Button {
                     copyToClipboard(phrase.content)
                     showCopyConfirmation = true
-                }
-                Button("編集...") {
-                    phraseToEdit = phrase // 編集対象のフレーズをセット
-                }
-                Button("QRコードを表示...") {
-                    selectedPhraseForQRCode = phrase
-                    showQRCodeSheet = true
+                } label: {
+                    Label("コピー", systemImage: "document.on.document")
                 }
                 Divider()
-                Button("削除...", role: .destructive) {
+                Button {
+                    phraseToEdit = phrase // 編集対象のフレーズをセット
+                } label: {
+                    Label("編集...", systemImage: "pencil")
+                }
+                Button {
+                    selectedPhraseForQRCode = phrase
+                    showQRCodeSheet = true
+                } label: {
+                    Label("QRコードを表示...", systemImage: "qrcode")
+                }
+                Divider()
+                Button(role: .destructive) {
                     phraseToDelete = phrase
                     showingDeleteConfirmation = true
+                } label: {
+                    Label("削除...", systemImage: "trash")
                 }
             } label: {
                 Image(systemName: "ellipsis.circle")
@@ -290,7 +299,7 @@ struct StandardPhraseWindowView: View {
                             .animation(.easeOut(duration: 0.1), value: isLoading)
                             .contextMenu(forSelectionType: StandardPhrase.ID.self, menu: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
-                                    Button("コピー") {
+                                    Button {
                                         copyToClipboard(currentPhrase.content)
                                         showCopyConfirmation = true
                                         currentCopyConfirmationTask?.cancel()
@@ -301,18 +310,27 @@ struct StandardPhraseWindowView: View {
                                                 showCopyConfirmation = false
                                             }
                                         }
-                                    }
-                                    Button("編集...") {
-                                        phraseToEdit = currentPhrase // 編集対象のフレーズをセット
-                                    }
-                                    Button("QRコードを表示...") {
-                                        selectedPhraseForQRCode = currentPhrase
-                                        showQRCodeSheet = true
+                                    } label: {
+                                        Label("コピー", systemImage: "document.on.document")
                                     }
                                     Divider()
-                                    Button("削除...", role: .destructive) {
+                                    Button {
+                                        phraseToEdit = currentPhrase // 編集対象のフレーズをセット
+                                    } label: {
+                                        Label("編集...", systemImage: "pencil")
+                                    }
+                                    Button {
+                                        selectedPhraseForQRCode = currentPhrase
+                                        showQRCodeSheet = true
+                                    } label: {
+                                        Label("QRコードを表示...", systemImage: "qrcode")
+                                    }
+                                    Divider()
+                                    Button(role: .destructive) {
                                         phraseToDelete = currentPhrase
                                         showingDeleteConfirmation = true
+                                    } label: {
+                                        Label("削除...", systemImage: "trash")
                                     }
                                 }
                             }, primaryAction: { selectedIDs in

@@ -80,47 +80,61 @@ struct HistoryItemRow: View {
 
     private var actionMenuItems: some View {
         Group {
-            Button("コピー") {
+            Button {
                 // 内部コピーフラグをtrueに設定
                 clipboardManager.isPerformingInternalCopy = true
                 clipboardManager.copyItemToClipboard(item)
                 showCopyConfirmation = true
+            } label: {
+                Label("コピー", systemImage: "document.on.document")
             }
             if item.isURL, let url = URL(string: item.text) {
-                Button("リンクを開く...") {
+                Button {
                     NSWorkspace.shared.open(url)
+                } label: {
+                    Label("リンクを開く...", systemImage: "paperclip")
                 }
             }
             if let qrContent = item.qrCodeContent {
-                Button("QRコードの内容をコピー") {
+                Button {
                     let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil)
                     // 内部コピーフラグをtrueに設定
                     clipboardManager.isPerformingInternalCopy = true
                     clipboardManager.copyItemToClipboard(newItem)
                     showCopyConfirmation = true
+                } label: {
+                    Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
                 }
             }
             Divider()
             if let filePath = item.filePath {
-                Button("クイックルック") {
+                Button {
                     if let sourceView = NSApp.keyWindow?.contentView {
                         quickLookManager.showQuickLook(for: filePath, sourceView: sourceView)
                     }
+                } label: {
+                    Label("クイックルック", systemImage: "eye")
                 }
             }
-            Button("項目から定型文を作成...") {
+            Button {
                 itemForNewPhrase = item
+            } label: {
+                Label("項目から定型文を作成...", systemImage: "pencil")
             }
             if item.filePath == nil {
-                Button("QRコードを表示...") {
+                Button {
                     showQRCodeSheet = true
                     selectedItemForQRCode = item
+                } label: {
+                    Label("QRコードを表示...", systemImage: "qrcode")
                 }
             }
             Divider()
-            Button("削除...", role: .destructive) {
+            Button(role: .destructive) {
                 itemToDelete = item
                 showingDeleteConfirmation = true
+            } label: {
+                Label("削除...", systemImage: "trash")
             }
         }
     }

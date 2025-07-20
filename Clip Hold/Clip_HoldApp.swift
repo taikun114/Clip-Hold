@@ -99,7 +99,7 @@ struct ClipHoldApp: App {
             isInserted: menuBarExtraInsertionBinding
         ) {
             // --- 定型文セクション ---
-            Text("よく使う定型文")
+            Label("よく使う定型文", systemImage: "star")
                 .font(.headline)
                 .padding(.bottom, 5)
             
@@ -116,7 +116,7 @@ struct ClipHoldApp: App {
                         return displayContent
                     }()
                     
-                    Button(displayText) {
+                    Button {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(phrase.content, forType: .string)
                         
@@ -126,20 +126,34 @@ struct ClipHoldApp: App {
                                 ClipHoldApp.performPaste()
                             }
                         }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "list.bullet.rectangle.portrait")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
+                                .foregroundColor(.secondary)
+                            Text(displayText)
+                                .font(.body)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
                     }
                 }
             }
             
             Divider()
-            Button("すべての定型文を表示...") {
+            Button {
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showStandardPhraseWindow()
                 }
+            } label: {
+                Label("すべての定型文を表示...", systemImage: "pencil.and.list.clipboard")
             }
             Divider()
             
             // --- コピー履歴セクション ---
-            Text("コピー履歴")
+            Label("コピー履歴", systemImage: "clock")
                 .font(.headline)
             if clipboardManager.clipboardHistory.isEmpty {
                 Text("履歴はありません")
@@ -221,16 +235,18 @@ struct ClipHoldApp: App {
             
             Divider()
             
-            Button("すべてのコピー履歴を表示...") {
+            Button {
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showHistoryWindow()
                 }
+            } label: {
+                Label("すべてのコピー履歴を表示...", systemImage: "list.clipboard")
             }
             
             Divider()
             
             SettingsLink {
-                Text("設定...")
+                Label("設定...", systemImage: "gear")
             }
             .buttonStyle(.preAction {
                 NSApp.activate(ignoringOtherApps: true)
@@ -248,7 +264,7 @@ struct ClipHoldApp: App {
         .environmentObject(standardPhraseManager)
     }
     
-    static func setupGlobalShortcuts() {        
+    static func setupGlobalShortcuts() {
         KeyboardShortcuts.onKeyDown(for: .showAllStandardPhrases) {
             print("「すべての定型文を表示」ショートカットが押されました！")
             if let delegate = NSApp.delegate as? AppDelegate {
