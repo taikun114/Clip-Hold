@@ -217,11 +217,23 @@ struct ClipHoldApp: App {
                                     .scaledToFit()
                                     .frame(width: 16, height: 16)
                             } else {
-                                Image(systemName: "text.page")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 16, height: 16)
-                                    .foregroundColor(.secondary)
+                                // ファイルパスもキャッシュもなければテキストアイコン
+                                // macOS 15 以降では text.page、それ以前では doc.plaintext を使用
+                                if #available(macOS 15.0, *) {
+                                    Image(systemName: "text.page")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(4)
+                                        .frame(width: 30, height: 30)
+                                        .foregroundColor(.secondary)
+                                } else {
+                                    Image(systemName: "doc.plaintext")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(4)
+                                        .frame(width: 30, height: 30)
+                                        .foregroundColor(.secondary)
+                                }
                             }
 
                             Text(displayText)
