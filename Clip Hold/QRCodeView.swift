@@ -81,7 +81,7 @@ struct QRCodeView: View {
         .frame(width: 350, height: 500)
         .fileExporter(
             isPresented: $showingSavePanel,
-            document: ImageDocument(image: imageToSave ?? NSImage()),
+            document: ImageDocument(pngData: imageToSave?.pngData() ?? Data()),
             contentType: .png,
             defaultFilename: suggestedFileName
         ) { result in
@@ -134,26 +134,36 @@ struct QRCodeView: View {
     @Environment(\.dismiss) var dismiss
 }
 
+extension NSImage {
+    func pngData() -> Data? {
+        guard let tiffRepresentation = tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) else {
+            return nil
+        }
+        return bitmapImage.representation(using: .png, properties: [:])
+    }
+}
+
+// ImageDocumentがSendableに準拠するために、NSImageではなくDataを保持するように変更します。
+// これにより、Swift 6のSendableチェックに根本的に準拠します。
 struct ImageDocument: FileDocument {
-    var image: NSImage
+    var pngData: Data // NSImageの代わりにPNGデータを保持
 
     static var readableContentTypes: [UTType] { [.png, .jpeg, .tiff] }
     static var writableContentTypes: [UTType] { [.png] }
     
-    init(image: NSImage) {
-        self.image = image
+    // PNGデータを受け取るイニシャライザ
+    init(pngData: Data) {
+        self.pngData = pngData
     }
 
+    // FileDocumentの要件を満たすためのイニシャライザ（今回は使用しないためfatalError）
     init(configuration: ReadConfiguration) throws {
         fatalError("Reading not implemented for ImageDocument")
     }
     
+    // ファイルラッパーを返すメソッド。保持しているPNGデータを直接使用します。
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        guard let tiffRepresentation = image.tiffRepresentation,
-              let bitmapImage = NSBitmapImageRep(data: tiffRepresentation),
-              let pngData = bitmapImage.representation(using: .png, properties: [:]) else {
-            throw CocoaError(.fileWriteUnknown)
-        }
         return FileWrapper(regularFileWithContents: pngData)
     }
 }
