@@ -216,8 +216,7 @@ struct HistoryWindowView: View {
             Button("削除", role: .destructive) {
                 if let item = itemToDelete {
                     clipboardManager.deleteItem(id: item.id)
-                    clipboardManager.loadClipboardHistory()
-                    print("DEBUG: Item deleted and history reloaded.")
+                    print("DEBUG: Item deleted.")
                     itemToDelete = nil
                     selectedItemID = nil
                 }
