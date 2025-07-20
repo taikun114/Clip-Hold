@@ -163,12 +163,22 @@ struct HistoryItemRow: View {
                     .frame(width: 30, height: 30)
             } else {
                 // ファイルパスもキャッシュもなければテキストアイコン
-                Image(systemName: "text.page")
-                    .resizable()
-                    .scaledToFit()
-                    .padding(4)
-                    .frame(width: 30, height: 30)
-                    .foregroundColor(.secondary)
+                // macOS 15 以降では text.page、それ以前では doc.plaintext を使用
+                if #available(macOS 15.0, *) {
+                    Image(systemName: "text.page")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(4)
+                        .frame(width: 30, height: 30)
+                        .foregroundColor(.secondary)
+                } else {
+                    Image(systemName: "doc.plaintext")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(4)
+                        .frame(width: 30, height: 30)
+                        .foregroundColor(.secondary)
+                }
             }
 
             VStack(alignment: .leading) {
