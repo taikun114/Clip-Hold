@@ -7,12 +7,6 @@ struct InfoSettingsView: View {
     // 現在のカラースキームを監視
     @Environment(\.colorScheme) var colorScheme
 
-    // macOS 26以上の判定
-    private var isMacOS26OrLater: Bool {
-        let majorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
-        return majorVersion >= 26
-    }
-
     // アラート表示を制御するState変数
     @State private var showingFeedbackMailAlert = false
     @State private var showingContributorsAlert = false
@@ -30,26 +24,13 @@ struct InfoSettingsView: View {
         Form { // 全体をFormで囲む
             Section(header: Text("Clip Holdについて").font(.headline)) {
                 HStack(alignment: .top, spacing: 20) {
-                    // macOSのバージョンによってアイコンを切り替える
-                    if isMacOS26OrLater {
-                        // macOS 26以降の場合、"AppIconLiquidGlass"を使用
-                        Image(nsImage: NSImage(named: NSImage.Name("AppIconLiquidGlass")) ?? NSImage())
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 96, height: 96)
-                            .padding(.vertical, 10)
-                            .padding(.leading, 10)
-                            .id(colorScheme)
-                    } else {
-                        // macOS 15以前の場合、既存の"AppIcon"を使用
-                        Image(nsImage: NSImage(named: NSImage.Name("AppIcon")) ?? NSImage())
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 128, height: 128)
-                            .padding(.vertical, 0)
-                            .padding(.leading, 0)
-                            .padding(.trailing, -10)
-                    }
+                    Image(nsImage: NSImage(named: NSImage.Name("AppIcon")) ?? NSImage())
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 128, height: 128)
+                        .padding(.vertical, 0)
+                        .padding(.leading, 0)
+                        .padding(.trailing, -10)
 
                     VStack(alignment: .leading) {
                         Spacer()
@@ -76,7 +57,7 @@ struct InfoSettingsView: View {
 
                         Spacer()
                     }
-                    .frame(maxHeight: isMacOS26OrLater ? 96 + 20 : 128, alignment: .topLeading)
+                    .frame(maxHeight: 128, alignment: .topLeading)
                 }
                 
                 // ライセンス情報セクション
