@@ -212,7 +212,7 @@ struct HistoryItemRow: View {
             .fixedSize()
         }
         .padding(.vertical, 4)
-        .padding(.leading, 5)
+        .padding(.leading, 2)
         .contentShape(Rectangle())
         .help(item.text)
         .onAppear {

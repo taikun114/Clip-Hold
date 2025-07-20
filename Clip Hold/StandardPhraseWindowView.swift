@@ -96,7 +96,7 @@ struct StandardPhraseItemRow: View {
             .fixedSize()
         }
         .padding(.vertical, 4)
-        .padding(.leading, 5)
+        .padding(.leading, 2)
         .contentShape(Rectangle())
         .help(phrase.content)
     }
@@ -206,7 +206,7 @@ struct StandardPhraseWindowView: View {
                             }
                         )
                     }
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 10)
                     .padding(.bottom, 5)
                     .onChange(of: searchText) { _, newValue in
                         searchTask?.cancel()

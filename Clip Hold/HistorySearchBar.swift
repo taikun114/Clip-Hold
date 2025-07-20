@@ -96,7 +96,7 @@ struct HistorySearchBar: View {
             .padding(.horizontal, 4)
 
         }
-        .padding(.horizontal, 8)
+        .padding(.horizontal, 10)
         .padding(.bottom, 5)
     }
 }
