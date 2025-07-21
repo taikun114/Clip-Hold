@@ -2,141 +2,10 @@ import SwiftUI
 import AppKit
 import CoreImage
 import UniformTypeIdentifiers
+import Quartz
+import QuickLookThumbnailing
 
-private let itemDateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .short
-    return formatter
-}()
-
-private func copyToClipboard(_ text: String) {
-    NSPasteboard.general.clearContents()
-    NSPasteboard.general.setString(text, forType: .string)
-}
-
-// 文字列を安全に切り詰めるヘルパー関数
-private func truncateString(_ text: String?, maxLength: Int) -> String {
-    guard let text = text else { return "" }
-    if text.count > maxLength {
-        return String(text.prefix(maxLength)) + "..."
-    }
-    return text
-}
-
-struct HistoryItemRow: View {
-    @EnvironmentObject var clipboardManager: ClipboardManager
-    
-    let item: ClipboardItem
-    let index: Int
-    let showLineNumber: Bool
-    @Binding var itemToDelete: ClipboardItem?
-    @Binding var showingDeleteConfirmation: Bool
-    @Binding var selectedItemID: UUID?
-    var dismissAction: () -> Void
-    @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
-
-    @Environment(\.colorScheme) var colorScheme
-
-    @Binding var showCopyConfirmation: Bool
-    @Binding var showQRCodeSheet: Bool
-    @Binding var selectedItemForQRCode: ClipboardItem?
-    
-    @Binding var itemForNewPhrase: ClipboardItem?
-
-    let lineNumberTextWidth: CGFloat?
-    let trailingPaddingForLineNumber: CGFloat
-
-    init(item: ClipboardItem,
-         index: Int,
-         showLineNumber: Bool,
-         itemToDelete: Binding<ClipboardItem?>,
-         showingDeleteConfirmation: Binding<Bool>,
-         selectedItemID: Binding<UUID?>,
-         dismissAction: @escaping () -> Void, // クロージャは@escapingをつける
-         showCopyConfirmation: Binding<Bool>,
-         showQRCodeSheet: Binding<Bool>,
-         selectedItemForQRCode: Binding<ClipboardItem?>,
-         itemForNewPhrase: Binding<ClipboardItem?>,
-         lineNumberTextWidth: CGFloat?,
-         trailingPaddingForLineNumber: CGFloat) {
-        
-        self.item = item
-        self.index = index
-        self.showLineNumber = showLineNumber
-        _itemToDelete = itemToDelete
-        _showingDeleteConfirmation = showingDeleteConfirmation
-        _selectedItemID = selectedItemID
-        self.dismissAction = dismissAction
-        _showCopyConfirmation = showCopyConfirmation
-        _showQRCodeSheet = showQRCodeSheet
-        _selectedItemForQRCode = selectedItemForQRCode
-        _itemForNewPhrase = itemForNewPhrase
-        self.lineNumberTextWidth = lineNumberTextWidth
-        self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
-    }
-
-    private var actionMenuItems: some View {
-        Group {
-            Button("コピー") {
-                copyToClipboard(item.text)
-                showCopyConfirmation = true
-            }
-            Button("項目から定型文を作成...") {
-                itemForNewPhrase = item // ここでClipboardItemをセット
-            }
-            Button("QRコードを表示...") {
-                showQRCodeSheet = true
-                selectedItemForQRCode = item
-            }
-            Divider()
-            Button("削除...", role: .destructive) {
-                itemToDelete = item
-                showingDeleteConfirmation = true
-            }
-        }
-    }
-
-    var body: some View {
-        HStack {
-            if showLineNumber {
-                Text("\(index + 1).")
-                    .font(.caption.monospacedDigit())
-                    .foregroundColor(.secondary)
-                    .frame(width: lineNumberTextWidth, alignment: .trailing)
-                    .padding(.trailing, trailingPaddingForLineNumber)
-            }
-
-            VStack(alignment: .leading) {
-                Text(item.text)
-                    .lineLimit(1)
-                    .font(.body)
-                    .truncationMode(.tail)
-                    .foregroundColor(.primary)
-                Text(item.date, formatter: itemDateFormatter)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            Spacer()
-
-            Menu {
-                actionMenuItems
-            } label: {
-                Image(systemName: "ellipsis.circle")
-                    .imageScale(.large)
-                    .foregroundColor(.primary)
-            }
-            .menuStyle(.borderlessButton)
-            .fixedSize()
-        }
-        .padding(.vertical, 4)
-        .padding(.leading, 5)
-        .contentShape(Rectangle())
-        .help(item.text)
-    }
-}
-
+// MARK: - HistoryWindowView
 struct HistoryWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
@@ -148,22 +17,29 @@ struct HistoryWindowView: View {
     @State private var itemToDelete: ClipboardItem?
     @State private var selectedItemID: UUID?
     @State private var isLoading: Bool = false
-    @State private var searchTask: Task<Void, Never>? = nil
     @State private var showCopyConfirmation: Bool = false
-    @State private var currentCopyConfirmationTask: Task<Void, Never>? = nil
+    @State private var currentCopyConfirmationTask: Task<Void, Never>?
     
+    @State private var copyConfirmationTask: Task<Void, Never>? = nil
+    @State private var historyUpdateTask: Task<Void, Never>? = nil
+
     @State private var showQRCodeSheet: Bool = false
     @State private var selectedItemForQRCode: ClipboardItem?
 
     @State private var itemForNewPhrase: ClipboardItem? = nil
 
-    @State private var previousClipboardHistoryCount: Int = 0 // 新しく追加
+    @State private var previousClipboardHistoryCount: Int = 0
+
+    @State private var selectedFilter: ItemFilter = .all
+    @State private var selectedSort: ItemSort = .newest
+
+    @State private var searchDebounceTask: Task<Void, Never>? = nil
 
     @FocusState private var isSearchFieldFocused: Bool
 
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
-    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false // 追加
+    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
 
     private var lineNumberTextWidth: CGFloat? {
         guard showLineNumbersInHistoryWindow, !filteredHistory.isEmpty else { return nil }
@@ -180,269 +56,137 @@ struct HistoryWindowView: View {
 
     private let trailingPaddingForLineNumber: CGFloat = 5
 
-    private func performSearch(searchTerm: String) {
-        let newFilteredHistory: [ClipboardItem]
-        if searchTerm.isEmpty {
-            newFilteredHistory = clipboardManager.clipboardHistory
-        } else {
-            newFilteredHistory = clipboardManager.clipboardHistory.filter { item in
-                item.text.localizedCaseInsensitiveContains(searchTerm)
-            }
+    // 文字列を安全に切り詰めるヘルパー関数
+    private func truncateString(_ text: String?, maxLength: Int) -> String {
+        guard let text = text else { return "" }
+        if text.count > maxLength {
+            return String(text.prefix(maxLength)) + "..."
         }
-        self.filteredHistory = newFilteredHistory
+        return text
     }
 
-    // QRコードを解析するヘルパー関数
-    private func parseQRCode(from image: NSImage) -> String? {
-        guard let ciImage = CIImage(data: image.tiffRepresentation ?? Data()) else { return nil }
-
-        let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
-        let features = detector?.features(in: ciImage)
-
-        for feature in features ?? [] {
-            if let qrCodeFeature = feature as? CIQRCodeFeature {
-                return qrCodeFeature.messageString
-            }
+    // 検索、フィルタリング、並び替えを統合したタスク実行関数
+    private func performUpdate(isIncrementalUpdate: Bool = false) {
+        if !isIncrementalUpdate {
+            isLoading = true
+            filteredHistory = []
         }
-        return nil
+        
+        historyUpdateTask?.cancel()
+
+        historyUpdateTask = Task { @MainActor in
+            guard !Task.isCancelled else {
+                isLoading = false
+                return
+            }
+
+            let historyCopy = clipboardManager.clipboardHistory
+            
+            let filtered = historyCopy.filter { item in
+                let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
+
+                let matchesFilter: Bool
+                switch selectedFilter {
+                case .all:
+                    matchesFilter = true
+                case .textOnly:
+                    matchesFilter = item.filePath == nil
+                case .fileOnly:
+                    matchesFilter = item.filePath != nil
+                case .imageOnly:
+                    matchesFilter = item.isImage
+                }
+
+                return matchesSearchText && matchesFilter
+            }
+
+            let sorted = filtered.sorted { item1, item2 in
+                switch selectedSort {
+                case .newest:
+                    return item1.date > item2.date
+                case .oldest:
+                    return item1.date < item2.date
+                case .largestFileSize:
+                    return (item1.fileSize ?? 0) > (item2.fileSize ?? 0)
+                case .smallestFileSize:
+                    return (item1.fileSize ?? 0) < (item2.fileSize ?? 0)
+                }
+            }
+
+            filteredHistory = sorted
+            isLoading = false
+        }
     }
 
     var body: some View {
-        ZStack { // ZStackでコンテンツとメッセージを重ねる
-            VisualEffectView(material: .menu, blendingMode: .behindWindow)
-                .ignoresSafeArea()
+        ZStack {
+            HistoryWindowBackground()
 
-            ZStack { // メインコンテンツを囲むZStack
+            ZStack {
                 VStack(spacing: 0) {
-                    HStack {
-                        TextField(
-                            "履歴を検索",
-                            text: $searchText
-                        )
-                        .textFieldStyle(.plain)
-                        .font(.title3)
-                        .padding(.vertical, 8)
-                        .padding(.leading, 30)
-                        .padding(.trailing, 10)
-                        .background(Color.primary.opacity(0.1))
-                        .cornerRadius(10)
-                        .controlSize(.large)
-                        .focused($isSearchFieldFocused)
-                        .overlay(
-                            HStack {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.secondary)
-                                    .padding(.leading, 8)
-                                    .offset(y: -1.0)
-                                Spacer()
-                                if !searchText.isEmpty {
-                                    Button(action: {
-                                        searchText = ""
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.secondary)
-                                    }
-                                    .buttonStyle(BorderlessButtonStyle())
-                                    .padding(.trailing, 8)
-                                }
-                            }
-                        )
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.bottom, 5)
-                    .onChange(of: searchText) { _, newValue in
-                        searchTask?.cancel()
-                        
-                        searchTask = Task { @MainActor in
-                            let initialDelayNanoseconds: UInt64 = 150_000_000
-                            try? await Task.sleep(nanoseconds: initialDelayNanoseconds)
+                    HistorySearchBar(
+                        searchText: $searchText,
+                        isLoading: $isLoading,
+                        isSearchFieldFocused: _isSearchFieldFocused,
+                        clipboardHistoryCount: clipboardManager.clipboardHistory.count,
+                        selectedFilter: $selectedFilter,
+                        selectedSort: $selectedSort
+                    )
 
-                            guard !Task.isCancelled else {
-                                return
-                            }
-                            
-                            isLoading = true
+                    Spacer(minLength: 0)
 
-                            let remainingDebounceNanoseconds: UInt64 = 150_000_000
-                            try? await Task.sleep(nanoseconds: remainingDebounceNanoseconds)
-
-                            guard !Task.isCancelled else {
-                                isLoading = false
-                                return
-                            }
-
-                            performSearch(searchTerm: newValue)
-                            isLoading = false
+                    HistoryContentList(
+                        filteredHistory: $filteredHistory,
+                        isLoading: $isLoading,
+                        showingDeleteConfirmation: $showingDeleteConfirmation,
+                        itemToDelete: $itemToDelete,
+                        selectedItemID: $selectedItemID,
+                        showCopyConfirmation: $showCopyConfirmation,
+                        currentCopyConfirmationTask: $currentCopyConfirmationTask,
+                        showQRCodeSheet: $showQRCodeSheet,
+                        selectedItemForQRCode: $selectedItemForQRCode,
+                        itemForNewPhrase: $itemForNewPhrase,
+                        previousClipboardHistoryCount: $previousClipboardHistoryCount,
+                        showLineNumbersInHistoryWindow: showLineNumbersInHistoryWindow,
+                        preventWindowCloseOnDoubleClick: preventWindowCloseOnDoubleClick,
+                        scrollToTopOnUpdate: scrollToTopOnUpdate,
+                        lineNumberTextWidth: lineNumberTextWidth,
+                        trailingPaddingForLineNumber: trailingPaddingForLineNumber,
+                        searchText: searchText,
+                        onCopyAction: { item in
+                            // 内部コピーフラグをtrueに設定
+                            clipboardManager.isPerformingInternalCopy = true
+                            ClipboardManager.shared.copyItemToClipboard(item)
                         }
-                    }
-                    .onChange(of: clipboardManager.clipboardHistory.count) { oldVal, newVal in
-                        performSearch(searchTerm: searchText) // 履歴が変更されたら、検索結果を更新
-                    }
-
-                    Spacer(minLength: 10)
-
-                    ZStack { // Listまたはメッセージが表示されるZStack
-                        if filteredHistory.isEmpty && !isLoading {
-                            VStack { // VStackで囲み、Spacerで中央に配置
-                                Spacer()
-                                Text("履歴はありません")
-                                    .foregroundColor(.secondary)
-                                    .font(.title2)
-                                    .padding(.bottom, 20)
-                                Spacer()
-                            }
-                        } else {
-                            ScrollViewReader { scrollViewProxy in // ここにScrollViewReaderを追加
-                                List(filteredHistory, selection: $selectedItemID) { item in
-                                    HistoryItemRow(
-                                        item: item,
-                                        index: filteredHistory.firstIndex(where: { $0.id == item.id }) ?? 0,
-                                        showLineNumber: showLineNumbersInHistoryWindow,
-                                        itemToDelete: $itemToDelete,
-                                        showingDeleteConfirmation: $showingDeleteConfirmation,
-                                        selectedItemID: $selectedItemID,
-                                        dismissAction: { dismiss() },
-                                        showCopyConfirmation: $showCopyConfirmation,
-                                        showQRCodeSheet: $showQRCodeSheet,
-                                        selectedItemForQRCode: $selectedItemForQRCode,
-                                        itemForNewPhrase: $itemForNewPhrase,
-                                        lineNumberTextWidth: lineNumberTextWidth,
-                                        trailingPaddingForLineNumber: trailingPaddingForLineNumber
-                                    )
-                                    .tag(item.id)
-                                    .listRowBackground(Color.clear)
-                                }
-                                .accessibilityLabel("履歴リスト")
-                                .listStyle(.plain)
-                                .scrollContentBackground(.hidden)
-                                .blur(radius: isLoading ? 5 : 0)
-                                .animation(.easeOut(duration: 0.2), value: isLoading)
-                                .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
-                                    if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
-                                        Button("コピー") {
-                                            copyToClipboard(currentItem.text)
-                                            showCopyConfirmation = true
-                                            currentCopyConfirmationTask?.cancel()
-                                            currentCopyConfirmationTask = Task { @MainActor in
-                                                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                                guard !Task.isCancelled else { return }
-                                                withAnimation {
-                                                    showCopyConfirmation = false
-                                                }
-                                            }
-                                        }
-                                        Button("項目から定型文を作成...") {
-                                            itemForNewPhrase = currentItem // ここでClipboardItemをセット
-                                        }
-                                        Button("QRコードを表示...") {
-                                            showQRCodeSheet = true
-                                            selectedItemForQRCode = currentItem
-                                        }
-                                        Divider()
-                                        Button("削除...", role: .destructive) {
-                                            itemToDelete = currentItem
-                                            showingDeleteConfirmation = true
-                                        }
-                                    }
-                                }, primaryAction: { selectedIDs in
-                                    if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
-                                        copyToClipboard(currentItem.text)
-                                        showCopyConfirmation = true
-                                        currentCopyConfirmationTask?.cancel()
-                                        currentCopyConfirmationTask = Task { @MainActor in
-                                            try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                            guard !Task.isCancelled else { return }
-                                            withAnimation {
-                                                showCopyConfirmation = false
-                                            }
-                                        }
-                                        if !preventWindowCloseOnDoubleClick {
-                                            dismiss()
-                                        }
-                                    }
-                                })
-                                .onDrop(of: [.image], isTargeted: nil) { providers in
-                                    guard let itemProvider = providers.first else { return false }
-
-                                    itemProvider.loadObject(ofClass: NSImage.self) { (image, error) in
-                                        DispatchQueue.main.async {
-                                            if let nsImage = image as? NSImage {
-                                                if let qrCodeContent = parseQRCode(from: nsImage) {
-                                                    clipboardManager.addHistoryItem(text: qrCodeContent)
-                                                    copyToClipboard(qrCodeContent)
-                                                } else {
-                                                    // QRコードが見つからなかった場合の処理
-                                                    print("QRコードが見つかりませんでした。")
-                                                }
-                                            } else if let error = error {
-                                                print("画像のロードに失敗しました: \(error.localizedDescription)")
-                                            }
-                                        }
-                                    }
-                                    return true
-                                }
-                                .onChange(of: filteredHistory) { _, newValue in
-                                    // filteredHistory が更新され、かつscrollToTopOnUpdateがtrue、かつ検索中でない場合
-                                    // さらに、元の履歴の数が変わった場合のみに限定する
-                                    if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && newValue.count > previousClipboardHistoryCount {
-                                        if let firstId = newValue.first?.id {
-                                            withAnimation {
-                                                scrollViewProxy.scrollTo(firstId, anchor: .top)
-                                            }
-                                        }
-                                    }
-                                    previousClipboardHistoryCount = newValue.count // 現在の履歴数を保存
-                                }
-                            } // ScrollViewReaderの終わり
-                        }
-                        if isLoading {
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                                .scaleEffect(1.5)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(Color.clear)
-                        }
-                    }
-                }
-            } // メインコンテンツを囲むZStackの終わり
-            
-            // コピー確認メッセージ
-            VStack {
-                Spacer() // 下部に寄せる
-                if showCopyConfirmation {
-                    ZStack { // グラデーションとテキストを重ねるZStack
-                        LinearGradient(gradient: Gradient(colors: [Color.black.opacity(0.0), Color.black.opacity(0.25)]), startPoint: .top, endPoint: .bottom)
-                            .frame(height: 60)
-                            .frame(maxWidth: .infinity) // 横幅を最大に
-                        
-                        Text("コピーしました！")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 0)
-                            .padding(.top, 15)
-                    }
-                    .frame(maxWidth: .infinity) // ZStack自体も横幅を最大に
-                    .offset(y: 1) // 下にぴったりとくっつくように微調整
-                    .transition(.opacity) // フェードイン/アウト
-                    .onAppear {
-                        // onAppearからはタイマー設定ロジックを削除。
-                        // ここは単にビューの出現アニメーションに使用
-                    }
-                    .onDisappear {
-                        // ビューが非表示になる際にタスクをキャンセル (念のため)
-                        currentCopyConfirmationTask?.cancel()
-                    }
+                    )
                 }
             }
-            .animation(.easeOut(duration: 0.1), value: showCopyConfirmation)
-            .allowsHitTesting(false) // クリックイベントを透過させる
+            
+            HistoryCopyConfirmation(showCopyConfirmation: $showCopyConfirmation)
+                .onAppear {
+                    currentCopyConfirmationTask?.cancel()
+                }
+                .onDisappear {
+                    currentCopyConfirmationTask?.cancel()
+                }
         }
         .onExitCommand {
             dismiss()
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
+        .onChange(of: searchText) { _, _ in
+            searchDebounceTask?.cancel()
+            searchDebounceTask = Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(300))
+                guard !Task.isCancelled else { return }
+                performUpdate()
+            }
+        }
+        .onChange(of: selectedFilter) { _, _ in performUpdate() }
+        .onChange(of: selectedSort) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
         .onAppear {
-            performSearch(searchTerm: searchText)
+            performUpdate()
             DispatchQueue.main.async {
                 isSearchFieldFocused = true
             }
@@ -460,10 +204,19 @@ struct HistoryWindowView: View {
                 }
             }
         }
+        .onDisappear {
+            // ウインドウが閉じる際に実行中のタスクをキャンセルしてメモリを解放
+            searchDebounceTask?.cancel()
+            searchDebounceTask = nil // タスクの参照をnilに設定
+            
+            historyUpdateTask?.cancel()
+            historyUpdateTask = nil // タスクの参照をnilに設定
+        }
         .alert("履歴の削除", isPresented: $showingDeleteConfirmation) {
             Button("削除", role: .destructive) {
                 if let item = itemToDelete {
                     clipboardManager.deleteItem(id: item.id)
+                    print("DEBUG: Item deleted.")
                     itemToDelete = nil
                     selectedItemID = nil
                 }
@@ -479,7 +232,7 @@ struct HistoryWindowView: View {
                 QRCodeView(text: item.text)
             }
         }
-        .sheet(item: $itemForNewPhrase) { item in // itemが非nilの時にシートが表示される
+        .sheet(item: $itemForNewPhrase) { item in
             AddEditPhraseView(mode: .add, initialContent: item.text)
                 .environmentObject(standardPhraseManager)
         }

@@ -4,6 +4,7 @@ import Carbon
 import UserNotifications
 import KeyboardShortcuts
 
+// PreAction機能を持つPrimitiveButtonStyle
 struct PreActionButtonStyle: PrimitiveButtonStyle {
     var preAction: () -> Void
 
@@ -34,6 +35,7 @@ struct ClipHoldApp: App {
     @AppStorage("maxHistoryInMenu") var maxHistoryInMenu: Int = 10
     @AppStorage("maxPhrasesInMenu") var maxPhrasesInMenu: Int = 5
     @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
 
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
@@ -46,7 +48,7 @@ struct ClipHoldApp: App {
         
         ClipHoldApp.setupGlobalShortcuts()
     }
-
+    
     // MARK: - キーボード操作をシミュレートする関数
     static func performPaste() {
         let delay: TimeInterval = 0.01
@@ -82,7 +84,7 @@ struct ClipHoldApp: App {
             set: { self.hideMenuBarExtra = !$0 } // isInserted の変更で hideMenuBarExtra を反転させる
         )
     }
-
+        
     var body: some Scene {
         Settings {
             SettingsView()
@@ -97,7 +99,7 @@ struct ClipHoldApp: App {
             isInserted: menuBarExtraInsertionBinding
         ) {
             // --- 定型文セクション ---
-            Text("よく使う定型文")
+            Label("よく使う定型文", systemImage: "star")
                 .font(.headline)
                 .padding(.bottom, 5)
             
@@ -114,83 +116,149 @@ struct ClipHoldApp: App {
                         return displayContent
                     }()
                     
-                    Button(displayText) {
+                    Button {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(phrase.content, forType: .string)
                         
-                        if quickPaste {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                ClipHoldApp.performPaste()
-                            }
-                        }
-                    }
-                }
-            }
-            
-            Divider()
-            Button("すべての定型文を表示...") {
-                if let delegate = NSApp.delegate as? AppDelegate {
-                    delegate.showStandardPhraseWindow()
-                }
-            }
-            Divider()
-            
-            // --- コピー履歴セクション ---
-            Text("コピー履歴")
-                .font(.headline)
-            if clipboardManager.clipboardHistory.isEmpty {
-                Text("履歴はありません")
-            } else {
-                let displayLimit = min(clipboardManager.clipboardHistory.count, maxHistoryInMenu)
-                ForEach(clipboardManager.clipboardHistory.prefix(displayLimit)) { item in
-                    let itemDateFormatter: DateFormatter = {
-                        let formatter = DateFormatter()
-                        formatter.dateStyle = .short
-                        formatter.timeStyle = .short
-                        return formatter
-                    }()
-                    
-                    let displayText: String = {
-                        var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
-                        let dateString = itemDateFormatter.string(from: item.date)
-                        
-                        if displayContent.count > 40 {
-                            displayContent = String(displayContent.prefix(40)) + "..."
-                        }
-                        
-                        return "\(displayContent) (\(dateString))"
-                    }()
-                    
-                    Button {
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(item.text, forType: .string)
-                        
+                        // quickPaste がオンの場合、定型文は常にテキストなのでそのままペースト
                         if quickPaste {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                 ClipHoldApp.performPaste()
                             }
                         }
                     } label: {
-                        Text(displayText)
-                            .font(.body)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
+                        HStack(spacing: 8) {
+                            Image(systemName: "list.bullet.rectangle.portrait")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
+                                .foregroundColor(.secondary)
+                            Text(displayText)
+                                .font(.body)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
+                    }
+                }
+            }
+            
+            Divider()
+            Button {
+                if let delegate = NSApp.delegate as? AppDelegate {
+                    delegate.showStandardPhraseWindow()
+                }
+            } label: {
+                Label("すべての定型文を表示...", systemImage: "pencil.and.list.clipboard")
+            }
+            Divider()
+            
+            // --- コピー履歴セクション ---
+            Label("コピー履歴", systemImage: "clock")
+                .font(.headline)
+            if clipboardManager.clipboardHistory.isEmpty {
+                Text("履歴はありません")
+            } else {
+                let displayLimit = min(clipboardManager.clipboardHistory.count, maxHistoryInMenu)
+                ForEach(clipboardManager.clipboardHistory.prefix(displayLimit)) { item in
+                    
+                    let itemDateFormatter: DateFormatter = {
+                        let formatter = DateFormatter()
+                        formatter.dateStyle = .short
+                        formatter.timeStyle = .short
+                        return formatter
+                    }()
+                     
+                    let displayText: String = {
+                        var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
+                        let dateString = itemDateFormatter.string(from: item.date)
+                                                 
+                        if displayContent.count > 40 {
+                            displayContent = String(displayContent.prefix(40)) + "..."
+                        }
+                                                 
+                        return "\(displayContent) (\(dateString))"
+                    }()
+                    
+                    Button {
+                        // 内部コピーフラグをtrueに設定
+                        clipboardManager.isPerformingInternalCopy = true
+                        clipboardManager.copyItemToClipboard(item)
+                        
+                        // quickPaste がオンの場合、かつ textOnlyQuickPaste がオンの場合は文字列のみペースト
+                        if quickPaste {
+                            let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste") // ここで最新の値を取得
+                            if textOnlyQuickPaste {
+                                // ファイルパスがなく、かつ画像でもない場合にのみペーストを実行
+                                if item.filePath == nil && !item.isImage {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                        ClipHoldApp.performPaste()
+                                    }
+                                } else {
+                                    print("textOnlyQuickPasteがオンのため、テキスト以外のコンテンツはペーストされません。")
+                                }
+                            } else {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    ClipHoldApp.performPaste()
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            if let cachedImage = item.cachedThumbnailImage {
+                                Image(nsImage: cachedImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 16, height: 16)
+                            } else if let filePath = item.filePath {
+                                // キャッシュがない場合は、従来のファイルアイコンを表示
+                                let nsImage = NSWorkspace.shared.icon(forFile: filePath.path)
+                                Image(nsImage: nsImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 16, height: 16)
+                            } else {
+                                // ファイルパスもキャッシュもなければテキストアイコン
+                                // macOS 15 以降では text.page、それ以前では doc.plaintext を使用
+                                if #available(macOS 15.0, *) {
+                                    Image(systemName: "text.page")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(4)
+                                        .frame(width: 30, height: 30)
+                                        .foregroundColor(.secondary)
+                                } else {
+                                    Image(systemName: "doc.plaintext")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(4)
+                                        .frame(width: 30, height: 30)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+
+                            Text(displayText)
+                                .font(.body)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
                     }
                 }
             }
             
             Divider()
             
-            Button("すべてのコピー履歴を表示...") {
+            Button {
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showHistoryWindow()
                 }
+            } label: {
+                Label("すべてのコピー履歴を表示...", systemImage: "list.clipboard")
             }
             
             Divider()
             
             SettingsLink {
-                Text("設定...")
+                Label("設定...", systemImage: "gear")
             }
             .buttonStyle(.preAction {
                 NSApp.activate(ignoringOtherApps: true)
@@ -209,9 +277,6 @@ struct ClipHoldApp: App {
     }
     
     static func setupGlobalShortcuts() {
-        // quickPaste の値は UserDefaults から直接読み込む
-        let quickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
-        
         KeyboardShortcuts.onKeyDown(for: .showAllStandardPhrases) {
             print("「すべての定型文を表示」ショートカットが押されました！")
             if let delegate = NSApp.delegate as? AppDelegate {
@@ -271,7 +336,11 @@ struct ClipHoldApp: App {
                     NSPasteboard.general.setString(phrase.content, forType: .string)
                     print("定型文「\(phrase.title)」がショートカットでコピーされました。")
 
-                    if quickPaste { // static context で取得した quickPaste を使用
+                    // quickPaste の最新の値を取得
+                    let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                    
+                    // quickPaste がオンの場合、定型文は常にテキストなのでそのままペースト
+                    if currentQuickPaste {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                             performPaste() // static メソッドとして呼び出し
                             print("performPaste")
@@ -293,14 +362,31 @@ struct ClipHoldApp: App {
                 if clipboardManager.clipboardHistory.indices.contains(i) {
                     let historyItem = clipboardManager.clipboardHistory[i]
                     NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(historyItem.text, forType: .string)
 
-                    print("\(i+1)個前の履歴「\(historyItem.text.prefix(20))...」がショートカットでコピーされました。")
+                    // 内部コピーフラグをtrueに設定
+                    clipboardManager.isPerformingInternalCopy = true
+                    clipboardManager.copyItemToClipboard(historyItem)
 
-                    if quickPaste { // static context で取得した quickPaste を使用
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                            performPaste() // static メソッドとして呼び出し
-                            print("performPaste")
+                    // quickPaste と textOnlyQuickPaste の最新の値を取得
+                    let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                    let currentTextOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
+
+                    // quickPaste がオンの場合、かつ textOnlyQuickPaste がオンの場合は、ファイルパスがなく、かつ画像でもない場合にのみペースト
+                    if currentQuickPaste {
+                        if currentTextOnlyQuickPaste {
+                            if historyItem.filePath == nil && !historyItem.isImage {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    performPaste()
+                                    print("performPaste")
+                                }
+                            } else {
+                                print("textOnlyQuickPasteがオンのため、テキスト以外のコンテンツはペーストされません。")
+                            }
+                        } else {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                performPaste()
+                                print("performPaste")
+                            }
                         }
                     }
                 } else {

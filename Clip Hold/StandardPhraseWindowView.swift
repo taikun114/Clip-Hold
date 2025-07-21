@@ -62,21 +62,30 @@ struct StandardPhraseItemRow: View {
             Spacer()
             
             Menu {
-                Button("コピー") {
+                Button {
                     copyToClipboard(phrase.content)
                     showCopyConfirmation = true
-                }
-                Button("編集...") {
-                    phraseToEdit = phrase // 編集対象のフレーズをセット
-                }
-                Button("QRコードを表示...") {
-                    selectedPhraseForQRCode = phrase
-                    showQRCodeSheet = true
+                } label: {
+                    Label("コピー", systemImage: "document.on.document")
                 }
                 Divider()
-                Button("削除...", role: .destructive) {
+                Button {
+                    phraseToEdit = phrase // 編集対象のフレーズをセット
+                } label: {
+                    Label("編集...", systemImage: "pencil")
+                }
+                Button {
+                    selectedPhraseForQRCode = phrase
+                    showQRCodeSheet = true
+                } label: {
+                    Label("QRコードを表示...", systemImage: "qrcode")
+                }
+                Divider()
+                Button(role: .destructive) {
                     phraseToDelete = phrase
                     showingDeleteConfirmation = true
+                } label: {
+                    Label("削除...", systemImage: "trash")
                 }
             } label: {
                 Image(systemName: "ellipsis.circle")
@@ -87,7 +96,7 @@ struct StandardPhraseItemRow: View {
             .fixedSize()
         }
         .padding(.vertical, 4)
-        .padding(.leading, 5)
+        .padding(.leading, 2)
         .contentShape(Rectangle())
         .help(phrase.content)
     }
@@ -191,7 +200,7 @@ struct StandardPhraseWindowView: View {
                             }
                         )
                     }
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 10)
                     .padding(.bottom, 5)
                     .onChange(of: searchText) { _, newValue in
                         searchTask?.cancel()
@@ -222,7 +231,7 @@ struct StandardPhraseWindowView: View {
                         performSearch(searchTerm: searchText)
                     }
                     
-                    Spacer(minLength: 10)
+                    Spacer(minLength: 0)
                     
                     ZStack {
                         if filteredPhrases.isEmpty && !isLoading {
@@ -278,13 +287,13 @@ struct StandardPhraseWindowView: View {
                                 }
                             }
                             .accessibilityLabel("定型文リスト")
-                            .listStyle(.plain)
+                            .listStyle(.inset)
                             .scrollContentBackground(.hidden)
                             .blur(radius: isLoading ? 5 : 0)
-                            .animation(.easeOut(duration: 0.2), value: isLoading)
+                            .animation(.easeOut(duration: 0.1), value: isLoading)
                             .contextMenu(forSelectionType: StandardPhrase.ID.self, menu: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
-                                    Button("コピー") {
+                                    Button {
                                         copyToClipboard(currentPhrase.content)
                                         showCopyConfirmation = true
                                         currentCopyConfirmationTask?.cancel()
@@ -295,18 +304,27 @@ struct StandardPhraseWindowView: View {
                                                 showCopyConfirmation = false
                                             }
                                         }
-                                    }
-                                    Button("編集...") {
-                                        phraseToEdit = currentPhrase // 編集対象のフレーズをセット
-                                    }
-                                    Button("QRコードを表示...") {
-                                        selectedPhraseForQRCode = currentPhrase
-                                        showQRCodeSheet = true
+                                    } label: {
+                                        Label("コピー", systemImage: "document.on.document")
                                     }
                                     Divider()
-                                    Button("削除...", role: .destructive) {
+                                    Button {
+                                        phraseToEdit = currentPhrase // 編集対象のフレーズをセット
+                                    } label: {
+                                        Label("編集...", systemImage: "pencil")
+                                    }
+                                    Button {
+                                        selectedPhraseForQRCode = currentPhrase
+                                        showQRCodeSheet = true
+                                    } label: {
+                                        Label("QRコードを表示...", systemImage: "qrcode")
+                                    }
+                                    Divider()
+                                    Button(role: .destructive) {
                                         phraseToDelete = currentPhrase
                                         showingDeleteConfirmation = true
+                                    } label: {
+                                        Label("削除...", systemImage: "trash")
                                     }
                                 }
                             }, primaryAction: { selectedIDs in

@@ -7,7 +7,6 @@ struct PrivacySettingsView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
 
     @ObservedObject private var accessibilityChecker = AccessibilityPermissionChecker.shared
-    @StateObject private var clipboardImporterExporter = ClipboardHistoryImporterExporter()
 
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false {
         // isClipboardMonitoringPausedが変更されたときに監視状態を更新
@@ -34,16 +33,11 @@ struct PrivacySettingsView: View {
         }
     }
 
-    @State private var showingClearHistoryConfirmation = false
-    @State private var isShowingExportSheet: Bool = false
-    @State private var isShowingImportSheet: Bool = false
-    
+    @State private var isShowingAddAppPopover: Bool = false
+    @State private var showAllRunningApps: Bool = false
     @State private var selectedExcludedAppId: String? = nil
     @State private var runningApplications: [NSRunningApplication] = []
     @State private var showingFinderPanel = false
-
-    @State private var isShowingAddAppPopover: Bool = false
-    @State private var showAllRunningApps: Bool = false
 
     @State private var notificationAuthorizationStatus: UNAuthorizationStatus = .notDetermined
 
@@ -118,60 +112,6 @@ struct PrivacySettingsView: View {
                     }
                     .buttonStyle(.bordered)
                     .help(isClipboardMonitoringPaused ? "クリップボード監視を再開します。" : "クリップボード監視を一時停止します。")
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("クリップボード履歴")
-                        Text("現在、インポートとエクスポートはテキストのみサポートしています。")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
-                    Button(action: {
-                        print("DEBUG: Import button tapped. isShowingImportSheet will be true.")
-                        self.isShowingImportSheet = true
-                    }) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.down")
-                            Text("インポート")
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .help("書き出したクリップボード履歴のJSONファイルを読み込みます。")
-
-                    Button(action: {
-                        self.isShowingExportSheet = true
-                    }) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.up")
-                            Text("エクスポート")
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(clipboardManager.clipboardHistory.isEmpty)
-                    .help("すべてのクリップボード履歴をJSONファイルとして書き出します。")
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                HStack {
-                    Text("\(clipboardManager.clipboardHistory.count)個の履歴")
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Button(action: {
-                        showingClearHistoryConfirmation = true
-                    }) {
-                        HStack {
-                            Image(systemName: "trash")
-                            Text("すべての履歴を削除")
-                        }
-                        .if(!clipboardManager.clipboardHistory.isEmpty) { view in
-                            view.foregroundStyle(.red)
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(clipboardManager.clipboardHistory.isEmpty)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             }
@@ -446,7 +386,7 @@ struct PrivacySettingsView: View {
                     Text("除外するアプリ")
                         .font(.headline)
                     
-                    Text("ここに追加したアプリはクリップボード監視の対象外となります。")
+                    Text("ここに追加したアプリが最前面にあるときはコピー履歴に追加されません。")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -483,40 +423,6 @@ struct PrivacySettingsView: View {
                 clipboardManager.startMonitoringPasteboard()
             }
         }
-        .fileExporter(
-            isPresented: $isShowingExportSheet,
-            document: ClipboardHistoryDocument(clipboardItems: clipboardManager.clipboardHistory),
-            contentType: .json,
-            defaultFilename: "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).json"
-        ) { result in
-                clipboardImporterExporter.handleExportResult(result)
-        }
-        .fileImporter(
-            isPresented: $isShowingImportSheet,
-            allowedContentTypes: [.json],
-            allowsMultipleSelection: false
-        ) { result in
-            print("DEBUG: fileImporter closure called for history import.")
-            clipboardImporterExporter.handleImportResult(result, into: clipboardManager)
-            self.isShowingImportSheet = false
-        }
-        .alert(item: $clipboardImporterExporter.currentAlert) { alertContent in
-            Alert(
-                title: alertContent.title,
-                message: alertContent.message,
-                dismissButton: .default(Text("OK"))
-            )
-        }
-        .alert("すべてのクリップボード履歴を削除", isPresented: $showingClearHistoryConfirmation) {
-            Button("削除", role: .destructive) {
-                clipboardManager.clearAllHistory()
-            }
-            Button("キャンセル", role: .cancel) {
-                // 何もしない
-            }
-        } message: {
-            Text("すべてのクリップボード履歴を本当に削除しますか？この操作は元に戻せません。")
-        }
         .background(
             AppSelectionImporterView(
                 isPresented: $showingFinderPanel,
@@ -530,16 +436,6 @@ struct PrivacySettingsView: View {
             .frame(width: 0, height: 0)
             .clipped()
         )
-    }
-}
-
-extension Date {
-    func formattedLocalExportFilename() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd-HH-mm-ss"
-        formatter.locale = Locale.current
-        formatter.timeZone = .current
-        return formatter.string(from: self)
     }
 }
 

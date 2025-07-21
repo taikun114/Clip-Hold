@@ -62,16 +62,12 @@ class LoginItemManager: ObservableObject {
 
     // システム設定のログイン項目パネルを開くヘルパーメソッド
     func openSystemSettingsLoginItems() {
-        SMAppService.openSystemSettingsLoginItems() //
+        SMAppService.openSystemSettingsLoginItems()
     }
 }
 
 struct GeneralSettingsView: View {
     @StateObject private var loginItemManager = LoginItemManager()
-
-    @AppStorage("maxHistoryToSave") var maxHistoryToSave: Int = 0 // 無制限を0で表す
-    @State private var tempSelectedSaveOption: HistoryOption
-    @State private var initialSaveOption: HistoryOption
 
     @AppStorage("maxHistoryInMenu") var maxHistoryInMenu: Int = 10
     @State private var tempSelectedMenuOption: MenuHistoryOption
@@ -83,7 +79,7 @@ struct GeneralSettingsView: View {
 
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
-    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false // 追加
+    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
 
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbersInStandardPhraseWindow: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
@@ -91,50 +87,25 @@ struct GeneralSettingsView: View {
     @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
 
     @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
+
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
 
-    @AppStorage("scanQRCodeImage") var scanQRCodeImage: Bool = false
-
-    @State private var showingCustomSaveHistorySheet = false
     @State private var showingCustomMenuHistorySheet = false
     @State private var showingCustomPhraseMenuSheet = false
-    
-    @State private var tempCustomSaveHistoryValue: Int = 20
+
     @State private var tempCustomMenuHistoryValue: Int = 10
     @State private var tempCustomPhrasesInMenuValue: Int = 5
 
-
     init() {
-        let savedMaxHistoryToSave = UserDefaults.standard.integer(forKey: "maxHistoryToSave")
-        var savedMaxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryInMenu")
-        var savedMaxPhrasesInMenu = UserDefaults.standard.integer(forKey: "maxPhrasesInMenu")
+        let savedMaxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryInMenu")
+        let savedMaxPhrasesInMenu = UserDefaults.standard.integer(forKey: "maxPhrasesInMenu")
 
         // DEBUG print for initial values from UserDefaults (accessing AppStorage directly here is fine)
-        print("DEBUG: init() - savedMaxHistoryToSave: \(savedMaxHistoryToSave)")
         print("DEBUG: init() - savedMaxHistoryInMenu: \(savedMaxHistoryInMenu)")
 
 
         // MARK: - ローカル変数を宣言し、それらの値を決定するロジック
-        // tempSelectedSaveOption の値を決定
-        let determinedTempSelectedSaveOption: HistoryOption
-        var determinedTempCustomSaveHistoryValue: Int
-
-        if savedMaxHistoryToSave == 0 {
-            determinedTempSelectedSaveOption = .unlimited
-            determinedTempCustomSaveHistoryValue = 20
-            // maxHistoryToSaveが0（無制限）で、maxHistoryInMenuも0（不正な状態）の場合の修正
-            if savedMaxHistoryInMenu == 0 {
-                savedMaxHistoryInMenu = 10 // UI表示と整合性を取るため一時変数を10に設定
-                UserDefaults.standard.set(10, forKey: "maxHistoryInMenu") // UserDefaultsも更新して次回起動時も正しくなるように
-            }
-        } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == savedMaxHistoryToSave }) {
-            determinedTempSelectedSaveOption = savedPreset
-            determinedTempCustomSaveHistoryValue = savedMaxHistoryToSave
-        } else {
-            determinedTempSelectedSaveOption = .custom(savedMaxHistoryToSave)
-            determinedTempCustomSaveHistoryValue = savedMaxHistoryToSave
-        }
-        
         // tempSelectedMenuOption の値を決定
         let determinedTempSelectedMenuOption: MenuHistoryOption
         var determinedTempCustomMenuHistoryValue: Int
@@ -143,7 +114,7 @@ struct GeneralSettingsView: View {
             determinedTempSelectedMenuOption = .preset(10)
             determinedTempCustomMenuHistoryValue = 10
             UserDefaults.standard.set(10, forKey: "maxHistoryInMenu") // UserDefaultsも確実に10に設定
-        } else if savedMaxHistoryInMenu == savedMaxHistoryToSave && savedMaxHistoryToSave != 0 {
+        } else if savedMaxHistoryInMenu == UserDefaults.standard.integer(forKey: "maxHistoryToSave") && UserDefaults.standard.integer(forKey: "maxHistoryToSave") != 0 {
             determinedTempSelectedMenuOption = .sameAsSaved
             determinedTempCustomMenuHistoryValue = savedMaxHistoryInMenu
         } else if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == savedMaxHistoryInMenu }) {
@@ -161,22 +132,20 @@ struct GeneralSettingsView: View {
 
         // savedMaxPhrasesInMenu が 0 の場合、デフォルト値の 5 を使用する
         if savedMaxPhrasesInMenu == 0 {
-            savedMaxPhrasesInMenu = 5
-            UserDefaults.standard.set(5, forKey: "maxPhrasesInMenu") // UserDefaultsも更新
-        }
-        
-        if let preset = HistoryOption.presets.first(where: { $0.intValue == savedMaxPhrasesInMenu }) {
-            determinedTempSelectedPhraseMenuOption = preset
-            determinedTempCustomPhrasesInMenuValue = savedMaxPhrasesInMenu
+            // savedMaxPhrasesInMenu はletなので変更できない
+            determinedTempCustomPhrasesInMenuValue = 5
+            UserDefaults.standard.set(5, forKey: "maxPhrasesInMenu") // UserDefaultsは更新
         } else {
-            determinedTempSelectedPhraseMenuOption = .custom(savedMaxPhrasesInMenu)
             determinedTempCustomPhrasesInMenuValue = savedMaxPhrasesInMenu
+        }
+    
+        if let preset = HistoryOption.presets.first(where: { $0.intValue == determinedTempCustomPhrasesInMenuValue }) {
+            determinedTempSelectedPhraseMenuOption = preset
+        } else {
+            determinedTempSelectedPhraseMenuOption = .custom(determinedTempCustomPhrasesInMenuValue)
         }
 
         // MARK: - すべての @State プロパティの初期化を一括で行う
-        _tempSelectedSaveOption = State(initialValue: determinedTempSelectedSaveOption)
-        _tempCustomSaveHistoryValue = State(initialValue: determinedTempCustomSaveHistoryValue)
-
         _tempSelectedMenuOption = State(initialValue: determinedTempSelectedMenuOption)
         _tempCustomMenuHistoryValue = State(initialValue: determinedTempCustomMenuHistoryValue)
 
@@ -184,7 +153,6 @@ struct GeneralSettingsView: View {
         _tempCustomPhrasesInMenuValue = State(initialValue: determinedTempCustomPhrasesInMenuValue)
 
         // initialオプションは、対応するtempオプションが確定した後に初期化
-        _initialSaveOption = State(initialValue: determinedTempSelectedSaveOption)
         _initialMenuOption = State(initialValue: determinedTempSelectedMenuOption)
         _initialPhraseMenuOption = State(initialValue: determinedTempSelectedPhraseMenuOption)
     }
@@ -202,56 +170,6 @@ struct GeneralSettingsView: View {
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                // 履歴を保存する最大数
-                HStack {
-                    Text("履歴を保存する最大数:")
-                    Spacer()
-
-                    Picker("履歴を保存する最大数", selection: $tempSelectedSaveOption) {
-                        ForEach(HistoryOption.presets) { option in
-                            Text(option.stringValue)
-                                .tag(option)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        Text("無制限")
-                            .tag(HistoryOption.unlimited)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Text("カスタム...")
-                            .tag(HistoryOption.custom(nil))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        if !HistoryOption.presets.contains(where: { $0.intValue == maxHistoryToSave }) && maxHistoryToSave != 0 && tempSelectedSaveOption != .custom(nil) {
-                            Divider()
-                            Text("カスタム: \(maxHistoryToSave)")
-                                .tag(HistoryOption.custom(maxHistoryToSave))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .onChange(of: tempSelectedSaveOption) {
-                        if case .custom(nil) = tempSelectedSaveOption {
-                            tempCustomSaveHistoryValue = maxHistoryToSave // 現在の値をカスタムシートの初期値に
-                            showingCustomSaveHistorySheet = true
-                        } else if tempSelectedSaveOption == .unlimited {
-                            maxHistoryToSave = 0 // 無制限を0として保存
-                        } else if let intValue = tempSelectedSaveOption.intValue {
-                            maxHistoryToSave = intValue
-                        }
-                        // 保存数の変更がメニュー表示数に影響する場合の処理（例：メニュー表示が「履歴の保存数に合わせる」の場合）
-                        if tempSelectedMenuOption == .sameAsSaved {
-                            maxHistoryInMenu = maxHistoryToSave
-                        }
-                        // ★修正: 保存数が無制限に設定された場合、かつメニュー表示が「保存数に合わせる」ならデフォルト値に戻す
-                        if tempSelectedSaveOption == .unlimited && tempSelectedMenuOption == .sameAsSaved {
-                            tempSelectedMenuOption = .preset(10) // デフォルト値（10個）に設定
-                            maxHistoryInMenu = 10
-                        }
-                    }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
@@ -274,18 +192,19 @@ struct GeneralSettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("QRコード画像をスキャンする")
-                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーしたときに、QRコードの内容が履歴に追加されます。")
+                        Text("テキストのみ")
+                        Text("このオプションをオンにすると、テキストのみがクイックペーストの対象となります。")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
-                    Toggle(isOn: $scanQRCodeImage) {
-                        Text("QRコード画像をスキャンする")
-                        Text("このオプションをオンにすると、QRコードが含まれた画像をコピーしたときに、QRコードの内容が履歴に追加されます。")
+                    Toggle(isOn: $textOnlyQuickPaste) {
+                        Text("テキストのみ")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
+                    // quickPasteがオフの時にグレイアウトする
+                    .disabled(!quickPaste)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: Clip Holdの設定
@@ -317,14 +236,12 @@ struct GeneralSettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .onChange(of: tempSelectedMenuOption) {
-                        if case .custom(nil) = tempSelectedMenuOption {
-                            tempCustomMenuHistoryValue = maxHistoryInMenu
-                            showingCustomMenuHistorySheet = true
-                        } else if tempSelectedMenuOption == .sameAsSaved {
-                            maxHistoryInMenu = maxHistoryToSave
-                        } else if let intValue = tempSelectedMenuOption.intValue {
-                            maxHistoryInMenu = intValue
+                    .onChange(of: tempSelectedPhraseMenuOption) { // ここを tempSelectedPhraseMenuOption に修正
+                        if case .custom(nil) = tempSelectedPhraseMenuOption {
+                            tempCustomPhrasesInMenuValue = maxPhrasesInMenu // 現在の値をカスタムシートの初期値に
+                            showingCustomPhraseMenuSheet = true
+                        } else if let intValue = tempSelectedPhraseMenuOption.intValue {
+                            maxPhrasesInMenu = intValue
                         }
                     }
                 }
@@ -338,8 +255,8 @@ struct GeneralSettingsView: View {
                     Picker("メニューに表示する履歴の最大数", selection: $tempSelectedMenuOption) {
                         ForEach(MenuHistoryOption.presetsAndSameAsSaved.filter { option in
                             if case .sameAsSaved = option {
-                                // tempSelectedSaveOption が .unlimited (無制限) でない場合のみ .sameAsSaved を表示
-                                return tempSelectedSaveOption != .unlimited
+                                // UserDefaults.standard.integer(forKey: "maxHistoryToSave") が 0 (無制限) でない場合のみ .sameAsSaved を表示
+                                return UserDefaults.standard.integer(forKey: "maxHistoryToSave") != 0
                             }
                             return true // その他のプリセットは常に表示
                         }) { option in
@@ -364,17 +281,18 @@ struct GeneralSettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .onChange(of: tempSelectedPhraseMenuOption) { // ここは $tempSelectedPhraseMenuOption の onChange が正しい
-                        if case .custom(nil) = tempSelectedPhraseMenuOption {
-                            tempCustomPhrasesInMenuValue = maxPhrasesInMenu // 現在の値をカスタムシートの初期値に
-                            showingCustomPhraseMenuSheet = true
-                        } else if let intValue = tempSelectedPhraseMenuOption.intValue {
-                            maxPhrasesInMenu = intValue
+                    .onChange(of: tempSelectedMenuOption) { // ここを tempSelectedMenuOption に修正
+                        if case .custom(nil) = tempSelectedMenuOption {
+                            tempCustomMenuHistoryValue = maxHistoryInMenu
+                            showingCustomMenuHistorySheet = true
+                        } else if tempSelectedMenuOption == .sameAsSaved {
+                            maxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryToSave")
+                        } else if let intValue = tempSelectedMenuOption.intValue {
+                            maxHistoryInMenu = intValue
                         }
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
 
                 HStack {
                     VStack(alignment: .leading) {
@@ -486,37 +404,6 @@ struct GeneralSettingsView: View {
             // View が表示されるたびにログイン項目の状態を最新にする
             loginItemManager.refreshLoginItemStatus()
         }
-        .sheet(isPresented: $showingCustomSaveHistorySheet) {
-            CustomNumberInputSheet(
-                title: Text("履歴を保存する最大数を設定"),
-                description: Text("保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。"),
-                currentValue: $tempCustomSaveHistoryValue,
-                onSave: { newValue in
-                    maxHistoryToSave = newValue
-
-                    if newValue == 0 {
-                        tempSelectedSaveOption = .unlimited
-                    } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == newValue }) {
-                        tempSelectedSaveOption = savedPreset
-                    } else {
-                        tempSelectedSaveOption = .custom(newValue)
-                    }
-
-                    if tempSelectedMenuOption == .sameAsSaved {
-                        maxHistoryInMenu = maxHistoryToSave
-                    }
-                },
-                onCancel: {
-                    if maxHistoryToSave == 0 {
-                        tempSelectedSaveOption = .unlimited
-                    } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxHistoryToSave }) {
-                        tempSelectedSaveOption = savedPreset
-                    } else {
-                        tempSelectedSaveOption = .custom(maxHistoryToSave)
-                    }
-                }
-            )
-        }
         .sheet(isPresented: $showingCustomMenuHistorySheet) {
             CustomNumberInputSheet(
                 title: Text("メニューに表示する履歴の最大数を設定"),
@@ -525,7 +412,7 @@ struct GeneralSettingsView: View {
                 onSave: { newValue in
                     maxHistoryInMenu = newValue
 
-                    if newValue == maxHistoryToSave {
+                    if newValue == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
                         tempSelectedMenuOption = .sameAsSaved
                     } else if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == newValue }) {
                         tempSelectedMenuOption = savedPreset
@@ -536,7 +423,7 @@ struct GeneralSettingsView: View {
                 onCancel: {
                     if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == maxHistoryInMenu }) {
                         tempSelectedMenuOption = savedPreset
-                    } else if maxHistoryInMenu == maxHistoryToSave {
+                    } else if maxHistoryInMenu == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
                         tempSelectedMenuOption = .sameAsSaved
                     } else {
                         tempSelectedMenuOption = .custom(maxHistoryInMenu)

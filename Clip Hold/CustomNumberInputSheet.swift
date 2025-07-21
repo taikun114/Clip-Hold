@@ -4,6 +4,8 @@ struct CustomNumberInputSheet: View {
     let title: Text
     let description: Text?
     @Binding var currentValue: Int
+    @Binding var selectedUnit: DataSizeUnit? // オプション型に変更
+
     var onSave: (Int) -> Void
     var onCancel: () -> Void
 
@@ -11,6 +13,15 @@ struct CustomNumberInputSheet: View {
 
     @State private var inputText: String = ""
     @State private var showAlert = false
+
+    init(title: Text, description: Text?, currentValue: Binding<Int>, selectedUnit: Binding<DataSizeUnit?> = .constant(nil), onSave: @escaping (Int) -> Void, onCancel: @escaping () -> Void) {
+        self.title = title
+        self.description = description
+        self._currentValue = currentValue
+        self._selectedUnit = selectedUnit
+        self.onSave = onSave
+        self.onCancel = onCancel
+    }
 
     var body: some View {
         VStack(spacing: 20) {
@@ -25,8 +36,23 @@ struct CustomNumberInputSheet: View {
                         performSave()
                     }
 
-                Stepper("", value: $currentValue, in: 1...Int.max)
-                .labelsHidden()
+                Stepper("値を調整", value: $currentValue, in: 1...Int.max)
+                    .labelsHidden()
+
+                // MARK: - 単位選択ピッカーの追加
+                if selectedUnit != nil {
+                    Picker("", selection: Binding<DataSizeUnit>( // 修正箇所: ラベルを空文字列に変更
+                        get: { selectedUnit ?? .megabytes },
+                        set: { selectedUnit = $0 }
+                    )) {
+                        ForEach(DataSizeUnit.allCases, id: \.self) { unit in // Use id: \.self for Identifiable
+                            Text(unit.label)
+                                .tag(unit)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 80)
+                }
             }
             .padding(.horizontal)
             .onChange(of: inputText) { oldValue, newValue in
@@ -44,7 +70,11 @@ struct CustomNumberInputSheet: View {
                 }
             }
             .onChange(of: currentValue) { oldValue, newValue in
-                inputText = String(newValue)
+                // currentValue がプログラム的に変更された場合のみinputTextを更新
+                // TextFieldでの直接入力と無限ループにならないように
+                if Int(inputText) != newValue {
+                    inputText = String(newValue)
+                }
             }
             .onAppear {
                 inputText = String(currentValue)
