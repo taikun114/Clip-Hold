@@ -1,7 +1,7 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
-## 1.2.0 (under development)
+## 1.2.0
 ### New Features
 - **Support for saving file and image copy history**
 - **Support for Quick Look of files in the History Window**
