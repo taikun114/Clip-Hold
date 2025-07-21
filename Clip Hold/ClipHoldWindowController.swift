@@ -1,7 +1,8 @@
 import AppKit
 import SwiftUI
+import Quartz
 
-class ClipHoldWindowController: NSWindowController, NSWindowDelegate {
+class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate {
 
     private let maxContentWidth: CGFloat = 900
     private let minContentWidth: CGFloat = 300
@@ -13,6 +14,10 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate {
     var applyTransparentBackground: Bool = true
 
     var windowFrameAutosaveKey: String?
+
+    // MARK: - Quick Look Properties
+    private var quickLookItem: QLPreviewItem?
+    private weak var quickLookSourceView: NSView?
 
     // MARK: - Initializers
     override init(window: NSWindow?) {
@@ -27,7 +32,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate {
         self.init(window: wrappingWindow)
         self.window?.delegate = self
         self.applyTransparentBackground = applyTransparentBackground
-        self.windowFrameAutosaveKey = windowFrameAutosaveKey // 保存キーを設定
+        self.windowFrameAutosaveKey = windowFrameAutosaveKey
         print("ClipHoldWindowController: Initialized with window \(wrappingWindow.identifier?.rawValue ?? "unknown").")
         
         // ウィンドウのカスタマイズを適用
@@ -38,10 +43,27 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate {
         }
     }
 
+    // MARK: - Public Quick Look Methods
+    func showQuickLook(for item: QLPreviewItem, from sourceView: NSView) {
+        self.quickLookItem = item
+        self.quickLookSourceView = sourceView
+
+        if let panel = QLPreviewPanel.shared() {
+            if panel.dataSource === self {
+                panel.reloadData()
+            }
+            panel.makeKeyAndOrderFront(nil)
+        }
+    }
+
+    func hideQuickLook() {
+        if QLPreviewPanel.sharedPreviewPanelExists(), QLPreviewPanel.shared().isVisible {
+            QLPreviewPanel.shared().orderOut(nil)
+        }
+    }
+
     // MARK: - NSWindowDelegate
     func windowDidUpdate(_ notification: Notification) {
-        if notification.object is NSWindow {
-        }
     }
     
     func windowWillClose(_ notification: Notification) {
@@ -64,6 +86,43 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate {
         // AppStorage の値に基づいて、ウィンドウを閉じるかどうかを決定
         return !preventWindowCloseOnDoubleClick
     }
+    
+    // MARK: - QLPreviewPanelController (from NSResponder)
+    override func acceptsPreviewPanelControl(_ panel: QLPreviewPanel!) -> Bool {
+        return true
+    }
+
+    override func beginPreviewPanelControl(_ panel: QLPreviewPanel!) {
+        panel.dataSource = self
+        panel.delegate = self
+    }
+
+    override func endPreviewPanelControl(_ panel: QLPreviewPanel!) {
+        panel.dataSource = nil
+        panel.delegate = nil
+        self.quickLookItem = nil
+        self.quickLookSourceView = nil
+    }
+
+    // MARK: - QLPreviewPanelDataSource
+    func numberOfPreviewItems(in panel: QLPreviewPanel!) -> Int {
+        return self.quickLookItem == nil ? 0 : 1
+    }
+
+    func previewPanel(_ panel: QLPreviewPanel!, previewItemAt index: Int) -> QLPreviewItem! {
+        return self.quickLookItem
+    }
+
+    // MARK: - QLPreviewPanelDelegate
+    func previewPanel(_ panel: QLPreviewPanel!, sourceFrameOnScreenFor previewItem: QLPreviewItem!) -> NSRect {
+        // アニメーションの開始位置を返す
+        guard let sourceView = self.quickLookSourceView, let window = sourceView.window else {
+            return .zero
+        }
+        let screenFrame = sourceView.convert(sourceView.bounds, to: nil)
+        return window.convertToScreen(screenFrame)
+    }
+
 
     // MARK: - ウィンドウのカスタマイズ適用
     func applyWindowCustomizations(window: NSWindow) {
@@ -80,21 +139,18 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate {
         window.hasShadow = true
         
         if applyTransparentBackground {
-            // ウィンドウの背景を透明にする
             window.isOpaque = false
             window.backgroundColor = .clear
 
             // SwiftUIコンテンツの背景レイヤーもクリアに設定 (念のため)
             if let contentView = window.contentView {
-                contentView.wantsLayer = true // レイヤーを使うことを宣言
+                contentView.wantsLayer = true
                 contentView.layer?.backgroundColor = NSColor.clear.cgColor
                 print("ClipHoldWindowController: Set contentView layer backgroundColor to clear.")
             }
         } else {
-            // 透明にしない場合 (デフォルトの不透明な背景に戻す)
             window.isOpaque = true
-            window.backgroundColor = .windowBackgroundColor // システムの標準背景色
-
+            window.backgroundColor = .windowBackgroundColor
             if let contentView = window.contentView {
                 contentView.wantsLayer = true
                 contentView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor

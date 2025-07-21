@@ -5,6 +5,23 @@ import UniformTypeIdentifiers
 import Quartz
 import QuickLookThumbnailing
 
+// アイコンのNSViewへの参照を親に渡すためのヘルパー
+private struct IconViewAccessor: NSViewRepresentable {
+    let id: UUID
+    @Binding var store: [UUID: NSView]
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            self.store[id] = view
+        }
+        return view
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
+
 private let itemDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .short
@@ -39,8 +56,9 @@ struct HistoryItemRow: View {
     @Binding var selectedItemForQRCode: ClipboardItem?
     
     @Binding var itemForNewPhrase: ClipboardItem?
-
-    let quickLookManager: QuickLookManager
+    
+    // アイコンビューの参照を格納する辞書へのBinding
+    @Binding var rowIconViews: [UUID: NSView]
 
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
@@ -58,9 +76,9 @@ struct HistoryItemRow: View {
          showQRCodeSheet: Binding<Bool>,
          selectedItemForQRCode: Binding<ClipboardItem?>,
          itemForNewPhrase: Binding<ClipboardItem?>,
-         quickLookManager: QuickLookManager,
          lineNumberTextWidth: CGFloat?,
-         trailingPaddingForLineNumber: CGFloat) {
+         trailingPaddingForLineNumber: CGFloat,
+         rowIconViews: Binding<[UUID: NSView]>) { // initにBindingを追加
             
         self.item = item
         self.index = index
@@ -73,9 +91,9 @@ struct HistoryItemRow: View {
         _showQRCodeSheet = showQRCodeSheet
         _selectedItemForQRCode = selectedItemForQRCode
         _itemForNewPhrase = itemForNewPhrase
-        self.quickLookManager = quickLookManager
         self.lineNumberTextWidth = lineNumberTextWidth
         self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
+        self._rowIconViews = rowIconViews // Bindingを初期化
     }
 
     private var actionMenuItems: some View {
@@ -98,7 +116,6 @@ struct HistoryItemRow: View {
             if let qrContent = item.qrCodeContent {
                 Button {
                     let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil)
-                    // 内部コピーフラグをtrueに設定
                     clipboardManager.isPerformingInternalCopy = true
                     clipboardManager.copyItemToClipboard(newItem)
                     showCopyConfirmation = true
@@ -109,8 +126,10 @@ struct HistoryItemRow: View {
             Divider()
             if let filePath = item.filePath {
                 Button {
-                    if let sourceView = NSApp.keyWindow?.contentView {
-                        quickLookManager.showQuickLook(for: filePath, sourceView: sourceView)
+                    // 保存されたアイコンビューの参照を使ってQuick Lookを呼び出す
+                    if let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController,
+                       let sourceView = rowIconViews[item.id] {
+                        controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
                     }
                 } label: {
                     Label("クイックルック", systemImage: "eye")
@@ -149,37 +168,40 @@ struct HistoryItemRow: View {
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
             
-            // item.cachedThumbnailImage が存在すればそれを使用
-            if let cachedIcon = item.cachedThumbnailImage {
-                Image(nsImage: cachedIcon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 30, height: 30)
-            } else if let filePath = item.filePath {
-                // キャッシュがない場合は、従来のファイルアイコンを表示し、サムネイル生成を試みる
-                Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 30, height: 30)
-            } else {
-                // ファイルパスもキャッシュもなければテキストアイコン
-                // macOS 15 以降では text.page、それ以前では doc.plaintext を使用
-                if #available(macOS 15.0, *) {
-                    Image(systemName: "text.page")
+            // アイコン部分をGroupでまとめる
+            let iconImageView = Group {
+                if let cachedIcon = item.cachedThumbnailImage {
+                    Image(nsImage: cachedIcon)
                         .resizable()
                         .scaledToFit()
-                        .padding(4)
                         .frame(width: 30, height: 30)
-                        .foregroundColor(.secondary)
+                } else if let filePath = item.filePath {
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
                 } else {
-                    Image(systemName: "doc.plaintext")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(4)
-                        .frame(width: 30, height: 30)
-                        .foregroundColor(.secondary)
+                    if #available(macOS 15.0, *) {
+                        Image(systemName: "text.page")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(4)
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Image(systemName: "doc.plaintext")
+                            .resizable()
+                            .scaledToFit()
+                            .padding(4)
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
+            
+            // アイコンにIconViewAccessorを適用して、NSViewの参照を保存する
+            iconImageView
+                .background(IconViewAccessor(id: item.id, store: $rowIconViews))
 
             VStack(alignment: .leading) {
                 Text(item.text)
@@ -216,7 +238,6 @@ struct HistoryItemRow: View {
         .contentShape(Rectangle())
         .help(item.text)
         .onAppear {
-            // cachedThumbnailImage が nil の場合のみサムネイル生成を試みる
             if item.cachedThumbnailImage == nil, let filePath = item.filePath {
                 iconLoadTask?.cancel() // 既存のタスクをキャンセル
 
