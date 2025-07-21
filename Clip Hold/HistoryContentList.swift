@@ -19,16 +19,17 @@ struct HistoryContentList: View {
     @Binding var itemForNewPhrase: ClipboardItem?
     @Binding var previousClipboardHistoryCount: Int
 
-    @State private var quickLookManager = QuickLookManager()
+    // 各行のアイコンのNSView参照を保存するためのState
+    @State private var rowIconViews: [UUID: NSView] = [:]
 
     let showLineNumbersInHistoryWindow: Bool
     let preventWindowCloseOnDoubleClick: Bool
     let scrollToTopOnUpdate: Bool
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
-    let searchText: String // searchTextを追加
+    let searchText: String
 
-    var onCopyAction: (ClipboardItem) -> Void // ClipboardItemを受け取り、何も返さないクロージャ
+    var onCopyAction: (ClipboardItem) -> Void
 
 
     private func parseQRCode(from image: NSImage) -> String? {
@@ -46,9 +47,9 @@ struct HistoryContentList: View {
     }
 
     var body: some View {
-        ZStack { // Tableまたはメッセージが表示されるZStack
+        ZStack {
             if filteredHistory.isEmpty && !isLoading {
-                VStack { // VStackで囲み、Spacerで中央に配置
+                VStack {
                     Spacer()
                     Text("履歴はありません")
                         .foregroundColor(.secondary)
@@ -72,9 +73,9 @@ struct HistoryContentList: View {
                                 showQRCodeSheet: $showQRCodeSheet,
                                 selectedItemForQRCode: $selectedItemForQRCode,
                                 itemForNewPhrase: $itemForNewPhrase,
-                                quickLookManager: quickLookManager,
                                 lineNumberTextWidth: lineNumberTextWidth,
-                                trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                trailingPaddingForLineNumber: trailingPaddingForLineNumber,
+                                rowIconViews: $rowIconViews // アイコンビュー辞書へのBindingを渡す
                             )
                             .tag(item.id)
                         }
@@ -91,39 +92,36 @@ struct HistoryContentList: View {
                             return .ignored
                         }
                         
-                        // このビューに関連付けられたNSViewを一時的に取得
-                        if let window = NSApp.keyWindow, let contentView = window.contentView {
-                            quickLookManager.showQuickLook(for: filePath, sourceView: contentView)
+                        // 保存しておいたアイコンのビューをアニメーションの開始点として指定する
+                        if let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController,
+                           let sourceView = rowIconViews[selectedID] {
+                            controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
                         }
                         
                         return .handled
                     }
                     .onChange(of: selectedItemID) { oldID, newID in
-                        // 新しい項目が選択されていない場合は何もしない
+                        guard let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController else { return }
+
                         guard let newID = newID else {
-                            // 選択が解除された場合、Quick Lookパネルを閉じる
-                            quickLookManager.hideQuickLook()
+                            controller.hideQuickLook()
                             return
                         }
                         
-                        // 選択された新しい項目を取得
                         guard let selectedItem = filteredHistory.first(where: { $0.id == newID }) else {
                             return
                         }
 
-                        // Quick Lookパネルが表示されているか確認
                         guard QLPreviewPanel.sharedPreviewPanelExists() && QLPreviewPanel.shared().isVisible else {
                             return
                         }
 
-                        // 選択された項目にファイルパスがあるか確認
-                        if let filePath = selectedItem.filePath {
-                            // ファイルが選択された場合、パネルの内容を更新
-                            quickLookManager.quickLookURL = filePath
-                            QLPreviewPanel.shared().reloadData()
+                        // 選択が変更された場合も、正しいアイコンビューから再表示する
+                        if let filePath = selectedItem.filePath,
+                           let sourceView = rowIconViews[newID] {
+                            controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
                         } else {
-                            // プレーンテキストが選択された場合、パネルを閉じる
-                            quickLookManager.hideQuickLook()
+                            controller.hideQuickLook()
                         }
                     }
                     .accessibilityLabel("履歴リスト")
@@ -160,7 +158,7 @@ struct HistoryContentList: View {
                                     let newItemToCopy = ClipboardItem(text: qrContent) // 新しいClipboardItemを作成
                                     // 内部コピーフラグをtrueに設定
                                     clipboardManager.isPerformingInternalCopy = true
-                                    onCopyAction(newItemToCopy) // onCopyActionを呼び出す
+                                    onCopyAction(newItemToCopy)
                                     showCopyConfirmation = true
                                     currentCopyConfirmationTask?.cancel()
                                     currentCopyConfirmationTask = Task { @MainActor in
@@ -177,15 +175,17 @@ struct HistoryContentList: View {
                             Divider()
                             if let filePath = currentItem.filePath {
                                 Button {
-                                    if let sourceView = NSApp.keyWindow?.contentView {
-                                        quickLookManager.showQuickLook(for: filePath, sourceView: sourceView)
+                                    // コンテキストメニューからも正しいアイコンビューを指定する
+                                    if let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController,
+                                       let sourceView = rowIconViews[id] {
+                                        controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
                                     }
                                 } label: {
                                     Label("クイックルック", systemImage: "eye")
                                 }
                             }
                             Button {
-                                itemForNewPhrase = currentItem // ここでClipboardItemをセット
+                                itemForNewPhrase = currentItem
                             } label: {
                                 Label("項目から定型文を作成...", systemImage: "pencil")
                             }
@@ -226,10 +226,7 @@ struct HistoryContentList: View {
                     })
                     .onDrop(of: [.image], isTargeted: nil) { providers in
                         guard let itemProvider = providers.first else { return false }
-
-                        // clipboardManager を定数にキャプチャ
-                        let manager = clipboardManager // ここでキャプチャします
-
+                        let manager = clipboardManager
                         itemProvider.loadObject(ofClass: NSImage.self) { (image, error) in
                             DispatchQueue.main.async {
                                 if let nsImage = image as? NSImage {
@@ -238,7 +235,7 @@ struct HistoryContentList: View {
                                         let newItemToCopy = ClipboardItem(text: qrCodeContent) // 新しいClipboardItemを作成
                                         // 内部コピーフラグをtrueに設定
                                         manager.isPerformingInternalCopy = true
-                                        onCopyAction(newItemToCopy) // onCopyActionを呼び出す
+                                        onCopyAction(newItemToCopy)
                                         
                                         showCopyConfirmation = true
                                     } else {
