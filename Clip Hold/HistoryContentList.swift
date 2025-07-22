@@ -238,6 +238,14 @@ struct HistoryContentList: View {
                                         onCopyAction(newItemToCopy)
                                         
                                         showCopyConfirmation = true
+                                        currentCopyConfirmationTask?.cancel() // 既存のタスクがあればキャンセル
+                                        currentCopyConfirmationTask = Task { @MainActor in
+                                            try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒後に非表示
+                                            guard !Task.isCancelled else { return }
+                                            withAnimation {
+                                                showCopyConfirmation = false
+                                            }
+                                        }
                                     } else {
                                         print("QRコードが見つかりませんでした。")
                                     }
