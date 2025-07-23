@@ -357,6 +357,7 @@ enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
 enum ItemFilter: String, CaseIterable, Identifiable {
     case all
     case textOnly
+    case linkOnly
     case fileOnly
     case imageOnly
 
@@ -366,6 +367,7 @@ enum ItemFilter: String, CaseIterable, Identifiable {
         switch self {
         case .all: return "すべての項目"
         case .textOnly: return "テキストのみ"
+        case .linkOnly: return "リンクのみ"
         case .fileOnly: return "ファイルのみ"
         case .imageOnly: return "画像のみ"
         }

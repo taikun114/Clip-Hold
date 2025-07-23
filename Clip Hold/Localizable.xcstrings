@@ -2683,6 +2683,22 @@
         }
       }
     },
+    "リンクのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only Links"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクのみ"
+          }
+        }
+      }
+    },
     "リンクを開きますか？" : {
       "localizations" : {
         "en" : {
