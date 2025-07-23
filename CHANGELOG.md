@@ -1,6 +1,10 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+## 1.2.1 (under development)
+### Bug Fixes and Improvements
+- Improve to show a clip icon when the history item is a website link
+
 ## 1.2.0
 ### New Features
 - **Support for saving file and image copy history**
