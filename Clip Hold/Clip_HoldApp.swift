@@ -204,7 +204,14 @@ struct ClipHoldApp: App {
                         }
                     } label: {
                         HStack(spacing: 8) {
-                            if let cachedImage = item.cachedThumbnailImage {
+                            if item.isURL { // URLの場合
+                                Image(systemName: "paperclip")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(4)
+                                    .frame(width: 16, height: 16)
+                                    .foregroundColor(.secondary)
+                            } else if let cachedImage = item.cachedThumbnailImage {
                                 Image(nsImage: cachedImage)
                                     .resizable()
                                     .scaledToFit()
@@ -224,14 +231,14 @@ struct ClipHoldApp: App {
                                         .resizable()
                                         .scaledToFit()
                                         .padding(4)
-                                        .frame(width: 30, height: 30)
+                                        .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
                                         .foregroundColor(.secondary)
                                 } else {
                                     Image(systemName: "doc.plaintext")
                                         .resizable()
                                         .scaledToFit()
                                         .padding(4)
-                                        .frame(width: 30, height: 30)
+                                        .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
                                         .foregroundColor(.secondary)
                                 }
                             }
