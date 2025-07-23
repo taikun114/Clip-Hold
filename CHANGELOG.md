@@ -3,7 +3,10 @@
 
 ## 1.2.1 (under development)
 ### Bug Fixes and Improvements
-- Improve to show a clip icon when the history item is a website link
+- Correct the English wording of “Only __” displayed in the filtering options from “Only __” to “__ Only”
+  - Example: `Only Text` → `Text Only`
+- Improve to display a clip icon when the history item is a website link
+- Add “Links Only” to the filtering options in the History Window
 
 ## 1.2.0
 ### New Features
