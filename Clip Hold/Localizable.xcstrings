@@ -2112,7 +2112,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only Text"
+            "value" : "Text Only"
           }
         },
         "ja" : {
@@ -2336,7 +2336,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only Files"
+            "value" : "Files Only"
           }
         },
         "ja" : {
@@ -2688,7 +2688,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only Links"
+            "value" : "Links Only"
           }
         },
         "ja" : {
@@ -4064,7 +4064,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only Images"
+            "value" : "Images Only"
           }
         },
         "ja" : {
