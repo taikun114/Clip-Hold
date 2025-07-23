@@ -91,6 +91,8 @@ struct HistoryWindowView: View {
                     matchesFilter = true
                 case .textOnly:
                     matchesFilter = item.filePath == nil
+                case .linkOnly:
+                    matchesFilter = item.isURL
                 case .fileOnly:
                     matchesFilter = item.filePath != nil
                 case .imageOnly:
