@@ -1,7 +1,7 @@
 # Clip Hold 変更ログ
 [English](/CHANGELOG.md) | **日本語**
 
-## 1.2.1（開発中）
+## 1.2.1
 ### バグ修正と改善
 - フィルタリングオプションに表示される「〇〇のみ」の英語表記を「Only 〇〇」から「〇〇 Only」に修正
   - 例: `Only Text` → `Text Only`

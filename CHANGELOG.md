@@ -1,7 +1,7 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
-## 1.2.1 (under development)
+## 1.2.1
 ### Bug Fixes and Improvements
 - Correct the English wording of “Only \_\_” displayed in the filtering options from “Only \_\_” to “\_\_ Only”
   - Example: `Only Text` → `Text Only`
