@@ -1,6 +1,13 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+## 1.2.1
+### Bug Fixes and Improvements
+- Correct the English wording of “Only \_\_” displayed in the filtering options from “Only \_\_” to “\_\_ Only”
+  - Example: `Only Text` → `Text Only`
+- Improve to display a clip icon when the history item is a website link
+- Add “Links Only” to the filtering options in the History Window
+
 ## 1.2.0
 ### New Features
 - **Support for saving file and image copy history**

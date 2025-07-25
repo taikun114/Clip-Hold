@@ -170,7 +170,14 @@ struct HistoryItemRow: View {
             
             // アイコン部分をGroupでまとめる
             let iconImageView = Group {
-                if let cachedIcon = item.cachedThumbnailImage {
+                if item.isURL { // URLの場合
+                    Image(systemName: "paperclip")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(4)
+                        .frame(width: 30, height: 30)
+                        .foregroundColor(.secondary)
+                } else if let cachedIcon = item.cachedThumbnailImage {
                     Image(nsImage: cachedIcon)
                         .resizable()
                         .scaledToFit()

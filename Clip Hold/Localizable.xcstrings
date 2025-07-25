@@ -2112,7 +2112,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only Text"
+            "value" : "Text Only"
           }
         },
         "ja" : {
@@ -2336,7 +2336,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only Files"
+            "value" : "Files Only"
           }
         },
         "ja" : {
@@ -2679,6 +2679,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リポジトリにスターをつけてくれるととてもうれしいです！"
+          }
+        }
+      }
+    },
+    "リンクのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リンクのみ"
           }
         }
       }
@@ -4048,7 +4064,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Only Images"
+            "value" : "Images Only"
           }
         },
         "ja" : {
