@@ -17,6 +17,8 @@
   </a>
 </p>
 
+[![Buy Me a Coffee](docs/images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
+
 ## Table of Contents
 - [What is Clip Hold?](#what-is-clip-hold)
   - [Download](#download)
@@ -141,6 +143,8 @@ You can donate using the following services.
 
 #### Buy Me a Coffee
 You can support me at [Buy Me a Coffee](https://www.buymeacoffee.com/i_am_taikun) from the price of a cup of green tea.
+
+[![Buy Me a Coffee](docs/images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
 
 #### PayPal\.Me
 If you have a PayPal account, you can also donate directly at [PayPal](https://paypal.me/taikun114).

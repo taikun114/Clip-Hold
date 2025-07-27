@@ -17,6 +17,8 @@
   </a>
 </p>
 
+[![Buy Me a Coffee](images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
+
 ## 目次
 - [Clip Holdとは？](#clip-holdとは)
   - [ダウンロード](#ダウンロード)
@@ -140,6 +142,8 @@ Clip Holdが気に入ったら寄付してくださると嬉しいです。開�
 
 #### Buy Me a Coffee
 [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_taikun)で緑茶一杯分の金額からサポートしていただけます。
+
+[![Buy Me a Coffee](images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
 
 #### PayPal\.Me
 PayPalアカウントをお持ちの方は、[**PayPal**](https://paypal.me/taikun114)で直接寄付していただくこともできます。
