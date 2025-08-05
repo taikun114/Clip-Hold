@@ -1,6 +1,10 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+## 1.2.2 (under development)
+### Bug Fixes and Improvements
+- Fix issue with two “About QR Code” items being displayed
+
 ## 1.2.1
 ### Bug Fixes and Improvements
 - Correct the English wording of “Only \_\_” displayed in the filtering options from “Only \_\_” to “\_\_ Only”
