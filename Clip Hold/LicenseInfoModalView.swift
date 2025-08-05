@@ -179,22 +179,6 @@ struct LicenseInfoModalView: View {
                         .font(.callout)
                         .padding(.horizontal)
                         .padding(.vertical, 1)
-
-                    // MARK: - QRコードについて
-                    VStack(alignment: .leading) {
-                        Text("QRコードについて")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .buttonStyle(.plain)
-                            .padding(.bottom, 1)
-                    }
-                    .padding(.top, 10)
-                    .padding(.horizontal)
-                    
-                    Text("QRコードは株式会社デンソーウェーブの登録商標です。")
-                        .font(.callout)
-                        .padding(.horizontal)
-                        .padding(.vertical, 1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 // スクロールビューのコンテンツが下部のオーバーレイに隠れないように、下部にパディングを追加
