@@ -417,6 +417,41 @@
         }
       }
     },
+    "Gemini CLI by Google" : {
+      "shouldTranslate" : false
+    },
+    "Gemini CLIのGitHubページへのリンクを開きます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to Gemini CLI GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLIのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Gemini CLIのGitHubページを開いてもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Gemini CLI GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLIのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
     "GitHubのDiscussionページを開いてもよろしいですか？" : {
       "localizations" : {
         "en" : {
