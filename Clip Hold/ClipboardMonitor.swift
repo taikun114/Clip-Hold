@@ -87,28 +87,30 @@ extension ClipboardManager {
 
                 // 1. ファイルURLを読み込もうとする（最優先）
                 // readObjectsがNSURLを返す場合と、stringがfileURLを返す場合を両方チェック
-                if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL],
-                   let firstFileURL = fileURLs.first {
-                    print("DEBUG: checkPasteboard - File URL detected: \(firstFileURL.lastPathComponent)")
-
-                    var qrCodeContent: String? = nil
-
-                    // コピーされたファイルが画像であるかチェック
-                    if let fileUTI = try? firstFileURL.resourceValues(forKeys: [.contentTypeKey]).contentType,
-                       fileUTI.conforms(to: .image) {
-                        if let image = NSImage(contentsOf: firstFileURL) {
-                            qrCodeContent = self.decodeQRCode(from: image)
-                        }
-                    }
+                if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] {
+                    print("DEBUG: checkPasteboard - File URLs detected: \(fileURLs.map { $0.lastPathComponent })")
                     
                     // 最前面のアプリケーションのパスを取得
                     let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
-
-                    if let newItem = await self.createClipboardItemForFileURL(firstFileURL, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
-                        await MainActor.run {
-                            self.addAndSaveItem(newItem)
+                    
+                    for fileURL in fileURLs {
+                        var qrCodeContent: String? = nil
+                        
+                        // コピーされたファイルが画像であるかチェック
+                        if let fileUTI = try? fileURL.resourceValues(forKeys: [.contentTypeKey]).contentType,
+                           fileUTI.conforms(to: .image) {
+                            if let image = NSImage(contentsOf: fileURL) {
+                                qrCodeContent = self.decodeQRCode(from: image)
+                            }
+                        }
+                        
+                        if let newItem = await self.createClipboardItemForFileURL(fileURL, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
+                            await MainActor.run {
+                                self.addAndSaveItem(newItem)
+                            }
                         }
                     }
+                    
                     // 処理が完了したので、内部コピーフラグをリセット
                     if wasInternalCopyInitially {
                         await MainActor.run {
