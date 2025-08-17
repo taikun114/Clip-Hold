@@ -56,7 +56,7 @@ struct StandardPhraseItemRow: View {
             
             VStack(alignment: .leading) {
                 Text(phrase.title)
-                    .font(.headline)
+                    .font(.body)
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .foregroundColor(.primary)
