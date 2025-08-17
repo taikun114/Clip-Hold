@@ -87,7 +87,7 @@ extension ClipboardManager {
 
                 // 1. ファイルURLを読み込もうとする（最優先）
                 // readObjectsがNSURLを返す場合と、stringがfileURLを返す場合を両方チェック
-                if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL] {
+                if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL], !fileURLs.isEmpty {
                     print("DEBUG: checkPasteboard - File URLs detected: \(fileURLs.map { $0.lastPathComponent })")
                     
                     // 最前面のアプリケーションのパスを取得
