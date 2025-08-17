@@ -91,3 +91,12 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         case id, text, date, filePath, fileSize, qrCodeContent, sourceAppPath
     }
 }
+
+// NSImageのエクステンション
+extension NSImage {
+    var imageData: Data? {
+        guard let tiffData = self.tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffData) else { return nil }
+        return bitmapImage.representation(using: .png, properties: [:])
+    }
+}

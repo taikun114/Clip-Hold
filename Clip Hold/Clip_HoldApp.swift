@@ -226,6 +226,7 @@ struct ClipHoldApp: App {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 16, height: 16)
+                                    .clipped()
                             } else if let filePath = item.filePath {
                                 // キャッシュがない場合は、従来のファイルアイコンを表示
                                 let nsImage = NSWorkspace.shared.icon(forFile: filePath.path)

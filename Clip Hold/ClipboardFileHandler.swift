@@ -232,10 +232,22 @@ extension ClipboardManager {
         Task.detached {
             do {
                 let thumbnail = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
+                // 画像を正方形にパディング（アスペクト比を維持）
+                let paddedImage = ClipboardManager.shared.padToSquare(thumbnail.nsImage, size: thumbnailSize)
+                
+                // NSImageをPNGデータに変換して、Sendableな形式にする
+                guard let imageData = paddedImage.imageData else {
+                    print("Failed to convert padded image to PNG data")
+                    return
+                }
+                
                 await MainActor.run {
-                    item.cachedThumbnailImage = thumbnail.nsImage
-                    // MenuBarExtraを更新するため、マネージャー全体を更新通知
-                    self.objectWillChange.send()
+                    // PNGデータからNSImageを再作成
+                    if let image = NSImage(data: imageData) {
+                        item.cachedThumbnailImage = image
+                        // MenuBarExtraを更新するため、マネージャー全体を更新通知
+                        self.objectWillChange.send()
+                    }
                 }
             } catch {
                 print("Failed to generate thumbnail for \(fileURL.lastPathComponent): \(error.localizedDescription)")

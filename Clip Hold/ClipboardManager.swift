@@ -71,5 +71,47 @@ class ClipboardManager: ObservableObject {
         isClipboardMonitoringPausedObserver?.invalidate()
         print("DEBUG: ClipboardManager: isClipboardMonitoringPausedObserver invalidated.")
     }
+    
+    // 画像を正方形にパディングするヘルパー関数（アスペクト比を維持）
+    func padToSquare(_ image: NSImage, size: CGSize) -> NSImage {
+        let imageSize = image.size
+        let maxSide = max(imageSize.width, imageSize.height)
+        let squareSize = CGSize(width: maxSide, height: maxSide)
+        
+        let paddedImage = NSImage(size: squareSize)
+        paddedImage.lockFocus()
+        
+        // 透明な背景を描画
+        NSColor.clear.set()
+        NSBezierPath(rect: CGRect(origin: .zero, size: squareSize)).fill()
+        
+        // 画像を中央に配置
+        let originX = (maxSide - imageSize.width) / 2
+        let originY = (maxSide - imageSize.height) / 2
+        image.draw(
+            in: CGRect(x: originX, y: originY, width: imageSize.width, height: imageSize.height),
+            from: CGRect(origin: .zero, size: imageSize),
+            operation: .copy,
+            fraction: 1.0
+        )
+        
+        paddedImage.unlockFocus()
+        
+        // 必要に応じてリサイズ
+        if maxSide != size.width || maxSide != size.height {
+            let resizedImage = NSImage(size: size)
+            resizedImage.lockFocus()
+            paddedImage.draw(
+                in: CGRect(origin: .zero, size: size),
+                from: CGRect(origin: .zero, size: squareSize),
+                operation: .copy,
+                fraction: 1.0
+            )
+            resizedImage.unlockFocus()
+            return resizedImage
+        }
+        
+        return paddedImage
+    }
 }
 
