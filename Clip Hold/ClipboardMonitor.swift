@@ -100,8 +100,11 @@ extension ClipboardManager {
                             qrCodeContent = self.decodeQRCode(from: image)
                         }
                     }
+                    
+                    // 最前面のアプリケーションのパスを取得
+                    let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
 
-                    if let newItem = await self.createClipboardItemForFileURL(firstFileURL, qrCodeContent: qrCodeContent) {
+                    if let newItem = await self.createClipboardItemForFileURL(firstFileURL, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
                         await MainActor.run {
                             self.addAndSaveItem(newItem)
                         }
@@ -127,8 +130,11 @@ extension ClipboardManager {
                             qrCodeContent = self.decodeQRCode(from: image)
                         }
                     }
+                    
+                    // 最前面のアプリケーションのパスを取得
+                    let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
 
-                    if let newItem = await self.createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent) {
+                    if let newItem = await self.createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
                         await MainActor.run {
                             self.addAndSaveItem(newItem)
                         }
@@ -167,8 +173,11 @@ extension ClipboardManager {
 
                 if let imageData = imageDataFromPasteboard, let image = imageFromPasteboard {
                     let qrCodeContent = self.decodeQRCode(from: image)
+                    
+                    // 最前面のアプリケーションのパスを取得
+                    let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
 
-                    if let newItem = await self.createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent) {
+                    if let newItem = await self.createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
                         await MainActor.run {
                             self.addAndSaveItem(newItem)
                         }
@@ -186,7 +195,9 @@ extension ClipboardManager {
                 // 3. ファイルも画像もなかった場合、文字列として処理を試みる
                 if let newString = pasteboard.string(forType: .string) {
                     print("DEBUG: checkPasteboard - String detected: \(newString.prefix(50))...")
-                    let newItem = ClipboardItem(text: newString, date: Date(), filePath: nil, fileSize: nil)
+                    // 最前面のアプリケーションのパスを取得
+                    let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                    let newItem = ClipboardItem(text: newString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
                     await MainActor.run {
                         self.addAndSaveItem(newItem)
                     }

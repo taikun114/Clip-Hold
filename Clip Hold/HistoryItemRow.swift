@@ -168,46 +168,68 @@ struct HistoryItemRow: View {
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
             
-            // アイコン部分をGroupでまとめる
-            let iconImageView = Group {
-                if item.isURL { // URLの場合
-                    Image(systemName: "paperclip")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(4)
-                        .frame(width: 30, height: 30)
-                        .foregroundColor(.secondary)
-                } else if let cachedIcon = item.cachedThumbnailImage {
-                    Image(nsImage: cachedIcon)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30, height: 30)
-                } else if let filePath = item.filePath {
-                    Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30, height: 30)
-                } else {
-                    if #available(macOS 15.0, *) {
-                        Image(systemName: "text.page")
-                            .resizable()
-                            .scaledToFit()
-                            .padding(4)
-                            .frame(width: 30, height: 30)
-                            .foregroundColor(.secondary)
+            // アイコン部分 (アプリアイコンをオーバーレイ表示するかどうかで分岐)
+            let iconView: some View = {
+                // 既存のアイコン
+                let baseIconView: some View = {
+                    if item.isURL { // URLの場合
+                        return AnyView(Image(systemName: "paperclip")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(4)
+                                        .frame(width: 30, height: 30)
+                                        .foregroundColor(.secondary))
+                    } else if let cachedIcon = item.cachedThumbnailImage {
+                        return AnyView(Image(nsImage: cachedIcon)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 30, height: 30))
+                    } else if let filePath = item.filePath {
+                        return AnyView(Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 30, height: 30))
                     } else {
-                        Image(systemName: "doc.plaintext")
-                            .resizable()
-                            .scaledToFit()
-                            .padding(4)
-                            .frame(width: 30, height: 30)
-                            .foregroundColor(.secondary)
+                        // テキストアイコン (macOSバージョンによる分岐)
+                        if #available(macOS 15.0, *) {
+                            return AnyView(Image(systemName: "text.page")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 30, height: 30)
+                                            .foregroundColor(.secondary))
+                        } else {
+                            return AnyView(Image(systemName: "doc.plaintext")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 30, height: 30)
+                                            .foregroundColor(.secondary))
+                        }
                     }
+                }()
+                
+                if let sourceAppPath = item.sourceAppPath {
+                    return AnyView(
+                        baseIconView
+                            .overlay(
+                                Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 15, height: 15)
+                                    .alignmentGuide(.leading) { _ in 4 }
+                                    .alignmentGuide(.top) { _ in 22.5 }
+                                    .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
+                                alignment: .bottomLeading
+                            )
+                    )
+                } else {
+                    return AnyView(baseIconView)
                 }
-            }
+            }()
             
             // アイコンにIconViewAccessorを適用して、NSViewの参照を保存する
-            iconImageView
+            iconView
                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
 
             VStack(alignment: .leading) {

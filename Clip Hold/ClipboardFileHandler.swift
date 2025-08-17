@@ -87,7 +87,7 @@ extension ClipboardManager {
     }
 
     // ヘルパー関数: ファイルURLからClipboardItemを作成（物理的な重複コピー防止ロジックを含む）
-    func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? { // private から internal に変更
+    func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? { // private から internal に変更
         let filesDirectory = createClipboardFilesDirectoryIfNeeded()
 
         // 外部ファイルの属性を取得
@@ -134,7 +134,7 @@ extension ClipboardManager {
                         print("ClipboardManager: Found potential duplicate in sandbox based on file size: \(sandboxedFileURL.lastPathComponent)")
                         // 重複が見つかった場合、既存のサンドボックスファイルを参照する新しいアイテムを返す
                         let displayName = extractOriginalFileName(from: sandboxedFileURL.lastPathComponent)
-                        return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent) // 新しいアイテムにもファイルサイズをセット
+                        return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) // 新しいアイテムにもファイルサイズをセット
                     }
                 }
             } catch {
@@ -145,7 +145,7 @@ extension ClipboardManager {
         // 重複ファイルが見つからなかった場合、ファイルをサンドボックスにコピーして新しいアイテムを返す
         if let copiedFileURL = await copyFileToAppSandbox(from: fileURL) {
             let displayName = fileURL.lastPathComponent
-            return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: externalFileAttributes.fileSize, qrCodeContent: qrCodeContent) // 新しいアイテムにもファイルサイズをセット
+            return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: externalFileAttributes.fileSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) // 新しいアイテムにもファイルサイズをセット
         }
 
         print("ClipboardManager: Failed to copy external item to sandbox: \(fileURL.lastPathComponent).")
@@ -153,7 +153,7 @@ extension ClipboardManager {
     }
 
     // MARK: - New Helper function for image duplication check and saving
-    func createClipboardItemFromImageData(_ imageData: Data, qrCodeContent: String?, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? { // private から internal に変更
+    func createClipboardItemFromImageData(_ imageData: Data, qrCodeContent: String?, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? { // private から internal に変更
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
 
         let newImageSize = UInt64(imageData.count)
@@ -189,7 +189,7 @@ extension ClipboardManager {
                     let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
                     if let sandboxedSize = sandboxedFileAttributes.fileSize, sandboxedSize == newImageSize {
                         print("ClipboardManager: Found duplicate image in sandbox based on file size: \(sandboxedFileURL.lastPathComponent)")
-                        return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent)
+                        return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
                     }
                 }
             }
@@ -204,7 +204,7 @@ extension ClipboardManager {
         do {
             try imageData.write(to: destinationURL)
             print("ClipboardManager: New image saved to sandbox as \(destinationURL.lastPathComponent)")
-            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: newImageSize, qrCodeContent: qrCodeContent)
+            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: newImageSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
         } catch {
             print("ClipboardManager: Error saving new image to sandbox: \(error.localizedDescription)")
             return nil
