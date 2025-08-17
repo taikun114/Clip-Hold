@@ -110,7 +110,7 @@ struct HistoryItemRow: View {
                 Button {
                     NSWorkspace.shared.open(url)
                 } label: {
-                    Label("リンクを開く...", systemImage: "paperclip")
+                    Label("リンクを開く", systemImage: "paperclip")
                 }
             }
             if let qrContent = item.qrCodeContent {

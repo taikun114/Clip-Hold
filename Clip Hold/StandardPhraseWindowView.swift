@@ -47,7 +47,17 @@ struct StandardPhraseItemRow: View {
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
             
-            Image(systemName: "list.bullet.rectangle.portrait")
+            // 定型文がURLかどうかを判定
+            let isURL: Bool = {
+                guard !phrase.content.isEmpty,
+                      let url = URL(string: phrase.content) else {
+                    return false
+                }
+                // URLスキームがhttpまたはhttpsであることを確認
+                return url.scheme == "http" || url.scheme == "https"
+            }()
+            
+            Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
                 .resizable()
                 .scaledToFit()
                 .padding(4)
@@ -75,6 +85,14 @@ struct StandardPhraseItemRow: View {
                     showCopyConfirmation = true
                 } label: {
                     Label("コピー", systemImage: "document.on.document")
+                }
+                // 定型文がURLの場合、「リンクを開く」メニューを表示
+                if isURL, let url = URL(string: phrase.content) {
+                    Button {
+                        NSWorkspace.shared.open(url)
+                    } label: {
+                        Label("リンクを開く", systemImage: "paperclip")
+                    }
                 }
                 Divider()
                 Button {
@@ -301,6 +319,16 @@ struct StandardPhraseWindowView: View {
                             .animation(.easeOut(duration: 0.1), value: isLoading)
                             .contextMenu(forSelectionType: StandardPhrase.ID.self, menu: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
+                                    // 定型文がURLかどうかを判定
+                                    let isURL: Bool = {
+                                        guard !currentPhrase.content.isEmpty,
+                                              let url = URL(string: currentPhrase.content) else {
+                                            return false
+                                        }
+                                        // URLスキームがhttpまたはhttpsであることを確認
+                                        return url.scheme == "http" || url.scheme == "https"
+                                    }()
+                                    
                                     Button {
                                         copyToClipboard(currentPhrase.content)
                                         showCopyConfirmation = true
@@ -314,6 +342,14 @@ struct StandardPhraseWindowView: View {
                                         }
                                     } label: {
                                         Label("コピー", systemImage: "document.on.document")
+                                    }
+                                    // 定型文がURLの場合、「リンクを開く」メニューを表示
+                                    if isURL, let url = URL(string: currentPhrase.content) {
+                                        Button {
+                                            NSWorkspace.shared.open(url)
+                                        } label: {
+                                            Label("リンクを開く", systemImage: "paperclip")
+                                        }
                                     }
                                     Divider()
                                     Button {

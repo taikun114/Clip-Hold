@@ -2750,18 +2750,18 @@
         }
       }
     },
-    "リンクを開く..." : {
+    "リンクを開く" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Link…"
+            "value" : "Open Link"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "リンクを開く…"
+            "value" : "リンクを開く"
           }
         }
       }
