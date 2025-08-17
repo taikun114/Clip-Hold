@@ -128,7 +128,17 @@ struct ClipHoldApp: App {
                         }
                     } label: {
                         HStack(spacing: 8) {
-                            Image(systemName: "list.bullet.rectangle.portrait")
+                            // 定型文がURLかどうかを判定
+                            let isURL: Bool = {
+                                guard !phrase.content.isEmpty,
+                                      let url = URL(string: phrase.content) else {
+                                    return false
+                                }
+                                // URLスキームがhttpまたはhttpsであることを確認
+                                return url.scheme == "http" || url.scheme == "https"
+                            }()
+                            
+                            Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 16, height: 16)
