@@ -564,22 +564,6 @@
         }
       }
     },
-    "Google Geminiと開発" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Developed with Google Gemini"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Google Geminiと開発"
-          }
-        }
-      }
-    },
     "Hello, world!" : {
       "shouldTranslate" : false
     },
@@ -820,6 +804,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QRコードを表示..."
+          }
+        }
+      }
+    },
+    "Qwen Code by Qwen" : {
+      "shouldTranslate" : false
+    },
+    "Qwen CodeのGitHubページへのリンクを開きます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to Qwen Code GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen CodeのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Qwen CodeのGitHubページを開いてもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Qwen Code GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen CodeのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -4090,6 +4109,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在のクリップボード内容を使って新しい定型文を追加します。"
+          }
+        }
+      }
+    },
+    "生成AIと開発" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developed with Generative AI"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生成AIと開発"
           }
         }
       }

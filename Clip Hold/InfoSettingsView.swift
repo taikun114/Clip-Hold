@@ -47,7 +47,7 @@ struct InfoSettingsView: View {
 
                         Spacer()
 
-                        Text("Google Geminiと開発")
+                        Text("生成AIと開発")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
 
