@@ -3,14 +3,19 @@
 
 ## 1.2.2 (under development)
 ### Bug Fixes and Improvements
-- Fix issue with two “About QR Code” items being displayed
+- **Add an app icon to the list item in the History window**
+  - It shows the app icon of the app that was in the foreground when it was copied. The icon will not be shown in the copy history before this feature was added.
+- **Add an icon to the Standard Phrase window**
+- **Support link in standard phrases**
+- **Support for copying multiple files at the same time**
+- **Fix issue with two “About QR Code” items being displayed on the license sheet**
 
 ## 1.2.1
 ### Bug Fixes and Improvements
-- Correct the English wording of “Only \_\_” displayed in the filtering options from “Only \_\_” to “\_\_ Only”
+- **Correct the English wording of “Only \_\_” displayed in the filtering options from “Only \_\_” to “\_\_ Only”**
   - Example: `Only Text` → `Text Only`
-- Improve to display a clip icon when the history item is a website link
-- Add “Links Only” to the filtering options in the History Window
+- **Improve to display a clip icon when the history item is a website link**
+- **Add “Links Only” to the filtering options in the History Window**
 
 ## 1.2.0
 ### New Features
