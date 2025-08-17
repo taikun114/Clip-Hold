@@ -93,23 +93,8 @@ extension ClipboardManager {
                     // 最前面のアプリケーションのパスを取得
                     let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
                     
-                    for fileURL in fileURLs {
-                        var qrCodeContent: String? = nil
-                        
-                        // コピーされたファイルが画像であるかチェック
-                        if let fileUTI = try? fileURL.resourceValues(forKeys: [.contentTypeKey]).contentType,
-                           fileUTI.conforms(to: .image) {
-                            if let image = NSImage(contentsOf: fileURL) {
-                                qrCodeContent = self.decodeQRCode(from: image)
-                            }
-                        }
-                        
-                        if let newItem = await self.createClipboardItemForFileURL(fileURL, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
-                            await MainActor.run {
-                                self.addAndSaveItem(newItem)
-                            }
-                        }
-                    }
+                    // 複数ファイルの処理を呼び出す
+                    await self.handleMultipleFilesChange(fileURLs: fileURLs, sourceAppPath: sourceAppPath)
                     
                     // 処理が完了したので、内部コピーフラグをリセット
                     if wasInternalCopyInitially {

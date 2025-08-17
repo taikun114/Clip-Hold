@@ -86,6 +86,88 @@ extension ClipboardManager {
         }
     }
 
+    // ヘルパー関数: 複数のファイルURLを処理
+    func handleMultipleFilesChange(fileURLs: [URL], sourceAppPath: String?) async {
+        var itemsWithQRCode: [(fileURL: URL, qrCodeContent: String?)] = []
+        
+        for fileURL in fileURLs {
+            var qrCodeContent: String? = nil
+            
+            // コピーされたファイルが画像であるかチェック
+            if let fileUTI = try? fileURL.resourceValues(forKeys: [.contentTypeKey]).contentType,
+               fileUTI.conforms(to: .image) {
+                if let image = NSImage(contentsOf: fileURL) {
+                    qrCodeContent = self.decodeQRCode(from: image)
+                }
+            }
+            
+            itemsWithQRCode.append((fileURL: fileURL, qrCodeContent: qrCodeContent))
+        }
+        
+        // 複数ファイル用の処理関数を呼び出す
+        if let newItems = await self.createClipboardItemsForMultipleFileURLs(itemsWithQRCode, sourceAppPath: sourceAppPath) {
+            await MainActor.run {
+                for newItem in newItems {
+                    self.addAndSaveItem(newItem)
+                }
+            }
+        }
+    }
+    
+    // ヘルパー関数: 複数のファイルURLからClipboardItemの配列を作成
+    func createClipboardItemsForMultipleFileURLs(_ itemsWithQRCode: [(fileURL: URL, qrCodeContent: String?)], sourceAppPath: String?) async -> [ClipboardItem]? {
+        // 内部コピーの場合はアラートをスキップ
+        if isPerformingInternalCopy {
+            print("DEBUG: createClipboardItemsForMultipleFileURLs - isPerformingInternalCopy is true, skipping alert and proceeding to save.")
+            var savedItems: [ClipboardItem] = []
+            for item in itemsWithQRCode {
+                if let newItem = await self.createClipboardItemForFileURL(item.fileURL, qrCodeContent: item.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true) {
+                    savedItems.append(newItem)
+                }
+            }
+            return savedItems.isEmpty ? nil : savedItems
+        }
+
+        var totalFileSize: UInt64 = 0
+        var fileItemsWithAttributes: [(fileURL: URL, qrCodeContent: String?, fileSize: UInt64?)] = []
+        
+        // 各ファイルの属性を取得し、合計サイズを計算
+        for item in itemsWithQRCode {
+            let fileAttributes = getFileAttributes(item.fileURL)
+            totalFileSize += fileAttributes.fileSize ?? 0
+            fileItemsWithAttributes.append((fileURL: item.fileURL, qrCodeContent: item.qrCodeContent, fileSize: fileAttributes.fileSize))
+        }
+        
+        print("DEBUG: createClipboardItemsForMultipleFileURLs - Total file size: \(totalFileSize) bytes for \(itemsWithQRCode.count) files.")
+        
+        // MARK: - ファイルサイズチェック (アラート確認からでない場合のみアラートを表示)
+        if largeFileAlertThreshold > 0 && totalFileSize > largeFileAlertThreshold {
+            // アラートしきい値を超えている場合、アラート表示を要求
+            let fileCount = itemsWithQRCode.count
+            let totalSizeForAlert = totalFileSize // ローカルコピーを作成
+            await MainActor.run {
+                self.pendingLargeFileItems = itemsWithQRCode // 全ファイル情報を保持
+                self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
+                print("DEBUG: createClipboardItemsForMultipleFileURLs - Setting showingLargeFileAlert to true for \(fileCount) files with total size \(totalSizeForAlert).")
+            }
+            return nil // まだ保存せず、ユーザーのアラート確認を待つ
+        } else if maxFileSizeToSave > 0 && totalFileSize > maxFileSizeToSave {
+            // 合計サイズが最大保存サイズ制限を超えている場合は保存しない
+            print("ClipboardManager: Multiple files not saved due to total size limit. Total size: \(totalFileSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
+            return nil
+        }
+        
+        // アラート表示が不要な場合、各ファイルを個別に処理して保存
+        var savedItems: [ClipboardItem] = []
+        for item in fileItemsWithAttributes {
+            if let newItem = await self.createClipboardItemForFileURL(item.fileURL, qrCodeContent: item.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true) {
+                savedItems.append(newItem)
+            }
+        }
+        
+        return savedItems.isEmpty ? nil : savedItems
+    }
+
     // ヘルパー関数: ファイルURLからClipboardItemを作成（物理的な重複コピー防止ロジックを含む）
     func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? { // private から internal に変更
         let filesDirectory = createClipboardFilesDirectoryIfNeeded()

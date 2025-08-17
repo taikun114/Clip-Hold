@@ -87,6 +87,22 @@
         }
       }
     },
+    "%1$@を超える%2$d個のファイル（合計%3$@）がコピーされました。履歴に保存してもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$d files (total %3$@) have been copied that is greater than %1$@. Are you sure you want to save them in the history?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@を超える%2$d個のファイル（合計%3$@）がコピーされました。履歴に保存してもよろしいですか？"
+          }
+        }
+      }
+    },
     "%1$@を超えるファイル（%2$@）がコピーされました。履歴に保存してもよろしいですか？" : {
       "localizations" : {
         "en" : {
@@ -3149,6 +3165,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "大容量ファイルのコピー"
+          }
+        }
+      }
+    },
+    "大容量ファイルの複数コピー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copying Multiple Large Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大容量ファイルの複数コピー"
           }
         }
       }
