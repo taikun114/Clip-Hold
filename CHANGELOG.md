@@ -8,6 +8,7 @@
 - **Add an icon to the Standard Phrase window**
 - **Support link in standard phrases**
 - **Support for copying multiple files at the same time**
+- **Improve menu history thumbnails to fit in a square**
 - **Fix issue with two “About QR Code” items being displayed on the license sheet**
 
 ## 1.2.1
