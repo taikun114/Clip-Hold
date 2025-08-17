@@ -38,7 +38,7 @@ struct StandardPhraseItemRow: View {
     let trailingPaddingForLineNumber: CGFloat
 
     var body: some View {
-        HStack {
+        HStack(spacing: 8) {
             if showLineNumber {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
@@ -46,6 +46,14 @@ struct StandardPhraseItemRow: View {
                     .frame(width: lineNumberTextWidth, alignment: .trailing)
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
+            
+            Image(systemName: "list.bullet.rectangle.portrait")
+                .resizable()
+                .scaledToFit()
+                .padding(4)
+                .frame(width: 30, height: 30)
+                .foregroundColor(.secondary)
+            
             VStack(alignment: .leading) {
                 Text(phrase.title)
                     .font(.headline)
