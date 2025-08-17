@@ -33,6 +33,7 @@ class ClipboardManager: ObservableObject {
     }
     var pendingLargeFileItem: (fileURL: URL, qrCodeContent: String?)?
     var pendingLargeFileItems: [(fileURL: URL, qrCodeContent: String?)]?
+    var pendingLargeFileItemsSourceAppPath: String? // 新しく追加
     var pendingLargeImageData: (imageData: Data, qrCodeContent: String?)?
 
     // MARK: - Initialization

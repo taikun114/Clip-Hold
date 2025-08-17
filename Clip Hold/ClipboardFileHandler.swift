@@ -147,6 +147,7 @@ extension ClipboardManager {
             let totalSizeForAlert = totalFileSize // ローカルコピーを作成
             await MainActor.run {
                 self.pendingLargeFileItems = itemsWithQRCode // 全ファイル情報を保持
+                self.pendingLargeFileItemsSourceAppPath = sourceAppPath // ソースアプリパスを保持
                 self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
                 print("DEBUG: createClipboardItemsForMultipleFileURLs - Setting showingLargeFileAlert to true for \(fileCount) files with total size \(totalSizeForAlert).")
             }

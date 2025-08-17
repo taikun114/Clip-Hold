@@ -67,11 +67,12 @@ extension ClipboardManager {
                 
                 // 複数ファイルが保留されている場合
                 if let pendingItems = self.pendingLargeFileItems {
+                    let sourceAppPath = self.pendingLargeFileItemsSourceAppPath // ソースアプリパスを取得
                     print("DEBUG: handleLargeFileAlertConfirmation - Attempting to add \(pendingItems.count) pending file items.")
                     var addedItems: [ClipboardItem] = []
                     for item in pendingItems {
-                        // 各ファイルを個別に処理
-                        if let newItem = await self.createClipboardItemForFileURL(item.fileURL, qrCodeContent: item.qrCodeContent, isFromAlertConfirmation: true) {
+                        // 各ファイルを個別に処理 (ソースアプリパスを渡す)
+                        if let newItem = await self.createClipboardItemForFileURL(item.fileURL, qrCodeContent: item.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true) {
                             addedItems.append(newItem)
                         }
                     }
@@ -113,6 +114,7 @@ extension ClipboardManager {
                 await MainActor.run {
                     self.pendingLargeFileItem = nil
                     self.pendingLargeFileItems = nil
+                    self.pendingLargeFileItemsSourceAppPath = nil // リセット
                     self.pendingLargeImageData = nil
                     // showingLargeFileAlert を false に設定して、didSet が再度NSAlertをトリガーするのを防ぐ
                     if self.showingLargeFileAlert {
@@ -126,6 +128,7 @@ extension ClipboardManager {
             // アラートの状態をリセット
             pendingLargeFileItem = nil
             pendingLargeFileItems = nil
+            pendingLargeFileItemsSourceAppPath = nil // リセット
             pendingLargeImageData = nil
             // showingLargeFileAlert を false に設定して、didSet が再度NSAlertをトリガーするのを防ぐ
             if showingLargeFileAlert {
