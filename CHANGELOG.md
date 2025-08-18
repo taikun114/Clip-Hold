@@ -1,15 +1,18 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
-## 1.2.2 (under development)
+## 1.3.0 (under development)
+### New Features
+- **Support link in standard phrases**
+- **Support for copying multiple files at the same time**
+
 ### Bug Fixes and Improvements
 - **Add an app icon to the list item in the History window**
   - It shows the app icon of the app that was in the foreground when it was copied. The icon will not be shown in the copy history before this feature was added.
 - **Add an icon to the Standard Phrase window**
-- **Support link in standard phrases**
-- **Support for copying multiple files at the same time**
-- **Improve menu history thumbnails to fit in a square**
 - **Fix issue with two “About QR Code” items being displayed on the license sheet**
+- **Improve menu history thumbnails to fit in a square**
+- **Improve to temporarily disable Quick Paste when clicking on an item from the menu bar while holding down the Option key**
 
 ## 1.2.1
 ### Bug Fixes and Improvements
