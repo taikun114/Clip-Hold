@@ -28,10 +28,14 @@ extension ClipboardManager {
 
     // MARK: - Helper function to add and save a new item
     func addAndSaveItem(_ newItem: ClipboardItem) { // private から internal に変更
-        // 最新の項目（配列の最後）と重複している場合はスキップ
-        if let lastItem = clipboardHistory.last, isDuplicate(newItem, of: lastItem) {
-            print("ClipboardManager: Item is a duplicate of the last item, skipping addition.")
-            return
+        // 最新の項目（配列の最初）と重複している場合はスキップ
+        if let firstItem = clipboardHistory.first {
+            let isDup = isDuplicate(newItem, of: firstItem)
+            print("ClipboardManager: Checking duplication with first item. New item text: '\(newItem.text.prefix(100))...', First item text: '\(firstItem.text.prefix(100))...', Is duplicate: \(isDup)")
+            if isDup {
+                print("ClipboardManager: Item is a duplicate of the first item, skipping addition.")
+                return
+            }
         }
 
         self.objectWillChange.send()

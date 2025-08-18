@@ -81,129 +81,151 @@ extension ClipboardManager {
                 }
             }
 
-            // 非同期処理を開始
+            // 非同期処理を開始 (リトライロジック付き)
             Task.detached { [weak self] in
                 guard let self = self else { return }
+                
+                // クリップボードデータの読み取りを最大3回試行
+                var attempt = 0
+                let maxAttempts = 3
+                var success = false
+                
+                while attempt < maxAttempts && !success {
+                    attempt += 1
+                    print("DEBUG: checkPasteboard - Attempt \(attempt) to read pasteboard data.")
+                    
+                    // 1. ファイルURLを読み込もうとする（最優先）
+                    // readObjectsがNSURLを返す場合と、stringがfileURLを返す場合を両方チェック
+                    if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL], !fileURLs.isEmpty {
+                        print("DEBUG: checkPasteboard - File URLs detected: \(fileURLs.map { $0.lastPathComponent })")
+                        
+                        // 最前面のアプリケーションのパスを取得
+                        let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                        
+                        // 複数ファイルの処理を呼び出す
+                        await self.handleMultipleFilesChange(fileURLs: fileURLs, sourceAppPath: sourceAppPath)
+                        
+                        // 処理が完了したので、内部コピーフラグをリセット
+                        if wasInternalCopyInitially {
+                            await MainActor.run {
+                                self.isPerformingInternalCopy = false
+                                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after file URL processing.")
+                            }
+                        }
+                        success = true
+                        return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
+                    } else if pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.fileURL.rawValue]),
+                              let stringURL = pasteboard.string(forType: .fileURL),
+                              let url = URL(string: stringURL) {
+                        print("DEBUG: checkPasteboard - File URL (string) detected: \(url.lastPathComponent)")
 
-                // 1. ファイルURLを読み込もうとする（最優先）
-                // readObjectsがNSURLを返す場合と、stringがfileURLを返す場合を両方チェック
-                if let fileURLs = pasteboard.readObjects(forClasses: [NSURL.self], options: nil) as? [URL], !fileURLs.isEmpty {
-                    print("DEBUG: checkPasteboard - File URLs detected: \(fileURLs.map { $0.lastPathComponent })")
-                    
-                    // 最前面のアプリケーションのパスを取得
-                    let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
-                    
-                    // 複数ファイルの処理を呼び出す
-                    await self.handleMultipleFilesChange(fileURLs: fileURLs, sourceAppPath: sourceAppPath)
-                    
-                    // 処理が完了したので、内部コピーフラグをリセット
-                    if wasInternalCopyInitially {
-                        await MainActor.run {
-                            self.isPerformingInternalCopy = false
-                            print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after file URL processing.")
+                        var qrCodeContent: String? = nil
+
+                        if let fileUTI = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType,
+                           fileUTI.conforms(to: .image) {
+                            if let image = NSImage(contentsOf: url) {
+                                qrCodeContent = self.decodeQRCode(from: image)
+                            }
+                        }
+                        
+                        // 最前面のアプリケーションのパスを取得
+                        let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+
+                        if let newItem = await self.createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
+                            await MainActor.run {
+                                self.addAndSaveItem(newItem)
+                            }
+                        }
+                        // 処理が完了したので、内部コピーフラグをリセット
+                        if wasInternalCopyInitially {
+                            await MainActor.run {
+                                self.isPerformingInternalCopy = false
+                                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after file URL (string) processing.")
+                            }
+                        }
+                        success = true
+                        return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
+                    }
+
+                    // 2. ファイルURLがなければ、画像データを直接読み込もうとする
+                    var imageDataFromPasteboard: Data?
+                    var imageFromPasteboard: NSImage?
+
+                    // ネイティブな画像データを優先して読み込む
+                    if let tiffData = pasteboard.data(forType: .tiff) {
+                        imageDataFromPasteboard = tiffData
+                        imageFromPasteboard = NSImage(data: tiffData)
+                        print("DEBUG: checkPasteboard - Image data detected on pasteboard (TIFF).")
+                    } else if let pngData = pasteboard.data(forType: .png) {
+                        imageDataFromPasteboard = pngData
+                        imageFromPasteboard = NSImage(data: pngData)
+                        print("DEBUG: checkPasteboard - Image data detected on pasteboard (PNG).")
+                    } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
+                        // どちらも見つからない場合、一般的なNSImageオブジェクトのTIFF表現を試みる
+                        imageDataFromPasteboard = image.tiffRepresentation
+                        imageFromPasteboard = image
+                        if imageDataFromPasteboard != nil {
+                            print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage).")
                         }
                     }
-                    return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
-                } else if pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.fileURL.rawValue]),
-                          let stringURL = pasteboard.string(forType: .fileURL),
-                          let url = URL(string: stringURL) {
-                    print("DEBUG: checkPasteboard - File URL (string) detected: \(url.lastPathComponent)")
 
-                    var qrCodeContent: String? = nil
+                    if let imageData = imageDataFromPasteboard, let image = imageFromPasteboard {
+                        let qrCodeContent = self.decodeQRCode(from: image)
+                        
+                        // 最前面のアプリケーションのパスを取得
+                        let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
 
-                    if let fileUTI = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType,
-                       fileUTI.conforms(to: .image) {
-                        if let image = NSImage(contentsOf: url) {
-                            qrCodeContent = self.decodeQRCode(from: image)
+                        if let newItem = await self.createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
+                            await MainActor.run {
+                                self.addAndSaveItem(newItem)
+                            }
                         }
+                        // 処理が完了したので、内部コピーフラグをリセット
+                        if wasInternalCopyInitially {
+                            await MainActor.run {
+                                self.isPerformingInternalCopy = false
+                                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after image data processing.")
+                            }
+                        }
+                        success = true
+                        return // 画像の有無に関わらず、画像データのチェックが完了したので終了
                     }
-                    
-                    // 最前面のアプリケーションのパスを取得
-                    let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
 
-                    if let newItem = await self.createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
+                    // 3. ファイルも画像もなかった場合、文字列として処理を試みる
+                    if let newString = pasteboard.string(forType: .string) {
+                        print("DEBUG: checkPasteboard - String detected: \(newString.prefix(50))...")
+                        // 最前面のアプリケーションのパスを取得
+                        let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                        let newItem = ClipboardItem(text: newString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
                         await MainActor.run {
                             self.addAndSaveItem(newItem)
                         }
-                    }
-                    // 処理が完了したので、内部コピーフラグをリセット
-                    if wasInternalCopyInitially {
-                        await MainActor.run {
-                            self.isPerformingInternalCopy = false
-                            print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after file URL (string) processing.")
+                        // 処理が完了したので、内部コピーフラグをリセット
+                        if wasInternalCopyInitially {
+                            await MainActor.run {
+                                self.isPerformingInternalCopy = false
+                                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after string processing.")
+                            }
                         }
+                        success = true
+                        return
                     }
-                    return // ファイルの有無に関わらず、ファイルパスのチェックが完了したので終了
-                }
-
-                // 2. ファイルURLがなければ、画像データを直接読み込もうとする
-                var imageDataFromPasteboard: Data?
-                var imageFromPasteboard: NSImage?
-
-                // ネイティブな画像データを優先して読み込む
-                if let tiffData = pasteboard.data(forType: .tiff) {
-                    imageDataFromPasteboard = tiffData
-                    imageFromPasteboard = NSImage(data: tiffData)
-                    print("DEBUG: checkPasteboard - Image data detected on pasteboard (TIFF).")
-                } else if let pngData = pasteboard.data(forType: .png) {
-                    imageDataFromPasteboard = pngData
-                    imageFromPasteboard = NSImage(data: pngData)
-                    print("DEBUG: checkPasteboard - Image data detected on pasteboard (PNG).")
-                } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
-                    // どちらも見つからない場合、一般的なNSImageオブジェクトのTIFF表現を試みる
-                    imageDataFromPasteboard = image.tiffRepresentation
-                    imageFromPasteboard = image
-                    if imageDataFromPasteboard != nil {
-                        print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage).")
-                    }
-                }
-
-                if let imageData = imageDataFromPasteboard, let image = imageFromPasteboard {
-                    let qrCodeContent = self.decodeQRCode(from: image)
                     
-                    // 最前面のアプリケーションのパスを取得
-                    let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
-
-                    if let newItem = await self.createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
-                        await MainActor.run {
-                            self.addAndSaveItem(newItem)
-                        }
+                    // サポートされていないタイプの場合、少し待機してリトライ
+                    if !success && attempt < maxAttempts {
+                        print("DEBUG: checkPasteboard - No supported item type found. Retrying in 0.1 seconds...")
+                        try? await Task.sleep(for: .milliseconds(100))
                     }
-                    // 処理が完了したので、内部コピーフラグをリセット
+                }
+                
+                if !success {
+                    print("ClipboardManager: No supported item type found on pasteboard after \(maxAttempts) attempts.")
+                    // どのタイプも処理されなかった場合でも、内部コピーフラグをリセット
                     if wasInternalCopyInitially {
                         await MainActor.run {
                             self.isPerformingInternalCopy = false
-                            print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after image data processing.")
+                            print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false as no supported item type found.")
                         }
-                    }
-                    return // 画像の有無に関わらず、画像データのチェックが完了したので終了
-                }
-
-                // 3. ファイルも画像もなかった場合、文字列として処理を試みる
-                if let newString = pasteboard.string(forType: .string) {
-                    print("DEBUG: checkPasteboard - String detected: \(newString.prefix(50))...")
-                    // 最前面のアプリケーションのパスを取得
-                    let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
-                    let newItem = ClipboardItem(text: newString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                    await MainActor.run {
-                        self.addAndSaveItem(newItem)
-                    }
-                    // 処理が完了したので、内部コピーフラグをリセット
-                    if wasInternalCopyInitially {
-                        await MainActor.run {
-                            self.isPerformingInternalCopy = false
-                            print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after string processing.")
-                        }
-                    }
-                    return
-                }
-
-                print("ClipboardManager: No supported item type found on pasteboard.")
-                // どのタイプも処理されなかった場合でも、内部コピーフラグをリセット
-                if wasInternalCopyInitially {
-                    await MainActor.run {
-                        self.isPerformingInternalCopy = false
-                        print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false as no supported item type found.")
                     }
                 }
             }
