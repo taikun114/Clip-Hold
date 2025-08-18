@@ -41,6 +41,21 @@ class ClipboardManager: ObservableObject {
         // ファイル保存ディレクトリの準備
         _ = createClipboardFilesDirectoryIfNeeded()
 
+        // マイグレーションが必要かどうかを確認し、必要であれば実行
+        let migrationPerformed = ChunkedHistoryManager.shared.migrateIfNeeded()
+        
+        // マイグレーションが成功した場合、通知を表示
+        if migrationPerformed {
+            DispatchQueue.main.async {
+                NotificationManager.shared.sendMigrationSuccessNotification()
+            }
+        } else if !migrationPerformed && FileManager.default.fileExists(atPath: (getAppSpecificDirectory()?.appendingPathComponent(historyFileName).path ?? "")) {
+            // マイグレーションが失敗した場合、失敗通知を表示
+            DispatchQueue.main.async {
+                NotificationManager.shared.sendMigrationFailureNotification()
+            }
+        }
+        
         loadClipboardHistory()
 
         print("ClipboardManager: Initialized with history count: \(clipboardHistory.count)")

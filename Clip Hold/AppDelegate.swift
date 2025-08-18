@@ -38,6 +38,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         let category = UNNotificationCategory(identifier: clipboardPausedNotificationCategory, actions: [resumeMonitoringAction], intentIdentifiers: [], options: [])
         UNUserNotificationCenter.current().setNotificationCategories([category])
         print("通知カテゴリ '\(clipboardPausedNotificationCategory)' とアクション '\(resumeMonitoringActionID)' を登録しました。")
+        
+        // マイグレーション失敗通知のカテゴリを登録
+        let openDocumentationAction = UNNotificationAction(
+            identifier: "OPEN_DOCUMENTATION_ACTION",
+            title: String(localized: "ドキュメントを表示…"),
+            options: [.foreground]
+        )
+        let migrationFailureCategory = UNNotificationCategory(
+            identifier: "MIGRATION_FAILURE_CATEGORY",
+            actions: [openDocumentationAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        UNUserNotificationCenter.current().setNotificationCategories([migrationFailureCategory])
+        print("マイグレーション失敗通知のカテゴリを登録しました。")
 
         if UserDefaults.standard.bool(forKey: "isClipboardMonitoringPaused") {
             NotificationManager.shared.scheduleClipboardPausedNotification()
@@ -229,11 +244,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
     // MARK: - UNUserNotificationCenterDelegate (通知アクションのハンドリング)
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        if response.actionIdentifier == resumeMonitoringActionID {
+        let actionID = response.actionIdentifier
+        let notificationCategory = response.notification.request.content.categoryIdentifier
+        
+        if actionID == resumeMonitoringActionID {
             print("通知アクション: '再開' が選択されました。")
             // NotificationManager を介して再開ロジックを実行
             NotificationManager.shared.resumeClipboardMonitoringAndSendNotification()
 
+            // アプリをフォアグラウンドに表示
+            NSApp.activate(ignoringOtherApps: true)
+        } else if actionID == "OPEN_DOCUMENTATION_ACTION" && notificationCategory == "MIGRATION_FAILURE_CATEGORY" {
+            print("通知アクション: 'ドキュメントを表示…' が選択されました。")
+            
+            // ドキュメントのURLを決定
+            let documentationURL: String
+            if Locale.current.language.languageCode?.identifier == "ja" {
+                documentationURL = "https://clip-hold.taikun.design/jp/docs/upgrade-history-data"
+            } else {
+                documentationURL = "https://clip-hold.taikun.design/docs/upgrade-history-data"
+            }
+            
+            // デフォルトブラウザでURLを開く
+            if let url = URL(string: documentationURL) {
+                NSWorkspace.shared.open(url)
+            }
+            
             // アプリをフォアグラウンドに表示
             NSApp.activate(ignoringOtherApps: true)
         }

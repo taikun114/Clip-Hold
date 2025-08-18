@@ -430,7 +430,7 @@ struct CopyHistorySettingsView: View {
             contentType: .json,
             defaultFilename: "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).json"
         ) { result in
-            clipboardImporterExporter.handleExportResult(result)
+            clipboardImporterExporter.handleExportResult(result, from: clipboardManager)
         }
         .fileImporter(
             isPresented: $isShowingImportSheet,

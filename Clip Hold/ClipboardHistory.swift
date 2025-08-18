@@ -28,14 +28,15 @@ extension ClipboardManager {
 
     // MARK: - Helper function to add and save a new item
     func addAndSaveItem(_ newItem: ClipboardItem) { // private から internal に変更
-        // 先頭の項目と重複している場合はスキップ
-        if let firstItem = clipboardHistory.first, isDuplicate(newItem, of: firstItem) {
-            print("ClipboardManager: Item is a duplicate of the first item, skipping addition.")
+        // 最新の項目（配列の最後）と重複している場合はスキップ
+        if let lastItem = clipboardHistory.last, isDuplicate(newItem, of: lastItem) {
+            print("ClipboardManager: Item is a duplicate of the last item, skipping addition.")
             return
         }
 
         self.objectWillChange.send()
-        clipboardHistory.insert(newItem, at: 0)
+        // 履歴を末尾に追加するように変更
+        clipboardHistory.append(newItem)
         print("ClipboardManager: New item added to history: \(newItem.text.prefix(50))...")
 
         if let filePath = newItem.filePath {
@@ -45,8 +46,10 @@ extension ClipboardManager {
         // 最大履歴数を超過した場合の処理を適用
         enforceMaxHistoryCount()
 
-        // 履歴を保存
-        scheduleSaveClipboardHistory()
+        // 履歴を保存 (新しいシステムを使用)
+        ChunkedHistoryManager.shared.saveHistoryItem(newItem)
+        // 既存のスケジューリングは削除
+        // scheduleSaveClipboardHistory()
     }
 
     func clearAllHistory() {
@@ -62,6 +65,9 @@ extension ClipboardManager {
         print("ClipboardManager: All history cleared.")
         // 履歴をクリアした際に、一時ファイルもクリーンアップ
         cleanUpTemporaryFiles()
+        
+        // 新しい履歴管理システムもクリア
+        ChunkedHistoryManager.shared.clearAllHistory()
     }
 
     func deleteItem(id: UUID) {
@@ -75,7 +81,8 @@ extension ClipboardManager {
             clipboardHistory.remove(at: index)
             print("ClipboardManager: Item deleted. Total history: \(clipboardHistory.count)")
 
-            scheduleSaveClipboardHistory()
+            // 新しい履歴管理システムからも削除
+            ChunkedHistoryManager.shared.deleteHistoryItem(id: id)
         }
     }
 
@@ -149,74 +156,35 @@ extension ClipboardManager {
 
     // MARK: - History Persistence (ファイルシステムに保存)
     private func saveClipboardHistory() {
-        guard let appSpecificDirectory = getAppSpecificDirectory() else {
-            print("ClipboardManager: Could not get app-specific directory for saving.")
-            return
-        }
-
-        let fileURL = appSpecificDirectory.appendingPathComponent(historyFileName)
-
-        do {
-            // ディレクトリが存在しない場合は作成 (getAppSpecificDirectoryとcreateClipboardFilesDirectoryIfNeededで既に作成されるはずだが念のため)
-            if !FileManager.default.fileExists(atPath: appSpecificDirectory.path) {
-                try FileManager.default.createDirectory(at: appSpecificDirectory, withIntermediateDirectories: true, attributes: nil)
-            }
-
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601 // 日付のエンコード形式を合わせる (ClipboardHistoryDocumentと一致させる)
-            encoder.outputFormatting = .prettyPrinted // 可読性のために整形 (Optional)
-
-            let data = try encoder.encode(clipboardHistory)
-            try data.write(to: fileURL)
-            print("ClipboardManager: Clipboard history saved to file: \(fileURL.path)")
-        } catch {
-            print("ClipboardManager: Error saving clipboard history to file: \(error.localizedDescription)")
-        }
+        // 新しい履歴管理システムを使用するため、このメソッドは使用しない
+        // 既存のコードは削除
     }
 
     // MARK: - History Loading (ファイルシステムからロード)
     public func loadClipboardHistory() {
-        guard let appSpecificDirectory = getAppSpecificDirectory() else {
-            print("ClipboardManager: Could not get app-specific directory for loading.")
-            return
-        }
-
-        let fileURL = appSpecificDirectory.appendingPathComponent(historyFileName)
-
-        // ファイルが存在しない場合は早期リターン
-        guard FileManager.default.fileExists(atPath: fileURL.path) else {
-            print("ClipboardManager: Clipboard history file not found, starting with empty history.")
-            return
-        }
-
-        do {
-            let data = try Data(contentsOf: fileURL)
-            let decoder = JSONDecoder()
-            // JSONDecoder には dateDecodingStrategy を使用します。
-            decoder.dateDecodingStrategy = .iso8601 // 日付のデコード形式を合わせる (ClipboardHistoryDocumentと一致させる)
-
-            var loadedHistory = try decoder.decode([ClipboardItem].self, from: data)
-
-            // ロードした履歴アイテムのfilePathが指すファイルが実際に存在するかを確認し、存在しない場合は削除
-            loadedHistory.removeAll { item in
-                if let filePath = item.filePath {
-                    if !FileManager.default.fileExists(atPath: filePath.path) {
-                        print("ClipboardManager: Missing file for history item: \(filePath.lastPathComponent). Removing item from history.")
-                        return true // 履歴から削除
-                    }
-                }
-                return false // 履歴に残す
+        // 新しい履歴管理システムから履歴をロード
+        let loadedHistory = ChunkedHistoryManager.shared.loadHistory()
+        
+        // ロードした履歴アイテムのfilePathが指すファイルが実際に存在するかを確認し、存在しない場合は削除
+        var validHistory = loadedHistory.filter { item in
+            if let filePath = item.filePath {
+                return FileManager.default.fileExists(atPath: filePath.path)
             }
-
-            self.clipboardHistory = loadedHistory
-
-            for item in self.clipboardHistory where item.filePath != nil {
-                generateThumbnail(for: item, at: item.filePath!)
-            }
-
-            print("ClipboardManager: Clipboard history loaded from file. Count: \(clipboardHistory.count), Size: \(data.count) bytes.")
-        } catch {
-            print("ClipboardManager: Error loading clipboard history from file: \(error.localizedDescription)")
+            return true // ファイルパスがない場合は常に有効とみなす
         }
+        
+        // 最大履歴数を超過した場合の処理を適用
+        if self.maxHistoryToSave > 0 && validHistory.count > self.maxHistoryToSave {
+            // 古いアイテム（配列の末尾）を削除
+            validHistory = Array(validHistory.prefix(self.maxHistoryToSave))
+        }
+        
+        self.clipboardHistory = validHistory
+
+        for item in self.clipboardHistory where item.filePath != nil {
+            generateThumbnail(for: item, at: item.filePath!)
+        }
+
+        print("ClipboardManager: Clipboard history loaded from new system. Count: \(clipboardHistory.count)")
     }
 }

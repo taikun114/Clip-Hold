@@ -77,18 +77,35 @@ class ClipboardHistoryImporterExporter: ObservableObject {
     }
     
     // MARK: - エクスポート結果のハンドリング用メソッド
-    func handleExportResult(_ result: Result<URL, Error>) {
+    func handleExportResult(_ result: Result<URL, Error>, from clipboardManager: ClipboardManager) {
         switch result {
         case .success(let url):
-            DispatchQueue.main.async {
-                self.currentAlert = .success(Text("クリップボード履歴が正常にエクスポートされました。"))
+            // エクスポート時は、新しい履歴管理システムからすべての履歴を取得してエクスポート
+            let historyToExport = clipboardManager.clipboardHistory
+            
+            do {
+                let encoder = JSONEncoder()
+                encoder.dateEncodingStrategy = .iso8601
+                encoder.outputFormatting = .prettyPrinted
+                
+                let data = try encoder.encode(historyToExport)
+                try data.write(to: url)
+                
+                DispatchQueue.main.async {
+                    self.currentAlert = .success(Text("クリップボード履歴が正常にエクスポートされました。"))
+                }
+                print("クリップボード履歴が正常にエクスポートされました: \(url.path)")
+            } catch {
+                DispatchQueue.main.async {
+                    self.currentAlert = .error(Text("履歴のエクスポートに失敗しました: \(error.localizedDescription)"))
+                }
+                print("履歴のエクスポートエラー: \(error.localizedDescription)")
             }
-            print("クリップボード履歴が正常にエクスポートされました: \(url.path)")
         case .failure(let error):
             DispatchQueue.main.async {
-                self.currentAlert = .error(Text("履歴のエクスポートに失敗しました: \(error.localizedDescription)"))
+                self.currentAlert = .error(Text("ファイルの選択に失敗しました: \(error.localizedDescription)"))
             }
-            print("履歴のエクスポートエラー: \(error.localizedDescription)")
+            print("ファイルの選択エラー: \(error.localizedDescription)")
         }
     }
 }

@@ -2241,6 +2241,22 @@
         }
       }
     },
+    "ドキュメントを表示…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Document..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ドキュメントを表示…"
+          }
+        }
+      }
+    },
     "バージョン: %@" : {
       "localizations" : {
         "en" : {
@@ -2893,6 +2909,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "以下の定型文は既存の項目とタイトルまたは内容が重複しています。\nタイトルまたは内容のどちらかを編集してください。"
+          }
+        }
+      }
+    },
+    "以前の履歴ファイルが使用されています。アップグレード方法はドキュメントをご覧ください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous history ﬁle is used. See documentation for upgrade instructions."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以前の履歴ファイルが使用されています。アップグレード方法はドキュメントをご覧ください。"
           }
         }
       }
@@ -3693,6 +3725,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴はありません"
+          }
+        }
+      }
+    },
+    "履歴ファイルが最新の形式に正しく変換されました。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History file has been converted to the latest format successfully."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ファイルが最新の形式に正しく変換されました。"
+          }
+        }
+      }
+    },
+    "履歴ファイルのアップグレードに失敗しました" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to Upgrade History File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ファイルのアップグレードに失敗しました"
+          }
+        }
+      }
+    },
+    "履歴ファイルのアップグレードに成功しました" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Successfully Upgraded History File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ファイルのアップグレードに成功しました"
           }
         }
       }
