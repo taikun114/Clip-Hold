@@ -377,8 +377,12 @@ struct ClipHoldApp: App {
                 // ClipboardManager はシングルトンなので、static context からも .shared でアクセス可能
                 let clipboardManager = ClipboardManager.shared
 
-                if clipboardManager.clipboardHistory.indices.contains(i) {
-                    let historyItem = clipboardManager.clipboardHistory[i]
+                // UI表示順序（日付の新しい順）に並び替えた配列を一時的に作成
+                let sortedHistoryForUI = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+
+                // 並び替えた配列に対してインデックスを適用
+                if sortedHistoryForUI.indices.contains(i) {
+                    let historyItem = sortedHistoryForUI[i]
                     NSPasteboard.general.clearContents()
 
                     // 内部コピーフラグをtrueに設定
@@ -408,7 +412,7 @@ struct ClipHoldApp: App {
                         }
                     }
                 } else {
-                    print("履歴ショートカット \(i+1) が押されましたが、対応する履歴は存在しません。")
+                    print("履歴ショートカット \(i+1) が押されましたが、対応する履歴（UI上\(i+1)番目）は存在しません。")
                 }
             }
         }
