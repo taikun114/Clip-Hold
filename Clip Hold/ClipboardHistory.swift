@@ -28,14 +28,41 @@ extension ClipboardManager {
 
     // MARK: - Helper function to add and save a new item
     func addAndSaveItem(_ newItem: ClipboardItem) { // private から internal に変更
-        // 最新の項目（配列の最初）と重複している場合はスキップ
-        if let firstItem = clipboardHistory.first {
-            let isDup = isDuplicate(newItem, of: firstItem)
-            print("ClipboardManager: Checking duplication with first item. New item text: '\(newItem.text.prefix(100))...', First item text: '\(firstItem.text.prefix(100))...', Is duplicate: \(isDup)")
-            if isDup {
-                print("ClipboardManager: Item is a duplicate of the first item, skipping addition.")
-                return
+        // 日付が最も新しいアイテムを「最後のアイテム」として取得
+        let lastItem = clipboardHistory.max { $0.date < $1.date }
+        
+        // 最後の履歴項目とアイテムのタイプ（テキスト or ファイル）が一致する場合のみ重複チェックを行う
+        if let lastItem = lastItem {
+            print("ClipboardManager: Last item details - Text: '\(lastItem.text.prefix(50))...', Date: \(lastItem.date), FilePath: \(String(describing: lastItem.filePath))")
+            let lastItemType = lastItem.filePath != nil ? "File" : "Text"
+            let newItemType = newItem.filePath != nil ? "File" : "Text"
+            print("ClipboardManager: Checking duplicate. Last item type: \(lastItemType) (filePath: \(String(describing: lastItem.filePath))), New item type: \(newItemType) (filePath: \(String(describing: newItem.filePath)))")
+            // newItemがテキストアイテムで、最後のアイテムもテキストの場合
+            if newItem.filePath == nil && lastItem.filePath == nil {
+                print("ClipboardManager: Both items are text. Checking for duplication...")
+                if isDuplicate(newItem, of: lastItem) {
+                    print("ClipboardManager: Text item is a duplicate of the last text item, skipping addition.")
+                    return
+                } else {
+                    print("ClipboardManager: Text items are not duplicates.")
+                }
             }
+            // newItemがファイルアイテムで、最後のアイテムもファイルの場合
+            else if newItem.filePath != nil && lastItem.filePath != nil {
+                print("ClipboardManager: Both items are files. Checking for duplication...")
+                if isDuplicate(newItem, of: lastItem) {
+                    print("ClipboardManager: File item is a duplicate of the last file item, skipping addition.")
+                    return
+                } else {
+                    print("ClipboardManager: File items are not duplicates.")
+                }
+            }
+            // タイプが異なる場合は重複チェックを行わず、履歴に追加
+            else {
+                print("ClipboardManager: Item types are different. Skipping duplicate check and adding to history.")
+            }
+        } else {
+            print("ClipboardManager: History is empty. Adding new item.")
         }
 
         self.objectWillChange.send()

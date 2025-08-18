@@ -192,6 +192,7 @@ extension ClipboardManager {
                     }
 
                     // 3. ファイルも画像もなかった場合、文字列として処理を試みる
+                    // ファイルパスや画像データが検出された場合は、文字列の処理をスキップする
                     if let newString = pasteboard.string(forType: .string) {
                         print("DEBUG: checkPasteboard - String detected: \(newString.prefix(50))...")
                         // 最前面のアプリケーションのパスを取得

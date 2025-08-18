@@ -296,14 +296,17 @@ extension ClipboardManager {
 
     // MARK: - Helper function for duplication check
     func isDuplicate(_ newItem: ClipboardItem, of existingItem: ClipboardItem) -> Bool { // private から internal に変更
-        // ファイルアイテムの場合、ファイルサイズで重複を判定
-        if newItem.filePath != nil && existingItem.filePath != nil && newItem.fileSize != nil && newItem.fileSize == existingItem.fileSize {
-            return true
+        // ファイルアイテムの場合、ファイルパスとサイズで重複を判定
+        if let newFilePath = newItem.filePath, let existingFilePath = existingItem.filePath {
+            // ファイルパスとサイズが一致する場合、重複と判定
+            // ファイル名（textプロパティ）は表示用なので比較対象に含めない
+            return newFilePath == existingFilePath && newItem.fileSize == existingItem.fileSize
         }
         // テキストアイテムの場合、テキスト内容で重複を判定
-        if newItem.filePath == nil && existingItem.filePath == nil && newItem.text == existingItem.text {
-            return true
+        else if newItem.filePath == nil && existingItem.filePath == nil {
+            return newItem.text == existingItem.text
         }
+        // 片方だけがファイルアイテムの場合は重複ではない
         return false
     }
 

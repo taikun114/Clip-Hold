@@ -33,9 +33,11 @@ extension ClipboardManager {
                         }
                     }
                 }
+                // ファイルパスが存在する場合は、テキストのコピーをスキップ
+                return
             }
 
-            // ファイルコピーが失敗した場合、またはファイルパスがない場合、テキストをコピー
+            // ファイルパスがない場合、テキストをコピー
             // item.text は非オプショナルなので、直接使用する
             await MainActor.run {
                 if NSPasteboard.general.string(forType: .string) != item.text { // クリップボードの内容がすでに同じでなければコピー
