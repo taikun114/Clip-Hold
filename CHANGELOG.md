@@ -2,6 +2,14 @@
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
 ## 1.3.0 (under development)
+
+> [!IMPORTANT]
+> This version has a major change in the way history files are saved.\
+> If you update from a previous version, your history file will also be upgraded to the new format. **The new history file format is not compatible with older versions of Clip Hold.**
+>
+> Note that the history file `clipboardHistory.json` used in the previous version will stay after the upgrade with the name changed to `oldClipboardHistory.json`.\
+> So if you use an older version of Clip Hold for some reason after upgrading the history file, you can rename `oldClipboardHistory.json` to `clipboardHistory.json` to load the old history file with the old Clip Hold.
+
 ### New Features
 - **Support link in standard phrases**
 - **Support for copying multiple files at the same time**
@@ -13,6 +21,9 @@
 - **Fix issue with two “About QR Code” items being displayed on the license sheet**
 - **Improve menu history thumbnails to fit in a square**
 - **Improve to temporarily disable Quick Paste when clicking on an item from the menu bar while holding down the Option key**
+- **Improve the issue causing large disk writes when copying with a large number of history items**
+- **Change file duplicate detection method to file hash-based**
+  - This allows for more accurate duplicate file detection.
 
 ## 1.2.1
 ### Bug Fixes and Improvements
