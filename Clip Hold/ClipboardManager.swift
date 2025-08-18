@@ -31,10 +31,14 @@ class ClipboardManager: ObservableObject {
             }
         }
     }
+    // 既存のプロパティ（将来的な互換性維持のため保持）
     var pendingLargeFileItem: (fileURL: URL, qrCodeContent: String?)?
     var pendingLargeFileItems: [(fileURL: URL, qrCodeContent: String?)]?
     var pendingLargeFileItemsSourceAppPath: String? // 新しく追加
     var pendingLargeImageData: (imageData: Data, qrCodeContent: String?)?
+    
+    // 新しく追加: ファイルサイズ情報を含む新しいプロパティ
+    var pendingLargeFileItemsWithSize: [(fileURL: URL, qrCodeContent: String?, fileSize: UInt64?)]?
 
     // MARK: - Initialization
     private init() {

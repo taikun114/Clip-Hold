@@ -145,9 +145,14 @@ extension ClipboardManager {
             // アラートしきい値を超えている場合、アラート表示を要求
             let fileCount = itemsWithQRCode.count
             let totalSizeForAlert = totalFileSize // ローカルコピーを作成
+            
+            // MainActor.run内で使用するために、必要な情報をローカル変数にコピー
+            let itemsWithSizeForAlert = fileItemsWithAttributes
+            let sourceAppPathForAlert = sourceAppPath
+            
             await MainActor.run {
-                self.pendingLargeFileItems = itemsWithQRCode // 全ファイル情報を保持
-                self.pendingLargeFileItemsSourceAppPath = sourceAppPath // ソースアプリパスを保持
+                self.pendingLargeFileItemsWithSize = itemsWithSizeForAlert
+                self.pendingLargeFileItemsSourceAppPath = sourceAppPathForAlert // ソースアプリパスを保持
                 self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
                 print("DEBUG: createClipboardItemsForMultipleFileURLs - Setting showingLargeFileAlert to true for \(fileCount) files with total size \(totalSizeForAlert).")
             }
