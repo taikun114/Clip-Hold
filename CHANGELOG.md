@@ -12,18 +12,21 @@
 
 ### New Features
 - **Support link in standard phrases**
+  - As in the History window, the Standard Phrases window now displays “Open Link” from the context menu when the item is a link.
 - **Support for copying multiple files at the same time**
 
 ### Bug Fixes and Improvements
+- **Fix issue with two “About QR Code” items being displayed on the license sheet**
+- **Fix issue that an image or image address could not be copied from Safari**
+- **Improve menu history thumbnails to fit in a square**
+- **Improve to temporarily disable Quick Paste when clicking on an item from the menu bar while holding down the Option key**
+  - Copying from a shortcut key is not affected by this.
+- **Improve the issue causing large disk writes when copying with a large number of history items**
 - **Add an app icon to the list item in the History window**
   - It shows the app icon of the app that was in the foreground when it was copied. The icon will not be shown in the copy history before this feature was added.
 - **Add an icon to the Standard Phrase window**
-- **Fix issue with two “About QR Code” items being displayed on the license sheet**
-- **Improve menu history thumbnails to fit in a square**
-- **Improve to temporarily disable Quick Paste when clicking on an item from the menu bar while holding down the Option key**
-- **Improve the issue causing large disk writes when copying with a large number of history items**
 - **Change file duplicate detection method to file hash-based**
-  - This allows for more accurate duplicate file detection.
+  - This allows for more accurate duplicate file detection. Existing size-based duplicate detection is used for folders and other items for which file hashes cannot be computed.
 
 ## 1.2.1
 ### Bug Fixes and Improvements
