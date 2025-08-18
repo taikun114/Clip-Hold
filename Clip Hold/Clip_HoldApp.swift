@@ -120,8 +120,8 @@ struct ClipHoldApp: App {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(phrase.content, forType: .string)
                         
-                        // quickPaste がオンの場合、定型文は常にテキストなのでそのままペースト
-                        if quickPaste {
+                        // オプションキーが押されていない場合のみクイックペーストを実行
+                        if quickPaste && !NSEvent.modifierFlags.contains(.option) {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                 ClipHoldApp.performPaste()
                             }
@@ -194,8 +194,8 @@ struct ClipHoldApp: App {
                         clipboardManager.isPerformingInternalCopy = true
                         clipboardManager.copyItemToClipboard(item)
                         
-                        // quickPaste がオンの場合、かつ textOnlyQuickPaste がオンの場合は文字列のみペースト
-                        if quickPaste {
+                        // オプションキーが押されていない場合のみクイックペーストを実行
+                        if quickPaste && !NSEvent.modifierFlags.contains(.option) {
                             let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste") // ここで最新の値を取得
                             if textOnlyQuickPaste {
                                 // ファイルパスがなく、かつ画像でもない場合にのみペーストを実行
