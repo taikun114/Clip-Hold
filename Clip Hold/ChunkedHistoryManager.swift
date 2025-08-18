@@ -62,6 +62,18 @@ class ChunkedHistoryManager: ObservableObject {
             
             print("ChunkedHistoryManager: Loaded \(oldHistory.count) items from old history file.")
             
+            // ファイルハッシュが存在しないアイテムに対してハッシュを計算して追加
+            for (index, item) in oldHistory.enumerated() {
+                if let filePath = item.filePath, item.fileHash == nil {
+                    // ファイルが存在する場合のみハッシュを計算
+                    if FileManager.default.fileExists(atPath: filePath.path) {
+                        let fileHash = HashCalculator.calculateFileHash(at: filePath)
+                        oldHistory[index].fileHash = fileHash
+                        print("ChunkedHistoryManager: Calculated hash for migrated file item at index \(index).")
+                    }
+                }
+            }
+            
             // 新しい形式で保存
             try saveHistoryItems(oldHistory)
             
@@ -93,7 +105,7 @@ class ChunkedHistoryManager: ObservableObject {
         return dir
     }
     
-    private func getHistoryFileURL(for chunkIndex: Int) -> URL? {
+    func getHistoryFileURL(for chunkIndex: Int) -> URL? { // private から internal に変更
         guard let dataDir = getOrCreateDirectory(historyDataDirectory) else { return nil }
         return dataDir.appendingPathComponent("\(historyFilePrefix)\(chunkIndex).\(fileExtension)")
     }
@@ -129,7 +141,7 @@ class ChunkedHistoryManager: ObservableObject {
         }
     }
     
-    private func saveHistoryItems(_ items: [ClipboardItem], to chunkIndex: Int) throws {
+    func saveHistoryItems(_ items: [ClipboardItem], to chunkIndex: Int) throws { // private から internal に変更
         guard let historyFileURL = getHistoryFileURL(for: chunkIndex) else { return }
         
         let encoder = JSONEncoder()
@@ -194,7 +206,7 @@ class ChunkedHistoryManager: ObservableObject {
         }
     }
     
-    private func loadLatestChunk() throws -> (Int, [ClipboardItem]) {
+    func loadLatestChunk() throws -> (Int, [ClipboardItem]) { // private から internal に変更
         let chunkCount = try getChunkCount()
         
         if chunkCount == 0 {
@@ -206,7 +218,7 @@ class ChunkedHistoryManager: ObservableObject {
         return (latestChunkIndex, items)
     }
     
-    private func loadHistoryChunk(at chunkIndex: Int) throws -> [ClipboardItem] {
+    func loadHistoryChunk(at chunkIndex: Int) throws -> [ClipboardItem] { // private から internal に変更
         guard let historyFileURL = getHistoryFileURL(for: chunkIndex) else {
             return []
         }
@@ -222,7 +234,7 @@ class ChunkedHistoryManager: ObservableObject {
         return try decoder.decode([ClipboardItem].self, from: data)
     }
     
-    private func getChunkCount() throws -> Int {
+    func getChunkCount() throws -> Int { // private から internal に変更
         guard let dataDir = historyDataDirectory else { return 0 }
         
         guard FileManager.default.fileExists(atPath: dataDir.path) else {

@@ -175,6 +175,9 @@ extension ClipboardManager {
 
         // 外部ファイルの属性を取得
         let externalFileAttributes = getFileAttributes(fileURL)
+        
+        // 外部ファイルのハッシュを計算
+        let externalFileHash = HashCalculator.calculateFileHash(at: fileURL)
 
         print("DEBUG: createClipboardItemForFileURL - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
 
@@ -209,15 +212,32 @@ extension ClipboardManager {
 
                 for sandboxedFileURL in sandboxedFileContents {
                     let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
-
-                    // MARK: - ファイルサイズが完全に一致するかどうかのみを比較
-                    if let externalSize = externalFileAttributes.fileSize,
-                       let sandboxedSize = sandboxedFileAttributes.fileSize,
-                       externalSize == sandboxedSize {
-                        print("ClipboardManager: Found potential duplicate in sandbox based on file size: \(sandboxedFileURL.lastPathComponent)")
-                        // 重複が見つかった場合、既存のサンドボックスファイルを参照する新しいアイテムを返す
-                        let displayName = extractOriginalFileName(from: sandboxedFileURL.lastPathComponent)
-                        return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) // 新しいアイテムにもファイルサイズをセット
+                    
+                    // ハッシュによる重複チェックを優先
+                    if let externalHash = externalFileHash {
+                        // サンドボックスファイルのハッシュを取得（既に計算済みの場合）または計算
+                        var sandboxedFileHash: String? = nil
+                        // 既存のClipboardItemからハッシュを取得しようとする（ここでは直接ファイルから読み込む）
+                        // 後で改善するが、まずはファイルから直接計算
+                        sandboxedFileHash = HashCalculator.calculateFileHash(at: sandboxedFileURL)
+                        
+                        if let sandboxedHash = sandboxedFileHash, externalHash == sandboxedHash {
+                            print("ClipboardManager: Found duplicate in sandbox based on file hash: \(sandboxedFileURL.lastPathComponent)")
+                            // 重複が見つかった場合、既存のサンドボックスファイルを参照する新しいアイテムを返す
+                            let displayName = extractOriginalFileName(from: sandboxedFileURL.lastPathComponent)
+                            // ファイルサイズとハッシュもセット
+                            return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: sandboxedHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+                        }
+                    } else {
+                        // ハッシュが計算できなかった場合、従来のファイルサイズによるチェックを行う
+                        if let externalSize = externalFileAttributes.fileSize,
+                           let sandboxedSize = sandboxedFileAttributes.fileSize,
+                           externalSize == sandboxedSize {
+                            print("ClipboardManager: Found potential duplicate in sandbox based on file size (hash calculation failed): \(sandboxedFileURL.lastPathComponent)")
+                            // 重複が見つかった場合、既存のサンドボックスファイルを参照する新しいアイテムを返す
+                            let displayName = extractOriginalFileName(from: sandboxedFileURL.lastPathComponent)
+                            return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) // ハッシュがない場合はセットしない
+                        }
                     }
                 }
             } catch {
@@ -228,7 +248,8 @@ extension ClipboardManager {
         // 重複ファイルが見つからなかった場合、ファイルをサンドボックスにコピーして新しいアイテムを返す
         if let copiedFileURL = await copyFileToAppSandbox(from: fileURL) {
             let displayName = fileURL.lastPathComponent
-            return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: externalFileAttributes.fileSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) // 新しいアイテムにもファイルサイズをセット
+            // 新しいアイテムにもファイルサイズとハッシュをセット
+            return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: externalFileAttributes.fileSize, fileHash: externalFileHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
         }
 
         print("ClipboardManager: Failed to copy external item to sandbox: \(fileURL.lastPathComponent).")
@@ -240,6 +261,8 @@ extension ClipboardManager {
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
 
         let newImageSize = UInt64(imageData.count)
+        // 画像データのハッシュを計算
+        let newImageHash = HashCalculator.calculateImageDataHash(imageData)
 
         print("DEBUG: createClipboardItemFromImageData - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
 
@@ -270,9 +293,21 @@ extension ClipboardManager {
             for sandboxedFileURL in sandboxedFileContents {
                 if sandboxedFileURL.lastPathComponent.hasSuffix("-image.png") {
                     let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
-                    if let sandboxedSize = sandboxedFileAttributes.fileSize, sandboxedSize == newImageSize {
-                        print("ClipboardManager: Found duplicate image in sandbox based on file size: \(sandboxedFileURL.lastPathComponent)")
-                        return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+                    
+                    // ハッシュによる重複チェックを優先
+                    if let sandboxedData = try? Data(contentsOf: sandboxedFileURL) {
+                        let sandboxedImageHash = HashCalculator.calculateImageDataHash(sandboxedData)
+                        if newImageHash == sandboxedImageHash {
+                            print("ClipboardManager: Found duplicate image in sandbox based on file hash: \(sandboxedFileURL.lastPathComponent)")
+                            // ファイルサイズとハッシュもセット
+                            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: sandboxedImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+                        }
+                    } else {
+                        // データが読み込めなかった場合、従来のファイルサイズによるチェックを行う
+                        if let sandboxedSize = sandboxedFileAttributes.fileSize, sandboxedSize == newImageSize {
+                            print("ClipboardManager: Found duplicate image in sandbox based on file size (hash calculation failed): \(sandboxedFileURL.lastPathComponent)")
+                            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+                        }
                     }
                 }
             }
@@ -287,7 +322,8 @@ extension ClipboardManager {
         do {
             try imageData.write(to: destinationURL)
             print("ClipboardManager: New image saved to sandbox as \(destinationURL.lastPathComponent)")
-            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: newImageSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+            // ファイルサイズとハッシュもセット
+            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: newImageSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
         } catch {
             print("ClipboardManager: Error saving new image to sandbox: \(error.localizedDescription)")
             return nil
@@ -296,11 +332,18 @@ extension ClipboardManager {
 
     // MARK: - Helper function for duplication check
     func isDuplicate(_ newItem: ClipboardItem, of existingItem: ClipboardItem) -> Bool { // private から internal に変更
-        // ファイルアイテムの場合、ファイルパスとサイズで重複を判定
+        // ファイルアイテムの場合、ファイルハッシュで重複を判定（ハッシュが利用可能な場合）
         if let newFilePath = newItem.filePath, let existingFilePath = existingItem.filePath {
-            // ファイルパスとサイズが一致する場合、重複と判定
-            // ファイル名（textプロパティ）は表示用なので比較対象に含めない
-            return newFilePath == existingFilePath && newItem.fileSize == existingItem.fileSize
+            // ファイルハッシュが両方存在する場合、ハッシュで比較
+            if let newFileHash = newItem.fileHash, let existingFileHash = existingItem.fileHash {
+                return newFileHash == existingFileHash
+            }
+            // どちらかのハッシュが存在しない場合、ファイルパスとサイズで比較（従来の方法）
+            else {
+                // ファイルパスとサイズが一致する場合、重複と判定
+                // ファイル名（textプロパティ）は表示用なので比較対象に含めない
+                return newFilePath == existingFilePath && newItem.fileSize == existingItem.fileSize
+            }
         }
         // テキストアイテムの場合、テキスト内容で重複を判定
         else if newItem.filePath == nil && existingItem.filePath == nil {

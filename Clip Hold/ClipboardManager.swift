@@ -56,6 +56,9 @@ class ClipboardManager: ObservableObject {
             }
         }
         
+        // アプリ起動時にファイルハッシュが存在しない履歴アイテムに対してハッシュを計算
+        calculateMissingFileHashesInHistory()
+        
         loadClipboardHistory()
 
         print("ClipboardManager: Initialized with history count: \(clipboardHistory.count)")
