@@ -583,6 +583,22 @@
     "Hello, world!" : {
       "shouldTranslate" : false
     },
+    "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴ウィンドウとメニューにその色のアイコンが表示されるようになります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you copy a color code in HEX, HSL / HSLA, or RGB / RGBA format, an icon for that color will be shown in the History window and menu."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴ウィンドウとメニューにその色のアイコンが表示されるようになります。"
+          }
+        }
+      }
+    },
     "Image File" : {
       "localizations" : {
         "en" : {
@@ -1197,6 +1213,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カスタム..."
+          }
+        }
+      }
+    },
+    "カラーコードに基づくカラーアイコンを表示する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show a Color Icon Based on Color Code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーコードに基づくカラーアイコンを表示する"
           }
         }
       }
@@ -4717,6 +4749,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開発者をサポート"
+          }
+        }
+      }
+    },
+    "開発者向け機能" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developer Features"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開発者向け機能"
           }
         }
       }
