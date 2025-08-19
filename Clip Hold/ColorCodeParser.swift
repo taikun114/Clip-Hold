@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ColorCodeParser {
     /// カラーコードの正規表現パターン
-    private static let hexPattern = #"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"#
+    private static let hexPattern = #"^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"#
     // RGBA形式のパターン (カンマ区切りとスペース区切り、%表記(少数点含む)、アルファ値(%表記含む)に対応)
     private static let rgbaPattern = #"^rgba?\(\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*(?:[, /]\s*(?:(0|1|0?\.\d+)|(\d{1,3}(?:\.\d+)?)%?)\s*)?\)$"#
     // HSLA形式のパターン (カンマ区切りとスペース区切り、deg表記、%省略、アルファ値(%表記含む)に対応)
@@ -19,7 +19,7 @@ struct ColorCodeParser {
     static func parseColor(from text: String) -> Color? {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // HEX形式 (例: #FFFFFF, #FFFFFFFF)
+        // HEX形式 (例: #FFFFFF, #FFFFFFFF, FFFFFF, FFFFFFFF)
         if let hexColor = parseHex(trimmedText) {
             return hexColor
         }
