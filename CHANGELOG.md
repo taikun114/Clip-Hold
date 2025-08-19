@@ -14,6 +14,7 @@
 - **Support link in standard phrases**
   - As in the History window, the Standard Phrases window now displays “Open Link” from the context menu when the item is a link.
 - **Support for copying multiple files at the same time**
+- **Support filtering by the app in the History window**
 
 ### Bug Fixes and Improvements
 - **Fix issue with two “About QR Code” items being displayed on the license sheet**
