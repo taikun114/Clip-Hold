@@ -32,6 +32,7 @@ struct HistoryWindowView: View {
 
     @State private var selectedFilter: ItemFilter = .all
     @State private var selectedSort: ItemSort = .newest
+    @State private var selectedApp: String? = nil
 
     @State private var searchDebounceTask: Task<Void, Never>? = nil
 
@@ -83,8 +84,13 @@ struct HistoryWindowView: View {
             let historyCopy = clipboardManager.clipboardHistory
             
             let filtered = historyCopy.filter { item in
+                // App filter
+                let matchesApp = selectedApp == nil || (item.sourceAppPath?.contains(selectedApp!) ?? false)
+                
+                // Search text filter
                 let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
 
+                // Item type filter
                 let matchesFilter: Bool
                 switch selectedFilter {
                 case .all:
@@ -99,7 +105,7 @@ struct HistoryWindowView: View {
                     matchesFilter = item.isImage
                 }
 
-                return matchesSearchText && matchesFilter
+                return matchesApp && matchesSearchText && matchesFilter
             }
 
             let sorted = filtered.sorted { item1, item2 in
@@ -132,7 +138,8 @@ struct HistoryWindowView: View {
                         isSearchFieldFocused: _isSearchFieldFocused,
                         clipboardHistoryCount: clipboardManager.clipboardHistory.count,
                         selectedFilter: $selectedFilter,
-                        selectedSort: $selectedSort
+                        selectedSort: $selectedSort,
+                        selectedApp: $selectedApp
                     )
 
                     Spacer(minLength: 0)
@@ -186,6 +193,7 @@ struct HistoryWindowView: View {
         }
         .onChange(of: selectedFilter) { _, _ in performUpdate() }
         .onChange(of: selectedSort) { _, _ in performUpdate() }
+        .onChange(of: selectedApp) { _, _ in performUpdate() }
         .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
         .onAppear {
             performUpdate()

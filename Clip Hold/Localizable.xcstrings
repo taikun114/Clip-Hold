@@ -955,6 +955,22 @@
         }
       }
     },
+    "アプリ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリ"
+          }
+        }
+      }
+    },
     "アラートを表示する容量を設定" : {
       "localizations" : {
         "en" : {
@@ -1821,6 +1837,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてスキップ"
+          }
+        }
+      }
+    },
+    "すべてのアプリ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Apps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのアプリ"
           }
         }
       }

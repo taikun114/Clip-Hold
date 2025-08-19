@@ -96,6 +96,25 @@ class ClipboardManager: ObservableObject {
         print("DEBUG: ClipboardManager: isClipboardMonitoringPausedObserver invalidated.")
     }
     
+    // アプリケーションの履歴を返す算出プロパティ
+    var appUsageHistory: [String: String] {
+        let appPaths = Set(clipboardHistory.compactMap { $0.sourceAppPath })
+        var appNames = [String: String]()
+
+        for path in appPaths {
+            let appURL = URL(fileURLWithPath: path)
+            let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
+
+            if let appBundle = Bundle(url: appURL) {
+                let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? appBundle.infoDictionary?["CFBundleName"] as? String ?? nonLocalizedName
+                appNames[nonLocalizedName] = appName
+            } else {
+                appNames[nonLocalizedName] = nonLocalizedName
+            }
+        }
+        return appNames
+    }
+    
     // 画像を正方形にパディングするヘルパー関数（アスペクト比を維持）
     func padToSquare(_ image: NSImage, size: CGSize) -> NSImage {
         let imageSize = image.size

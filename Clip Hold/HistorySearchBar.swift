@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct HistorySearchBar: View {
+    @EnvironmentObject var clipboardManager: ClipboardManager
     @Binding var searchText: String
     @Binding var isLoading: Bool
     @FocusState var isSearchFieldFocused: Bool
@@ -10,6 +11,7 @@ struct HistorySearchBar: View {
 
     @Binding var selectedFilter: ItemFilter
     @Binding var selectedSort: ItemSort
+    @Binding var selectedApp: String?
 
     var body: some View {
         HStack {
@@ -52,7 +54,6 @@ struct HistorySearchBar: View {
                         selectedFilter = filter
                     } label: {
                         HStack {
-                            // 選択されている場合にのみチェックマークを表示
                             if selectedFilter == filter {
                                 Image(systemName: "checkmark")
                             }
@@ -60,10 +61,47 @@ struct HistorySearchBar: View {
                         }
                     }
                 }
+                
+                if !clipboardManager.appUsageHistory.isEmpty {
+                    Divider()
+                    Menu {
+                        Button {
+                            selectedApp = nil
+                        } label: {
+                            HStack {
+                                if selectedApp == nil {
+                                    Image(systemName: "checkmark")
+                                }
+                                Text("すべてのアプリ")
+                            }
+                        }
+                        
+                        Divider()
+                        
+                        ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { nonLocalizedName, localizedName in
+                            Button {
+                                selectedApp = nonLocalizedName
+                            } label: {
+                                HStack {
+                                    if selectedApp == nonLocalizedName {
+                                        Image(systemName: "checkmark")
+                                    }
+                                    Text(localizedName)
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            if selectedApp != nil {
+                                Image(systemName: "checkmark")
+                            }
+                            Text("アプリ")
+                        }
+                    }
+                }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
-                    // フィルターがデフォルト以外の場合はアクセントカラーを適用
-                    .tint(selectedFilter != .all ? .accentColor : .secondary)
+                    .tint(selectedFilter != .all || selectedApp != nil ? .accentColor : .secondary)
                     .contentShape(Rectangle())
             }
             .menuStyle(.borderlessButton)
@@ -99,4 +137,9 @@ struct HistorySearchBar: View {
         .padding(.horizontal, 10)
         .padding(.bottom, 5)
     }
+}
+
+#Preview {
+    HistoryWindowView()
+        .environmentObject(ClipboardManager.shared)
 }
