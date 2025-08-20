@@ -192,8 +192,14 @@ struct StandardPhraseWindowView: View {
 
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
-            VisualEffectView(material: .menu, blendingMode: .behindWindow)
-                .ignoresSafeArea()
+            if #available(macOS 26, *) {
+                Color.clear
+                    .glassEffect(in: .rect(cornerRadius: 16.0))
+                    .ignoresSafeArea()
+            } else {
+                VisualEffectView(material: .menu, blendingMode: .behindWindow)
+                    .ignoresSafeArea()
+            }
 
             ZStack { // メインコンテンツを囲むZStack
                 VStack(spacing: 0) {
