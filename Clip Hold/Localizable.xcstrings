@@ -583,18 +583,18 @@
     "Hello, world!" : {
       "shouldTranslate" : false
     },
-    "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴ウィンドウとメニューにその色のアイコンが表示されるようになります。" : {
+    "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When you copy a color code in HEX, HSL / HSLA, or RGB / RGBA format, an icon for that color will be shown in the History window and menu."
+            "value" : "When you copy a color code in HEX, HSL / HSLA, or RGB / RGBA format, an icon for that color will be shown in the History / Standard Phrases window and menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴ウィンドウとメニューにその色のアイコンが表示されるようになります。"
+            "value" : "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。"
           }
         }
       }

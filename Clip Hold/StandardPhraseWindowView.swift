@@ -22,6 +22,7 @@ struct StandardPhraseItemRow: View {
     let phrase: StandardPhrase
     let index: Int
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumber: Bool = false
+    @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     @Binding var phraseToDelete: StandardPhrase?
     @Binding var showingDeleteConfirmation: Bool
     @Binding var selectedPhraseID: UUID?
@@ -38,6 +39,15 @@ struct StandardPhraseItemRow: View {
     let trailingPaddingForLineNumber: CGFloat
 
     var body: some View {
+        // isURLをbodyのトップレベルで定義
+        let isURL: Bool = {
+            guard !phrase.content.isEmpty,
+                  let url = URL(string: phrase.content) else {
+                return false
+            }
+            return url.scheme == "http" || url.scheme == "https"
+        }()
+
         HStack(spacing: 8) {
             if showLineNumber {
                 Text("\(index + 1).")
@@ -47,22 +57,17 @@ struct StandardPhraseItemRow: View {
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
             
-            // 定型文がURLかどうかを判定
-            let isURL: Bool = {
-                guard !phrase.content.isEmpty,
-                      let url = URL(string: phrase.content) else {
-                    return false
-                }
-                // URLスキームがhttpまたはhttpsであることを確認
-                return url.scheme == "http" || url.scheme == "https"
-            }()
-            
-            Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
-                .resizable()
-                .scaledToFit()
-                .padding(4)
-                .frame(width: 30, height: 30)
-                .foregroundColor(.secondary)
+            // アイコン表示ロジック
+            if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
+                ColorCodeIconView(color: color)
+            } else {
+                Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(4)
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(.secondary)
+            }
             
             VStack(alignment: .leading) {
                 Text(phrase.title)

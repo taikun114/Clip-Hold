@@ -21,26 +21,6 @@ private struct IconViewAccessor: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
-// カラーコードを表示するためのカスタムアイコンビュー
-private struct ColorCodeIconView: View {
-    let color: Color
-    
-    var body: some View {
-        ZStack {
-            // 背景を円形にクリップ (元の色)
-            Circle()
-                .fill(color) // そのままの色
-            
-            // 外枠
-            Circle()
-                .stroke(Color.secondary, lineWidth: 0.5)
-        }
-        .frame(width: 25, height: 25) // アイコンの大きさを25に変更
-        .shadow(color: .black.opacity(0.2), radius: 1, x: 0, y: 1)
-    }
-}
-
-
 private let itemDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .short
@@ -193,9 +173,7 @@ struct HistoryItemRow: View {
                 // カラーコードアイコンの表示条件をチェック
                 if showColorCodeIcon, item.filePath == nil, let color = ColorCodeParser.parseColor(from: item.text) {
                     // カラーコードが解析できた場合、専用のカラーアイコンを表示
-                    // アイコンのフレームサイズを他のアイコンと揃える (30x30)
                     let baseIconView = ColorCodeIconView(color: color)
-                        .frame(width: 30, height: 30)
                     
                     // カラーアイコンにもアプリアイコンを表示する
                     if let sourceAppPath = item.sourceAppPath {

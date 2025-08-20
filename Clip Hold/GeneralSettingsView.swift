@@ -406,14 +406,14 @@ struct GeneralSettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("カラーコードに基づくカラーアイコンを表示する")
-                        Text("HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴ウィンドウとメニューにその色のアイコンが表示されるようになります。")
+                        Text("HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $showColorCodeIcon) {
                         Text("カラーコードに基づくカラーアイコンを表示する")
-                        Text("HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴ウィンドウとメニューにその色のアイコンが表示されるようになります。")
+                        Text("HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
