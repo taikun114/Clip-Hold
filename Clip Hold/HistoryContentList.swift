@@ -148,6 +148,13 @@ struct HistoryContentList: View {
                             } label: {
                                 Label("コピー", systemImage: "document.on.document")
                             }
+                            if let filePath = currentItem.filePath {
+                                Button {
+                                    NSWorkspace.shared.open(filePath)
+                                } label: {
+                                    Label("開く", systemImage: "arrow.up.forward.app")
+                                }
+                            }
                             if currentItem.isURL, let url = URL(string: currentItem.text) {
                                 Button {
                                     NSWorkspace.shared.open(url)
