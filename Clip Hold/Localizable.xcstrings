@@ -7,40 +7,6 @@
     "-" : {
       "shouldTranslate" : false
     },
-    "、%lld文字" : {
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : ", %lld character"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : ", %lld characters"
-                }
-              }
-            }
-          }
-        },
-        "ja" : {
-          "variations" : {
-            "plural" : {
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "、%lld文字"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "「%@」" : {
       "localizations" : {
         "en" : {
@@ -278,6 +244,40 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld個の履歴"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld文字" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld character"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld characters"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld文字"
                 }
               }
             }

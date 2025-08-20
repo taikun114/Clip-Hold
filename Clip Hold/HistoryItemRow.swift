@@ -301,7 +301,8 @@ struct HistoryItemRow: View {
                     Text(item.date, formatter: itemDateFormatter)
                     
                     if showCharacterCount {
-                        Text("、\(item.text.count)文字")
+                        Text("-")
+                        Text("\(item.text.count)文字")
                     }
                     
                     if let fileSize = item.fileSize, item.filePath != nil {
