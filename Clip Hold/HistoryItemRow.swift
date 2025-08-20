@@ -77,6 +77,8 @@ struct HistoryItemRow: View {
     
     // アイコンビューの参照を格納する辞書へのBinding
     @Binding var rowIconViews: [UUID: NSView]
+    
+    let showCharacterCount: Bool
 
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
@@ -96,7 +98,8 @@ struct HistoryItemRow: View {
          itemForNewPhrase: Binding<ClipboardItem?>,
          lineNumberTextWidth: CGFloat?,
          trailingPaddingForLineNumber: CGFloat,
-         rowIconViews: Binding<[UUID: NSView]>) { // initにBindingを追加
+         rowIconViews: Binding<[UUID: NSView]>,
+         showCharacterCount: Bool) { // initにBindingを追加
             
         self.item = item
         self.index = index
@@ -112,6 +115,7 @@ struct HistoryItemRow: View {
         self.lineNumberTextWidth = lineNumberTextWidth
         self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
         self._rowIconViews = rowIconViews // Bindingを初期化
+        self.showCharacterCount = showCharacterCount
     }
 
     private var actionMenuItems: some View {
@@ -288,6 +292,10 @@ struct HistoryItemRow: View {
                     .foregroundColor(.primary)
                 HStack(spacing: 4) {
                     Text(item.date, formatter: itemDateFormatter)
+                    
+                    if showCharacterCount {
+                        Text("、\(item.text.count)文字")
+                    }
                     
                     if let fileSize = item.fileSize, item.filePath != nil {
                         Text("-")

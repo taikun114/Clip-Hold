@@ -7,6 +7,40 @@
     "-" : {
       "shouldTranslate" : false
     },
+    "、%lld文字" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : ", %lld character"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : ", %lld characters"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "、%lld文字"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "「%@」" : {
       "localizations" : {
         "en" : {
@@ -1233,7 +1267,7 @@
         }
       }
     },
-    "カラーコードに基づくカラーアイコンを表示する" : {
+    "カラーコードに基づくカラーアイコンを表示" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1244,7 +1278,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "カラーコードに基づくカラーアイコンを表示する"
+            "value" : "カラーコードに基づくカラーアイコンを表示"
           }
         }
       }
@@ -2833,7 +2867,7 @@
         }
       }
     },
-    "リストが更新されたら最も上にスクロールする" : {
+    "リストが更新されたら最も上にスクロール" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2844,7 +2878,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "リストが更新されたら最も上にスクロールする"
+            "value" : "リストが更新されたら最も上にスクロール"
           }
         }
       }
@@ -3345,18 +3379,18 @@
         }
       }
     },
-    "定型文ウィンドウに番号を表示する" : {
+    "定型文ウィンドウに番号を表示" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show numbers in the standard phrases window"
+            "value" : "Show Numbers in the Standard Phrases Window"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "定型文ウィンドウに番号を表示する"
+            "value" : "定型文ウィンドウに番号を表示"
           }
         }
       }
@@ -3617,18 +3651,34 @@
         }
       }
     },
-    "履歴ウィンドウに番号を表示する" : {
+    "履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show numbers in the history window"
+            "value" : "Show the character count after the date in the History window and in the menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "履歴ウィンドウに番号を表示する"
+            "value" : "履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウに番号を表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Numbers in the History Window"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウに番号を表示"
           }
         }
       }
@@ -4065,6 +4115,22 @@
         }
       }
     },
+    "文字数カウントを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Character Count"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字数カウントを表示"
+          }
+        }
+      }
+    },
     "新しいタイトル" : {
       "localizations" : {
         "en" : {
@@ -4401,7 +4467,7 @@
         }
       }
     },
-    "番号を表示する" : {
+    "番号を表示" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4412,7 +4478,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "番号を表示する"
+            "value" : "番号を表示"
           }
         }
       }

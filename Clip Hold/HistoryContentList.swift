@@ -25,6 +25,7 @@ struct HistoryContentList: View {
     let showLineNumbersInHistoryWindow: Bool
     let preventWindowCloseOnDoubleClick: Bool
     let scrollToTopOnUpdate: Bool
+    let showCharacterCount: Bool
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
     let searchText: String
@@ -75,7 +76,8 @@ struct HistoryContentList: View {
                                 itemForNewPhrase: $itemForNewPhrase,
                                 lineNumberTextWidth: lineNumberTextWidth,
                                 trailingPaddingForLineNumber: trailingPaddingForLineNumber,
-                                rowIconViews: $rowIconViews // アイコンビュー辞書へのBindingを渡す
+                                rowIconViews: $rowIconViews, // アイコンビュー辞書へのBindingを渡す
+                                showCharacterCount: showCharacterCount // showCharacterCountを渡す
                             )
                             .tag(item.id)
                         }

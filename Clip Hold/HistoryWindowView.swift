@@ -41,6 +41,7 @@ struct HistoryWindowView: View {
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
+    @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
     private var lineNumberTextWidth: CGFloat? {
         guard showLineNumbersInHistoryWindow, !filteredHistory.isEmpty else { return nil }
@@ -161,6 +162,7 @@ struct HistoryWindowView: View {
                         showLineNumbersInHistoryWindow: showLineNumbersInHistoryWindow,
                         preventWindowCloseOnDoubleClick: preventWindowCloseOnDoubleClick,
                         scrollToTopOnUpdate: scrollToTopOnUpdate,
+                        showCharacterCount: showCharacterCount,
                         lineNumberTextWidth: lineNumberTextWidth,
                         trailingPaddingForLineNumber: trailingPaddingForLineNumber,
                         searchText: searchText,

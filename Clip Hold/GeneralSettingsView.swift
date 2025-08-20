@@ -82,6 +82,7 @@ struct GeneralSettingsView: View {
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     @AppStorage("enableColorCodeFilter") var enableColorCodeFilter: Bool = false
+    @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbersInStandardPhraseWindow: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
@@ -317,10 +318,10 @@ struct GeneralSettingsView: View {
             // MARK: - 定型文ウィンドウ
             Section(header: Text("定型文ウィンドウ").font(.headline)) {
                 HStack {
-                    Text("番号を表示する")
+                    Text("番号を表示")
                     Spacer()
                     Toggle(isOn: $showLineNumbersInStandardPhraseWindow) {
-                        Text("定型文ウィンドウに番号を表示する")
+                        Text("定型文ウィンドウに番号を表示")
                         Text("定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
@@ -355,10 +356,10 @@ struct GeneralSettingsView: View {
             // MARK: - 履歴をウィンドウ
             Section(header: Text("履歴ウィンドウ").font(.headline)) {
                 HStack {
-                    Text("番号を表示する")
+                    Text("番号を表示")
                     Spacer()
                     Toggle(isOn: $showLineNumbersInHistoryWindow) {
-                        Text("履歴ウィンドウに番号を表示する")
+                        Text("履歴ウィンドウに番号を表示")
                         Text("履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
@@ -389,10 +390,10 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
-                    Text("リストが更新されたら最も上にスクロールする")
+                    Text("リストが更新されたら最も上にスクロール")
                     Spacer()
                     Toggle(isOn: $scrollToTopOnUpdate) {
-                        Text("リストが更新されたら最も上にスクロールする")
+                        Text("リストが更新されたら最も上にスクロール")
                         Text("履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
@@ -405,14 +406,30 @@ struct GeneralSettingsView: View {
             Section(header: Text("開発者向け機能").font(.headline)) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("カラーコードに基づくカラーアイコンを表示する")
+                        Text("文字数カウントを表示")
+                        Text("履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $showCharacterCount) {
+                        Text("文字数カウントを表示")
+                        Text("履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("カラーコードに基づくカラーアイコンを表示")
                         Text("HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $showColorCodeIcon) {
-                        Text("カラーコードに基づくカラーアイコンを表示する")
+                        Text("カラーコードに基づくカラーアイコンを表示")
                         Text("HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。")
                     }
                     .toggleStyle(.switch)

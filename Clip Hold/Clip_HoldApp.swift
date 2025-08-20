@@ -37,6 +37,7 @@ struct ClipHoldApp: App {
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
+    @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
@@ -189,12 +190,14 @@ struct ClipHoldApp: App {
                     let displayText: String = {
                         var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
                         let dateString = itemDateFormatter.string(from: item.date)
-                                                 
+                        
+                        let characterCountText = showCharacterCount ? "、\(item.text.count)文字" : ""
+                        
                         if displayContent.count > 40 {
                             displayContent = String(displayContent.prefix(40)) + "..."
                         }
-                                                 
-                        return "\(displayContent) (\(dateString))"
+                        
+                        return "\(displayContent) (\(dateString)\(characterCountText))"
                     }()
                     
                     Button {
