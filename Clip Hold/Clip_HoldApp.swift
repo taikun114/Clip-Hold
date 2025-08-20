@@ -36,6 +36,7 @@ struct ClipHoldApp: App {
     @AppStorage("maxPhrasesInMenu") var maxPhrasesInMenu: Int = 5
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
+    @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
 
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
@@ -128,21 +129,26 @@ struct ClipHoldApp: App {
                         }
                     } label: {
                         HStack(spacing: 8) {
-                            // 定型文がURLかどうかを判定
-                            let isURL: Bool = {
-                                guard !phrase.content.isEmpty,
-                                      let url = URL(string: phrase.content) else {
-                                    return false
-                                }
-                                // URLスキームがhttpまたはhttpsであることを確認
-                                return url.scheme == "http" || url.scheme == "https"
-                            }()
-                            
-                            Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 16, height: 16)
-                                .foregroundColor(.secondary)
+                            // カラーコードアイコンの表示条件をチェック
+                            if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
+                                Image(nsImage: clipboardManager.createColorIcon(color: color, size: CGSize(width: 16, height: 16)))
+                            } else {
+                                // 定型文がURLかどうかを判定
+                                let isURL: Bool = {
+                                    guard !phrase.content.isEmpty,
+                                          let url = URL(string: phrase.content) else {
+                                        return false
+                                    }
+                                    // URLスキームがhttpまたはhttpsであることを確認
+                                    return url.scheme == "http" || url.scheme == "https"
+                                }()
+                                
+                                Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 16, height: 16)
+                                    .foregroundColor(.secondary)
+                            }
                             Text(displayText)
                                 .font(.body)
                                 .lineLimit(1)
@@ -214,7 +220,10 @@ struct ClipHoldApp: App {
                         }
                     } label: {
                         HStack(spacing: 8) {
-                            if item.isURL { // URLの場合
+                            // カラーコードアイコンの表示条件をチェック
+                            if showColorCodeIcon, item.filePath == nil, let color = ColorCodeParser.parseColor(from: item.text) {
+                                Image(nsImage: clipboardManager.createColorIcon(color: color, size: CGSize(width: 16, height: 16)))
+                            } else if item.isURL { // URLの場合
                                 Image(systemName: "paperclip")
                                     .resizable()
                                     .scaledToFit()

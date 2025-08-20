@@ -156,5 +156,29 @@ class ClipboardManager: ObservableObject {
         
         return paddedImage
     }
+    
+    // 色から円形のNSImageを生成するヘルパー関数
+    func createColorIcon(color: Color, size: CGSize) -> NSImage {
+        let nsColor = NSColor(color)
+        let image = NSImage(size: size)
+        image.lockFocus()
+        
+        let rect = NSRect(origin: .zero, size: size)
+        
+        // 円形のパスを作成
+        let path = NSBezierPath(ovalIn: rect.insetBy(dx: 0.5, dy: 0.5))
+        
+        // 色を塗りつぶし
+        nsColor.setFill()
+        path.fill()
+        
+        // 枠線を描画
+        NSColor.separatorColor.setStroke()
+        path.lineWidth = 1
+        path.stroke()
+        
+        image.unlockFocus()
+        return image
+    }
 }
 
