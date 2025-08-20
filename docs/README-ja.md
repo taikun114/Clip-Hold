@@ -5,19 +5,23 @@
 
 <p align="center">
   <a href="https://github.com/taikun114/Clip-Hold">
-    <img alt="GitHubリポジトリ スター数" src="https://img.shields.io/github/stars/taikun114/Clip-Hold?style=for-the-badge&label=%E3%82%B9%E3%82%BF%E3%83%BC&labelColor=131838&color=f2f4ff" style="border-radius: 8px;">
+    <img alt="GitHubリポジトリ スター数" src="https://img.shields.io/github/stars/taikun114/Clip-Hold?style=for-the-badge&label=%E3%82%B9%E3%82%BF%E3%83%BC&labelColor=131838&color=f2f4ff">
   </a>
   &nbsp;
   <a href="https://github.com/taikun114/Clip-Hold/releases/latest">
-    <img alt="GitHub リリース" src="https://img.shields.io/github/v/release/taikun114/Clip-Hold?sort=semver&display_name=tag&style=for-the-badge&label=%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9&labelColor=131838&color=f2f4ff" style="border-radius: 8px;">
+    <img alt="GitHub リリース" src="https://img.shields.io/github/v/release/taikun114/Clip-Hold?sort=semver&display_name=tag&style=for-the-badge&label=%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9&labelColor=131838&color=f2f4ff">
   </a>
   &nbsp;
   <a href="https://github.com/taikun114/Clip-Hold/releases/latest">
-    <img alt="GitHub ダウンロード数（すべてのアセット、すべてのリリース）" src="https://img.shields.io/github/downloads/taikun114/Clip-Hold/total?style=for-the-badge&label=%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E6%95%B0&labelColor=131838&color=f2f4ff" style="border-radius: 8px;">
+    <img alt="GitHub ダウンロード数（すべてのアセット、すべてのリリース）" src="https://img.shields.io/github/downloads/taikun114/Clip-Hold/total?style=for-the-badge&label=%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E6%95%B0&labelColor=131838&color=f2f4ff">
   </a>
 </p>
 
-[![Buy Me a Coffee](images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
+<p align="center">
+  <a href="https://www.buymeacoffee.com/i_am_taikun” target="_blank">
+    <img alt="Buy Me a Coffee" src="images/blue-button.png">
+  </a>
+</p>
 
 ## 目次
 - [Clip Holdとは？](#clip-holdとは)
@@ -143,7 +147,9 @@ Clip Holdが気に入ったら寄付してくださると嬉しいです。開�
 #### Buy Me a Coffee
 [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_taikun)で緑茶一杯分の金額からサポートしていただけます。
 
-[![Buy Me a Coffee](images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
+<a href="https://www.buymeacoffee.com/i_am_taikun” target=“_blank">
+  <img alt="Buy Me a Coffee" src="images/blue-button.png">
+</a>
 
 #### PayPal\.Me
 PayPalアカウントをお持ちの方は、[**PayPal**](https://paypal.me/taikun114)で直接寄付していただくこともできます。
@@ -151,6 +157,12 @@ PayPalアカウントをお持ちの方は、[**PayPal**](https://paypal.me/taik
 ## クレジット
 ### [Google Gemini](https://gemini.google.com/) by Google
 Clip Holdの開発には、Googleの生成AIであるGoogle Gemini（2.5 Flash）が使用されました。Swiftを含むプログラムの知識が一切ない自分にとって、生成AIの力がなければこのアプリを完成させることはできなかったでしょう。
+
+### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google
+Google Geminiを開発に組み込む際、Gemini CLIが大変役に立ちました。自動でコードファイルを書き換えてビルドし、自動で修正までしてくれるため開発する際の作業量が大幅に減りました。
+
+### [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen
+Clip Hold 1.3.0以降の開発ではGoogle Geminiに加え、AlibabaのAI開発チームであるQwenによって開発されたQwen Codeが使用されました。Qwen Codeでは高度なコーディングモデル（Clip Hold 1.3.0の開発時点ではQwen3 Coder Plus）が利用でき、1日あたり最大2000リクエストまで無料で使用できるという大変寛大な利用制限のおかげで、開発を中断することなく、スムーズに開発し続けることができました。
 
 ### [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) by Sindre Sorhus
 Clip Holdのグローバルショートカットキーの実装にはKeyboardShortcutsパッケージが使用されました。このパッケージのおかげで、非常にスムーズにショートカット機能を実装することができました。
