@@ -174,8 +174,10 @@ struct ClipHoldApp: App {
             if clipboardManager.clipboardHistory.isEmpty {
                 Text("履歴はありません")
             } else {
-                let displayLimit = min(clipboardManager.clipboardHistory.count, maxHistoryInMenu)
-                ForEach(clipboardManager.clipboardHistory.prefix(displayLimit)) { item in
+                // clipboardHistoryを日付の新しい順にソート
+                let sortedHistory = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+                let displayLimit = min(sortedHistory.count, maxHistoryInMenu)
+                ForEach(sortedHistory.prefix(displayLimit)) { item in
                     
                     let itemDateFormatter: DateFormatter = {
                         let formatter = DateFormatter()
