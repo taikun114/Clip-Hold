@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.buymeacoffee.com/i_am_taikun” target="_blank">
+  <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
     <img alt="Buy Me a Coffee" src="images/blue-button.png">
   </a>
 </p>
@@ -147,7 +147,7 @@ Clip Holdが気に入ったら寄付してくださると嬉しいです。開�
 #### Buy Me a Coffee
 [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_taikun)で緑茶一杯分の金額からサポートしていただけます。
 
-<a href="https://www.buymeacoffee.com/i_am_taikun” target=“_blank">
+<a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
   <img alt="Buy Me a Coffee" src="images/blue-button.png">
 </a>
 

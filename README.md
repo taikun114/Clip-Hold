@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://www.buymeacoffee.com/i_am_taikun” target="_blank">
+  <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
     <img alt="Buy Me a Coffee" src="docs/images/blue-button.png">
   </a>
 </p>
@@ -148,7 +148,7 @@ You can donate using the following services.
 #### Buy Me a Coffee
 You can support me at [Buy Me a Coffee](https://www.buymeacoffee.com/i_am_taikun) from the price of a cup of green tea.
 
-<a href="https://www.buymeacoffee.com/i_am_taikun” target=“_blank">
+<a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
   <img alt="Buy Me a Coffee" src="docs/images/blue-button.png">
 </a>
 
