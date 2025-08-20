@@ -16,6 +16,8 @@
 - **Support for copying multiple files at the same time**
 - **Support filtering by the app in the History window**
 - **Add Developer Features**
+  - **Add “Show Character Count” option**
+    - Show the character count after the date in the History window and in the menu.
   - **Add “Show a Color Icon Based on Color Code” option**
     - When you copy a color code in HEX, HSL / HSLA, or RGB / RGBA format, an icon for that color will be shown in the History / Standard Phrases window and menu.
   - **Add “Allow Filtering by Color Codes” option**
@@ -30,7 +32,10 @@
 - **Improve the issue causing large disk writes when copying with a large number of history items**
 - **Add an app icon to the list item in the History window**
   - It shows the app icon of the app that was in the foreground when it was copied. The icon will not be shown in the copy history before this feature was added.
+  - When you hover the mouse cursor over an app icon, the app name will be displayed in a tooltip.
 - **Add an icon to the Standard Phrase window**
+- **Add “Open” to the History window menu when the item is a file**
+- **Add a dedicated alert message when trying to delete a file from the history**
 - **Change file duplicate detection method to file hash-based**
   - This allows for more accurate duplicate file detection. Existing size-based duplicate detection is used for folders and other items for which file hashes cannot be computed.
 
