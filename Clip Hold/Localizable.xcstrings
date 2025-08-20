@@ -1217,6 +1217,22 @@
         }
       }
     },
+    "カラーコードでフィルタリングできるようにする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Filtering by Color Codes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーコードでフィルタリングできるようにする"
+          }
+        }
+      }
+    },
     "カラーコードに基づくカラーアイコンを表示する" : {
       "localizations" : {
         "en" : {
@@ -1229,6 +1245,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラーコードに基づくカラーアイコンを表示する"
+          }
+        }
+      }
+    },
+    "カラーコードのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color Codes Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーコードのみ"
           }
         }
       }
@@ -3613,6 +3645,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウのフィルタリングオプションに「カラーコードのみ」を追加します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add “Color Codes Only” to the filtering options in the History window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウのフィルタリングオプションに「カラーコードのみ」を追加します。"
           }
         }
       }

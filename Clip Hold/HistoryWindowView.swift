@@ -103,6 +103,8 @@ struct HistoryWindowView: View {
                     matchesFilter = item.filePath != nil
                 case .imageOnly:
                     matchesFilter = item.isImage
+                case .colorCodeOnly:
+                    matchesFilter = item.filePath == nil && ColorCodeParser.parseColor(from: item.text) != nil
                 }
 
                 return matchesApp && matchesSearchText && matchesFilter

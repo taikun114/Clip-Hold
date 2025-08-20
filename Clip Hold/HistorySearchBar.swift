@@ -12,6 +12,9 @@ struct HistorySearchBar: View {
     @Binding var selectedFilter: ItemFilter
     @Binding var selectedSort: ItemSort
     @Binding var selectedApp: String?
+    
+    // カラーコードフィルタリング設定のバインディング
+    @AppStorage("enableColorCodeFilter") var enableColorCodeFilter: Bool = false
 
     var body: some View {
         HStack {
@@ -49,7 +52,10 @@ struct HistorySearchBar: View {
             )
             // フィルターボタン
             Menu {
-                ForEach(ItemFilter.allCases) { filter in
+                ForEach(ItemFilter.allCases.filter { 
+                    // colorCodeOnlyは設定がオンの場合のみ表示
+                    $0 != .colorCodeOnly || enableColorCodeFilter
+                }) { filter in
                     Button {
                         selectedFilter = filter
                     } label: {
