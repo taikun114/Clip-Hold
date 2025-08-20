@@ -21,6 +21,24 @@ private struct IconViewAccessor: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
+// sourceAppPathからローカライズされたアプリ名を取得するヘルパー関数
+private func getLocalizedName(for sourceAppPath: String?) -> String? {
+    guard let sourceAppPath = sourceAppPath else { return nil }
+    
+    let appURL = URL(fileURLWithPath: sourceAppPath)
+    let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
+
+    if let appBundle = Bundle(url: appURL) {
+        let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? 
+                     appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? 
+                     appBundle.infoDictionary?["CFBundleName"] as? String ?? 
+                     nonLocalizedName
+        return appName
+    } else {
+        return nonLocalizedName
+    }
+}
+
 private let itemDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .short
@@ -177,6 +195,7 @@ struct HistoryItemRow: View {
                     
                     // カラーアイコンにもアプリアイコンを表示する
                     if let sourceAppPath = item.sourceAppPath {
+                        let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView
                                 .overlay(
@@ -190,6 +209,7 @@ struct HistoryItemRow: View {
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
+                                .help(appName) // ツールチップを追加
                         )
                     } else {
                         return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: $rowIconViews)))
@@ -235,6 +255,7 @@ struct HistoryItemRow: View {
                     }()
                     
                     if let sourceAppPath = item.sourceAppPath {
+                        let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView
                                 .overlay(
@@ -248,6 +269,7 @@ struct HistoryItemRow: View {
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
+                                .help(appName) // ツールチップを追加
                         )
                     } else {
                         return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: $rowIconViews)))
@@ -275,6 +297,7 @@ struct HistoryItemRow: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
             }
+            .help(item.text) // コンテンツテキスト部分にツールチップを追加
 
             Spacer()
 
@@ -291,7 +314,6 @@ struct HistoryItemRow: View {
         .padding(.vertical, 4)
         .padding(.leading, 2)
         .contentShape(Rectangle())
-        .help(item.text)
         .onAppear {
             if item.cachedThumbnailImage == nil, let filePath = item.filePath {
                 iconLoadTask?.cancel() // 既存のタスクをキャンセル
