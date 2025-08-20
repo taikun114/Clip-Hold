@@ -15,6 +15,11 @@
   - As in the History window, the Standard Phrases window now displays “Open Link” from the context menu when the item is a link.
 - **Support for copying multiple files at the same time**
 - **Support filtering by the app in the History window**
+- **Add Developer Features**
+  - **Add “Show a Color Icon Based on Color Code” option**
+    - When you copy a color code in HEX, HSL / HSLA, or RGB / RGBA format, an icon for that color will be shown in the History / Standard Phrases window and menu.
+  - **Add “Allow Filtering by Color Codes” option**
+    - Add “Color Codes Only” to the filtering options in the History window.
 
 ### Bug Fixes and Improvements
 - **Fix issue with two “About QR Code” items being displayed on the license sheet**
