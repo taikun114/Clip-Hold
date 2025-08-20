@@ -239,7 +239,13 @@ struct HistoryWindowView: View {
                 itemToDelete = nil
             }
         } message: {
-            Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？")
+            if let item = itemToDelete, item.filePath != nil {
+                // ファイルパスがある場合
+                Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。")
+            } else {
+                // ファイルパスがない場合（テキストなど）
+                Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？")
+            }
         }
         .sheet(isPresented: $showQRCodeSheet) {
             if let item = selectedItemForQRCode {

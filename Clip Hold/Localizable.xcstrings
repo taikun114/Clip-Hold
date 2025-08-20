@@ -62,13 +62,29 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete “%@” ?"
+            "value" : "Are you sure you want to delete “%@”?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」を本当に削除しますか？"
+          }
+        }
+      }
+    },
+    "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete “%@”? The file will be removed from the history and any other history items associated with this file will also be deleted."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。"
           }
         }
       }
