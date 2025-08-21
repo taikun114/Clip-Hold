@@ -52,6 +52,8 @@ struct SettingsView: View {
                     .tag("shortcuts")
                 Label("プライバシー", systemImage: "hand.raised")
                     .tag("privacy")
+                Label("開発者向け機能", systemImage: "hammer")
+                    .tag("developer")
             }
             .safeAreaInset(edge: .bottom) {
                 if #available(macOS 26, *) {
@@ -115,6 +117,8 @@ struct SettingsView: View {
                 case "privacy":
                     PrivacySettingsView()
                         .environmentObject(clipboardManager)
+                case "developer":
+                    DeveloperSettingsView()
                 case "info":
                     InfoSettingsView()
                 default:

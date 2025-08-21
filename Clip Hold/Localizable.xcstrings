@@ -1267,6 +1267,22 @@
         }
       }
     },
+    "カラーコード" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color Codes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーコード"
+          }
+        }
+      }
+    },
     "カラーコードでフィルタリングできるようにする" : {
       "localizations" : {
         "en" : {
@@ -2319,6 +2335,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ディスカッションページへのリンクを開きます."
+          }
+        }
+      }
+    },
+    "テキスト" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキスト"
           }
         }
       }
