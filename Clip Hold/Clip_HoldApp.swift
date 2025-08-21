@@ -87,10 +87,12 @@ struct ClipHoldApp: App {
         )
     }
         
+    @Environment(\.openSettings) private var openSettings
+
     var body: some Scene {
         Settings {
             SettingsView()
-                .frame(width: 500, height: 500)
+                .frame(width: 650, height: 500)
                 .environmentObject(clipboardManager)
                 .environmentObject(standardPhraseManager)
         }
@@ -289,12 +291,12 @@ struct ClipHoldApp: App {
             
             Divider()
             
-            SettingsLink {
+            Button(action: {
+                NSApp.activate(ignoringOtherApps: true)
+                openSettings()
+            }) {
                 Label("設定...", systemImage: "gear")
             }
-            .buttonStyle(.preAction {
-                NSApp.activate(ignoringOtherApps: true)
-            })
             .keyboardShortcut(",", modifiers: .command)
             
             Divider()
