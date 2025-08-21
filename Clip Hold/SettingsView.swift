@@ -42,7 +42,7 @@ struct SettingsView: View {
                     .tag("copyHistory")
                 Label("ショートカット", systemImage: "command")
                     .tag("shortcuts")
-                Label("プライバシー", systemImage: "hand.raised.fill")
+                Label("プライバシー", systemImage: "hand.raised")
                     .tag("privacy")
             }
             .safeAreaInset(edge: .bottom) {
@@ -50,7 +50,7 @@ struct SettingsView: View {
                     selectedSection = "info"
                 }) {
                     HStack {
-                        Image(systemName: "info.circle.fill")
+                        Image(systemName: "info.circle")
                             .foregroundColor(selectedSection == "info" ? .white : accentColor)
                         Text("情報")
                             .foregroundColor(selectedSection == "info" ? .white : .primary)
