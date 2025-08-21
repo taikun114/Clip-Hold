@@ -1,11 +1,35 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import SwiftUIIntrospect
 
 struct SettingsView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var clipboardManager: ClipboardManager
 
     @State private var selectedSection: String = "general"
+    @Environment(\.colorScheme) var colorScheme
+
+    private var accentColor: Color {
+        switch colorScheme {
+        case .dark:
+            return Color.accentColor.adjustedSaturation(-0.215)
+        case .light:
+            return Color.accentColor.adjustedBrightness(-0.07).adjustedSaturation(-0.03)
+        @unknown default:
+            return .accentColor
+        }
+    }
+    
+    private var sidebarButtonBackgroundColor: Color {
+        switch colorScheme {
+        case .dark:
+            return Color.accentColor.adjustedBrightness(-0.305).adjustedSaturation(-0.105)
+        case .light:
+            return Color.accentColor.adjustedBrightness(-0.22).adjustedSaturation(-0.04)
+        @unknown default:
+            return Color.accentColor.opacity(0.2)
+        }
+    }
 
     var body: some View {
         NavigationSplitView {
@@ -20,39 +44,58 @@ struct SettingsView: View {
                     .tag("shortcuts")
                 Label("プライバシー", systemImage: "hand.raised.fill")
                     .tag("privacy")
-                Label("情報", systemImage: "info.circle.fill")
-                    .tag("info")
             }
-            .frame(minWidth: 200, idealWidth: 200, maxWidth: .infinity)
-            .navigationSplitViewColumnWidth(min: 200, ideal: 200, max: 200)
+            .safeAreaInset(edge: .bottom) {
+                Button(action: {
+                    selectedSection = "info"
+                }) {
+                    HStack {
+                        Image(systemName: "info.circle.fill")
+                            .foregroundColor(selectedSection == "info" ? .white : accentColor)
+                        Text("情報")
+                            .foregroundColor(selectedSection == "info" ? .white : .primary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(4)
+                .padding(.horizontal, 5)
+                .padding(.vertical, 2)
+                .background(selectedSection == "info" ? sidebarButtonBackgroundColor : Color.clear)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .padding(10)
+            }
+            .frame(minWidth: 150, idealWidth: 200, maxWidth: 250)
+            .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 250)
             .toolbar(removing: .sidebarToggle)
         } detail: {
             Group {
                 switch selectedSection {
                 case "general":
                     GeneralSettingsView()
-                        .frame(minWidth: 450, maxWidth: .infinity)
                 case "standardPhrases":
                     StandardPhraseSettingsView()
                         .environmentObject(standardPhraseManager)
-                        .frame(minWidth: 450, maxWidth: .infinity)
                 case "copyHistory":
                     CopyHistorySettingsView()
-                        .frame(minWidth: 450, maxWidth: .infinity)
                 case "shortcuts":
                     ShortcutsSettingsView()
-                        .frame(minWidth: 450, maxWidth: .infinity)
                 case "privacy":
                     PrivacySettingsView()
                         .environmentObject(clipboardManager)
-                        .frame(minWidth: 450, maxWidth: .infinity)
                 case "info":
                     InfoSettingsView()
-                        .frame(minWidth: 450, maxWidth: .infinity)
                 default:
                     GeneralSettingsView()
-                        .frame(minWidth: 450, maxWidth: .infinity)
                 }
+            }
+            .frame(minWidth: 450, maxWidth: .infinity)
+        }
+        .introspect(.navigationSplitView, on: .macOS(.v14, .v15)) { splitview in
+            if let delegate = splitview.delegate as? NSSplitViewController {
+                delegate.splitViewItems.first?.canCollapse = false
+                delegate.splitViewItems.first?.canCollapseFromWindowResize = false
             }
         }
     }

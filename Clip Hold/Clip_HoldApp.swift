@@ -92,7 +92,7 @@ struct ClipHoldApp: App {
     var body: some Scene {
         Settings {
             SettingsView()
-                .frame(width: 650, height: 500)
+                .frame(width: 700, height: 550)
                 .environmentObject(clipboardManager)
                 .environmentObject(standardPhraseManager)
         }
