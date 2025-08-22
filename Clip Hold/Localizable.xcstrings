@@ -2837,6 +2837,22 @@
         }
       }
     },
+    "プリセット: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット: %@"
+          }
+        }
+      }
+    },
     "プリセット名" : {
       "localizations" : {
         "en" : {

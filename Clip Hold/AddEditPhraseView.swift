@@ -10,14 +10,16 @@ struct AddEditPhraseView: View {
     }
 
     let mode: Mode
+    var onSave: ((StandardPhrase) -> Void)? // コールバック追加
     @State var phraseToEdit: StandardPhrase // editモードの場合の元のphraseを保持
 
     @State private var title: String
     @State private var content: String
     @State private var useContentAsTitle: Bool = false
 
-    init(mode: Mode, phraseToEdit: StandardPhrase? = nil, initialContent: String? = nil) {
+    init(mode: Mode, phraseToEdit: StandardPhrase? = nil, initialContent: String? = nil, onSave: ((StandardPhrase) -> Void)? = nil) {
         self.mode = mode
+        self.onSave = onSave
         _phraseToEdit = State(initialValue: phraseToEdit ?? StandardPhrase(title: "", content: ""))
 
         switch mode {
@@ -80,10 +82,21 @@ struct AddEditPhraseView: View {
                         finalTitle = title
                     }
 
+                    let phrase = StandardPhrase(title: finalTitle, content: content)
+                    
                     if case .add = mode {
-                        standardPhraseManager.addPhrase(title: finalTitle, content: content)
+                        if let onSave = onSave {
+                            onSave(phrase)
+                        } else {
+                            standardPhraseManager.addPhrase(title: finalTitle, content: content)
+                        }
                     } else if case .edit(let originalPhrase) = mode {
-                        standardPhraseManager.updatePhrase(id: originalPhrase.id, newTitle: finalTitle, newContent: content)
+                        let updatedPhrase = StandardPhrase(id: originalPhrase.id, title: finalTitle, content: content)
+                        if let onSave = onSave {
+                            onSave(updatedPhrase)
+                        } else {
+                            standardPhraseManager.updatePhrase(id: originalPhrase.id, newTitle: finalTitle, newContent: content)
+                        }
                     }
                     dismiss()
                 }

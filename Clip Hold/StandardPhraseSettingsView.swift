@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 // MARK: - StandardPhraseSettingsView
 struct StandardPhraseSettingsView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @StateObject private var presetManager = StandardPhrasePresetManager.shared
 
     @State private var showingAddPhraseSheet = false
     @State private var selectedPhrase: StandardPhrase?
@@ -17,9 +18,6 @@ struct StandardPhraseSettingsView: View {
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
     
-    // プリセット選択用の状態変数
-    @State private var selectedPreset = "defaultPreset"
-
     var body: some View {
         Form {
             // MARK: - 定型文の管理セクション
@@ -29,7 +27,7 @@ struct StandardPhraseSettingsView: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 HStack {
-                    Text("\(standardPhraseManager.standardPhrases.count)個の定型文")
+                    Text("\(currentPhrases.count)個の定型文")
                         .foregroundStyle(.secondary)
                     Spacer()
                     Button(action: {
@@ -39,12 +37,12 @@ struct StandardPhraseSettingsView: View {
                             Image(systemName: "trash")
                             Text("すべての定型文を削除")
                         }
-                        .if(!standardPhraseManager.standardPhrases.isEmpty) { view in
+                        .if(!currentPhrases.isEmpty) { view in
                             view.foregroundStyle(.red)
                         }
                     }
                     .buttonStyle(.bordered)
-                    .disabled(standardPhraseManager.standardPhrases.isEmpty)
+                    .disabled(currentPhrases.isEmpty)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             }
@@ -65,26 +63,32 @@ struct StandardPhraseSettingsView: View {
                 HStack {
                     Text("プリセット")
                     Spacer()
-                    Picker("", selection: $selectedPreset) {
-                        Text("デフォルト")
-                            .tag("defaultPreset")
+                    Picker("", selection: $presetManager.selectedPresetId) {
+                        ForEach(presetManager.presets) { preset in
+                            Text(preset.name)
+                                .tag(preset.id as UUID?)
+                        }
                         Divider()
                         Text("新規プリセット...")
-                            .tag("newPreset")
+                            .tag(nil as UUID?)
                     }
                     .pickerStyle(.menu)
-                    .onChange(of: selectedPreset) { _, newValue in
-                        if newValue == "newPreset" {
+                    .onChange(of: presetManager.selectedPresetId) { _, newValue in
+                        if newValue == nil {
                             showingAddPresetSheet = true
-                            // 選択をデフォルトに戻す
-                            selectedPreset = "defaultPreset"
+                            // 選択を元に戻す
+                            if let currentSelectedId = presetManager.selectedPresetId {
+                                presetManager.selectedPresetId = currentSelectedId
+                            } else if let firstPreset = presetManager.presets.first {
+                                presetManager.selectedPresetId = firstPreset.id
+                            }
                         }
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
                 List(selection: $selectedPhraseId) {
-                    ForEach(standardPhraseManager.standardPhrases) { phrase in
+                    ForEach(currentPhrases) { phrase in
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(phrase.title)
@@ -104,9 +108,9 @@ struct StandardPhraseSettingsView: View {
                         .accessibilityElement(children: .combine)
                         .accessibilityLabel("タイトル: \(phrase.title)、内容: \(phrase.content)")
                     }
-                    .onMove(perform: standardPhraseManager.movePhrase)
+                    .onMove(perform: movePhrase)
                     .onDelete { indexSet in
-                        standardPhraseManager.deletePhrase(atOffsets: indexSet)
+                        deletePhrase(atOffsets: indexSet)
                         selectedPhraseId = nil
                     }
                 }
@@ -139,7 +143,7 @@ struct StandardPhraseSettingsView: View {
 
                             Button(action: {
                                 if let selectedId = selectedPhraseId {
-                                    if let phrase = standardPhraseManager.standardPhrases.first(where: { $0.id == selectedId }) {
+                                    if let phrase = currentPhrases.first(where: { $0.id == selectedId }) {
                                         phraseToDelete = phrase
                                         showingDeleteConfirmation = true
                                     }
@@ -160,7 +164,7 @@ struct StandardPhraseSettingsView: View {
 
                             Button(action: {
                                 if let selectedId = selectedPhraseId {
-                                    if let phrase = standardPhraseManager.standardPhrases.first(where: { $0.id == selectedId }) {
+                                    if let phrase = currentPhrases.first(where: { $0.id == selectedId }) {
                                         selectedPhrase = phrase
                                     }
                                 }
@@ -183,13 +187,13 @@ struct StandardPhraseSettingsView: View {
                     if !selection.isEmpty {
                         Button("編集") {
                             if let firstSelectedId = selection.first {
-                                if let phraseToEdit = standardPhraseManager.standardPhrases.first(where: { $0.id == firstSelectedId }) {
+                                if let phraseToEdit = currentPhrases.first(where: { $0.id == firstSelectedId }) {
                                     selectedPhrase = phraseToEdit
                                 }
                             }
                         }
                         Button("削除", role: .destructive) {
-                            let phrasesToDelete = standardPhraseManager.standardPhrases.filter { selection.contains($0.id) }
+                            let phrasesToDelete = currentPhrases.filter { selection.contains($0.id) }
                             if let firstPhrase = phrasesToDelete.first {
                                 phraseToDelete = firstPhrase
                                 showingDeleteConfirmation = true
@@ -198,7 +202,7 @@ struct StandardPhraseSettingsView: View {
                     }
                 } primaryAction: { selection in
                     if let firstSelectedId = selection.first {
-                        if let phraseToEdit = standardPhraseManager.standardPhrases.first(where: { $0.id == firstSelectedId }) {
+                        if let phraseToEdit = currentPhrases.first(where: { $0.id == firstSelectedId }) {
                             selectedPhrase = phraseToEdit
                         }
                     }
@@ -207,17 +211,21 @@ struct StandardPhraseSettingsView: View {
         }
         .formStyle(.grouped)
         .sheet(isPresented: $showingAddPhraseSheet) {
-            AddEditPhraseView(mode: .add)
-                .environmentObject(standardPhraseManager)
+            AddEditPhraseView(mode: .add) { newPhrase in
+                addPhrase(newPhrase)
+            }
+            .environmentObject(standardPhraseManager)
         }
         .sheet(item: $selectedPhrase) { phrase in
-            AddEditPhraseView(mode: .edit(phrase), phraseToEdit: phrase)
-                .environmentObject(standardPhraseManager)
+            AddEditPhraseView(mode: .edit(phrase), phraseToEdit: phrase) { editedPhrase in
+                updatePhrase(editedPhrase)
+            }
+            .environmentObject(standardPhraseManager)
         }
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation) {
             Button("削除", role: .destructive) {
                 if let phrase = phraseToDelete {
-                    standardPhraseManager.deletePhrase(id: phrase.id)
+                    deletePhrase(id: phrase.id)
                     phraseToDelete = nil
                     selectedPhraseId = nil
                 }
@@ -230,7 +238,7 @@ struct StandardPhraseSettingsView: View {
         }
         .alert("すべての定型文を削除", isPresented: $showingClearAllPhrasesConfirmation) {
             Button("削除", role: .destructive) {
-                standardPhraseManager.deleteAllPhrases()
+                deleteAllPhrases()
             }
             Button("キャンセル", role: .cancel) { }
         } message: {
@@ -248,8 +256,7 @@ struct StandardPhraseSettingsView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .onSubmit {
                         if !newPresetName.isEmpty {
-                            // ここにプリセット保存のロジックを実装
-                            showingAddPresetSheet = false
+                            addPreset(name: newPresetName)
                             newPresetName = ""
                         }
                     }
@@ -265,8 +272,7 @@ struct StandardPhraseSettingsView: View {
                     .controlSize(.large)
 
                     Button("保存") {
-                        // ここにプリセット保存のロジックを実装
-                        showingAddPresetSheet = false
+                        addPreset(name: newPresetName)
                         newPresetName = ""
                     }
                     .controlSize(.large)
@@ -277,6 +283,56 @@ struct StandardPhraseSettingsView: View {
             .padding()
             .frame(width: 300, height: 140)
         }
+    }
+}
+
+// MARK: - Helper Methods
+extension StandardPhraseSettingsView {
+    private var currentPhrases: [StandardPhrase] {
+        presetManager.selectedPreset?.phrases ?? []
+    }
+    
+    private func addPhrase(_ phrase: StandardPhrase) {
+        guard var selectedPreset = presetManager.selectedPreset else { return }
+        selectedPreset.phrases.append(phrase)
+        presetManager.updatePreset(selectedPreset)
+    }
+    
+    private func updatePhrase(_ phrase: StandardPhrase) {
+        guard var selectedPreset = presetManager.selectedPreset else { return }
+        if let index = selectedPreset.phrases.firstIndex(where: { $0.id == phrase.id }) {
+            selectedPreset.phrases[index] = phrase
+            presetManager.updatePreset(selectedPreset)
+        }
+    }
+    
+    private func deletePhrase(id: UUID) {
+        guard var selectedPreset = presetManager.selectedPreset else { return }
+        selectedPreset.phrases.removeAll { $0.id == id }
+        presetManager.updatePreset(selectedPreset)
+    }
+    
+    private func deletePhrase(atOffsets indexSet: IndexSet) {
+        guard var selectedPreset = presetManager.selectedPreset else { return }
+        selectedPreset.phrases.remove(atOffsets: indexSet)
+        presetManager.updatePreset(selectedPreset)
+    }
+    
+    private func movePhrase(from source: IndexSet, to destination: Int) {
+        guard var selectedPreset = presetManager.selectedPreset else { return }
+        selectedPreset.phrases.move(fromOffsets: source, toOffset: destination)
+        presetManager.updatePreset(selectedPreset)
+    }
+    
+    private func deleteAllPhrases() {
+        guard var selectedPreset = presetManager.selectedPreset else { return }
+        selectedPreset.phrases = []
+        presetManager.updatePreset(selectedPreset)
+    }
+    
+    private func addPreset(name: String) {
+        presetManager.addPreset(name: name)
+        showingAddPresetSheet = false
     }
 }
 

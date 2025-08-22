@@ -41,6 +41,7 @@ struct ClipHoldApp: App {
 
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
+    @StateObject var presetManager = StandardPhrasePresetManager.shared
 
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
@@ -94,15 +95,18 @@ struct ClipHoldApp: App {
             isInserted: menuBarExtraInsertionBinding
         ) {
             // --- 定型文セクション ---
-            Label("よく使う定型文", systemImage: "star")
-                .font(.headline)
-                .padding(.bottom, 5)
-            
-            if standardPhraseManager.standardPhrases.isEmpty {
+            HStack {
+                Label("よく使う定型文", systemImage: "star")
+                    .font(.headline)
+            }
+            .padding(.bottom, 5)
+                        
+            let phrasesToShow = presetManager.selectedPreset?.phrases ?? standardPhraseManager.standardPhrases
+            if phrasesToShow.isEmpty {
                 Text("定型文はありません")
             } else {
-                let displayLimit = min(standardPhraseManager.standardPhrases.count, maxPhrasesInMenu)
-                ForEach(standardPhraseManager.standardPhrases.prefix(displayLimit)) { phrase in
+                let displayLimit = min(phrasesToShow.count, maxPhrasesInMenu)
+                ForEach(phrasesToShow.prefix(displayLimit)) { phrase in
                     let displayText: String = {
                         let displayContent = phrase.title.replacingOccurrences(of: "\n", with: " ")
                         if displayContent.count > 40 {
@@ -153,6 +157,15 @@ struct ClipHoldApp: App {
             }
             
             Divider()
+
+            // プリセット選択メニュー
+            Menu("プリセット: \(presetManager.selectedPreset?.name ?? "デフォルト")") {
+                    ForEach(presetManager.presets) { preset in
+                        Button(preset.name) {
+                            presetManager.selectedPresetId = preset.id
+                        }
+                }
+            }
             Button {
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showStandardPhraseWindow()
