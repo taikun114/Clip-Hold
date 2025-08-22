@@ -13,6 +13,8 @@
 ### New Features
 - **Revamped settings screen**
   - The existing tabbed style has been greatly revamped to a sidebar style setting screen.
+- **Add “Show App Icons” option**
+  - Toggle to show or hide the app icon for each item in the History window.
 - **Add “Developer Features” tab**
   - **Add “Show Character Count” option**
     - Show the character count after the date in the History window and in the menu.
