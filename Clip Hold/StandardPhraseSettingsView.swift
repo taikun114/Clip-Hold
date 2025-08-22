@@ -12,6 +12,13 @@ struct StandardPhraseSettingsView: View {
     @State private var showingClearAllPhrasesConfirmation = false
 
     @State private var selectedPhraseId: UUID? = nil
+    
+    // プリセット追加シート用の状態変数
+    @State private var showingAddPresetSheet = false
+    @State private var newPresetName = ""
+    
+    // プリセット選択用の状態変数
+    @State private var selectedPreset = "defaultPreset"
 
     var body: some View {
         Form {
@@ -54,6 +61,28 @@ struct StandardPhraseSettingsView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             ) {
+                // プリセット項目
+                HStack {
+                    Text("プリセット")
+                    Spacer()
+                    Picker("", selection: $selectedPreset) {
+                        Text("デフォルト")
+                            .tag("defaultPreset")
+                        Divider()
+                        Text("新規プリセット...")
+                            .tag("newPreset")
+                    }
+                    .pickerStyle(.menu)
+                    .onChange(of: selectedPreset) { _, newValue in
+                        if newValue == "newPreset" {
+                            showingAddPresetSheet = true
+                            // 選択をデフォルトに戻す
+                            selectedPreset = "defaultPreset"
+                        }
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
                 List(selection: $selectedPhraseId) {
                     ForEach(standardPhraseManager.standardPhrases) { phrase in
                         HStack {
@@ -206,6 +235,47 @@ struct StandardPhraseSettingsView: View {
             Button("キャンセル", role: .cancel) { }
         } message: {
             Text("すべての定型文を本当に削除しますか？この操作は元に戻せません。")
+        }
+        .sheet(isPresented: $showingAddPresetSheet) {
+            VStack(spacing: 10) {
+                HStack {
+                    Text("プリセット名を入力")
+                        .font(.headline)
+                    Spacer()
+                }
+
+                TextField("プリセット名", text: $newPresetName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .onSubmit {
+                        if !newPresetName.isEmpty {
+                            // ここにプリセット保存のロジックを実装
+                            showingAddPresetSheet = false
+                            newPresetName = ""
+                        }
+                    }
+
+                Spacer()
+
+                HStack {
+                    Spacer()
+                    Button("キャンセル", role: .cancel) {
+                        showingAddPresetSheet = false
+                        newPresetName = ""
+                    }
+                    .controlSize(.large)
+
+                    Button("保存") {
+                        // ここにプリセット保存のロジックを実装
+                        showingAddPresetSheet = false
+                        newPresetName = ""
+                    }
+                    .controlSize(.large)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(newPresetName.isEmpty)
+                }
+            }
+            .padding()
+            .frame(width: 300, height: 140)
         }
     }
 }
