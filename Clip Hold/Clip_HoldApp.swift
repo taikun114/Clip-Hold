@@ -184,7 +184,7 @@ struct ClipHoldApp: App {
                         var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
                         let dateString = itemDateFormatter.string(from: item.date)
                         
-                        let characterCountText = showCharacterCount ? "、\(item.text.count)文字" : ""
+                        let characterCountText = showCharacterCount ? String(localized:" - \(item.text.count)文字") : ""
                         
                         if displayContent.count > 40 {
                             displayContent = String(displayContent.prefix(40)) + "..."
