@@ -30,6 +30,7 @@
 ### Bug Fixes and Improvements
 - **Fix issue with two “About QR Code” items being displayed on the license sheet**
 - **Fix issue that an image or image address could not be copied from Safari**
+- **Fix issue that sometimes did not add to the history**
 - **Improve menu history thumbnails to fit in a square**
 - **Improve to temporarily disable Quick Paste when clicking on an item from the menu bar while holding down the Option key**
   - Copying from a shortcut key is not affected by this.
@@ -39,6 +40,7 @@
   - When you hover the mouse cursor over an app icon, the app name will be displayed in a tooltip.
 - **Add an icon to the Standard Phrase window**
 - **Add “Open” to the History window menu when the item is a file**
+- **Add “Add to Apps to Exclude...” to the History window menu**
 - **Add a dedicated alert message when trying to delete a file from the history**
 - **Change file duplicate detection method to file hash-based**
   - This allows for more accurate duplicate file detection. Existing size-based duplicate detection is used for folders and other items for which file hashes cannot be computed.
