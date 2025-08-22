@@ -135,6 +135,7 @@ struct StandardPhraseItemRow: View {
 
 struct StandardPhraseWindowView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
 
     @State private var searchText: String = ""
@@ -171,11 +172,12 @@ struct StandardPhraseWindowView: View {
     private let trailingPaddingForLineNumber: CGFloat = 5
 
     private func performSearch(searchTerm: String) {
+        let currentPhrases = presetManager.selectedPreset?.phrases ?? standardPhraseManager.standardPhrases
         let newFilteredPhrases: [StandardPhrase]
         if searchTerm.isEmpty {
-            newFilteredPhrases = standardPhraseManager.standardPhrases
+            newFilteredPhrases = currentPhrases
         } else {
-            newFilteredPhrases = standardPhraseManager.standardPhrases.filter {
+            newFilteredPhrases = currentPhrases.filter {
                 $0.title.localizedCaseInsensitiveContains(searchTerm) ||
                 $0.content.localizedCaseInsensitiveContains(searchTerm)
             }
@@ -186,10 +188,18 @@ struct StandardPhraseWindowView: View {
     private func movePhrases(from source: IndexSet, to destination: Int) {
         // 検索中の場合は並び替えを許可しない
         if searchText.isEmpty {
-            standardPhraseManager.movePhrase(from: source, to: destination)
+            // プリセットが選択されている場合、プリセットの定型文を更新
+            if let selectedPreset = presetManager.selectedPreset {
+                var updatedPreset = selectedPreset
+                updatedPreset.phrases.move(fromOffsets: source, toOffset: destination)
+                presetManager.updatePreset(updatedPreset)
+            } else {
+                // プリセットが選択されていない場合、標準の定型文マネージャーを使用
+                standardPhraseManager.movePhrase(from: source, to: destination)
+            }
         }
     }
-
+    
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
             VisualEffectView(material: .menu, blendingMode: .behindWindow)
@@ -230,6 +240,29 @@ struct StandardPhraseWindowView: View {
                                 }
                             }
                         )
+                        
+                        // プリセット選択メニューを追加
+                        Menu {
+                            ForEach(presetManager.presets) { preset in
+                                Button {
+                                    presetManager.selectedPresetId = preset.id
+                                } label: {
+                                    HStack {
+                                        if presetManager.selectedPresetId == preset.id {
+                                            Image(systemName: "checkmark")
+                                        }
+                                        Text(preset.name)
+                                    }
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "line.3.horizontal.decrease")
+                                .imageScale(.large)
+                                .foregroundStyle(.secondary)
+                        }
+                        .menuStyle(.borderlessButton)
+                        .frame(width: 30)
+                        .padding(.horizontal, 4)
                     }
                     .padding(.horizontal, 10)
                     .padding(.bottom, 5)
@@ -259,6 +292,9 @@ struct StandardPhraseWindowView: View {
                         }
                     }
                     .onChange(of: standardPhraseManager.standardPhrases) { _, _ in
+                        performSearch(searchTerm: searchText)
+                    }
+                    .onChange(of: presetManager.selectedPreset?.phrases) { _, _ in
                         performSearch(searchTerm: searchText)
                     }
                     
@@ -489,4 +525,5 @@ struct StandardPhraseWindowView: View {
 #Preview {
     StandardPhraseWindowView()
         .environmentObject(StandardPhraseManager.shared)
+        .environmentObject(StandardPhrasePresetManager.shared)
 }

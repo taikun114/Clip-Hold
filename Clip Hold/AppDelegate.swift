@@ -128,11 +128,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
     }
 
+    @MainActor
     func showStandardPhraseWindow() {
         if standardPhraseWindowController == nil || standardPhraseWindowController?.window == nil {
             let contentView = StandardPhraseWindowView()
                 .environmentObject(ClipboardManager.shared)
                 .environmentObject(StandardPhraseManager.shared)
+                .environmentObject(StandardPhrasePresetManager.shared)
 
             let hostingController = NSHostingController(rootView: contentView)
             
