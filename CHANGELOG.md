@@ -40,6 +40,7 @@
 - **Add a dedicated alert message when trying to delete a file from the history**
 - **Change file duplicate detection method to file hash-based**
   - This allows for more accurate duplicate file detection. Existing size-based duplicate detection is used for folders and other items for which file hashes cannot be computed.
+- **Change the default “Maximum Size per File:” from 1 GB to Unlimited**
 
 ## 1.2.1
 ### Bug Fixes and Improvements
