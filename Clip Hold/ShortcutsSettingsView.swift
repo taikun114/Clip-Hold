@@ -83,12 +83,12 @@ struct ShortcutsSettingsView: View {
                             if phraseExists {
                                 Text("「\(standardPhraseManager.standardPhrases[index].title)」")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .lineLimit(1)
                             } else {
                                 Text("定型文が設定されていません")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                         
@@ -140,7 +140,7 @@ struct ShortcutsSettingsView: View {
                         Text("クリップボードの内容から定型文を追加する")
                         Text("現在のクリップボード内容を使って新しい定型文を追加します。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     KeyboardShortcuts.Recorder(for: .addStandardPhraseFromClipboard)

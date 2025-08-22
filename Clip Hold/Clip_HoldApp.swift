@@ -141,7 +141,7 @@ struct ClipHoldApp: App {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 16, height: 16)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                             Text(displayText)
                                 .font(.body)
@@ -227,7 +227,7 @@ struct ClipHoldApp: App {
                                     .scaledToFit()
                                     .padding(4)
                                     .frame(width: 16, height: 16)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             } else if let cachedImage = item.cachedThumbnailImage {
                                 Image(nsImage: cachedImage)
                                     .resizable()
@@ -250,14 +250,14 @@ struct ClipHoldApp: App {
                                         .scaledToFit()
                                         .padding(4)
                                         .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                 } else {
                                     Image(systemName: "doc.plaintext")
                                         .resizable()
                                         .scaledToFit()
                                         .padding(4)
                                         .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                 }
                             }
 

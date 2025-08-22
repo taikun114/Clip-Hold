@@ -99,7 +99,7 @@ struct PrivacySettingsView: View {
                         Text("クリップボード監視")
                         Text(isClipboardMonitoringPaused ? "一時停止中" : "動作中")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
@@ -122,7 +122,7 @@ struct PrivacySettingsView: View {
                         .font(.headline)
                     Text("一部の機能には、システムの許可が必要です。")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             ) {
@@ -135,7 +135,7 @@ struct PrivacySettingsView: View {
                         Text("通知")
                         Text("通知機能を使用する場合は許可を与える必要があります。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
 
@@ -173,7 +173,7 @@ struct PrivacySettingsView: View {
                         Text("アクセシビリティ")
                         Text("クイックペースト機能を使用する場合は許可を与える必要があります。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
@@ -235,7 +235,7 @@ struct PrivacySettingsView: View {
                             .tag(bundleIdentifier)
                         } else {
                             Text(bundleIdentifier)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                                 .contextMenu {
                                     Button("削除", role: .destructive) {
                                         removeAppFromExclusionList(bundleIdentifier: bundleIdentifier)
@@ -303,7 +303,7 @@ struct PrivacySettingsView: View {
                                                         Spacer()
                                                         Text(String(describing: app.processIdentifier))
                                                             .font(.caption)
-                                                            .foregroundColor(.secondary)
+                                                            .foregroundStyle(.secondary)
                                                     }
                                                     .contentShape(Rectangle())
                                                 }
@@ -388,7 +388,7 @@ struct PrivacySettingsView: View {
                     
                     Text("ここに追加したアプリが最前面にあるときはコピー履歴に追加されません。")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.bottom, 4)

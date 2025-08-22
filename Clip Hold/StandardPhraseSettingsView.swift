@@ -23,7 +23,7 @@ struct StandardPhraseSettingsView: View {
 
                 HStack {
                     Text("\(standardPhraseManager.standardPhrases.count)個の定型文")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Button(action: {
                         showingClearAllPhrasesConfirmation = true
@@ -50,7 +50,7 @@ struct StandardPhraseSettingsView: View {
 
                     Text("定型文の順番はドラッグアンドドロップで並び替えることができます。")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             ) {
@@ -64,7 +64,7 @@ struct StandardPhraseSettingsView: View {
 
                                 Text(phrase.content)
                                     .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .lineLimit(1)
                             }
                             Spacer()

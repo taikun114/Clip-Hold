@@ -178,7 +178,7 @@ struct GeneralSettingsView: View {
                         Text("クイックペースト")
                         Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $quickPaste) {
@@ -195,7 +195,7 @@ struct GeneralSettingsView: View {
                         Text("テキストのみ")
                         Text("このオプションをオンにすると、テキストのみがクイックペーストの対象となります。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $textOnlyQuickPaste) {
@@ -299,7 +299,7 @@ struct GeneralSettingsView: View {
                         Text("メニューバーアイコンを一時的に非表示")
                         Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $hideMenuBarExtra) {

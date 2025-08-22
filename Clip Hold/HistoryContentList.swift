@@ -53,7 +53,7 @@ struct HistoryContentList: View {
                 VStack {
                     Spacer()
                     Text("履歴はありません")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .font(.title2)
                         .padding(.bottom, 20)
                     Spacer()

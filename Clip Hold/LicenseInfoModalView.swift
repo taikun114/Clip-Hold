@@ -51,17 +51,17 @@ struct LicenseInfoModalView: View {
                         Text("Clip Hold")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(.primary)
+                            .foregroundStyle(.primary)
                             .padding(.bottom, 1)
                         
                         Text("バージョン: \(appVersionString) (\(appBuildString))")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .padding(.bottom, 1)
 
                         Text(verbatim: "GNU General Public License v3.0")
                             .font(.headline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .padding([.top, .horizontal])
 
@@ -88,7 +88,7 @@ struct LicenseInfoModalView: View {
                             Text("KeyboardShortcuts by Sindre Sorhus")
                                 .font(.title2)
                                 .fontWeight(.bold)
-                                .foregroundColor(.accentColor)
+                                .foregroundStyle(Color.accentColor)
                                 .underline(isKeyboardShortcutsLinkHovered)
                         }
                         .buttonStyle(.plain)
@@ -100,12 +100,12 @@ struct LicenseInfoModalView: View {
                         
                         Text("バージョン: \(keyboardShortcutsVersionString)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .padding(.bottom, 1)
 
                         Text(verbatim: "MIT License")
                             .font(.headline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.top, 10)
                     .padding(.horizontal)
@@ -136,7 +136,7 @@ struct LicenseInfoModalView: View {
                             Text("create-dmg by Andrey Tarantsov and Andrew Janke")
                                 .font(.title2)
                                 .fontWeight(.bold)
-                                .foregroundColor(.accentColor)
+                                .foregroundStyle(Color.accentColor)
                                 .underline(isCreateDmgLinkHovered)
                         }
                         .buttonStyle(.plain)
@@ -148,12 +148,12 @@ struct LicenseInfoModalView: View {
                         
                         Text("バージョン: \(createDmgVersionString)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .padding(.bottom, 1)
 
                         Text(verbatim: "MIT License")
                             .font(.headline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.top, 10)
                     .padding(.horizontal)
@@ -182,7 +182,7 @@ struct LicenseInfoModalView: View {
                             Text("Gemini CLI by Google")
                                 .font(.title2)
                                 .fontWeight(.bold)
-                                .foregroundColor(.accentColor)
+                                .foregroundStyle(Color.accentColor)
                                 .underline(isGeminiCLILinkHovered)
                         }
                         .buttonStyle(.plain)
@@ -194,12 +194,12 @@ struct LicenseInfoModalView: View {
                         
                         Text("バージョン: \(geminiCLIVersionString)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .padding(.bottom, 1)
 
                         Text(verbatim: "Apache License 2.0")
                             .font(.headline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.top, 10)
                     .padding(.horizontal)
@@ -228,7 +228,7 @@ struct LicenseInfoModalView: View {
                             Text("Qwen Code by Qwen")
                                 .font(.title2)
                                 .fontWeight(.bold)
-                                .foregroundColor(.accentColor)
+                                .foregroundStyle(Color.accentColor)
                                 .underline(isQwenCodeLinkHovered)
                         }
                         .buttonStyle(.plain)
@@ -240,12 +240,12 @@ struct LicenseInfoModalView: View {
                         
                         Text("バージョン: \(qwenCodeVersionString)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .padding(.bottom, 1)
 
                         Text(verbatim: "Apache License 2.0")
                             .font(.headline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     .padding(.top, 10)
                     .padding(.horizontal)

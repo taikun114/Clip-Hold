@@ -14,7 +14,7 @@ struct DeveloperSettingsView: View {
                         Text("文字数カウントを表示")
                         Text("履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $showCharacterCount) {
@@ -34,7 +34,7 @@ struct DeveloperSettingsView: View {
                         Text("カラーコードに基づくカラーアイコンを表示")
                         Text("HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $showColorCodeIcon) {
@@ -50,7 +50,7 @@ struct DeveloperSettingsView: View {
                         Text("カラーコードでフィルタリングできるようにする")
                         Text("履歴ウィンドウのフィルタリングオプションに「カラーコードのみ」を追加します。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $enableColorCodeFilter) {

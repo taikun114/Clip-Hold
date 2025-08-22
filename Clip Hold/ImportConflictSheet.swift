@@ -35,7 +35,7 @@ struct ImportConflictSheet: View {
 
             Text("以下の定型文は既存の項目とタイトルまたは内容が重複しています。\nタイトルまたは内容のどちらかを編集してください。")
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
 
             if let conflictBinding = currentConflict {
                 VStack(alignment: .leading, spacing: 10) {
@@ -46,7 +46,7 @@ struct ImportConflictSheet: View {
                             .font(.subheadline)
                         Text("内容: \(conflictBinding.wrappedValue.existingPhrase.content)")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
 
                         VStack(alignment: .leading) {
                             Text("新しいタイトル:")
@@ -91,7 +91,7 @@ struct ImportConflictSheet: View {
                 Spacer()
                 Text("すべての競合を処理しました。")
                     .font(.title3)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 Spacer()
             }
 

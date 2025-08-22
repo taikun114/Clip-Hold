@@ -206,7 +206,7 @@ struct CopyHistorySettingsView: View {
                         Text("ファイル1つあたりの最大容量:")
                         Text("ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Picker("ファイル1つあたりの最大容量", selection: $tempSelectedFileSizeOption) {
@@ -239,7 +239,7 @@ struct CopyHistorySettingsView: View {
                         Text("次の容量より大きいファイルコピー時にアラートを表示:")
                         Text("ここで設定した容量よりも大きいファイルをコピーしようとした際に、コピーしたファイルを履歴に保存するかどうかを求めるアラートが表示されます。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Picker("この容量より大きいファイルコピー時にアラートを表示", selection: $tempSelectedAlertOption) {
@@ -275,7 +275,7 @@ struct CopyHistorySettingsView: View {
                         Text("クリップボード履歴")
                         Text("現在、インポートとエクスポートはテキストのみサポートしています。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
@@ -306,7 +306,7 @@ struct CopyHistorySettingsView: View {
 
                 HStack {
                     Text("\(clipboardManager.clipboardHistory.count)個の履歴")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Button(action: {
                         showingClearHistoryConfirmation = true
@@ -331,7 +331,7 @@ struct CopyHistorySettingsView: View {
                     Text("保存フォルダの項目数:")
                     Spacer()
                     Text("\(itemCount)個")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
@@ -339,7 +339,7 @@ struct CopyHistorySettingsView: View {
                     Text("保存フォルダの総容量:")
                     Spacer()
                     Text(ByteCountFormatter.string(fromByteCount: Int64(totalFolderSize), countStyle: .file))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
@@ -380,7 +380,7 @@ struct CopyHistorySettingsView: View {
 
                     Text("ファイルやフォルダをコピーしたときにデータが保存されるフォルダを管理します。")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.bottom, 4)

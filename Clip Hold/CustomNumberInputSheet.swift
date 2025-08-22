@@ -83,7 +83,7 @@ struct CustomNumberInputSheet: View {
             if let description = description {
                 description
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
 
             HStack {

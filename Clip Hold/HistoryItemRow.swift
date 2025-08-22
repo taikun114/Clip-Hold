@@ -192,7 +192,7 @@ struct HistoryItemRow: View {
             if showLineNumber {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .frame(width: lineNumberTextWidth, alignment: .trailing)
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
@@ -234,7 +234,7 @@ struct HistoryItemRow: View {
                                             .scaledToFit()
                                             .padding(4)
                                             .frame(width: 30, height: 30)
-                                            .foregroundColor(.secondary))
+                                            .foregroundStyle(.secondary))
                         } else if let cachedIcon = item.cachedThumbnailImage {
                             return AnyView(Image(nsImage: cachedIcon)
                                             .resizable()
@@ -253,14 +253,14 @@ struct HistoryItemRow: View {
                                                 .scaledToFit()
                                                 .padding(4)
                                                 .frame(width: 30, height: 30)
-                                                .foregroundColor(.secondary))
+                                                .foregroundStyle(.secondary))
                             } else {
                                 return AnyView(Image(systemName: "doc.plaintext")
                                                 .resizable()
                                                 .scaledToFit()
                                                 .padding(4)
                                                 .frame(width: 30, height: 30)
-                                                .foregroundColor(.secondary))
+                                                .foregroundStyle(.secondary))
                             }
                         }
                     }()
@@ -296,7 +296,7 @@ struct HistoryItemRow: View {
                     .lineLimit(1)
                     .font(.body)
                     .truncationMode(.tail)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                 HStack(spacing: 4) {
                     Text(item.date, formatter: itemDateFormatter)
                     
@@ -311,7 +311,7 @@ struct HistoryItemRow: View {
                     }
                 }
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             }
             .help(item.text) // コンテンツテキスト部分にツールチップを追加
 
@@ -322,7 +322,7 @@ struct HistoryItemRow: View {
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .imageScale(.large)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
             }
             .menuStyle(.borderlessButton)
             .fixedSize()

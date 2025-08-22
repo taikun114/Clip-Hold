@@ -36,9 +36,9 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "info.circle")
                                 .font(.body.weight(.semibold))
-                                .foregroundColor(selectedSection == "info" ? .white : .primary)
+                                .foregroundStyle(selectedSection == "info" ? .white : .primary)
                             Text("情報")
-                                .foregroundColor(selectedSection == "info" ? .white : .primary)
+                                .foregroundStyle(selectedSection == "info" ? .white : .primary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())
@@ -56,9 +56,9 @@ struct SettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "info.circle")
-                                .foregroundColor(selectedSection == "info" ? .white : .accentColor.opacity(0.8))
+                                .foregroundStyle(selectedSection == "info" ? .white : .accentColor.opacity(0.8))
                             Text("情報")
-                                .foregroundColor(selectedSection == "info" ? .white : .primary)
+                                .foregroundStyle(selectedSection == "info" ? .white : .primary)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())

@@ -52,7 +52,7 @@ struct StandardPhraseItemRow: View {
             if showLineNumber {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .frame(width: lineNumberTextWidth, alignment: .trailing)
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
@@ -66,7 +66,7 @@ struct StandardPhraseItemRow: View {
                     .scaledToFit()
                     .padding(4)
                     .frame(width: 30, height: 30)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
             
             VStack(alignment: .leading) {
@@ -74,10 +74,10 @@ struct StandardPhraseItemRow: View {
                     .font(.body)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                 Text(phrase.content)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
@@ -121,7 +121,7 @@ struct StandardPhraseItemRow: View {
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .imageScale(.large)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
@@ -214,7 +214,7 @@ struct StandardPhraseWindowView: View {
                         .overlay(
                             HStack {
                                 Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .padding(.leading, 8)
                                     .offset(y: -1.0)
                                 Spacer()
@@ -223,7 +223,7 @@ struct StandardPhraseWindowView: View {
                                         searchText = ""
                                     }) {
                                         Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.secondary)
+                                            .foregroundStyle(.secondary)
                                     }
                                     .buttonStyle(BorderlessButtonStyle())
                                     .padding(.trailing, 8)
@@ -269,7 +269,7 @@ struct StandardPhraseWindowView: View {
                             VStack { // VStackで囲み、Spacerで中央に配置
                                 Spacer()
                                 Text("定型文はありません")
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .font(.title2)
                                     .padding(.bottom, 20)
                                 Spacer()
@@ -417,7 +417,7 @@ struct StandardPhraseWindowView: View {
                         
                         Text("コピーしました！")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 0)
                             .padding(.top, 15)
                     }
