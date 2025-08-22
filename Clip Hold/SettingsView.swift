@@ -12,36 +12,6 @@ struct SettingsView: View {
     @State private var isProgrammaticSelection: Bool = false
     @Environment(\.colorScheme) var colorScheme
 
-    private var accentColor: Color {
-        switch colorScheme {
-        case .dark:
-            return Color.accentColor.adjustedSaturation(-0.215)
-        case .light:
-            return Color.accentColor.adjustedBrightness(-0.07).adjustedSaturation(-0.03)
-        @unknown default:
-            return .accentColor
-        }
-    }
-    
-    private var sidebarButtonBackgroundColor: Color {
-        switch colorScheme {
-        case .dark:
-            if #available(macOS 26, *) {
-                return Color.accentColor.adjustedBrightness(-0.2).adjustedSaturation(0.3)
-            } else {
-                return Color.accentColor.adjustedBrightness(-0.305).adjustedSaturation(-0.105)
-            }
-        case .light:
-            if #available(macOS 26, *) {
-                return Color.accentColor.adjustedBrightness(-0.22).adjustedSaturation(-0.04)
-            } else {
-                return Color.accentColor.adjustedBrightness(-0.22).adjustedSaturation(-0.04)
-            }
-        @unknown default:
-            return Color.accentColor.opacity(0.8)
-        }
-    }
-
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedSection) {
@@ -77,7 +47,7 @@ struct SettingsView: View {
                     .padding(4)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(selectedSection == "info" ? sidebarButtonBackgroundColor : Color.clear)
+                    .background(selectedSection == "info" ? Color.accentColor.opacity(0.8) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .padding(10)
                 } else {
@@ -86,7 +56,7 @@ struct SettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "info.circle")
-                                .foregroundColor(selectedSection == "info" ? .white : accentColor)
+                                .foregroundColor(selectedSection == "info" ? .white : .accentColor.opacity(0.8))
                             Text("情報")
                                 .foregroundColor(selectedSection == "info" ? .white : .primary)
                         }
@@ -97,7 +67,7 @@ struct SettingsView: View {
                     .padding(4)
                     .padding(.horizontal, 5)
                     .padding(.vertical, 2)
-                    .background(selectedSection == "info" ? sidebarButtonBackgroundColor : Color.clear)
+                    .background(selectedSection == "info" ? Color.accentColor.opacity(0.8) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                     .padding(10)
                 }
@@ -139,21 +109,23 @@ struct SettingsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigation) {
                     HStack(spacing: 0) {
-                        Button(action: goBack) {
-                            Image(systemName: "chevron.left")
-                                .frame(width: 20, height: 20)
-                                .contentShape(Rectangle())
+                        Group {
+                            Button(action: goBack) {
+                                Image(systemName: "chevron.left")
+                                    .frame(width: 20, height: 20)
+                                    .contentShape(Rectangle())
+                            }
+                            .disabled(!canGoBack)
+                            if #available(macOS 26, *) {
+                                Capsule().fill(Color.secondary).opacity(0.1).frame(width: 1, height: 20)
+                            }
+                            Button(action: goForward) {
+                                Image(systemName: "chevron.right")
+                                    .frame(width: 20, height: 20)
+                                    .contentShape(Rectangle())
+                            }
+                            .disabled(!canGoForward)
                         }
-                        .disabled(!canGoBack)
-                        if #available(macOS 26, *) {
-                            Capsule().fill(Color.secondary).opacity(0.1).frame(width: 1, height: 20)
-                        }
-                        Button(action: goForward) {
-                            Image(systemName: "chevron.right")
-                                .frame(width: 20, height: 20)
-                                .contentShape(Rectangle())
-                        }
-                        .disabled(!canGoForward)
                     }
                 }
             }
