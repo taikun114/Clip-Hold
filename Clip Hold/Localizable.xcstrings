@@ -1071,6 +1071,22 @@
         }
       }
     },
+    "アプリアイコンを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show App Icons"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリアイコンを表示"
+          }
+        }
+      }
+    },
     "アラートを表示する容量を設定" : {
       "localizations" : {
         "en" : {
@@ -2330,7 +2346,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close the standard phrases window on double click"
+            "value" : "Do not close the Standard Phrases window on double click"
           }
         },
         "ja" : {
@@ -2346,7 +2362,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close the history window on double click"
+            "value" : "Do not close the History window on double click"
           }
         },
         "ja" : {
@@ -3482,7 +3498,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the standard phrases window."
+            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the Standard Phrases window."
           }
         },
         "ja" : {
@@ -3498,7 +3514,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show or not show numbers for each item in the standard phrases window."
+            "value" : "Toggle to show or not show numbers for each item in the Standard Phrases window."
           }
         },
         "ja" : {
@@ -3514,7 +3530,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show the standard phrases window always on top"
+            "value" : "Show the Standard Phrases window always on top"
           }
         },
         "ja" : {
@@ -3530,7 +3546,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show the standard phrases window always on top"
+            "value" : "Toggle to show the Standard Phrases window always on top."
           }
         },
         "ja" : {
@@ -3770,7 +3786,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the history window."
+            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the History window."
           }
         },
         "ja" : {
@@ -3797,12 +3813,28 @@
         }
       }
     },
+    "履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle to show or hide the app icon for each item in the History window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。"
+          }
+        }
+      }
+    },
     "履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show or not show numbers for each item in the history window."
+            "value" : "Toggle to show or not show numbers for each item in the History window."
           }
         },
         "ja" : {
@@ -3818,7 +3850,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show the history window always on top"
+            "value" : "Show the History window always on top"
           }
         },
         "ja" : {
@@ -3834,7 +3866,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show the history window always on top"
+            "value" : "Toggle to show the History window always on top."
           }
         },
         "ja" : {

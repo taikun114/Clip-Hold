@@ -79,6 +79,7 @@ struct HistoryItemRow: View {
     @Binding var rowIconViews: [UUID: NSView]
     
     let showCharacterCount: Bool
+    @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
 
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
@@ -204,8 +205,8 @@ struct HistoryItemRow: View {
                     // カラーコードが解析できた場合、専用のカラーアイコンを表示
                     let baseIconView = ColorCodeIconView(color: color)
                     
-                    // カラーアイコンにもアプリアイコンを表示する
-                    if let sourceAppPath = item.sourceAppPath {
+                    // カラーアイコンにもアプリアイコンを表示する (showAppIconOverlayがtrueの場合のみ)
+                    if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
                         let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView
@@ -265,7 +266,8 @@ struct HistoryItemRow: View {
                         }
                     }()
                     
-                    if let sourceAppPath = item.sourceAppPath {
+                    // アプリアイコンをオーバーレイ表示 (showAppIconOverlayがtrueの場合のみ)
+                    if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
                         let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView

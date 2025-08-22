@@ -80,6 +80,7 @@ struct GeneralSettingsView: View {
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
+    @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
 
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbersInStandardPhraseWindow: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
@@ -352,6 +353,17 @@ struct GeneralSettingsView: View {
 
             // MARK: - 履歴をウィンドウ
             Section(header: Text("履歴ウィンドウ").font(.headline)) {
+                HStack {
+                    Text("アプリアイコンを表示")
+                    Spacer()
+                    Toggle(isOn: $showAppIconOverlay) {
+                        Text("アプリアイコンを表示")
+                        Text("履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
                     Text("番号を表示")
                     Spacer()
