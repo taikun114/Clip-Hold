@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var historyIndex: Int = 0
     @State private var isProgrammaticSelection: Bool = false
     @Environment(\.colorScheme) var colorScheme
+    @State private var isWindowFocused: Bool = true
 
     var body: some View {
         NavigationSplitView {
@@ -36,9 +37,9 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "info.circle")
                                 .font(.body.weight(.semibold))
-                                .foregroundStyle(selectedSection == "info" ? .white : .primary)
+                                .foregroundStyle(selectedSection == "info" ? (isWindowFocused ? .white : .primary) : .primary)
                             Text("情報")
-                                .foregroundStyle(selectedSection == "info" ? .white : .primary)
+                                .foregroundStyle(selectedSection == "info" ? (isWindowFocused ? .white : .secondary.opacity(0.5)) : (isWindowFocused ? .primary : .secondary.opacity(0.5)))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())
@@ -47,7 +48,7 @@ struct SettingsView: View {
                     .padding(4)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(selectedSection == "info" ? Color.accentColor.opacity(0.8) : Color.clear)
+                    .background(selectedSection == "info" ? (isWindowFocused ? Color.accentColor.opacity(0.8) : Color.gray.opacity(0.3)) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .padding(10)
                 } else {
@@ -56,9 +57,9 @@ struct SettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "info.circle")
-                                .foregroundStyle(selectedSection == "info" ? .white : .accentColor.opacity(0.8))
+                                .foregroundStyle(selectedSection == "info" ? (isWindowFocused ? .white : .accentColor.opacity(0.8)) : .accentColor.opacity(0.8))
                             Text("情報")
-                                .foregroundStyle(selectedSection == "info" ? .white : .primary)
+                                .foregroundStyle(selectedSection == "info" ? (isWindowFocused ? .white : .secondary.opacity(0.5)) : (isWindowFocused ? .primary : .secondary.opacity(0.5)))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())
@@ -67,7 +68,7 @@ struct SettingsView: View {
                     .padding(4)
                     .padding(.horizontal, 5)
                     .padding(.vertical, 2)
-                    .background(selectedSection == "info" ? Color.accentColor.opacity(0.8) : Color.clear)
+                    .background(selectedSection == "info" ? (isWindowFocused ? Color.accentColor.opacity(0.8) : Color.gray.opacity(0.3)) : Color.clear)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
                     .padding(10)
                 }
@@ -140,6 +141,12 @@ struct SettingsView: View {
                 navigationHistory.append(newSection)
                 historyIndex = navigationHistory.count - 1
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            isWindowFocused = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
+            isWindowFocused = false
         }
     }
 
