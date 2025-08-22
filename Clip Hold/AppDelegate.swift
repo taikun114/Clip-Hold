@@ -88,6 +88,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     // MARK: - Window Management
 
+    func showSettingsWindow() {
+        SettingsWindowController.shared.showWindow()
+    }
+
     func showHistoryWindow() {
         if historyWindowController == nil || historyWindowController?.window == nil {
             let contentView = HistoryWindowView()

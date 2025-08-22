@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6D1790DD2E57347800CCECB4 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 6D1790DC2E57347800CCECB4 /* SwiftUIIntrospect */; };
 		6D18390E2E1165B0008540BC /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 6D18390D2E1165B0008540BC /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
@@ -58,7 +57,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D18390E2E1165B0008540BC /* KeyboardShortcuts in Frameworks */,
-				6D1790DD2E57347800CCECB4 /* SwiftUIIntrospect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,7 +126,6 @@
 			name = "Clip Hold";
 			packageProductDependencies = (
 				6D18390D2E1165B0008540BC /* KeyboardShortcuts */,
-				6D1790DC2E57347800CCECB4 /* SwiftUIIntrospect */,
 			);
 			productName = "Clip Hold";
 			productReference = 6D244A112E03FA9F008A66F6 /* Clip Hold.app */;
@@ -215,7 +212,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6D18390B2E1165A2008540BC /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
-				6D1790DB2E57347800CCECB4 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6D244A122E03FA9F008A66F6 /* Products */;
@@ -433,7 +429,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 202508212352;
+				CURRENT_PROJECT_VERSION = 202508221515;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -492,7 +488,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 202508212352;
+				CURRENT_PROJECT_VERSION = 202508221515;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -544,7 +540,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202508212352;
+				CURRENT_PROJECT_VERSION = 202508221515;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -563,7 +559,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202508212352;
+				CURRENT_PROJECT_VERSION = 202508221515;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -581,7 +577,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202508212352;
+				CURRENT_PROJECT_VERSION = 202508221515;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -598,7 +594,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202508212352;
+				CURRENT_PROJECT_VERSION = 202508221515;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -653,14 +649,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		6D1790DB2E57347800CCECB4 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect";
-			requirement = {
-				kind = exactVersion;
-				version = 1.3.0;
-			};
-		};
 		6D18390B2E1165A2008540BC /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
@@ -672,11 +660,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6D1790DC2E57347800CCECB4 /* SwiftUIIntrospect */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6D1790DB2E57347800CCECB4 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
-			productName = SwiftUIIntrospect;
-		};
 		6D18390D2E1165B0008540BC /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6D18390B2E1165A2008540BC /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;

@@ -95,43 +95,44 @@ struct SettingsView: View {
                     .padding(.horizontal, 5)
                     .padding(.vertical, 2)
                     .background(selectedSection == "info" ? sidebarButtonBackgroundColor : Color.clear)
-                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
                     .padding(10)
                 }
             }
             .frame(minWidth: 150, idealWidth: 200, maxWidth: 250)
             .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 250)
-            .toolbar(removing: .sidebarToggle)
         } detail: {
             Group {
                 switch selectedSection {
                 case "general":
                     GeneralSettingsView()
+                        .navigationTitle("一般")
                 case "standardPhrases":
                     StandardPhraseSettingsView()
                         .environmentObject(standardPhraseManager)
+                        .navigationTitle("定型文")
                 case "copyHistory":
                     CopyHistorySettingsView()
+                        .navigationTitle("コピー履歴")
                 case "shortcuts":
                     ShortcutsSettingsView()
+                        .navigationTitle("ショートカット")
                 case "privacy":
                     PrivacySettingsView()
                         .environmentObject(clipboardManager)
+                        .navigationTitle("プライバシー")
                 case "developer":
                     DeveloperSettingsView()
+                        .navigationTitle("開発者向け機能")
                 case "info":
                     InfoSettingsView()
+                        .navigationTitle("情報")
                 default:
                     GeneralSettingsView()
+                        .navigationTitle("一般")
                 }
             }
             .frame(minWidth: 450, maxWidth: .infinity)
-        }
-        .introspect(.navigationSplitView, on: .macOS(.v14, .v15)) { splitview in
-            if let delegate = splitview.delegate as? NSSplitViewController {
-                delegate.splitViewItems.first?.canCollapse = false
-                delegate.splitViewItems.first?.canCollapseFromWindowResize = false
-            }
         }
     }
 }

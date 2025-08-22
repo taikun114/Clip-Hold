@@ -88,13 +88,6 @@ struct ClipHoldApp: App {
     }
         
     var body: some Scene {
-        Settings {
-            SettingsView()
-                .frame(width: 700, height: 550)
-                .environmentObject(clipboardManager)
-                .environmentObject(standardPhraseManager)
-        }
-
         MenuBarExtra(
             "Clip Hold", // <- titleKey
             image: isClipboardMonitoringPaused ? "Menubar Icon Dimmed" : "Menubar Icon",
@@ -289,13 +282,11 @@ struct ClipHoldApp: App {
             
             Divider()
             
-            SettingsLink {
+            Button(action: {
+                SettingsWindowController.shared.showWindow()
+            }) {
                 Label("設定...", systemImage: "gear")
             }
-            .buttonStyle(.preAction {
-                NSApp.activate(ignoringOtherApps: true)
-            })
-            .keyboardShortcut(",", modifiers: .command)
             
             Divider()
             
@@ -306,6 +297,14 @@ struct ClipHoldApp: App {
         }
         .environmentObject(clipboardManager)
         .environmentObject(standardPhraseManager)
+        .commands {
+            CommandGroup(replacing: .appSettings) {
+                Button("設定...") {
+                    SettingsWindowController.shared.showWindow()
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
+        }
     }
     
     static func setupGlobalShortcuts() {
