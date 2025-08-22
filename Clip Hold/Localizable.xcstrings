@@ -1253,6 +1253,22 @@
         }
       }
     },
+    "エクスポートしたいプリセットを選択" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the presets you want to export"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エクスポートしたいプリセットを選択"
+          }
+        }
+      }
+    },
     "エラー" : {
       "localizations" : {
         "en" : {
@@ -2017,6 +2033,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スターをつける"
+          }
+        }
+      }
+    },
+    "すべて" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて"
           }
         }
       }
@@ -2885,6 +2917,22 @@
         }
       }
     },
+    "プリセットを選択" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットを選択"
+          }
+        }
+      }
+    },
     "プリセット名" : {
       "localizations" : {
         "en" : {
@@ -3713,6 +3761,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文が設定されていません"
+          }
+        }
+      }
+    },
+    "定型文のエクスポート" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Standard Phrases"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文のエクスポート"
           }
         }
       }
@@ -4549,6 +4613,22 @@
         }
       }
     },
+    "旧バージョンで使用できるようにする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make it work with older versions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旧バージョンで使用できるようにする"
+          }
+        }
+      }
+    },
     "書き出したクリップボード履歴のJSONファイルを読み込みます。" : {
       "localizations" : {
         "en" : {
@@ -4593,6 +4673,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "有効な数値を入力してください。"
+          }
+        }
+      }
+    },
+    "有効にすると、プリセット情報なしで定型文のみをエクスポートします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, only standard phrases are exported without preset information."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効にすると、プリセット情報なしで定型文のみをエクスポートします。"
           }
         }
       }

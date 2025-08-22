@@ -16,12 +16,16 @@ extension View {
 
 struct PhraseDocument: FileDocument {
     var standardPhrases: [StandardPhrase]
+    var presetData: [StandardPhrasePreset]?
+    var isLegacyFormat: Bool
 
     static var readableContentTypes: [UTType] { [.json] }
     static var writableContentTypes: [UTType] { [.json] }
 
-    init(standardPhrases: [StandardPhrase] = []) {
+    init(standardPhrases: [StandardPhrase] = [], presetData: [StandardPhrasePreset]? = nil, isLegacyFormat: Bool = false) {
         self.standardPhrases = standardPhrases
+        self.presetData = presetData
+        self.isLegacyFormat = isLegacyFormat
     }
 
     init(configuration: ReadConfiguration) throws {
@@ -29,12 +33,26 @@ struct PhraseDocument: FileDocument {
             throw CocoaError(.fileReadCorruptFile)
         }
         self.standardPhrases = try JSONDecoder().decode([StandardPhrase].self, from: data)
+        self.presetData = nil
+        self.isLegacyFormat = true
     }
 
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted]
-        let data = try encoder.encode(standardPhrases)
+        
+        let data: Data
+        if isLegacyFormat {
+            // レガシーフォーマット: 定型文の配列のみ
+            data = try encoder.encode(standardPhrases)
+        } else if let presetData = presetData {
+            // プリセットフォーマット: プリセットの配列
+            data = try encoder.encode(presetData)
+        } else {
+            // デフォルト: 定型文の配列のみ
+            data = try encoder.encode(standardPhrases)
+        }
+        
         return FileWrapper(regularFileWithContents: data)
     }
 }
@@ -56,12 +74,22 @@ struct StandardPhraseImportExportView: View {
     @State private var showingImportConflictSheet = false
     @State private var importConflicts: [StandardPhraseDuplicate] = []
     @State private var nonConflictingPhrasesToImport: [StandardPhrase] = []
-
+    
+    // エクスポートシート用の状態変数
+    @State private var showingExportSheet = false
+    @State private var selectedExportPresetId: UUID?
+    @State private var useLegacyFormat = false
+    
     // すべてのプリセットが空かどうかを判定する計算プロパティ
     private var areAllPresetsEmpty: Bool {
         return presetManager.presets.allSatisfy { $0.phrases.isEmpty }
     }
-
+    
+    // 選択可能なプリセットのリスト
+    private var exportablePresets: [StandardPhrasePreset] {
+        return presetManager.presets
+    }
+    
     var body: some View {
         HStack {
             Text("定型文")
@@ -78,7 +106,7 @@ struct StandardPhraseImportExportView: View {
             .help("書き出した定型文のJSONファイルを読み込みます。") // インポートボタンのツールチップ
 
             Button {
-                showingFileExporter = true
+                showingExportSheet = true
             } label: {
                 HStack {
                     Image(systemName: "square.and.arrow.up")
@@ -89,9 +117,57 @@ struct StandardPhraseImportExportView: View {
             .disabled(areAllPresetsEmpty)
             .help("すべての定型文をJSONファイルとして書き出します。") // エクスポートボタンのツールチップ
         }
+        .sheet(isPresented: $showingExportSheet) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("定型文のエクスポート")
+                    .font(.headline)
+                
+                Text("エクスポートしたいプリセットを選択")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                
+                Picker("プリセットを選択", selection: $selectedExportPresetId) {
+                    Text("すべて")
+                        .tag(nil as UUID?)
+                    
+                    Divider()
+                    
+                    ForEach(exportablePresets) { preset in
+                        Text(preset.name)
+                            .tag(preset.id as UUID?)
+                    }
+                }
+                .pickerStyle(.menu)
+                .labelsHidden()
+                
+                Toggle("旧バージョンで使用できるようにする", isOn: $useLegacyFormat)
+                    .help("有効にすると、プリセット情報なしで定型文のみをエクスポートします。")
+                Spacer()
+
+                HStack {
+                    Spacer()
+                    Button("キャンセル") {
+                        showingExportSheet = false
+                        selectedExportPresetId = nil
+                        useLegacyFormat = false
+                    }
+                    .keyboardShortcut(.cancelAction)
+                    .controlSize(.large)
+                    
+                    Button("エクスポート") {
+                        showingExportSheet = false
+                        showingFileExporter = true
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .controlSize(.large)
+                }
+            }
+            .padding()
+            .frame(width: 350, height: 190)
+        }
         .fileExporter(
             isPresented: $showingFileExporter,
-            document: standardPhraseManager.exportPhrasesAsDocument(),
+            document: createExportDocument(),
             contentType: .json,
             defaultFilename: "Clip Hold Standard Phrases.json"
         ) { result in
@@ -101,6 +177,10 @@ struct StandardPhraseImportExportView: View {
             case .failure(let error):
                 print("エクスポート失敗: \(error.localizedDescription)")
             }
+            
+            // エクスポート後に状態をリセット
+            selectedExportPresetId = nil
+            useLegacyFormat = false
         }
         .fileImporter(
             isPresented: $showingFileImporter,
@@ -153,6 +233,32 @@ struct StandardPhraseImportExportView: View {
                 nonConflictingPhrasesToImport.removeAll() // シートを閉じたらクリア
             }
             .environmentObject(standardPhraseManager)
+        }
+    }
+    
+    // エクスポートドキュメントを作成するメソッド
+    private func createExportDocument() -> PhraseDocument {
+        if useLegacyFormat {
+            // レガシーフォーマット: 選択されたプリセットまたはすべての定型文をマージ
+            let phrases: [StandardPhrase]
+            if let presetId = selectedExportPresetId, 
+               let preset = presetManager.presets.first(where: { $0.id == presetId }) {
+                phrases = preset.phrases
+            } else {
+                // すべてのプリセットの定型文をマージ
+                phrases = presetManager.presets.flatMap { $0.phrases }
+            }
+            return PhraseDocument(standardPhrases: phrases, isLegacyFormat: true)
+        } else {
+            // プリセットフォーマット
+            if let presetId = selectedExportPresetId,
+               let preset = presetManager.presets.first(where: { $0.id == presetId }) {
+                // 単一プリセットをエクスポート
+                return PhraseDocument(presetData: [preset], isLegacyFormat: false)
+            } else {
+                // すべてのプリセットをエクスポート
+                return PhraseDocument(presetData: presetManager.presets, isLegacyFormat: false)
+            }
         }
     }
 }
