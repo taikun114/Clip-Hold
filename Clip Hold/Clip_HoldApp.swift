@@ -159,11 +159,18 @@ struct ClipHoldApp: App {
             Divider()
 
             // プリセット選択メニュー
-            Menu("プリセット: \(presetManager.selectedPreset?.name ?? "デフォルト")") {
+            Menu {
+                Picker("プリセット", selection: $presetManager.selectedPresetId) {
                     ForEach(presetManager.presets) { preset in
-                        Button(preset.name) {
-                            presetManager.selectedPresetId = preset.id
-                        }
+                        Text(preset.name).tag(preset.id as UUID?)
+                    }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                HStack {
+                    Text("プリセット: \(presetManager.selectedPreset?.name ?? "デフォルト")")
+                    Image(systemName: "line.3.horizontal.decrease")
+                        .foregroundStyle(.secondary)
                 }
             }
             Button {
