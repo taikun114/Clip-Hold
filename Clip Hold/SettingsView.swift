@@ -7,6 +7,9 @@ struct SettingsView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
 
     @State private var selectedSection: String = "general"
+    @State private var navigationHistory: [String] = ["general"]
+    @State private var historyIndex: Int = 0
+    @State private var isProgrammaticSelection: Bool = false
     @Environment(\.colorScheme) var colorScheme
 
     private var accentColor: Color {
@@ -63,7 +66,7 @@ struct SettingsView: View {
                         HStack {
                             Image(systemName: "info.circle")
                                 .font(.body.weight(.semibold))
-                                .foregroundColor(.primary)
+                                .foregroundColor(selectedSection == "info" ? .white : .primary)
                             Text("情報")
                                 .foregroundColor(selectedSection == "info" ? .white : .primary)
                         }
@@ -133,6 +136,70 @@ struct SettingsView: View {
                 }
             }
             .frame(minWidth: 450, maxWidth: .infinity)
+            .toolbar {
+                ToolbarItem(placement: .navigation) {
+                    HStack(spacing: 0) {
+                        Button(action: goBack) {
+                            Image(systemName: "chevron.left")
+                                .frame(width: 20, height: 20)
+                                .contentShape(Rectangle())
+                        }
+                        .disabled(!canGoBack)
+                        if #available(macOS 26, *) {
+                            Capsule().fill(Color.secondary).opacity(0.1).frame(width: 1, height: 20)
+                        }
+                        Button(action: goForward) {
+                            Image(systemName: "chevron.right")
+                                .frame(width: 20, height: 20)
+                                .contentShape(Rectangle())
+                        }
+                        .disabled(!canGoForward)
+                    }
+                }
+            }
+        }
+        .onChange(of: selectedSection) { _, newSection in
+            if !isProgrammaticSelection {
+                // ユーザーの操作による変更の場合のみ履歴を更新
+                if historyIndex < navigationHistory.count - 1 {
+                    // 履歴の途中で新しい項目を選択した場合、それ以降の履歴を削除
+                    navigationHistory.removeSubrange((historyIndex + 1)...)
+                }
+                navigationHistory.append(newSection)
+                historyIndex = navigationHistory.count - 1
+            }
+        }
+    }
+
+    private var canGoBack: Bool {
+        historyIndex > 0
+    }
+
+    private var canGoForward: Bool {
+        historyIndex < navigationHistory.count - 1
+    }
+
+    private func goBack() {
+        if canGoBack {
+            historyIndex -= 1
+            isProgrammaticSelection = true
+            selectedSection = navigationHistory[historyIndex]
+            // フラグをリセット
+            DispatchQueue.main.async {
+                isProgrammaticSelection = false
+            }
+        }
+    }
+
+    private func goForward() {
+        if canGoForward {
+            historyIndex += 1
+            isProgrammaticSelection = true
+            selectedSection = navigationHistory[historyIndex]
+            // フラグをリセット
+            DispatchQueue.main.async {
+                isProgrammaticSelection = false
+            }
         }
     }
 }
