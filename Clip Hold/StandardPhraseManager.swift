@@ -12,10 +12,45 @@ class StandardPhraseManager: ObservableObject {
     }
 
     private let phrasesFileName = "standardPhrases.json"
+    private let presetDirectoryName = "standardPhrasesPreset"
 
     private init() {
+        migrateToPresetDirectory()
         loadStandardPhrases()
         print("StandardPhraseManager: Initialized with phrase count: \(standardPhrases.count)")
+    }
+
+    // MARK: - Migration to Preset Directory
+    private func migrateToPresetDirectory() {
+        guard let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            print("StandardPhraseManager: Could not find Application Support directory (migration).")
+            return
+        }
+
+        let appSpecificDirectory = directory.appendingPathComponent("ClipHold")
+        let oldFileURL = appSpecificDirectory.appendingPathComponent(phrasesFileName)
+        let presetDirectory = appSpecificDirectory.appendingPathComponent(presetDirectoryName)
+
+        // プリセットディレクトリが存在しない場合は作成
+        if !FileManager.default.fileExists(atPath: presetDirectory.path) {
+            do {
+                try FileManager.default.createDirectory(at: presetDirectory, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print("StandardPhraseManager: Error creating preset directory: \(error.localizedDescription)")
+                return
+            }
+        }
+
+        // 既存のstandardPhrases.jsonファイルがあれば、default.jsonとしてリネーム
+        if FileManager.default.fileExists(atPath: oldFileURL.path) {
+            let defaultFileURL = presetDirectory.appendingPathComponent("default.json")
+            do {
+                try FileManager.default.moveItem(at: oldFileURL, to: defaultFileURL)
+                print("StandardPhraseManager: Migrated standardPhrases.json to default.json in preset directory.")
+            } catch {
+                print("StandardPhraseManager: Error migrating standardPhrases.json: \(error.localizedDescription)")
+            }
+        }
     }
 
     // MARK: - Persistence (ファイルシステムに保存)
@@ -25,16 +60,25 @@ class StandardPhraseManager: ObservableObject {
             return
         }
 
-        // アプリ固有のサブディレクトリを作成 (ClipboardManager と同じ場所)
+        // アプリ固有のサブディレクトリとプリセットディレクトリを取得
         let appSpecificDirectory = directory.appendingPathComponent("ClipHold")
-        let fileURL = appSpecificDirectory.appendingPathComponent(phrasesFileName)
+        let presetDirectory = appSpecificDirectory.appendingPathComponent(presetDirectoryName)
+
+        // プリセットディレクトリが存在しない場合は作成
+        if !FileManager.default.fileExists(atPath: presetDirectory.path) {
+            do {
+                try FileManager.default.createDirectory(at: presetDirectory, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print("StandardPhraseManager: Error creating preset directory: \(error.localizedDescription)")
+                return
+            }
+        }
+
+        // デフォルトプリセットとして保存 (UUIDは固定)
+        let defaultPresetId = UUID(uuidString: "00000000-0000-0000-0000-000000000000") ?? UUID()
+        let fileURL = presetDirectory.appendingPathComponent("\(defaultPresetId.uuidString).json")
 
         do {
-            // ディレクトリが存在しない場合は作成
-            if !FileManager.default.fileExists(atPath: appSpecificDirectory.path) {
-                try FileManager.default.createDirectory(at: appSpecificDirectory, withIntermediateDirectories: true, attributes: nil)
-            }
-            
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted // 可読性のために整形 (Optional)
             
@@ -53,11 +97,21 @@ class StandardPhraseManager: ObservableObject {
         }
         
         let appSpecificDirectory = directory.appendingPathComponent("ClipHold")
-        let fileURL = appSpecificDirectory.appendingPathComponent(phrasesFileName)
+        let presetDirectory = appSpecificDirectory.appendingPathComponent(presetDirectoryName)
         
-        // ファイルが存在しない場合は早期リターン (初回起動時やファイルがない場合)
+        // プリセットディレクトリが存在しない場合は早期リターン
+        guard FileManager.default.fileExists(atPath: presetDirectory.path) else {
+            print("StandardPhraseManager: Preset directory not found, starting with empty phrases.")
+            return
+        }
+        
+        // デフォルトプリセットファイルをロード
+        let defaultPresetId = UUID(uuidString: "00000000-0000-0000-0000-000000000000") ?? UUID()
+        let fileURL = presetDirectory.appendingPathComponent("\(defaultPresetId.uuidString).json")
+        
+        // ファイルが存在しない場合は早期リターン
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
-            print("StandardPhraseManager: Standard phrases file not found, starting with empty phrases.")
+            print("StandardPhraseManager: Default preset file not found, starting with empty phrases.")
             return
         }
         

@@ -48,6 +48,7 @@ extension StandardPhraseManager {
 // MARK: - インポート/エクスポート機能を提供するView
 struct StandardPhraseImportExportView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @StateObject private var presetManager = StandardPhrasePresetManager.shared
 
     @State private var showingFileExporter = false
     @State private var showingFileImporter = false
@@ -55,6 +56,11 @@ struct StandardPhraseImportExportView: View {
     @State private var showingImportConflictSheet = false
     @State private var importConflicts: [StandardPhraseDuplicate] = []
     @State private var nonConflictingPhrasesToImport: [StandardPhrase] = []
+
+    // すべてのプリセットが空かどうかを判定する計算プロパティ
+    private var areAllPresetsEmpty: Bool {
+        return presetManager.presets.allSatisfy { $0.phrases.isEmpty }
+    }
 
     var body: some View {
         HStack {
@@ -80,7 +86,7 @@ struct StandardPhraseImportExportView: View {
                 }
             }
             .buttonStyle(.bordered)
-            .disabled(standardPhraseManager.standardPhrases.isEmpty)
+            .disabled(areAllPresetsEmpty)
             .help("すべての定型文をJSONファイルとして書き出します。") // エクスポートボタンのツールチップ
         }
         .fileExporter(

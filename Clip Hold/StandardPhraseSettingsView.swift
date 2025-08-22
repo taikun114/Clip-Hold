@@ -16,7 +16,12 @@ struct StandardPhraseSettingsView: View {
     
     // プリセット追加シート用の状態変数
     @State private var showingAddPresetSheet = false
+    @State private var showingEditPresetSheet = false
     @State private var newPresetName = ""
+    @State private var editingPreset: StandardPhrasePreset?
+    @State private var selectedPresetId: UUID? = nil
+    @State private var presetToDelete: StandardPhrasePreset?
+    @State private var showingDeletePresetConfirmation = false
     
     var body: some View {
         Form {
@@ -47,19 +52,8 @@ struct StandardPhraseSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             }
 
-            // MARK: - 定型文の設定セクション
-            Section(header:
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("定型文の設定")
-                        .font(.headline)
-
-                    Text("定型文の順番はドラッグアンドドロップで並び替えることができます。")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            ) {
-                // プリセット項目
+            // MARK: - プリセットセクション
+            Section(header: Text("プリセット").font(.headline)) {
                 HStack {
                     Text("プリセット")
                     Spacer()
@@ -87,6 +81,145 @@ struct StandardPhraseSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
+                List(selection: $selectedPresetId) {
+                    ForEach(presetManager.presets) { preset in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(preset.name)
+                                    .font(.headline)
+                                    .lineLimit(1)
+                                
+                                Text("\(preset.phrases.count)個の定型文")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                            Spacer()
+                        }
+                        .tag(preset.id)
+                        .contentShape(Rectangle())
+                    }
+                    .onDelete(perform: deletePreset)
+                    .onMove(perform: movePreset)
+                }
+                .listStyle(.plain)
+                .frame(minHeight: 100)
+                .scrollContentBackground(.hidden)
+                .padding(.bottom, 24)
+                .contextMenu(forSelectionType: UUID.self) { selection in
+                    if selection.count == 1 {
+                        Button {
+                            if let selectedId = selection.first {
+                                if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
+                                    editingPreset = preset
+                                    newPresetName = preset.name
+                                    showingEditPresetSheet = true
+                                }
+                            }
+                        } label: {
+                            Label("編集...", systemImage: "pencil")
+                        }
+                        Divider()
+                        Button(role: .destructive) {
+                            if let selectedId = selection.first {
+                                if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
+                                    presetToDelete = preset
+                                    showingDeletePresetConfirmation = true
+                                }
+                            }
+                        } label: {
+                            Label("削除...", systemImage: "trash")
+                        }
+                    }
+                } primaryAction: { selection in
+                    if let selectedId = selection.first {
+                        if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
+                            editingPreset = preset
+                            newPresetName = preset.name
+                            showingEditPresetSheet = true
+                        }
+                    }
+                }
+                .overlay(alignment: .bottom) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Divider()
+                        HStack(spacing: 0) {
+                            Button(action: {
+                                showingAddPresetSheet = true
+                            }) {
+                                Image(systemName: "plus")
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                    .frame(width: 24, height: 24)
+                                    .offset(x: 2.0, y: -1.0)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.borderless)
+                            .help("新しいプリセットをリストに追加します。")
+                            
+                            Divider()
+                                .frame(width: 1, height: 16)
+                                .background(Color.gray.opacity(0.1))
+                                .padding(.horizontal, 4)
+                            
+                            Button(action: {
+                                if let selectedId = selectedPresetId {
+                                    if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
+                                        presetToDelete = preset
+                                        showingDeletePresetConfirmation = true
+                                    }
+                                }
+                            }) {
+                                Image(systemName: "minus")
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                    .frame(width: 24, height: 24)
+                                    .offset(y: -0.5)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.borderless)
+                            .disabled(selectedPresetId == nil)
+                            .help("選択したプリセットをリストから削除します。")
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                if let selectedId = selectedPresetId {
+                                    if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
+                                        editingPreset = preset
+                                        newPresetName = preset.name
+                                        showingEditPresetSheet = true
+                                    }
+                                }
+                            }) {
+                                Image(systemName: "pencil")
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                    .frame(width: 24, height: 24)
+                                    .offset(y: -1.0)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.borderless)
+                            .disabled(selectedPresetId == nil)
+                            .help("選択したプリセットを編集します。")
+                        }
+                        .background(Rectangle().opacity(0.04))
+                    }
+                }
+            }
+
+            // MARK: - 定型文の設定セクション
+            Section(header:
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("定型文の設定")
+                        .font(.headline)
+
+                    Text("定型文の順番はドラッグアンドドロップで並び替えることができます。")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            ) {
                 List(selection: $selectedPhraseId) {
                     ForEach(currentPhrases) { phrase in
                         HStack {
@@ -185,19 +318,24 @@ struct StandardPhraseSettingsView: View {
                 }
                 .contextMenu(forSelectionType: UUID.self) { selection in
                     if !selection.isEmpty {
-                        Button("編集") {
+                        Button {
                             if let firstSelectedId = selection.first {
                                 if let phraseToEdit = currentPhrases.first(where: { $0.id == firstSelectedId }) {
                                     selectedPhrase = phraseToEdit
                                 }
                             }
+                        } label: {
+                            Label("編集...", systemImage: "pencil")
                         }
-                        Button("削除", role: .destructive) {
+                        Divider()
+                        Button(role: .destructive) {
                             let phrasesToDelete = currentPhrases.filter { selection.contains($0.id) }
                             if let firstPhrase = phrasesToDelete.first {
                                 phraseToDelete = firstPhrase
                                 showingDeleteConfirmation = true
                             }
+                        } label: {
+                            Label("削除...", systemImage: "trash")
                         }
                     }
                 } primaryAction: { selection in
@@ -235,6 +373,19 @@ struct StandardPhraseSettingsView: View {
             }
         } message: {
             Text("「\(phraseToDelete?.title ?? "この定型文")」を本当に削除しますか？")
+        }
+        .alert("プリセットの削除", isPresented: $showingDeletePresetConfirmation) {
+            Button("削除", role: .destructive) {
+                if let preset = presetToDelete {
+                    deletePreset(id: preset.id)
+                    presetToDelete = nil
+                }
+            }
+            Button("キャンセル", role: .cancel) {
+                presetToDelete = nil
+            }
+        } message: {
+            Text("「\(presetToDelete?.name ?? "このプリセット")」を本当に削除しますか？")
         }
         .alert("すべての定型文を削除", isPresented: $showingClearAllPhrasesConfirmation) {
             Button("削除", role: .destructive) {
@@ -274,6 +425,47 @@ struct StandardPhraseSettingsView: View {
                     Button("保存") {
                         addPreset(name: newPresetName)
                         newPresetName = ""
+                    }
+                    .controlSize(.large)
+                    .buttonStyle(.borderedProminent)
+                    .disabled(newPresetName.isEmpty)
+                }
+            }
+            .padding()
+            .frame(width: 300, height: 140)
+        }
+        .sheet(isPresented: $showingEditPresetSheet) {
+            VStack(spacing: 10) {
+                HStack {
+                    Text("プリセット名を入力")
+                        .font(.headline)
+                    Spacer()
+                }
+
+                TextField("プリセット名", text: $newPresetName)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .onSubmit {
+                        if !newPresetName.isEmpty, let preset = editingPreset {
+                            updatePreset(preset, newName: newPresetName)
+                            newPresetName = ""
+                        }
+                    }
+
+                Spacer()
+
+                HStack {
+                    Spacer()
+                    Button("キャンセル", role: .cancel) {
+                        showingEditPresetSheet = false
+                        newPresetName = ""
+                    }
+                    .controlSize(.large)
+
+                    Button("保存") {
+                        if let preset = editingPreset {
+                            updatePreset(preset, newName: newPresetName)
+                            newPresetName = ""
+                        }
                     }
                     .controlSize(.large)
                     .buttonStyle(.borderedProminent)
@@ -333,6 +525,28 @@ extension StandardPhraseSettingsView {
     private func addPreset(name: String) {
         presetManager.addPreset(name: name)
         showingAddPresetSheet = false
+    }
+    
+    private func updatePreset(_ preset: StandardPhrasePreset, newName: String) {
+        guard let index = presetManager.presets.firstIndex(where: { $0.id == preset.id }) else { return }
+        presetManager.presets[index].name = newName
+        presetManager.updatePreset(presetManager.presets[index])
+        showingEditPresetSheet = false
+    }
+    
+    private func deletePreset(id: UUID) {
+        presetManager.deletePreset(id: id)
+        selectedPresetId = nil
+    }
+    
+    private func deletePreset(offsets: IndexSet) {
+        presetManager.presets.remove(atOffsets: offsets)
+        selectedPresetId = nil
+    }
+    
+    private func movePreset(from source: IndexSet, to destination: Int) {
+        presetManager.presets.move(fromOffsets: source, toOffset: destination)
+        presetManager.savePresetIndex()
     }
 }
 

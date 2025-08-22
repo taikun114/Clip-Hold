@@ -2853,6 +2853,38 @@
         }
       }
     },
+    "プリセット%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット%lld"
+          }
+        }
+      }
+    },
+    "プリセットの削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットの削除"
+          }
+        }
+      }
+    },
     "プリセット名" : {
       "localizations" : {
         "en" : {
@@ -4373,6 +4405,22 @@
         }
       }
     },
+    "新しいプリセットをリストに追加します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a new preset to the list."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいプリセットをリストに追加します。"
+          }
+        }
+      }
+    },
     "新しい内容:" : {
       "localizations" : {
         "en" : {
@@ -4757,22 +4805,6 @@
         }
       }
     },
-    "編集" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編集"
-          }
-        }
-      }
-    },
     "編集..." : {
       "localizations" : {
         "en" : {
@@ -4993,6 +5025,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択したアプリをリストから削除します。"
+          }
+        }
+      }
+    },
+    "選択したプリセットをリストから削除します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete a selected preset from the list."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択したプリセットをリストから削除します。"
+          }
+        }
+      }
+    },
+    "選択したプリセットを編集します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit a selected preset."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択したプリセットを編集します。"
           }
         }
       }
