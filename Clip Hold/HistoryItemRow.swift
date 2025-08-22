@@ -85,6 +85,8 @@ struct HistoryItemRow: View {
     let trailingPaddingForLineNumber: CGFloat
 
     @State private var iconLoadTask: Task<Void, Never>?
+    @State private var showingExcludeAppAlert = false
+    @State private var appToExclude: String?
 
     init(item: ClipboardItem,
          index: Int,
@@ -179,6 +181,15 @@ struct HistoryItemRow: View {
                 }
             }
             Divider()
+            // "除外するアプリに追加..." menu item
+            if let sourceAppPath = item.sourceAppPath {
+                Button {
+                    appToExclude = sourceAppPath
+                    showingExcludeAppAlert = true
+                } label: {
+                    Label("除外するアプリに追加...", systemImage: "hand.raised.circle")
+                }
+            }
             Button(role: .destructive) {
                 itemToDelete = item
                 showingDeleteConfirmation = true
@@ -357,6 +368,34 @@ struct HistoryItemRow: View {
         }
         .onDisappear {
             iconLoadTask?.cancel()
+        }
+        .alert(String(localized: "除外するアプリに追加"), isPresented: $showingExcludeAppAlert) {
+            Button("キャンセル", role: .cancel) { }
+            Button("追加") {
+                if let appPath = appToExclude {
+                    // Get the bundle identifier from the app path
+                    let appURL = URL(fileURLWithPath: appPath)
+                    if let appBundle = Bundle(url: appURL),
+                       let bundleIdentifier = appBundle.bundleIdentifier {
+                        // Update the excluded app identifiers in ClipboardManager
+                        var currentExcludedIdentifiers = clipboardManager.excludedAppIdentifiers
+                        if !currentExcludedIdentifiers.contains(bundleIdentifier) {
+                            currentExcludedIdentifiers.append(bundleIdentifier)
+                            clipboardManager.updateExcludedAppIdentifiers(currentExcludedIdentifiers)
+                            
+                            // Also update UserDefaults
+                            if let encoded = try? JSONEncoder().encode(currentExcludedIdentifiers) {
+                                UserDefaults.standard.set(encoded, forKey: "excludedAppIdentifiersData")
+                            }
+                        }
+                    }
+                }
+            }
+        } message: {
+            if let appPath = appToExclude {
+                let appName = getLocalizedName(for: appPath) ?? appPath
+                Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
+            }
         }
     }
 }

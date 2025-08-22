@@ -2,6 +2,24 @@ import SwiftUI
 import AppKit
 import Quartz
 
+// sourceAppPathからローカライズされたアプリ名を取得するヘルパー関数
+private func getLocalizedName(for sourceAppPath: String?) -> String? {
+    guard let sourceAppPath = sourceAppPath else { return nil }
+    
+    let appURL = URL(fileURLWithPath: sourceAppPath)
+    let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
+
+    if let appBundle = Bundle(url: appURL) {
+        let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? 
+                     appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? 
+                     appBundle.infoDictionary?["CFBundleName"] as? String ?? 
+                     nonLocalizedName
+        return appName
+    } else {
+        return nonLocalizedName
+    }
+}
+
 struct HistoryContentList: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
@@ -18,6 +36,10 @@ struct HistoryContentList: View {
     @Binding var selectedItemForQRCode: ClipboardItem?
     @Binding var itemForNewPhrase: ClipboardItem?
     @Binding var previousClipboardHistoryCount: Int
+
+    // State variables for the exclude app alert
+    @State private var showingExcludeAppAlert = false
+    @State private var appToExclude: String?
 
     // 各行のアイコンのNSView参照を保存するためのState
     @State private var rowIconViews: [UUID: NSView] = [:]
@@ -207,6 +229,15 @@ struct HistoryContentList: View {
                                 }
                             }
                             Divider()
+                            // "除外するアプリに追加..." menu item
+                            if let sourceAppPath = currentItem.sourceAppPath {
+                                Button {
+                                    appToExclude = sourceAppPath
+                                    showingExcludeAppAlert = true
+                                } label: {
+                                    Label("除外するアプリに追加...", systemImage: "hand.raised.circle")
+                                }
+                            }
                             Button(role: .destructive) {
                                 itemToDelete = currentItem
                                 showingDeleteConfirmation = true
@@ -276,6 +307,34 @@ struct HistoryContentList: View {
                             }
                         }
                         previousClipboardHistoryCount = newValue.count // 現在の履歴数を保存
+                    }
+                    .alert(String(localized: "除外するアプリに追加"), isPresented: $showingExcludeAppAlert) {
+                        Button("キャンセル", role: .cancel) { }
+                        Button("追加") {
+                            if let appPath = appToExclude {
+                                // Get the bundle identifier from the app path
+                                let appURL = URL(fileURLWithPath: appPath)
+                                if let appBundle = Bundle(url: appURL),
+                                   let bundleIdentifier = appBundle.bundleIdentifier {
+                                    // Update the excluded app identifiers in ClipboardManager
+                                    var currentExcludedIdentifiers = clipboardManager.excludedAppIdentifiers
+                                    if !currentExcludedIdentifiers.contains(bundleIdentifier) {
+                                        currentExcludedIdentifiers.append(bundleIdentifier)
+                                        clipboardManager.updateExcludedAppIdentifiers(currentExcludedIdentifiers)
+                                        
+                                        // Also update UserDefaults
+                                        if let encoded = try? JSONEncoder().encode(currentExcludedIdentifiers) {
+                                            UserDefaults.standard.set(encoded, forKey: "excludedAppIdentifiersData")
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } message: {
+                        if let appPath = appToExclude {
+                            let appName = getLocalizedName(for: appPath) ?? appPath
+                            Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
+                        }
                     }
                 } // ScrollViewReaderの終わり
             }

@@ -89,6 +89,22 @@
         }
       }
     },
+    "「%@」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to add “%@” to the Apps to Exclude? You can change the Apps to Exclude in the “Privacy” settings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。"
+          }
+        }
+      }
+    },
     "%@を超えるファイルがコピーされました。履歴に保存してもよろしいですか？" : {
       "localizations" : {
         "en" : {
@@ -5009,6 +5025,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "除外するアプリ"
+          }
+        }
+      }
+    },
+    "除外するアプリに追加" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Apps to Exclude"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外するアプリに追加"
+          }
+        }
+      }
+    },
+    "除外するアプリに追加..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Apps to Exclude…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外するアプリに追加..."
           }
         }
       }
