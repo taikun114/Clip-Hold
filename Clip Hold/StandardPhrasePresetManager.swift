@@ -293,8 +293,18 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     func deleteAllPresets() {
+        var userDeletedDefault = false
         for preset in presets {
+            // デフォルトプリセットの場合、削除されたことを表すフラグを設定
+            if preset.id == defaultPresetId {
+                userDeletedDefault = true
+            }
+            
             deletePresetFile(id: preset.id)
+        }
+        
+        if userDeletedDefault {
+            setUserDeletedDefaultPreset()
         }
         
         presets.removeAll()
@@ -303,8 +313,7 @@ class StandardPhrasePresetManager: ObservableObject {
         savePresetIndex()
         saveSelectedPresetId()
         
-        // Re-create default preset unless user explicitly deleted it before
-        createDefaultPreset()
+        // デフォルトプリセットは再作成しない
     }
 }
 
