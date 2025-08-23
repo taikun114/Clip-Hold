@@ -21,7 +21,7 @@
 - **Revamped settings screen**
   - The existing tabbed style has been greatly revamped to a sidebar style setting screen.
 - **Add Preset feature for Standard Phrases**
-  - You can now group your favorite standard phrases by preset. You can switch between presets from the menu or the Standard Phrases window.
+  - You can now group your favorite standard phrases by preset. You can switch between presets from the menu or the Standard Phrases window. You can also use shortcut keys to create and switch presets.
 - **Add “Show App Icons” option**
   - Toggle to show or hide the app icon for each item in the History window.
 - **Add “Developer Features” tab**
