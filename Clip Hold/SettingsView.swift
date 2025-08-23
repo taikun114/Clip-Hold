@@ -1,6 +1,5 @@
 import SwiftUI
 import UniformTypeIdentifiers
-import SwiftUIIntrospect
 
 struct SettingsView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
