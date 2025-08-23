@@ -10,9 +10,18 @@
 > Note that the history file `clipboardHistory.json` used in the previous version will stay after the upgrade with the name changed to `oldClipboardHistory.json`.\
 > So if you use an older version of Clip Hold for some reason after upgrading the history file, you can rename `oldClipboardHistory.json` to `clipboardHistory.json` to load the old history file with the old Clip Hold.
 
+> [!IMPORTANT]
+> This version has changed the saving method with the introduction of the Standard Phrases Preset feature.\
+> The file structure itself is unchanged, so it is compatible with older versions of Clip Hold.
+> 
+> Note that the standard phrases file `standardPhrases.json` used in previous versions will be renamed to `default.json` in the `standardPhrasesPreset` folder.\
+> So if you use an older version of Clip Hold for some reason, you can rename `standardPhrasesPreset/default.json` to `standardPhrases.json` to load the standard phrases file with the old Clip Hold.
+
 ### New Features
 - **Revamped settings screen**
   - The existing tabbed style has been greatly revamped to a sidebar style setting screen.
+- **Add Preset feature for Standard Phrases**
+  - You can now group your favorite standard phrases by preset. You can switch between presets from the menu or the Standard Phrases window.
 - **Add “Show App Icons” option**
   - Toggle to show or hide the app icon for each item in the History window.
 - **Add “Developer Features” tab**
@@ -22,6 +31,8 @@
     - When you copy a color code in HEX, HSL / HSLA, or RGB / RGBA format, an icon for that color will be shown in the History / Standard Phrases window and menu.
   - **Add “Allow Filtering by Color Codes” option**
     - Add “Color Codes Only” to the filtering options in the History window.
+  - **Add “Reset All Settings” option**
+    - Resets all settings of the app to their defaults. History and standard phrases are not affected.
 - **Support link in standard phrases**
   - As in the History window, the Standard Phrases window now displays “Open Link” from the context menu when the item is a link.
 - **Support for copying multiple files at the same time**
