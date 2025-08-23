@@ -79,7 +79,7 @@ struct StandardPhraseSettingsView: View {
                     ForEach(presetManager.presets) { preset in
                         HStack {
                             VStack(alignment: .leading) {
-                                Text(preset.name)
+                                Text(displayName(for: preset))
                                     .font(.headline)
                                     .lineLimit(1)
                                 
@@ -250,7 +250,7 @@ struct StandardPhraseSettingsView: View {
                         }
                     )) {
                         ForEach(presetManager.presets) { preset in
-                            Text(preset.name)
+                            Text(displayName(for: preset))
                                 .tag(preset.id as UUID?)
                         }
                         
@@ -433,7 +433,11 @@ struct StandardPhraseSettingsView: View {
                 presetToDelete = nil
             }
         } message: {
-            Text("「\(presetToDelete?.name ?? "このプリセット")」を本当に削除しますか？")
+            if let preset = presetToDelete {
+                Text("「\(displayName(for: preset))」を本当に削除しますか？")
+            } else {
+                Text("このプリセットを本当に削除しますか？")
+            }
         }
         .alert("すべての定型文を削除", isPresented: $showingClearAllPhrasesConfirmation) {
             Button("削除", role: .destructive) {
@@ -441,8 +445,8 @@ struct StandardPhraseSettingsView: View {
             }
             Button("キャンセル", role: .cancel) { }
         } message: {
-            if let presetName = presetManager.selectedPreset?.name {
-                Text("プリセット「\(presetName)」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
+            if let preset = presetManager.selectedPreset {
+                Text("プリセット「\(displayName(for: preset))」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
             } else {
                 Text("選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。")
             }
@@ -533,8 +537,8 @@ struct StandardPhraseSettingsView: View {
             }
             Button("キャンセル", role: .cancel) { }
         } message: {
-            if let presetName = presetManager.selectedPreset?.name {
-                Text("プリセット「\(presetName)」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
+            if let preset = presetManager.selectedPreset {
+                Text("プリセット「\(displayName(for: preset))」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
             } else {
                 Text("選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。")
             }
@@ -552,6 +556,13 @@ struct StandardPhraseSettingsView: View {
 
 // MARK: - Helper Methods
 extension StandardPhraseSettingsView {
+    private func displayName(for preset: StandardPhrasePreset) -> String {
+        if preset.name == "Default" {
+            return String(localized: "Default")
+        }
+        return preset.name
+    }
+    
     private var currentPhrases: [StandardPhrase] {
         presetManager.selectedPreset?.phrases ?? []
     }

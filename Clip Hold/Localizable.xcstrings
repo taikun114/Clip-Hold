@@ -567,6 +567,22 @@
         }
       }
     },
+    "Default" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デフォルト"
+          }
+        }
+      }
+    },
     "Finderで選択..." : {
       "localizations" : {
         "en" : {
@@ -1879,6 +1895,22 @@
         }
       }
     },
+    "このプリセットを本当に削除しますか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete this preset?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このプリセットを本当に削除しますか？"
+          }
+        }
+      }
+    },
     "このまま追加" : {
       "localizations" : {
         "en" : {
@@ -2617,22 +2649,6 @@
         }
       }
     },
-    "デフォルト" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Default"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "デフォルト"
-          }
-        }
-      }
-    },
     "デフォルトのショートカットに戻します。" : {
       "localizations" : {
         "en" : {
@@ -3013,22 +3029,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセット「%@」からすべての定型文を本当に削除しますか？この操作は元に戻せません。"
-          }
-        }
-      }
-    },
-    "プリセット%lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preset %lld"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プリセット%lld"
           }
         }
       }

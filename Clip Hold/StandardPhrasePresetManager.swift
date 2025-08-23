@@ -12,26 +12,16 @@ class StandardPhrasePresetManager: ObservableObject {
     private let presetIndexFileName = "presetIndex.json"
     private let defaultPresetFileName = "default"
     private let defaultPresetId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
-    private let userDeletedDefaultPresetKey = "UserDeletedDefaultPreset" // ユーザーがデフォルトプリセットを削除したことを記録するキー
+    private let userDeletedDefaultPresetKey = "UserDeletedDefaultPreset"
     
     private init() {
         loadPresetsFromFileSystem()
-        // 初回起動時にデフォルトプリセットを作成（ただしユーザーが削除していない場合のみ）
-        if presets.isEmpty && !didUserDeleteDefaultPreset() {
-            createDefaultPreset()
-        }
-        // 選択されたプリセットがなければ最初のものを選択
-        if selectedPresetId == nil, let firstPreset = presets.first {
-            selectedPresetId = firstPreset.id
-        }
     }
     
-    // ユーザーがデフォルトプリセットを削除したかどうかを確認するメソッド
     private func didUserDeleteDefaultPreset() -> Bool {
         return UserDefaults.standard.bool(forKey: userDeletedDefaultPresetKey)
     }
     
-    // ユーザーがデフォルトプリセットを削除したことを記録するメソッド
     private func setUserDeletedDefaultPreset() {
         UserDefaults.standard.set(true, forKey: userDeletedDefaultPresetKey)
     }
@@ -44,21 +34,14 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     private func createDefaultPreset() {
-        // ユーザーがデフォルトプリセットを削除している場合は作成しない
-        if didUserDeleteDefaultPreset() {
+        if didUserDeleteDefaultPreset() || presets.contains(where: { $0.id == defaultPresetId }) {
             return
         }
         
-        // 既にデフォルトプリセットが存在する場合は作成しない
-        if presets.contains(where: { $0.id == defaultPresetId }) {
-            return
-        }
-        
-        // StandardPhraseManagerから既存の定型文を取得
         let standardPhraseManager = StandardPhraseManager.shared
         let defaultPreset = StandardPhrasePreset(
             id: defaultPresetId,
-            name: String(localized: "デフォルト"),
+            name: "Default", // Non-localized name
             phrases: standardPhraseManager.standardPhrases
         )
         presets.append(defaultPreset)
@@ -68,36 +51,13 @@ class StandardPhrasePresetManager: ObservableObject {
         saveSelectedPresetId()
     }
     
-    private func createDefaultPresetIfNeeded() {
-        // ユーザーがデフォルトプリセットを削除している場合は作成しない
-        if didUserDeleteDefaultPreset() {
-            return
-        }
-        
-        // 既にデフォルトプリセットが存在する場合は作成しない
-        if presets.contains(where: { $0.id == defaultPresetId }) {
-            return
-        }
-        
-        // StandardPhraseManagerから既存の定型文を取得
-        let standardPhraseManager = StandardPhraseManager.shared
-        let defaultPreset = StandardPhrasePreset(
-            id: defaultPresetId,
-            name: String(localized: "デフォルト"),
-            phrases: standardPhraseManager.standardPhrases
-        )
-        presets.append(defaultPreset)
-        savePresetToFile(defaultPreset)
-        savePresetIndex()
-    }
-    
     private func loadPresetsFromFileSystem() {
         guard let presetDirectory = getPresetDirectory() else {
             presets = []
             return
         }
         
-        // プリセットディレクトリが存在しない場合は作成
+        // Ensure preset directory exists
         if !FileManager.default.fileExists(atPath: presetDirectory.path) {
             do {
                 try FileManager.default.createDirectory(at: presetDirectory, withIntermediateDirectories: true, attributes: nil)
@@ -108,119 +68,65 @@ class StandardPhrasePresetManager: ObservableObject {
             }
         }
         
-        // プリセットフォルダ内のファイルをスキャン
-        let presetFiles: [URL]
-        do {
-            presetFiles = try FileManager.default.contentsOfDirectory(at: presetDirectory, includingPropertiesForKeys: nil)
-                .filter { $0.pathExtension == "json" && $0.lastPathComponent != presetIndexFileName }
-        } catch {
-            print("Error scanning preset directory: \(error.localizedDescription)")
-            presets = []
-            return
+        // Try to load from index first
+        if !loadPresetIndex() {
+            // If index fails, rebuild from file system
+            rebuildPresetIndexFromFileSystem()
         }
         
-        print("Found \(presetFiles.count) preset files")
-        
-        // presetIndex.jsonをロード、なければ作成
-        var indexLoaded = loadPresetIndex()
-        print("Index loaded: \(indexLoaded), Presets count: \(presets.count)")
-        
-        // インデックスが空またはファイル数と一致しない場合、再構築
-        if !indexLoaded || presets.isEmpty || presets.count != presetFiles.count {
-            print("Rebuilding preset index")
-            rebuildPresetIndex(from: presetFiles, in: presetDirectory)
-            indexLoaded = true
-        }
-        
-        // デフォルトプリセットファイルが存在する場合
-        let defaultFileURL = presetDirectory.appendingPathComponent(defaultPresetFileName).appendingPathExtension("json")
-        if FileManager.default.fileExists(atPath: defaultFileURL.path) {
-            loadDefaultPreset(from: defaultFileURL)
-        } else {
-            // デフォルトプリセットがなければ作成
-            createDefaultPresetIfNeeded()
-        }
-        
-        // 各プリセットファイルをロード
+        // Load phrases for each preset
         for preset in presets {
-            let fileURL = presetDirectory.appendingPathComponent(preset.id.uuidString).appendingPathExtension("json")
-            if FileManager.default.fileExists(atPath: fileURL.path) {
-                loadPresetPhrases(from: fileURL, for: preset.id)
-            }
+            loadPresetPhrases(for: preset.id)
         }
         
-        // 選択されたプリセットIDも保存されている場合、復元する
-        if let selectedIdData = UserDefaults.standard.data(forKey: "SelectedStandardPhrasePresetId"),
-           let selectedId = try? JSONDecoder().decode(UUID.self, from: selectedIdData) {
-            // 選択されたプリセットIDが存在するか確認
-            if presets.contains(where: { $0.id == selectedId }) {
-                selectedPresetId = selectedId
-            } else {
-                // 存在しない場合はデフォルトプリセットを選択
-                selectedPresetId = defaultPresetId
-            }
-        } else {
-            // 保存された選択がない場合はデフォルトプリセットを選択
-            selectedPresetId = defaultPresetId
+        // If no presets exist after loading/rebuilding, create the default one
+        if presets.isEmpty && !didUserDeleteDefaultPreset() {
+            createDefaultPreset()
         }
         
-        // プリセットが空っぽだった場合は最初のものを選択
-        if selectedPresetId == nil, let firstPreset = presets.first {
-            selectedPresetId = firstPreset.id
-        }
+        // Load selected preset ID
+        loadSelectedPresetId()
         
-        print("Final presets count: \(presets.count)")
+        // Ensure a preset is selected if any exist
+        if selectedPresetId == nil || !presets.contains(where: { $0.id == selectedPresetId }) {
+            selectedPresetId = presets.first?.id
+            saveSelectedPresetId()
+        }
     }
     
-    private func rebuildPresetIndex(from presetFiles: [URL], in presetDirectory: URL) {
+    private func rebuildPresetIndexFromFileSystem() {
+        guard let presetDirectory = getPresetDirectory() else { return }
+        
         var newPresets: [StandardPhrasePreset] = []
         
-        // デフォルトプリセットを最初に追加（ただしユーザーが削除していない場合のみ）
-        if !didUserDeleteDefaultPreset() {
-            let defaultPreset = StandardPhrasePreset(id: defaultPresetId, name: String(localized: "デフォルト"), phrases: [])
-            newPresets.append(defaultPreset)
-        }
-        
-        // 他のプリセットファイルを処理
-        var presetIndex = 1 // デフォルトを除いたインデックス
-        for fileURL in presetFiles {
-            let fileName = fileURL.deletingPathExtension().lastPathComponent
+        do {
+            let presetFiles = try FileManager.default.contentsOfDirectory(at: presetDirectory, includingPropertiesForKeys: nil)
+                .filter { $0.pathExtension == "json" && $0.lastPathComponent != presetIndexFileName }
             
-            // defaultファイルの場合はスキップ
-            if fileName == defaultPresetFileName {
-                continue
-            }
-            
-            // UUIDとして解析できるか確認
-            if let uuid = UUID(uuidString: fileName) {
-                // プリセット名を「プリセット1」「プリセット2」のように設定
-                let presetName = String(localized: "プリセット\(presetIndex)")
-                let preset = StandardPhrasePreset(id: uuid, name: presetName, phrases: [])
-                newPresets.append(preset)
-                print("Added preset: \(presetName) with ID: \(uuid)")
-                presetIndex += 1
-            } else {
-                // UUIDとして解析できない場合は、新しいUUIDを割り当ててファイル名を変更
-                let newUUID = UUID()
-                let newFileName = newUUID.uuidString
-                let newFileURL = presetDirectory.appendingPathComponent(newFileName).appendingPathExtension("json")
+            var presetCounter = 1
+            for fileURL in presetFiles {
+                let fileName = fileURL.deletingPathExtension().lastPathComponent
                 
-                do {
-                    try FileManager.default.moveItem(at: fileURL, to: newFileURL)
-                    let presetName = String(localized: "プリセット\(presetIndex)")
-                    let preset = StandardPhrasePreset(id: newUUID, name: presetName, phrases: [])
+                if fileName == defaultPresetFileName {
+                    if !didUserDeleteDefaultPreset() {
+                        let preset = StandardPhrasePreset(id: defaultPresetId, name: "Default", phrases: [])
+                        newPresets.insert(preset, at: 0) // Ensure default is first
+                    }
+                } else if let uuid = UUID(uuidString: fileName) {
+                    let presetName = "Preset \(presetCounter)"
+                    let preset = StandardPhrasePreset(id: uuid, name: presetName, phrases: [])
                     newPresets.append(preset)
-                    print("Renamed and added preset: \(presetName) with new ID: \(newUUID)")
-                    presetIndex += 1
-                } catch {
-                    print("Error renaming file: \(error.localizedDescription)")
+                    presetCounter += 1
                 }
             }
+            
+            presets = newPresets
+            savePresetIndex()
+            print("Rebuilt index with \(newPresets.count) presets")
+            
+        } catch {
+            print("Error rebuilding preset index from file system: \(error.localizedDescription)")
         }
-        
-        presets = newPresets
-        savePresetIndex()
-        print("Rebuilt index with \(newPresets.count) presets")
     }
     
     private func loadPresetIndex() -> Bool {
@@ -231,12 +137,22 @@ class StandardPhrasePresetManager: ObservableObject {
         
         do {
             let data = try Data(contentsOf: indexFileURL)
-            let decoder = JSONDecoder()
-            let presetInfos = try decoder.decode([PresetInfo].self, from: data)
+            let presetInfos = try JSONDecoder().decode([PresetInfo].self, from: data)
             
-            presets = presetInfos.map { presetInfo in
-                StandardPhrasePreset(id: presetInfo.id, name: presetInfo.name, phrases: [])
+            var loadedPresets: [StandardPhrasePreset] = []
+            for presetInfo in presetInfos {
+                // Self-healing: check if the actual preset file exists
+                let fileName = presetInfo.id == defaultPresetId ? defaultPresetFileName : presetInfo.id.uuidString
+                let presetFileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
+                if FileManager.default.fileExists(atPath: presetFileURL.path) {
+                    loadedPresets.append(StandardPhrasePreset(id: presetInfo.id, name: presetInfo.name, phrases: []))
+                } else if presetInfo.id == defaultPresetId && didUserDeleteDefaultPreset() {
+                    // If default preset file is missing and user deleted it, do nothing
+                    continue
+                }
             }
+            
+            self.presets = loadedPresets
             return true
         } catch {
             print("Error loading preset index: \(error.localizedDescription)")
@@ -244,58 +160,28 @@ class StandardPhrasePresetManager: ObservableObject {
         }
     }
     
-    private func loadDefaultPreset(from fileURL: URL) {
-        // ユーザーがデフォルトプリセットを削除している場合はロードしない
-        if didUserDeleteDefaultPreset() {
-            return
-        }
+    private func loadPresetPhrases(for presetId: UUID) {
+        guard let presetDirectory = getPresetDirectory(),
+              let presetIndex = presets.firstIndex(where: { $0.id == presetId }) else { return }
+        
+        let fileName = presetId == defaultPresetId ? defaultPresetFileName : presetId.uuidString
+        let fileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
+        
+        guard FileManager.default.fileExists(atPath: fileURL.path) else { return }
         
         do {
             let data = try Data(contentsOf: fileURL)
-            let decoder = JSONDecoder()
-            let phrases = try decoder.decode([StandardPhrase].self, from: data)
-            
-            // 既にデフォルトプリセットが存在する場合は更新
-            if let defaultPresetIndex = presets.firstIndex(where: { $0.id == defaultPresetId }) {
-                presets[defaultPresetIndex].phrases = phrases
-            } else {
-                // インデックスにデフォルトプリセットがない場合は新規作成（これは起こらないはず）
-                let defaultPreset = StandardPhrasePreset(id: defaultPresetId, name: String(localized: "デフォルト"), phrases: phrases)
-                presets.append(defaultPreset)
-            }
+            let phrases = try JSONDecoder().decode([StandardPhrase].self, from: data)
+            presets[presetIndex].phrases = phrases
         } catch {
-            print("Error loading default preset: \(error.localizedDescription)")
-        }
-    }
-    
-    private func loadPresetPhrases(from fileURL: URL, for presetId: UUID) {
-        do {
-            let data = try Data(contentsOf: fileURL)
-            let decoder = JSONDecoder()
-            let phrases = try decoder.decode([StandardPhrase].self, from: data)
-            
-            if let presetIndex = presets.firstIndex(where: { $0.id == presetId }) {
-                presets[presetIndex].phrases = phrases
-            }
-        } catch {
-            print("Error loading preset phrases: \(error.localizedDescription)")
+            print("Error loading phrases for preset \(presetId): \(error.localizedDescription)")
         }
     }
     
     private func savePresetToFile(_ preset: StandardPhrasePreset) {
         guard let presetDirectory = getPresetDirectory() else { return }
         
-        // ディレクトリが存在しない場合は作成
-        if !FileManager.default.fileExists(atPath: presetDirectory.path) {
-            do {
-                try FileManager.default.createDirectory(at: presetDirectory, withIntermediateDirectories: true, attributes: nil)
-            } catch {
-                print("Error creating preset directory: \(error.localizedDescription)")
-                return
-            }
-        }
-        
-        let fileName = preset.id.uuidString == defaultPresetId.uuidString ? defaultPresetFileName : preset.id.uuidString
+        let fileName = preset.id == defaultPresetId ? defaultPresetFileName : preset.id.uuidString
         let fileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
         
         do {
@@ -312,14 +198,10 @@ class StandardPhrasePresetManager: ObservableObject {
         guard let presetDirectory = getPresetDirectory() else { return }
         let indexFileURL = presetDirectory.appendingPathComponent(presetIndexFileName)
         
-        let presetInfos = presets.map { preset in
-            PresetInfo(id: preset.id, name: preset.name)
-        }
+        let presetInfos = presets.map { PresetInfo(id: $0.id, name: $0.name) }
         
         do {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .prettyPrinted
-            let data = try encoder.encode(presetInfos)
+            let data = try JSONEncoder().encode(presetInfos)
             try data.write(to: indexFileURL)
         } catch {
             print("Error saving preset index: \(error.localizedDescription)")
@@ -328,20 +210,24 @@ class StandardPhrasePresetManager: ObservableObject {
     
     private func deletePresetFile(id: UUID) {
         guard let presetDirectory = getPresetDirectory() else { return }
-        let fileName = id.uuidString == defaultPresetId.uuidString ? defaultPresetFileName : id.uuidString
+        let fileName = id == defaultPresetId ? defaultPresetFileName : id.uuidString
         let fileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
         
-        do {
-            if FileManager.default.fileExists(atPath: fileURL.path) {
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            do {
                 try FileManager.default.removeItem(at: fileURL)
+            } catch {
+                print("Error deleting preset file: \(error.localizedDescription)")
             }
-            
-            // デフォルトプリセットが削除された場合、ユーザーが削除したことを記録
-            if id == defaultPresetId {
-                setUserDeletedDefaultPreset()
+        }
+    }
+    
+    private func loadSelectedPresetId() {
+        if let selectedIdData = UserDefaults.standard.data(forKey: "SelectedStandardPhrasePresetId"),
+           let selectedId = try? JSONDecoder().decode(UUID.self, from: selectedIdData) {
+            if presets.contains(where: { $0.id == selectedId }) {
+                self.selectedPresetId = selectedId
             }
-        } catch {
-            print("Error deleting preset file: \(error.localizedDescription)")
         }
     }
     
@@ -349,6 +235,8 @@ class StandardPhrasePresetManager: ObservableObject {
         if let selectedPresetId = selectedPresetId,
            let encodedId = try? JSONEncoder().encode(selectedPresetId) {
             UserDefaults.standard.set(encodedId, forKey: "SelectedStandardPhrasePresetId")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "SelectedStandardPhrasePresetId")
         }
     }
     
@@ -362,20 +250,18 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     func deletePreset(id: UUID) {
-        // デフォルトプリセットが削除される場合は、ユーザーが削除したことを記録
         if id == defaultPresetId {
             setUserDeletedDefaultPreset()
         }
         
         presets.removeAll { $0.id == id }
         deletePresetFile(id: id)
-        savePresetIndex()
-        // 削除されたプリセットが選択されていたら、別のプリセットを選択する
-        if selectedPresetId == id, let firstPreset = presets.first {
-            selectedPresetId = firstPreset.id
-        } else if selectedPresetId == id {
-            selectedPresetId = nil
+        
+        if selectedPresetId == id {
+            selectedPresetId = presets.first?.id
         }
+        
+        savePresetIndex()
         saveSelectedPresetId()
     }
     
@@ -393,29 +279,22 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     func deleteAllPresets() {
-        // すべてのプリセットファイルを削除
         for preset in presets {
             deletePresetFile(id: preset.id)
         }
         
-        // プリセットリストをクリア
         presets.removeAll()
-        
-        // 選択されたプリセットIDをクリア
         selectedPresetId = nil
         
-        // プリセットインデックスを保存
         savePresetIndex()
-        
-        // 選択されたプリセットIDを保存
         saveSelectedPresetId()
         
-        // デフォルトプリセットを作成（ただしユーザーが削除していない場合のみ）
+        // Re-create default preset unless user explicitly deleted it before
         createDefaultPreset()
     }
 }
 
-// プリセットのIDと名前を保持するための構造体
+// For storing preset info in the index file
 struct PresetInfo: Codable {
     let id: UUID
     let name: String
