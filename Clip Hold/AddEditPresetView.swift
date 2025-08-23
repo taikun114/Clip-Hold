@@ -5,6 +5,7 @@ struct AddEditPresetView: View {
     
     @State private var presetName: String = ""
     @Environment(\.dismiss) var dismiss
+    @FocusState private var isPresetNameFieldFocused: Bool
     
     var onDismiss: (() -> Void)? = nil
     
@@ -18,6 +19,7 @@ struct AddEditPresetView: View {
 
             TextField("プリセット名", text: $presetName)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
+                .focused($isPresetNameFieldFocused)
                 .onSubmit {
                     if !presetName.isEmpty {
                         addPreset()
@@ -50,6 +52,15 @@ struct AddEditPresetView: View {
                 window.makeKeyAndOrderFront(nil)
                 NSApp.activate(ignoringOtherApps: true)
             }
+            
+            // テキストフィールドにフォーカスを当てる
+            DispatchQueue.main.async {
+                isPresetNameFieldFocused = true
+            }
+        }
+        .onExitCommand {
+            dismiss()
+            onDismiss?()
         }
     }
     

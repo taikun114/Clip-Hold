@@ -421,6 +421,14 @@ struct ClipHoldApp: App {
             }
         }
 
+        // 新しいプリセットの追加ショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .addNewPreset) {
+            print("「新しいプリセットを追加」ショートカットが押されました！")
+            if let delegate = NSApp.delegate as? AppDelegate {
+                delegate.showAddPresetWindow()
+            }
+        }
+
         // クリップボードから新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addStandardPhraseFromClipboard) {
             print("「クリップボードから定型文を追加」ショートカットが押されました！")

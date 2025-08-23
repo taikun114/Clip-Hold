@@ -4842,6 +4842,22 @@
         }
       }
     },
+    "新しいプリセットを追加する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a New Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいプリセットを追加する"
+          }
+        }
+      }
+    },
     "新しい内容:" : {
       "localizations" : {
         "en" : {

@@ -155,6 +155,19 @@ struct ShortcutsSettingsView: View {
                     .buttonStyle(.borderless)
                     .help("デフォルトのショートカットに戻します。")
                 }
+                HStack {
+                    Text("新しいプリセットを追加する")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .addNewPreset)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.addNewPreset)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
             }
             
             Section(header: Text("コピー履歴").font(.headline)) {

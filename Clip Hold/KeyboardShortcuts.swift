@@ -7,6 +7,7 @@ extension KeyboardShortcuts.Name {
 
     static let addSNewtandardPhrase = Self("addSNewtandardPhrase", default: .init(.a, modifiers: [.control, .command]))
     static let addStandardPhraseFromClipboard = Self("addStandardPhraseFromClipboard", default: .init(.c, modifiers: [.control, .command]))
+    static let addNewPreset = Self("addNewPreset", default: .init(.n, modifiers: [.control, .command]))
 
     static let toggleClipboardMonitoring = Self("toggleClipboardMonitoring", default: .init(.m, modifiers: [.option, .command]))
 
