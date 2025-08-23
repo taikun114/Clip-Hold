@@ -26,53 +26,6 @@ struct StandardPhraseSettingsView: View {
     
     var body: some View {
         Form {
-            // MARK: - 定型文の管理セクション
-            Section(header: Text("定型文の管理").font(.headline)) {
-                StandardPhraseImportExportView()
-                    .environmentObject(standardPhraseManager)
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                HStack {
-                    Text("\(currentPhrases.count)個の定型文")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Button(action: {
-                        showingClearAllPhrasesConfirmation = true
-                    }) {
-                        HStack {
-                            Image(systemName: "trash")
-                            Text("すべての定型文を削除")
-                        }
-                        .if(!currentPhrases.isEmpty) { view in
-                            view.foregroundStyle(.red)
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(currentPhrases.isEmpty)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                HStack {
-                    Text("\(presetManager.presets.count)個のプリセット")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Button(action: {
-                        showingClearAllPresetsConfirmation = true
-                    }) {
-                        HStack {
-                            Image(systemName: "trash")
-                            Text("すべてのプリセットを削除")
-                        }
-                        .if(!presetManager.presets.isEmpty) { view in
-                            view.foregroundStyle(.red)
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(presetManager.presets.isEmpty)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            }
-
             // MARK: - プリセットセクション
             Section(header: Text("プリセット").font(.headline)) {
                 List(selection: $selectedPresetId) {
@@ -391,6 +344,53 @@ struct StandardPhraseSettingsView: View {
                     }
                 }
             }
+            
+            // MARK: - 定型文の管理セクション
+            Section(header: Text("定型文の管理").font(.headline)) {
+                StandardPhraseImportExportView()
+                    .environmentObject(standardPhraseManager)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    Text("\(currentPhrases.count)個の定型文")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button(action: {
+                        showingClearAllPhrasesConfirmation = true
+                    }) {
+                        HStack {
+                            Image(systemName: "trash")
+                            Text("すべての定型文を削除")
+                        }
+                        .if(!currentPhrases.isEmpty) { view in
+                            view.foregroundStyle(.red)
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(currentPhrases.isEmpty)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    Text("\(presetManager.presets.count)個のプリセット")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button(action: {
+                        showingClearAllPresetsConfirmation = true
+                    }) {
+                        HStack {
+                            Image(systemName: "trash")
+                            Text("すべてのプリセットを削除")
+                        }
+                        .if(!presetManager.presets.isEmpty) { view in
+                            view.foregroundStyle(.red)
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(presetManager.presets.isEmpty)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            }
         }
         .formStyle(.grouped)
         .sheet(isPresented: $showingAddPhraseSheet) {
@@ -468,13 +468,13 @@ struct StandardPhraseSettingsView: View {
                 Spacer()
 
                 HStack {
-                    Spacer()
                     Button("キャンセル", role: .cancel) {
                         showingAddPresetSheet = false
                         newPresetName = ""
                     }
                     .controlSize(.large)
 
+                    Spacer()
                     Button("保存") {
                         addPreset(name: newPresetName)
                         newPresetName = ""
@@ -507,13 +507,13 @@ struct StandardPhraseSettingsView: View {
                 Spacer()
 
                 HStack {
-                    Spacer()
                     Button("キャンセル", role: .cancel) {
                         showingEditPresetSheet = false
                         newPresetName = ""
                     }
                     .controlSize(.large)
 
+                    Spacer()
                     Button("保存") {
                         if let preset = editingPreset {
                             updatePreset(preset, newName: newPresetName)
