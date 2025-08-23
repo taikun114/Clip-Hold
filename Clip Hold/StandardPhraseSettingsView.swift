@@ -101,32 +101,29 @@ struct StandardPhraseSettingsView: View {
                 .scrollContentBackground(.hidden)
                 .padding(.bottom, 24)
                 .contextMenu(forSelectionType: UUID.self) { selection in
-                    if selection.count == 1 {
+                    if let selectedId = selection.first {
                         Button {
-                            if let selectedId = selection.first {
-                                if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
-                                    editingPreset = preset
-                                    newPresetName = preset.name
-                                    showingEditPresetSheet = true
-                                }
+                            if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
+                                editingPreset = preset
+                                newPresetName = preset.name
+                                showingEditPresetSheet = true
                             }
                         } label: {
                             Label("編集...", systemImage: "pencil")
                         }
+                        .disabled(isDefaultPreset(id: selectedId))
                         Divider()
                         Button(role: .destructive) {
-                            if let selectedId = selection.first {
-                                if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
-                                    presetToDelete = preset
-                                    showingDeletePresetConfirmation = true
-                                }
+                            if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
+                                presetToDelete = preset
+                                showingDeletePresetConfirmation = true
                             }
                         } label: {
                             Label("削除...", systemImage: "trash")
                         }
                     }
                 } primaryAction: { selection in
-                    if let selectedId = selection.first {
+                    if let selectedId = selection.first, !isDefaultPreset(id: selectedId) {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             editingPreset = preset
                             newPresetName = preset.name
@@ -194,7 +191,7 @@ struct StandardPhraseSettingsView: View {
                                     .contentShape(Rectangle())
                             }
                             .buttonStyle(.borderless)
-                            .disabled(selectedPresetId == nil)
+                            .disabled(selectedPresetId == nil || isDefaultPreset(id: selectedPresetId))
                             .help("選択したプリセットを編集します。")
                         }
                         .background(Rectangle().opacity(0.04))
@@ -563,6 +560,11 @@ extension StandardPhraseSettingsView {
         return preset.name
     }
     
+    private func isDefaultPreset(id: UUID?) -> Bool {
+        guard let id = id else { return false }
+        return id.uuidString == "00000000-0000-0000-0000-000000000000"
+    }
+    
     private var currentPhrases: [StandardPhrase] {
         presetManager.selectedPreset?.phrases ?? []
     }
@@ -623,7 +625,10 @@ extension StandardPhraseSettingsView {
     }
     
     private func deletePreset(offsets: IndexSet) {
-        presetManager.presets.remove(atOffsets: offsets)
+        let idsToDelete = offsets.map { presetManager.presets[$0].id }
+        for id in idsToDelete {
+            presetManager.deletePreset(id: id)
+        }
         selectedPresetId = nil
     }
     
