@@ -21,7 +21,7 @@ extension Int {
 }
 
 struct ShortcutsSettingsView: View {
-    @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @StateObject private var presetManager = StandardPhrasePresetManager.shared
     @EnvironmentObject var clipboardManager: ClipboardManager
 
     var body: some View {
@@ -77,11 +77,13 @@ struct ShortcutsSettingsView: View {
                     HStack {
                         VStack(alignment: .leading) {
                             // OrdinalSuffix を使用して英語表記の順序数にする
-                            Text("\((index + 1).ordinalSuffix)定型文をコピーする")                            
-                            let phraseExists = standardPhraseManager.standardPhrases.indices.contains(index)
+                            Text("\((index + 1).ordinalSuffix)定型文をコピーする")
+                            
+                            let currentPhrases = presetManager.selectedPreset?.phrases ?? []
+                            let phraseExists = currentPhrases.indices.contains(index)
                             
                             if phraseExists {
-                                Text("「\(standardPhraseManager.standardPhrases[index].title)」")
+                                Text("「\(currentPhrases[index].title)」")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                                     .lineLimit(1)

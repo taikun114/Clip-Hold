@@ -101,7 +101,7 @@ struct ClipHoldApp: App {
             }
             .padding(.bottom, 5)
                         
-            let phrasesToShow = presetManager.selectedPreset?.phrases ?? standardPhraseManager.standardPhrases
+            let phrasesToShow = presetManager.selectedPreset?.phrases ?? []
             if phrasesToShow.isEmpty {
                 Text("定型文はありません")
             } else {
@@ -378,19 +378,14 @@ struct ClipHoldApp: App {
         for i in 0..<KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts.count {
             let shortcutName = KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts[i]
             KeyboardShortcuts.onKeyDown(for: shortcutName) {
-                // StandardPhraseManager はシングルトンなので、static context からも .shared でアクセス可能
-                let standardPhraseManager = StandardPhraseManager.shared
-
-                if standardPhraseManager.standardPhrases.indices.contains(i) {
-                    let phrase = standardPhraseManager.standardPhrases[i]
+                let presetManager = StandardPhrasePresetManager.shared
+                if let selectedPreset = presetManager.selectedPreset, selectedPreset.phrases.indices.contains(i) {
+                    let phrase = selectedPreset.phrases[i]
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(phrase.content, forType: .string)
                     print("定型文「\(phrase.title)」がショートカットでコピーされました。")
 
-                    // quickPaste の最新の値を取得
                     let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
-                    
-                    // quickPaste がオンの場合、定型文は常にテキストなのでそのままペースト
                     if currentQuickPaste {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                             performPaste() // static メソッドとして呼び出し
