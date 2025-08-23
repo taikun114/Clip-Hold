@@ -249,6 +249,40 @@
         }
       }
     },
+    "%lld個のプリセット" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld preset"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld presets"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld個のプリセット"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld個の定型文" : {
       "localizations" : {
         "en" : {
@@ -2231,6 +2265,38 @@
         }
       }
     },
+    "すべてのプリセットを削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのプリセットを削除"
+          }
+        }
+      }
+    },
+    "すべてのプリセットを本当に削除しますか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete all presets? This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのプリセットを本当に削除しますか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
     "すべての定型文をJSONファイルとして書き出します。" : {
       "localizations" : {
         "en" : {
@@ -2259,22 +2325,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての定型文を削除"
-          }
-        }
-      }
-    },
-    "すべての定型文を本当に削除しますか？この操作は元に戻せません。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Are you sure you want to delete all standard phrases? This cannot be undone."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての定型文を本当に削除しますか？この操作は元に戻せません。"
           }
         }
       }
@@ -2947,6 +2997,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセット: %@"
+          }
+        }
+      }
+    },
+    "プリセット「%@」からすべての定型文を本当に削除しますか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete all standard phrases from the preset “%@”? This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット「%@」からすべての定型文を本当に削除しますか？この操作は元に戻せません。"
           }
         }
       }
@@ -5381,6 +5447,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択されたファイルがありません。"
+          }
+        }
+      }
+    },
+    "選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete all standard phrases from the selected preset? This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。"
           }
         }
       }

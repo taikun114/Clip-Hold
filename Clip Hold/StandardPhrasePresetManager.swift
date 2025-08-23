@@ -391,6 +391,28 @@ class StandardPhrasePresetManager: ObservableObject {
         guard let selectedPresetId = selectedPresetId else { return nil }
         return presets.first { $0.id == selectedPresetId }
     }
+    
+    func deleteAllPresets() {
+        // すべてのプリセットファイルを削除
+        for preset in presets {
+            deletePresetFile(id: preset.id)
+        }
+        
+        // プリセットリストをクリア
+        presets.removeAll()
+        
+        // 選択されたプリセットIDをクリア
+        selectedPresetId = nil
+        
+        // プリセットインデックスを保存
+        savePresetIndex()
+        
+        // 選択されたプリセットIDを保存
+        saveSelectedPresetId()
+        
+        // デフォルトプリセットを作成（ただしユーザーが削除していない場合のみ）
+        createDefaultPreset()
+    }
 }
 
 // プリセットのIDと名前を保持するための構造体

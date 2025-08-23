@@ -11,6 +11,7 @@ struct StandardPhraseSettingsView: View {
     @State private var showingDeleteConfirmation = false
     @State private var phraseToDelete: StandardPhrase?
     @State private var showingClearAllPhrasesConfirmation = false
+    @State private var showingClearAllPresetsConfirmation = false
 
     @State private var selectedPhraseId: UUID? = nil
     
@@ -50,64 +51,30 @@ struct StandardPhraseSettingsView: View {
                     .disabled(currentPhrases.isEmpty)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                HStack {
+                    Text("\(presetManager.presets.count)個のプリセット")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Button(action: {
+                        showingClearAllPresetsConfirmation = true
+                    }) {
+                        HStack {
+                            Image(systemName: "trash")
+                            Text("すべてのプリセットを削除")
+                        }
+                        .if(!presetManager.presets.isEmpty) { view in
+                            view.foregroundStyle(.red)
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(presetManager.presets.isEmpty)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             }
 
             // MARK: - プリセットセクション
             Section(header: Text("プリセット").font(.headline)) {
-                HStack {
-                    Text("プリセット")
-                    Spacer()
-                    Picker("", selection: Binding(
-                        get: {
-                            // プリセットが空の場合、特別なUUIDを返す
-                            if presetManager.presets.isEmpty {
-                                return UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
-                            }
-                            return presetManager.selectedPresetId
-                        },
-                        set: { newValue in
-                            // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
-                            if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
-                                // プリセットがない場合は何もしない
-                                // 選択を元に戻す
-                                if let firstPreset = presetManager.presets.first {
-                                    presetManager.selectedPresetId = firstPreset.id
-                                } else {
-                                    // まだプリセットがない場合はnilのまま
-                                    presetManager.selectedPresetId = nil
-                                }
-                            } else if newValue == nil {
-                                showingAddPresetSheet = true
-                                // 選択を元に戻す
-                                if let currentSelectedId = presetManager.selectedPresetId {
-                                    presetManager.selectedPresetId = currentSelectedId
-                                } else if let firstPreset = presetManager.presets.first {
-                                    presetManager.selectedPresetId = firstPreset.id
-                                }
-                            } else {
-                                presetManager.selectedPresetId = newValue
-                            }
-                        }
-                    )) {
-                        ForEach(presetManager.presets) { preset in
-                            Text(preset.name)
-                                .tag(preset.id as UUID?)
-                        }
-                        
-                        // プリセットがない場合の項目
-                        if presetManager.presets.isEmpty {
-                            Text("プリセットがありません")
-                                .tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
-                        }
-                        
-                        Divider()
-                        Text("新規プリセット...")
-                            .tag(nil as UUID?)
-                    }
-                    .pickerStyle(.menu)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
                 List(selection: $selectedPresetId) {
                     ForEach(presetManager.presets) { preset in
                         HStack {
@@ -247,6 +214,60 @@ struct StandardPhraseSettingsView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             ) {
+                HStack {
+                    Text("プリセット")
+                    Spacer()
+                    Picker("", selection: Binding(
+                        get: {
+                            // プリセットが空の場合、特別なUUIDを返す
+                            if presetManager.presets.isEmpty {
+                                return UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+                            }
+                            return presetManager.selectedPresetId
+                        },
+                        set: { newValue in
+                            // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
+                            if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+                                // プリセットがない場合は何もしない
+                                // 選択を元に戻す
+                                if let firstPreset = presetManager.presets.first {
+                                    presetManager.selectedPresetId = firstPreset.id
+                                } else {
+                                    // まだプリセットがない場合はnilのまま
+                                    presetManager.selectedPresetId = nil
+                                }
+                            } else if newValue == nil {
+                                showingAddPresetSheet = true
+                                // 選択を元に戻す
+                                if let currentSelectedId = presetManager.selectedPresetId {
+                                    presetManager.selectedPresetId = currentSelectedId
+                                } else if let firstPreset = presetManager.presets.first {
+                                    presetManager.selectedPresetId = firstPreset.id
+                                }
+                            } else {
+                                presetManager.selectedPresetId = newValue
+                            }
+                        }
+                    )) {
+                        ForEach(presetManager.presets) { preset in
+                            Text(preset.name)
+                                .tag(preset.id as UUID?)
+                        }
+                        
+                        // プリセットがない場合の項目
+                        if presetManager.presets.isEmpty {
+                            Text("プリセットがありません")
+                                .tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
+                        }
+                        
+                        Divider()
+                        Text("新規プリセット...")
+                            .tag(nil as UUID?)
+                    }
+                    .pickerStyle(.menu)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
                 List(selection: $selectedPhraseId) {
                     ForEach(currentPhrases) { phrase in
                         HStack {
@@ -420,7 +441,11 @@ struct StandardPhraseSettingsView: View {
             }
             Button("キャンセル", role: .cancel) { }
         } message: {
-            Text("すべての定型文を本当に削除しますか？この操作は元に戻せません。")
+            if let presetName = presetManager.selectedPreset?.name {
+                Text("プリセット「\(presetName)」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
+            } else {
+                Text("選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。")
+            }
         }
         .sheet(isPresented: $showingAddPresetSheet) {
             VStack(spacing: 10) {
@@ -501,6 +526,26 @@ struct StandardPhraseSettingsView: View {
             }
             .padding()
             .frame(width: 300, height: 140)
+        }
+        .alert("すべての定型文を削除", isPresented: $showingClearAllPhrasesConfirmation) {
+            Button("削除", role: .destructive) {
+                deleteAllPhrases()
+            }
+            Button("キャンセル", role: .cancel) { }
+        } message: {
+            if let presetName = presetManager.selectedPreset?.name {
+                Text("プリセット「\(presetName)」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
+            } else {
+                Text("選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。")
+            }
+        }
+        .alert("すべてのプリセットを削除", isPresented: $showingClearAllPresetsConfirmation) {
+            Button("削除", role: .destructive) {
+                presetManager.deleteAllPresets()
+            }
+            Button("キャンセル", role: .cancel) { }
+        } message: {
+            Text("すべてのプリセットを本当に削除しますか？この操作は元に戻せません。")
         }
     }
 }
