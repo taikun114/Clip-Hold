@@ -24,10 +24,26 @@ struct StandardPhraseSettingsView: View {
     @State private var presetToDelete: StandardPhrasePreset?
     @State private var showingDeletePresetConfirmation = false
     
+    // プリセット巡回時の通知設定
+    @AppStorage("sendNotificationOnPresetChange") private var sendNotificationOnPresetChange: Bool = false
+    
     var body: some View {
         Form {
             // MARK: - プリセットセクション
-            Section(header: Text("プリセット").font(.headline)) {
+            Section(header:
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("プリセットの設定")
+                        .font(.headline)
+
+                    Text("プリセットの順番はドラッグアンドドロップで並び替えることができます。")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            ) {
+                Toggle("ショートカットキーで切り替えたときに通知を送信する", isOn: $sendNotificationOnPresetChange)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
                 List(selection: $selectedPresetId) {
                     ForEach(presetManager.presets) { preset in
                         HStack {

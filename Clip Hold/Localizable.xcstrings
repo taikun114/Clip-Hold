@@ -2152,6 +2152,22 @@
         }
       }
     },
+    "ショートカットキーで切り替えたときに通知を送信する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send a Notification When Switching with Shortcut Keys"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ショートカットキーで切り替えたときに通知を送信する"
+          }
+        }
+      }
+    },
     "スキップ" : {
       "localizations" : {
         "en" : {
@@ -3141,6 +3157,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセットの削除"
+          }
+        }
+      }
+    },
+    "プリセットの設定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットの設定"
+          }
+        }
+      }
+    },
+    "プリセットの順番はドラッグアンドドロップで並び替えることができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can drag and drop to change the order of the presets."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットの順番はドラッグアンドドロップで並び替えることができます。"
+          }
+        }
+      }
+    },
+    "プリセットを切り替える" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットを切り替える"
           }
         }
       }

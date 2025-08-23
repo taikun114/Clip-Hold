@@ -429,6 +429,34 @@ struct ClipHoldApp: App {
             }
         }
 
+        // プリセットを巡回するショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .cyclePresets) {
+            print("「プリセットを巡回」ショートカットが押されました！")
+            let presetManager = StandardPhrasePresetManager.shared
+            if !presetManager.presets.isEmpty {
+                let currentIndex = presetManager.presets.firstIndex { $0.id == presetManager.selectedPresetId } ?? -1
+                let nextIndex = (currentIndex + 1) % presetManager.presets.count
+                let nextPreset = presetManager.presets[nextIndex]
+                presetManager.selectedPresetId = nextPreset.id
+                
+                // 通知設定がオンの場合、通知を送信
+                if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
+                    let notificationCenter = UNUserNotificationCenter.current()
+                    let content = UNMutableNotificationContent()
+                    content.title = nextPreset.name
+                    content.body = "「\(nextPreset.name)」に切り替わりました。"
+                    content.sound = nil // 音なし
+                    
+                    let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
+                    notificationCenter.add(request) { error in
+                        if let error = error {
+                            print("通知の送信に失敗しました: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+        }
+
         // クリップボードから新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addStandardPhraseFromClipboard) {
             print("「クリップボードから定型文を追加」ショートカットが押されました！")

@@ -72,6 +72,35 @@ struct ShortcutsSettingsView: View {
                 }
             }
 
+            Section(header: Text("プリセット").font(.headline)) {
+                HStack {
+                    Text("新しいプリセットを追加する")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .addNewPreset)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.addNewPreset)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+                HStack {
+                    Text("プリセットを切り替える")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .cyclePresets)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.cyclePresets)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+            }
+            
             Section(header: Text("定型文").font(.headline)) {
                 ForEach(0..<10, id: \.self) { index in
                     HStack {
@@ -148,19 +177,6 @@ struct ShortcutsSettingsView: View {
                     KeyboardShortcuts.Recorder(for: .addStandardPhraseFromClipboard)
                     Button(action: {
                         KeyboardShortcuts.reset(.addStandardPhraseFromClipboard)
-                    }) {
-                        Image(systemName: "arrow.counterclockwise")
-                            .imageScale(.small)
-                    }
-                    .buttonStyle(.borderless)
-                    .help("デフォルトのショートカットに戻します。")
-                }
-                HStack {
-                    Text("新しいプリセットを追加する")
-                    Spacer()
-                    KeyboardShortcuts.Recorder(for: .addNewPreset)
-                    Button(action: {
-                        KeyboardShortcuts.reset(.addNewPreset)
                     }) {
                         Image(systemName: "arrow.counterclockwise")
                             .imageScale(.small)
