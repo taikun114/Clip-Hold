@@ -256,9 +256,9 @@ struct StandardPhraseImportExportView: View {
         .sheet(isPresented: $showingPresetConflictSheet) {
             PresetConflictSheet(
                 conflictingPresets: conflictingPresets,
-                onCompletion: { action in
+                onCompletion: { action, individualActions in
                     presetImportAction = action
-                    processPresetImportWithAction(action)
+                    processPresetImportWithAction(action, individualActions: individualActions)
                 }
             )
         }
@@ -353,7 +353,7 @@ struct StandardPhraseImportExportView: View {
         
         // 既存のプリセットと比較して競合をチェック
         for preset in presets {
-            if let existingPreset = presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) {
+            if presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) != nil {
                 conflicts.append(preset)
             }
         }
@@ -369,7 +369,7 @@ struct StandardPhraseImportExportView: View {
     }
     
     // MARK: - プリセット競合後の処理
-    private func processPresetImportWithAction(_ action: PresetConflictSheet.PresetConflictAction) {
+    private func processPresetImportWithAction(_ action: PresetConflictSheet.PresetConflictAction, individualActions: [UUID: PresetConflictSheet.PresetConflictAction] = [:]) {
         switch action {
         case .merge:
             for preset in presetsToImport {
@@ -426,6 +426,59 @@ struct StandardPhraseImportExportView: View {
                 } else {
                     // 競合するプリセットはスキップ
                     continue
+                }
+            }
+        case .resolveIndividually:
+            // 個別に解決
+            for preset in presetsToImport {
+                if let individualAction = individualActions[preset.id] {
+                    switch individualAction {
+                    case .merge:
+                        if let existingPreset = presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) {
+                            // 既存のプリセットに定型文を統合
+                            var mergedPhrases = existingPreset.phrases
+                            
+                            // 新しい定型文のみを追加 (内容が一致するものは除外)
+                            for newPhrase in preset.phrases {
+                                if !mergedPhrases.contains(where: { $0.title == newPhrase.title && $0.content == newPhrase.content }) {
+                                    mergedPhrases.append(newPhrase)
+                                }
+                            }
+                            
+                            // 更新されたプリセットを保存
+                            var updatedPreset = existingPreset
+                            updatedPreset.phrases = mergedPhrases
+                            presetManager.updatePreset(updatedPreset)
+                        } else {
+                            // 新しいプリセットとして追加
+                            presetManager.addPreset(name: preset.name)
+                            // 追加されたプリセットのIDを取得して、定型文を追加
+                            if let addedPreset = presetManager.presets.first(where: { $0.name == preset.name }) {
+                                standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
+                            }
+                        }
+                    case .add:
+                        // プリセットをそのまま追加 (名前が同じでも新しいIDで保存)
+                        // 既存のプリセット名と重複しないように新しい名前を生成
+                        var newPresetName = preset.name
+                        var counter = 1
+                        while presetManager.presets.contains(where: { $0.name == newPresetName }) {
+                            newPresetName = "\(preset.name) (\(counter))"
+                            counter += 1
+                        }
+                        
+                        presetManager.addPreset(name: newPresetName)
+                        // 追加されたプリセットのIDを取得して、定型文を追加
+                        if let addedPreset = presetManager.presets.first(where: { $0.name == newPresetName }) {
+                            standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
+                        }
+                    case .skip:
+                        // プリセットをスキップ
+                        continue
+                    case .resolveIndividually:
+                        // このケースは発生しないはず
+                        break
+                    }
                 }
             }
         }
