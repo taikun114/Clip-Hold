@@ -7,12 +7,14 @@ struct PresetConflictSheet: View {
     @State private var selectedAction: PresetConflictAction = .merge
     var onCompletion: (PresetConflictAction) -> Void
     
-    enum PresetConflictAction {
-        case merge, add, skip
+    enum PresetConflictAction: String, CaseIterable {
+        case merge = "統合する"
+        case add = "このまま追加する"
+        case skip = "スキップする"
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 15) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("重複したプリセット")
                 .font(.headline)
                 .fontWeight(.bold)
@@ -21,24 +23,28 @@ struct PresetConflictSheet: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             
-            List(conflictingPresets, id: \.id) { preset in
-                Text(preset.name)
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(conflictingPresets, id: \.id) { preset in
+                    HStack(alignment: .top) {
+                        Text("-")
+                            .font(.body)
+                        Text(preset.name)
+                            .font(.body)
+                    }
+                }
             }
-            .frame(height: 100)
+            .padding(.leading, 10)
             
-            Text("操作を選択してください。")
+            Text("続けるには操作を選択してください。")
                 .font(.subheadline)
             
-            VStack(alignment: .leading, spacing: 8) {
-                RadioButtonGroup(
-                    selectedAction: $selectedAction,
-                    actions: [
-                        (title: "統合する", action: .merge),
-                        (title: "このまま追加する", action: .add),
-                        (title: "スキップする", action: .skip)
-                    ]
-                )
+            Picker("", selection: $selectedAction) {
+                ForEach(PresetConflictAction.allCases, id: \.self) { action in
+                    Text(action.rawValue)
+                        .tag(action)
+                }
             }
+            .pickerStyle(.radioGroup)
             
             Spacer()
             
@@ -61,30 +67,16 @@ struct PresetConflictSheet: View {
             }
         }
         .padding()
-        .frame(minWidth: 400, idealWidth: 500, maxWidth: 600, minHeight: 350)
+        .frame(minWidth: 100, maxWidth: 300, minHeight: 200, maxHeight: 600)
     }
 }
 
-struct RadioButtonGroup<T: Equatable>: View {
-    @Binding var selectedAction: T
-    let actions: [(title: String, action: T)]
-    
-    var body: some View {
-        ForEach(actions.indices, id: \.self) { index in
-            HStack {
-                Button(action: {
-                    selectedAction = actions[index].action
-                }) {
-                    HStack {
-                        Image(systemName: selectedAction == actions[index].action ? "circle.fill" : "circle")
-                            .foregroundColor(selectedAction == actions[index].action ? .accentColor : .secondary)
-                        Text(actions[index].title)
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-                
-                Spacer()
-            }
-        }
-    }
+#Preview {
+    PresetConflictSheet(
+        conflictingPresets: [
+            StandardPhrasePreset(name: "デフォルト"),
+            StandardPhrasePreset(name: "プリセット1")
+        ],
+        onCompletion: { _ in }
+    )
 }
