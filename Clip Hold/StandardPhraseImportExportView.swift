@@ -400,9 +400,17 @@ struct StandardPhraseImportExportView: View {
         case .add:
             // プリセットをそのまま追加 (名前が同じでも新しいIDで保存)
             for preset in presetsToImport {
-                presetManager.addPreset(name: preset.name)
+                // 既存のプリセット名と重複しないように新しい名前を生成
+                var newPresetName = preset.name
+                var counter = 1
+                while presetManager.presets.contains(where: { $0.name == newPresetName }) {
+                    newPresetName = "\(preset.name) (\(counter))"
+                    counter += 1
+                }
+                
+                presetManager.addPreset(name: newPresetName)
                 // 追加されたプリセットのIDを取得して、定型文を追加
-                if let addedPreset = presetManager.presets.first(where: { $0.name == preset.name }) {
+                if let addedPreset = presetManager.presets.first(where: { $0.name == newPresetName }) {
                     standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
                 }
             }
@@ -415,6 +423,9 @@ struct StandardPhraseImportExportView: View {
                     if let addedPreset = presetManager.presets.first(where: { $0.name == preset.name }) {
                         standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
                     }
+                } else {
+                    // 競合するプリセットはスキップ
+                    continue
                 }
             }
         }
