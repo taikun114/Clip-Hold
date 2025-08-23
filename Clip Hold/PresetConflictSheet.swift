@@ -17,6 +17,13 @@ struct PresetConflictSheet: View {
         case resolveIndividually = "一つ一つ解決する"
     }
     
+    private func displayName(for preset: StandardPhrasePreset) -> String {
+        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+            return String(localized: "Default")
+        }
+        return preset.name
+    }
+    
     var body: some View {
         Group {
             if showIndividualResolution {
@@ -44,7 +51,7 @@ struct PresetConflictSheet: View {
                     HStack(alignment: .top) {
                         Text("-")
                             .font(.body)
-                        Text(preset.name)
+                        Text(displayName(for: preset))
                             .font(.body)
                     }
                 }
@@ -90,7 +97,7 @@ struct PresetConflictSheet: View {
     
     private var individualResolutionView: some View {
         VStack(alignment: .leading, spacing: 15) {
-            Text("\"\(conflictingPresets[currentPresetIndex].name)\"の操作を選択してください。")
+            Text("\"\(displayName(for: conflictingPresets[currentPresetIndex]))\"の操作を選択してください。")
                 .font(.headline)
                 .fontWeight(.bold)
             
@@ -147,9 +154,9 @@ struct PresetConflictSheet: View {
 #Preview {
     PresetConflictSheet(
         conflictingPresets: [
-            StandardPhrasePreset(name: "デフォルト"),
-            StandardPhrasePreset(name: "プリセット1")
+            StandardPhrasePreset(name: "Default"),
+            StandardPhrasePreset(name: "Preset 1")
         ],
-        onCompletion: { _, _ in }
+        onCompletion: { _, _ in } 
     )
 }

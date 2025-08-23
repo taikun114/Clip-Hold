@@ -11,6 +11,13 @@ struct ImportPresetSelectionSheet: View {
     @State private var newPresetName = ""
     @State private var showCreatePresetView = false
     
+    private func displayName(for preset: StandardPhrasePreset) -> String {
+        if preset.name == "Default" {
+            return String(localized: "Default")
+        }
+        return preset.name
+    }
+    
     var body: some View {
         Group {
             if showCreatePresetView {
@@ -66,7 +73,7 @@ struct ImportPresetSelectionSheet: View {
                     
                     Picker("プリセットを選択", selection: $selectedPresetId) {
                         ForEach(presetManager.presets) { preset in
-                            Text(preset.name)
+                            Text(displayName(for: preset))
                                 .tag(preset.id as UUID?)
                         }
                         

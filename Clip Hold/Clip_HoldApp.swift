@@ -87,6 +87,21 @@ struct ClipHoldApp: App {
             set: { self.hideMenuBarExtra = !$0 } // isInserted の変更で hideMenuBarExtra を反転させる
         )
     }
+    
+    private func displayName(for preset: StandardPhrasePreset?) -> String {
+        guard let preset = preset else {
+            // 選択されているプリセットがない場合（あり得ないはずだが念のため）
+            return String(localized: "Default")
+        }
+        return displayName(for: preset)
+    }
+
+    private func displayName(for preset: StandardPhrasePreset) -> String {
+        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+            return String(localized: "Default")
+        }
+        return preset.name
+    }
         
     var body: some Scene {
         MenuBarExtra(
@@ -106,7 +121,8 @@ struct ClipHoldApp: App {
                 Text("定型文はありません")
             } else {
                 let displayLimit = min(phrasesToShow.count, maxPhrasesInMenu)
-                ForEach(phrasesToShow.prefix(displayLimit)) { phrase in
+                ForEach(phrasesToShow.prefix(displayLimit)) {
+                    phrase in
                     let displayText: String = {
                         let displayContent = phrase.title.replacingOccurrences(of: "\n", with: " ")
                         if displayContent.count > 40 {
@@ -161,14 +177,15 @@ struct ClipHoldApp: App {
             // プリセット選択メニュー
             Menu {
                 Picker("プリセット", selection: $presetManager.selectedPresetId) {
-                    ForEach(presetManager.presets) { preset in
-                        Text(preset.name).tag(preset.id as UUID?)
+                    ForEach(presetManager.presets) {
+                        preset in
+                        Text(displayName(for: preset)).tag(preset.id as UUID?)
                     }
                 }
                 .pickerStyle(.inline)
             } label: {
                 HStack {
-                    Text("プリセット: \(presetManager.selectedPreset?.name ?? "デフォルト")")
+                    Text("プリセット: \(displayName(for: presetManager.selectedPreset))")
                     Image(systemName: "line.3.horizontal.decrease")
                         .foregroundStyle(.secondary)
                 }
@@ -191,7 +208,8 @@ struct ClipHoldApp: App {
                 // clipboardHistoryを日付の新しい順にソート
                 let sortedHistory = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
                 let displayLimit = min(sortedHistory.count, maxHistoryInMenu)
-                ForEach(sortedHistory.prefix(displayLimit)) { item in
+                ForEach(sortedHistory.prefix(displayLimit)) {
+                    item in
                     
                     let itemDateFormatter: DateFormatter = {
                         let formatter = DateFormatter()

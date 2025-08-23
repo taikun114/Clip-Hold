@@ -554,7 +554,7 @@ struct StandardPhraseSettingsView: View {
 // MARK: - Helper Methods
 extension StandardPhraseSettingsView {
     private func displayName(for preset: StandardPhrasePreset) -> String {
-        if preset.name == "Default" {
+        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
             return String(localized: "Default")
         }
         return preset.name

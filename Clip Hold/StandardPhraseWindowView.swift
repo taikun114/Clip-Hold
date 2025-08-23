@@ -200,6 +200,13 @@ struct StandardPhraseWindowView: View {
         }
     }
     
+    private func displayName(for preset: StandardPhrasePreset) -> String {
+        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+            return String(localized: "Default")
+        }
+        return preset.name
+    }
+    
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
             VisualEffectView(material: .menu, blendingMode: .behindWindow)
@@ -251,7 +258,7 @@ struct StandardPhraseWindowView: View {
                                         if presetManager.selectedPresetId == preset.id {
                                             Image(systemName: "checkmark")
                                         }
-                                        Text(preset.name)
+                                        Text(displayName(for: preset))
                                     }
                                 }
                             }
