@@ -12,17 +12,28 @@ class StandardPhrasePresetManager: ObservableObject {
     private let presetIndexFileName = "presetIndex.json"
     private let defaultPresetFileName = "default"
     private let defaultPresetId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+    private let userDeletedDefaultPresetKey = "UserDeletedDefaultPreset" // ユーザーがデフォルトプリセットを削除したことを記録するキー
     
     private init() {
         loadPresetsFromFileSystem()
-        // 初回起動時にデフォルトプリセットを作成
-        if presets.isEmpty {
+        // 初回起動時にデフォルトプリセットを作成（ただしユーザーが削除していない場合のみ）
+        if presets.isEmpty && !didUserDeleteDefaultPreset() {
             createDefaultPreset()
         }
         // 選択されたプリセットがなければ最初のものを選択
         if selectedPresetId == nil, let firstPreset = presets.first {
             selectedPresetId = firstPreset.id
         }
+    }
+    
+    // ユーザーがデフォルトプリセットを削除したかどうかを確認するメソッド
+    private func didUserDeleteDefaultPreset() -> Bool {
+        return UserDefaults.standard.bool(forKey: userDeletedDefaultPresetKey)
+    }
+    
+    // ユーザーがデフォルトプリセットを削除したことを記録するメソッド
+    private func setUserDeletedDefaultPreset() {
+        UserDefaults.standard.set(true, forKey: userDeletedDefaultPresetKey)
     }
     
     private func getPresetDirectory() -> URL? {
@@ -33,6 +44,11 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     private func createDefaultPreset() {
+        // ユーザーがデフォルトプリセットを削除している場合は作成しない
+        if didUserDeleteDefaultPreset() {
+            return
+        }
+        
         // 既にデフォルトプリセットが存在する場合は作成しない
         if presets.contains(where: { $0.id == defaultPresetId }) {
             return
@@ -53,6 +69,11 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     private func createDefaultPresetIfNeeded() {
+        // ユーザーがデフォルトプリセットを削除している場合は作成しない
+        if didUserDeleteDefaultPreset() {
+            return
+        }
+        
         // 既にデフォルトプリセットが存在する場合は作成しない
         if presets.contains(where: { $0.id == defaultPresetId }) {
             return
@@ -154,9 +175,11 @@ class StandardPhrasePresetManager: ObservableObject {
     private func rebuildPresetIndex(from presetFiles: [URL], in presetDirectory: URL) {
         var newPresets: [StandardPhrasePreset] = []
         
-        // デフォルトプリセットを最初に追加
-        let defaultPreset = StandardPhrasePreset(id: defaultPresetId, name: String(localized: "デフォルト"), phrases: [])
-        newPresets.append(defaultPreset)
+        // デフォルトプリセットを最初に追加（ただしユーザーが削除していない場合のみ）
+        if !didUserDeleteDefaultPreset() {
+            let defaultPreset = StandardPhrasePreset(id: defaultPresetId, name: String(localized: "デフォルト"), phrases: [])
+            newPresets.append(defaultPreset)
+        }
         
         // 他のプリセットファイルを処理
         var presetIndex = 1 // デフォルトを除いたインデックス
@@ -222,6 +245,11 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     private func loadDefaultPreset(from fileURL: URL) {
+        // ユーザーがデフォルトプリセットを削除している場合はロードしない
+        if didUserDeleteDefaultPreset() {
+            return
+        }
+        
         do {
             let data = try Data(contentsOf: fileURL)
             let decoder = JSONDecoder()
@@ -300,12 +328,17 @@ class StandardPhrasePresetManager: ObservableObject {
     
     private func deletePresetFile(id: UUID) {
         guard let presetDirectory = getPresetDirectory() else { return }
-        let fileName = id.uuidString == defaultPresetFileName ? defaultPresetFileName : id.uuidString
+        let fileName = id.uuidString == defaultPresetId.uuidString ? defaultPresetFileName : id.uuidString
         let fileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
         
         do {
             if FileManager.default.fileExists(atPath: fileURL.path) {
                 try FileManager.default.removeItem(at: fileURL)
+            }
+            
+            // デフォルトプリセットが削除された場合、ユーザーが削除したことを記録
+            if id == defaultPresetId {
+                setUserDeletedDefaultPreset()
             }
         } catch {
             print("Error deleting preset file: \(error.localizedDescription)")
@@ -329,6 +362,11 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     func deletePreset(id: UUID) {
+        // デフォルトプリセットが削除される場合は、ユーザーが削除したことを記録
+        if id == defaultPresetId {
+            setUserDeletedDefaultPreset()
+        }
+        
         presets.removeAll { $0.id == id }
         deletePresetFile(id: id)
         savePresetIndex()
