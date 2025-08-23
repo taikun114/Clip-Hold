@@ -156,25 +156,51 @@ class StandardPhraseManager: ObservableObject {
         standardPhrases.removeAll()
     }
 
-    func checkConflicts(with importedPhrases: [StandardPhrase]) -> (conflicting: [StandardPhraseDuplicate], nonConflicting: [StandardPhrase]) {
-        var conflicting: [StandardPhraseDuplicate] = []
-        var nonConflicting: [StandardPhrase] = []
-
+    @MainActor func checkConflicts(with importedPhrases: [StandardPhrase], inPresetId presetId: UUID? = nil) -> (conflicts: [StandardPhraseDuplicate], nonConflicts: [StandardPhrase]) {
+        var conflicts: [StandardPhraseDuplicate] = []
+        var nonConflicts: [StandardPhrase] = []
+        
+        // チェック対象の定型文リストを決定
+        let targetPhrases: [StandardPhrase]
+        if let presetId = presetId, 
+           let preset = StandardPhrasePresetManager.shared.presets.first(where: { $0.id == presetId }) {
+            targetPhrases = preset.phrases
+        } else {
+            targetPhrases = standardPhrases
+        }
+        
         for importedPhrase in importedPhrases {
-            if let existingPhrase = standardPhrases.first(where: {
-                $0.title == importedPhrase.title || $0.content == importedPhrase.content
-            }) {
-                conflicting.append(StandardPhraseDuplicate(existingPhrase: existingPhrase, newPhrase: importedPhrase))
+            // タイトルまたは内容が一致する既存の定型文を探す
+            let existingPhraseWithTitle = targetPhrases.first { $0.title == importedPhrase.title }
+            let existingPhraseWithContent = targetPhrases.first { $0.content == importedPhrase.content }
+            
+            if existingPhraseWithTitle != nil || existingPhraseWithContent != nil {
+                // 既存の定型文と競合している場合
+                let duplicate = StandardPhraseDuplicate(
+                    existingPhrase: existingPhraseWithTitle ?? existingPhraseWithContent!,
+                    newPhrase: importedPhrase
+                )
+                conflicts.append(duplicate)
             } else {
-                nonConflicting.append(importedPhrase)
+                // 競合していない場合はそのまま追加
+                nonConflicts.append(importedPhrase)
             }
         }
-        print("インポートフレーズを競合と非競合に分割しました。競合: \(conflicting.count), 非競合: \(nonConflicting.count)")
-        return (conflicting, nonConflicting)
+        
+        return (conflicts, nonConflicts)
     }
 
-    func addImportedPhrases(_ phrasesToAdd: [StandardPhrase]) {
-        standardPhrases.append(contentsOf: phrasesToAdd)
-        print("インポートされたフレーズを追加しました。現在の定型文数: \(self.standardPhrases.count)")
+    @MainActor func addImportedPhrases(_ phrasesToAdd: [StandardPhrase], toPresetId presetId: UUID? = nil) {
+        if let presetId = presetId {
+            // 指定されたプリセットに定型文を追加
+            if var preset = StandardPhrasePresetManager.shared.presets.first(where: { $0.id == presetId }) {
+                preset.phrases.append(contentsOf: phrasesToAdd)
+                StandardPhrasePresetManager.shared.updatePreset(preset)
+            }
+        } else {
+            // デフォルトの動作: 全定型文リストに追加
+            standardPhrases.append(contentsOf: phrasesToAdd)
+            print("インポートされたフレーズを追加しました。現在の定型文数: \(self.standardPhrases.count)")
+        }
     }
 }

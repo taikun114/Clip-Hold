@@ -32,9 +32,30 @@ struct PhraseDocument: FileDocument {
         guard let data = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        self.standardPhrases = try JSONDecoder().decode([StandardPhrase].self, from: data)
-        self.presetData = nil
-        self.isLegacyFormat = true
+        
+        // ファイルの内容を一度解析して、プリセットフォーマットかどうかを判断
+        if let jsonObject = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
+            // 最初の要素に 'id', 'name', 'phrases' があるか確認
+            if let firstItem = jsonObject.first,
+               firstItem["id"] != nil,
+               firstItem["name"] != nil,
+               firstItem["phrases"] != nil {
+                // プリセットフォーマット
+                let decoder = JSONDecoder()
+                let presets = try decoder.decode([StandardPhrasePreset].self, from: data)
+                self.presetData = presets
+                self.standardPhrases = []
+                self.isLegacyFormat = false
+            } else {
+                // レガシーフォーマット (定型文の配列のみ)
+                let decoder = JSONDecoder()
+                self.standardPhrases = try decoder.decode([StandardPhrase].self, from: data)
+                self.presetData = nil
+                self.isLegacyFormat = true
+            }
+        } else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
     }
 
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
@@ -74,6 +95,17 @@ struct StandardPhraseImportExportView: View {
     @State private var showingImportConflictSheet = false
     @State private var importConflicts: [StandardPhraseDuplicate] = []
     @State private var nonConflictingPhrasesToImport: [StandardPhrase] = []
+    @State private var currentSelectedURL: URL? = nil // 追加: 現在選択されているURLを保持
+    
+    // プリセット選択シート用の状態変数
+    @State private var showingImportPresetSelectionSheet = false
+    @State private var selectedImportPresetId: UUID? = nil
+    
+    // プリセット競合シート用の状態変数
+    @State private var showingPresetConflictSheet = false
+    @State private var conflictingPresets: [StandardPhrasePreset] = []
+    @State private var presetImportAction: PresetConflictSheet.PresetConflictAction = .merge
+    @State private var presetsToImport: [StandardPhrasePreset] = []
     
     // エクスポートシート用の状態変数
     @State private var showingExportSheet = false
@@ -190,30 +222,14 @@ struct StandardPhraseImportExportView: View {
             switch result {
             case .success(let urls):
                 guard let selectedURL = urls.first else { return }
+                currentSelectedURL = selectedURL // 追加: 選択されたURLを保持
                 let gotAccess = selectedURL.startAccessingSecurityScopedResource()
                 defer {
                     if gotAccess {
                         selectedURL.stopAccessingSecurityScopedResource()
                     }
                 }
-                do {
-                    let data = try Data(contentsOf: selectedURL)
-                    let decoder = JSONDecoder()
-                    let importedPhrases = try decoder.decode([StandardPhrase].self, from: data)
-
-                    let (conflicts, nonConflicts) = standardPhraseManager.checkConflicts(with: importedPhrases)
-
-                    if !conflicts.isEmpty {
-                        importConflicts = conflicts
-                        nonConflictingPhrasesToImport = nonConflicts
-                        showingImportConflictSheet = true
-                    } else {
-                        standardPhraseManager.addImportedPhrases(importedPhrases)
-                    }
-
-                } catch {
-                    importError = "ファイルの読み込みに失敗しました: \(error.localizedDescription)"
-                }
+                handleImport(from: selectedURL)
             case .failure(let error):
                 importError = "ファイルの選択に失敗しました: \(error.localizedDescription)"
             }
@@ -222,6 +238,29 @@ struct StandardPhraseImportExportView: View {
             Button("OK") { importError = nil }
         } message: {
             Text(importError ?? "不明なエラーが発生しました。")
+        }
+        .sheet(isPresented: $showingImportPresetSelectionSheet) {
+            ImportPresetSelectionSheet(
+                presetManager: presetManager,
+                selectedPresetId: $selectedImportPresetId
+            ) { shouldCreateNewPreset in
+                if let presetId = selectedImportPresetId {
+                    // プリセット選択後の処理
+                    processImportIntoPreset(presetId: presetId)
+                } else if shouldCreateNewPreset {
+                    // 新規プリセットが作成された場合の処理
+                    // 既にprocessImportIntoPresetはImportPresetSelectionSheet内で呼ばれているため、ここでは何もしない
+                }
+            }
+        }
+        .sheet(isPresented: $showingPresetConflictSheet) {
+            PresetConflictSheet(
+                conflictingPresets: conflictingPresets,
+                onCompletion: { action in
+                    presetImportAction = action
+                    processPresetImportWithAction(action)
+                }
+            )
         }
         .sheet(isPresented: $showingImportConflictSheet) {
             ImportConflictSheet(
@@ -234,6 +273,155 @@ struct StandardPhraseImportExportView: View {
             }
             .environmentObject(standardPhraseManager)
         }
+    }
+    
+    // MARK: - インポート処理
+    private func handleImport(from url: URL) {
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            
+            // ファイルの内容を一度解析して、プリセットフォーマットかどうかを判断
+            if let jsonObject = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] {
+                // 最初の要素に 'id', 'name', 'phrases' があるか確認
+                if let firstItem = jsonObject.first,
+                   firstItem["id"] != nil,
+                   firstItem["name"] != nil,
+                   firstItem["phrases"] != nil {
+                    // プリセットフォーマット
+                    let presets = try decoder.decode([StandardPhrasePreset].self, from: data)
+                    handlePresetFormatImport(presets)
+                } else {
+                    // レガシーフォーマット (定型文の配列のみ)
+                    let phrases = try decoder.decode([StandardPhrase].self, from: data)
+                    handleLegacyFormatImport(phrases)
+                }
+            } else {
+                importError = "無効なファイル形式です。"
+            }
+        } catch {
+            importError = "ファイルの読み込みに失敗しました: \(error.localizedDescription)"
+        }
+    }
+    
+    // MARK: - レガシーフォーマットインポート処理
+    private func handleLegacyFormatImport(_ phrases: [StandardPhrase]) {
+        // プリセット選択シートを表示
+        showingImportPresetSelectionSheet = true
+        selectedImportPresetId = presetManager.selectedPresetId
+    }
+    
+    // MARK: - プリセット選択後の処理
+    private func processImportIntoPreset(presetId: UUID) {
+        // 保持しているURLを使用して処理を続行
+        guard let selectedURL = currentSelectedURL else { return }
+        
+        // セキュリティスコープ付きリソースへのアクセスを開始
+        let gotAccess = selectedURL.startAccessingSecurityScopedResource()
+        defer {
+            // 処理が完了したらアクセスを終了
+            if gotAccess {
+                selectedURL.stopAccessingSecurityScopedResource()
+            }
+        }
+        
+        do {
+            let data = try Data(contentsOf: selectedURL)
+            let decoder = JSONDecoder()
+            let importedPhrases = try decoder.decode([StandardPhrase].self, from: data)
+            
+            // 競合チェック
+            let (conflicts, nonConflicts) = standardPhraseManager.checkConflicts(with: importedPhrases, inPresetId: presetId)
+            
+            if !conflicts.isEmpty {
+                importConflicts = conflicts
+                nonConflictingPhrasesToImport = nonConflicts
+                showingImportConflictSheet = true
+            } else {
+                // 競合がなければ直接追加
+                standardPhraseManager.addImportedPhrases(nonConflicts, toPresetId: presetId)
+            }
+        } catch {
+            importError = "ファイルの読み込みに失敗しました: \(error.localizedDescription)"
+        }
+    }
+    
+    // MARK: - プリセットフォーマットインポート処理
+    private func handlePresetFormatImport(_ presets: [StandardPhrasePreset]) {
+        presetsToImport = presets
+        var conflicts: [StandardPhrasePreset] = []
+        
+        // 既存のプリセットと比較して競合をチェック
+        for preset in presets {
+            if let existingPreset = presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) {
+                conflicts.append(preset)
+            }
+        }
+        
+        if !conflicts.isEmpty {
+            // 競合がある場合は競合シートを表示
+            conflictingPresets = conflicts
+            showingPresetConflictSheet = true
+        } else {
+            // 競合がなければそのまま統合
+            processPresetImportWithAction(.merge)
+        }
+    }
+    
+    // MARK: - プリセット競合後の処理
+    private func processPresetImportWithAction(_ action: PresetConflictSheet.PresetConflictAction) {
+        switch action {
+        case .merge:
+            for preset in presetsToImport {
+                if let existingPreset = presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) {
+                    // 既存のプリセットに定型文を統合
+                    var mergedPhrases = existingPreset.phrases
+                    
+                    // 新しい定型文のみを追加 (内容が一致するものは除外)
+                    for newPhrase in preset.phrases {
+                        if !mergedPhrases.contains(where: { $0.title == newPhrase.title && $0.content == newPhrase.content }) {
+                            mergedPhrases.append(newPhrase)
+                        }
+                    }
+                    
+                    // 更新されたプリセットを保存
+                    var updatedPreset = existingPreset
+                    updatedPreset.phrases = mergedPhrases
+                    presetManager.updatePreset(updatedPreset)
+                } else {
+                    // 新しいプリセットとして追加
+                    presetManager.addPreset(name: preset.name)
+                    // 追加されたプリセットのIDを取得して、定型文を追加
+                    if let addedPreset = presetManager.presets.first(where: { $0.name == preset.name }) {
+                        standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
+                    }
+                }
+            }
+        case .add:
+            // プリセットをそのまま追加 (名前が同じでも新しいIDで保存)
+            for preset in presetsToImport {
+                presetManager.addPreset(name: preset.name)
+                // 追加されたプリセットのIDを取得して、定型文を追加
+                if let addedPreset = presetManager.presets.first(where: { $0.name == preset.name }) {
+                    standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
+                }
+            }
+        case .skip:
+            // 競合するプリセットを除いて追加
+            for preset in presetsToImport {
+                if !conflictingPresets.contains(where: { $0.name == preset.name }) {
+                    presetManager.addPreset(name: preset.name)
+                    // 追加されたプリセットのIDを取得して、定型文を追加
+                    if let addedPreset = presetManager.presets.first(where: { $0.name == preset.name }) {
+                        standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
+                    }
+                }
+            }
+        }
+        
+        // 状態をリセット
+        presetsToImport.removeAll()
+        conflictingPresets.removeAll()
     }
     
     // エクスポートドキュメントを作成するメソッド
