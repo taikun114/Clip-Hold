@@ -90,8 +90,8 @@ struct ClipHoldApp: App {
     
     private func displayName(for preset: StandardPhrasePreset?) -> String {
         guard let preset = preset else {
-            // 選択されているプリセットがない場合（あり得ないはずだが念のため）
-            return String(localized: "Default")
+            // 選択されているプリセットがない場合
+            return String(localized: "プリセットがありません")
         }
         return displayName(for: preset)
     }
@@ -176,10 +176,39 @@ struct ClipHoldApp: App {
 
             // プリセット選択メニュー
             Menu {
-                Picker("プリセット", selection: $presetManager.selectedPresetId) {
+                Picker("プリセット", selection: Binding(
+                    get: {
+                        // プリセットが空の場合、特別なUUIDを返す
+                        if presetManager.presets.isEmpty {
+                            return UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+                        }
+                        return presetManager.selectedPresetId
+                    },
+                    set: { newValue in
+                        // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
+                        if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+                            // プリセットがない場合は何もしない
+                            // 選択を元に戻す
+                            if let firstPreset = presetManager.presets.first {
+                                presetManager.selectedPresetId = firstPreset.id
+                            } else {
+                                // まだプリセットがない場合はnilのまま
+                                presetManager.selectedPresetId = nil
+                            }
+                        } else {
+                            presetManager.selectedPresetId = newValue
+                        }
+                    }
+                )) {
                     ForEach(presetManager.presets) {
                         preset in
                         Text(displayName(for: preset)).tag(preset.id as UUID?)
+                    }
+                    
+                    // プリセットがない場合の項目
+                    if presetManager.presets.isEmpty {
+                        Text("プリセットがありません")
+                            .tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
                     }
                 }
                 .pickerStyle(.inline)

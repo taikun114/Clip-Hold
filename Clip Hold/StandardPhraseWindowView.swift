@@ -207,6 +207,14 @@ struct StandardPhraseWindowView: View {
         return preset.name
     }
     
+    private func displayName(for preset: StandardPhrasePreset?) -> String {
+        guard let preset = preset else {
+            // 選択されているプリセットがない場合
+            return String(localized: "プリセットがありません")
+        }
+        return displayName(for: preset)
+    }
+    
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
             VisualEffectView(material: .menu, blendingMode: .behindWindow)
@@ -261,6 +269,16 @@ struct StandardPhraseWindowView: View {
                                         Text(displayName(for: preset))
                                     }
                                 }
+                            }
+                            
+                            // プリセットがない場合の項目
+                            if presetManager.presets.isEmpty {
+                                Button {
+                                    // 何もしない
+                                } label: {
+                                    Text(displayName(for: presetManager.selectedPreset))
+                                }
+                                .disabled(true)
                             }
                         } label: {
                             Image(systemName: "line.3.horizontal.decrease")
