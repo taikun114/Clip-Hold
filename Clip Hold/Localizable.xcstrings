@@ -1169,6 +1169,38 @@
         }
       }
     },
+    "アプリのすべての設定を初期状態に戻します。コピー履歴と定型文は影響を受けません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resets all settings of the app to their defaults. Copy history and standard phrases are not affected."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリのすべての設定を初期状態に戻します。コピー履歴と定型文は影響を受けません。"
+          }
+        }
+      }
+    },
+    "アプリの全ての設定を初期状態に戻してもよろしいですか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to reset all settings of the app to their defaults? This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリの全ての設定を初期状態に戻してもよろしいですか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
     "アラートを表示する容量を設定" : {
       "localizations" : {
         "en" : {
@@ -2409,6 +2441,38 @@
         }
       }
     },
+    "すべての設定が初期状態に戻りました。変更を完全に適用するにはアプリを再起動してください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All settings have been reset to their defaults. Please restart the app to fully apply the changes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての設定が初期状態に戻りました。変更を完全に適用するにはアプリを再起動してください。"
+          }
+        }
+      }
+    },
+    "すべての設定をリセット" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset All Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての設定をリセット"
+          }
+        }
+      }
+    },
     "すべての除外するアプリをリストから削除します。" : {
       "localizations" : {
         "en" : {
@@ -2645,6 +2709,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "テスト通知を送信します。"
+          }
+        }
+      }
+    },
+    "デバッグ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デバッグ"
           }
         }
       }
@@ -3301,6 +3381,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リストが更新されたら最も上にスクロール"
+          }
+        }
+      }
+    },
+    "リセット" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセット"
+          }
+        }
+      }
+    },
+    "リセット..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセット..."
+          }
+        }
+      }
+    },
+    "リセット完了" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Completed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセット完了"
           }
         }
       }
