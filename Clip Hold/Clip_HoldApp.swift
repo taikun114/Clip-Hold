@@ -212,6 +212,14 @@ struct ClipHoldApp: App {
                     }
                 }
                 .pickerStyle(.inline)
+                
+                Divider()
+                
+                Button("新規プリセット...") {
+                    if let delegate = NSApp.delegate as? AppDelegate {
+                        delegate.showAddPresetWindow()
+                    }
+                }
             } label: {
                 HStack {
                     Text("プリセット: \(displayName(for: presetManager.selectedPreset))")

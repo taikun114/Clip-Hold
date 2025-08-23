@@ -156,6 +156,10 @@ struct StandardPhraseWindowView: View {
 
     @FocusState private var isSearchFieldFocused: Bool
 
+    // 新規プリセット追加シート用の状態変数
+    @State private var showingAddPresetSheet = false
+    @State private var newPresetName = ""
+
     private var lineNumberTextWidth: CGFloat? {
         guard showLineNumbers, !filteredPhrases.isEmpty else { return nil }
         
@@ -279,6 +283,12 @@ struct StandardPhraseWindowView: View {
                                     Text(displayName(for: presetManager.selectedPreset))
                                 }
                                 .disabled(true)
+                            }
+                            
+                            Divider()
+                            
+                            Button("新規プリセット...") {
+                                showingAddPresetSheet = true
                             }
                         } label: {
                             Image(systemName: "line.3.horizontal.decrease")
@@ -530,6 +540,10 @@ struct StandardPhraseWindowView: View {
         .sheet(item: $phraseToEdit) { phrase in
             AddEditPhraseView(mode: .edit(phrase))
                 .environmentObject(standardPhraseManager)
+                .environmentObject(presetManager)
+        }
+        .sheet(isPresented: $showingAddPresetSheet) {
+            AddEditPresetView()
                 .environmentObject(presetManager)
         }
         .onAppear {

@@ -229,6 +229,81 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         addPhraseWindowController?.window?.makeKeyAndOrderFront(nil) // 最前面に表示
         NSApp.activate(ignoringOtherApps: true)
     }
+    
+    @MainActor
+    func showAddPresetWindow() {
+        // 既存のウィンドウがあればそれを再利用
+        if addPhraseWindowController != nil && addPhraseWindowController?.window != nil {
+            // 既存のウィンドウがある場合は、コンテンツを更新して前面に表示
+            print("AppDelegate: Add Preset window already exists. Updating content and bringing to front.")
+            if let window = addPhraseWindowController?.window { // Controller 経由でウィンドウにアクセス
+                let newContentView = AddEditPresetView() { [weak self] in
+                    // ウィンドウを閉じたときの後処理
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.addPhraseWindowController = nil
+                        print("AppDelegate: addPhraseWindowController set to nil asynchronously.")
+                    }
+                }
+                .environmentObject(StandardPhrasePresetManager.shared)
+
+                // 既存の NSHostingController の rootView を AnyView としてキャストし、新しい AnyView で更新
+                if let existingHostingController = window.contentViewController as? NSHostingController<AnyView> {
+                    existingHostingController.rootView = AnyView(newContentView)
+                } else {
+                    // もし contentViewController が期待する型でない場合は、新しいものに置き換える
+                    window.contentViewController = NSHostingController(rootView: AnyView(newContentView))
+                }
+            }
+        } else {
+            // 新しいウィンドウを作成
+            let contentView = AddEditPresetView() { [weak self] in
+                // ウィンドウを閉じたときの後処理
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.addPhraseWindowController = nil
+                    print("AppDelegate: addPhraseWindowController set to nil asynchronously.")
+                }
+            }
+            .environmentObject(StandardPhrasePresetManager.shared)
+
+            let hostingController = NSHostingController(rootView: AnyView(contentView))
+
+            var windowRect = NSRect(x: 0, y: 0, width: 300, height: 140) // ウィンドウの固定サイズを設定
+            
+            if let screenFrame = NSScreen.main?.visibleFrame {
+                // スクリーンの中央に配置するためのX座標とY座標を計算
+                let x = screenFrame.minX + (screenFrame.width - windowRect.width) / 2
+                let y = screenFrame.minY + (screenFrame.height - windowRect.height) / 2
+                windowRect.origin = NSPoint(x: x, y: y) // 計算した座標をウィンドウの原点に設定
+                print("AppDelegate: Calculated window origin: (\(x), \(y)) for screen frame: \(screenFrame)")
+            } else {
+                print("AppDelegate: Could not get main screen frame, falling back to default window position.")
+                // スクリーン情報が取得できない場合のフォールバック（このままでもデフォルトで左上から表示される）
+            }
+
+            let window = NSWindow(
+                contentRect: windowRect,
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered, defer: false)
+
+            window.contentViewController = hostingController
+            window.identifier = NSUserInterfaceItemIdentifier("AddPresetWindow")
+
+            // ClipHoldWindowController でウィンドウをラップ
+            addPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: false)
+
+            // ウィンドウのデリゲートを設定 (AppDelegateが最終的なデリゲートになる)
+            addPhraseWindowController?.window?.delegate = self
+
+            print("AppDelegate: Add Preset window created.")
+        }
+        
+        // ウィンドウを表示し、アプリをアクティブにする
+        addPhraseWindowController?.showWindow(nil) // Controller 経由で表示
+        addPhraseWindowController?.window?.makeKeyAndOrderFront(nil) // 最前面に表示
+        NSApp.activate(ignoringOtherApps: true)
+    }
 
     // MARK: - NSWindowDelegate
     func windowWillClose(_ notification: Notification) {
