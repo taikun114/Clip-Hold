@@ -398,12 +398,14 @@ struct StandardPhraseSettingsView: View {
                 addPhrase(newPhrase)
             }
             .environmentObject(standardPhraseManager)
+            .environmentObject(presetManager)
         }
         .sheet(item: $selectedPhrase) { phrase in
             AddEditPhraseView(mode: .edit(phrase), phraseToEdit: phrase) { editedPhrase in
                 updatePhrase(editedPhrase)
             }
             .environmentObject(standardPhraseManager)
+            .environmentObject(presetManager)
         }
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation) {
             Button("削除", role: .destructive) {

@@ -23,6 +23,7 @@ private func getLocalizedName(for sourceAppPath: String?) -> String? {
 struct HistoryContentList: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
 
     @Binding var filteredHistory: [ClipboardItem]
@@ -101,6 +102,8 @@ struct HistoryContentList: View {
                                 rowIconViews: $rowIconViews, // アイコンビュー辞書へのBindingを渡す
                                 showCharacterCount: showCharacterCount // showCharacterCountを渡す
                             )
+                            .environmentObject(standardPhraseManager)
+                            .environmentObject(presetManager)
                             .tag(item.id)
                         }
                     }

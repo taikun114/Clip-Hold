@@ -92,11 +92,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         SettingsWindowController.shared.showWindow()
     }
 
+    @MainActor
     func showHistoryWindow() {
         if historyWindowController == nil || historyWindowController?.window == nil {
             let contentView = HistoryWindowView()
                 .environmentObject(ClipboardManager.shared)
                 .environmentObject(StandardPhraseManager.shared)
+                .environmentObject(StandardPhrasePresetManager.shared)
             
             let hostingController = NSHostingController(rootView: contentView)
             
@@ -166,10 +168,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
     }
 
+    @MainActor
     func showAddPhraseWindow(withContent content: String) {
         if addPhraseWindowController == nil || addPhraseWindowController?.window == nil {
             let contentView = AddEditPhraseView(mode: .add, initialContent: content)
                 .environmentObject(StandardPhraseManager.shared)
+                .environmentObject(StandardPhrasePresetManager.shared)
 
             let hostingController = NSHostingController(rootView: AnyView(contentView))
 
@@ -209,6 +213,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 // newContentView を、if/else ブロックの外側に移動し、両方からアクセス可能にする
                 let newContentView = AddEditPhraseView(mode: .add, initialContent: content)
                     .environmentObject(StandardPhraseManager.shared)
+                    .environmentObject(StandardPhrasePresetManager.shared)
 
                 // 既存の NSHostingController の rootView を AnyView としてキャストし、新しい AnyView で更新
                 if let existingHostingController = window.contentViewController as? NSHostingController<AnyView> {

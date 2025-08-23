@@ -3,6 +3,7 @@ import SwiftUI
 struct AddEditPhraseView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
 
     enum Mode: Equatable {
         case add
@@ -88,14 +89,27 @@ struct AddEditPhraseView: View {
                         if let onSave = onSave {
                             onSave(phrase)
                         } else {
-                            standardPhraseManager.addPhrase(title: finalTitle, content: content)
+                            // プリセットが選択されている場合はプリセットに追加、そうでなければデフォルトに追加
+                            if var selectedPreset = presetManager.selectedPreset {
+                                selectedPreset.phrases.append(phrase)
+                                presetManager.updatePreset(selectedPreset)
+                            } else {
+                                standardPhraseManager.addPhrase(title: finalTitle, content: content)
+                            }
                         }
                     } else if case .edit(let originalPhrase) = mode {
                         let updatedPhrase = StandardPhrase(id: originalPhrase.id, title: finalTitle, content: content)
                         if let onSave = onSave {
                             onSave(updatedPhrase)
                         } else {
-                            standardPhraseManager.updatePhrase(id: originalPhrase.id, newTitle: finalTitle, newContent: content)
+                            // プリセットが選択されている場合はプリセットを更新、そうでなければデフォルトを更新
+                            if var selectedPreset = presetManager.selectedPreset,
+                               let index = selectedPreset.phrases.firstIndex(where: { $0.id == originalPhrase.id }) {
+                                selectedPreset.phrases[index] = updatedPhrase
+                                presetManager.updatePreset(selectedPreset)
+                            } else {
+                                standardPhraseManager.updatePhrase(id: originalPhrase.id, newTitle: finalTitle, newContent: content)
+                            }
                         }
                     }
                     dismiss()
@@ -118,9 +132,11 @@ struct AddEditPhraseView_Previews: PreviewProvider {
     static var previews: some View {
         AddEditPhraseView(mode: .add)
             .environmentObject(StandardPhraseManager.shared)
+            .environmentObject(StandardPhrasePresetManager.shared)
 
         AddEditPhraseView(mode: .edit(StandardPhrase(title: "既存の定型文のタイトル", content: "これは既存の定型文の内容です。")))
             .environmentObject(StandardPhraseManager.shared)
+            .environmentObject(StandardPhrasePresetManager.shared)
     }
 }
 

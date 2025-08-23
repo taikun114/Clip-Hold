@@ -9,6 +9,7 @@ import QuickLookThumbnailing
 struct HistoryWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
 
     @State private var searchText: String = ""
@@ -255,6 +256,7 @@ struct HistoryWindowView: View {
         .sheet(item: $itemForNewPhrase) { item in
             AddEditPhraseView(mode: .add, initialContent: item.text)
                 .environmentObject(standardPhraseManager)
+                .environmentObject(presetManager)
         }
     }
 }
@@ -262,4 +264,6 @@ struct HistoryWindowView: View {
 #Preview {
     HistoryWindowView()
         .environmentObject(ClipboardManager.shared)
+        .environmentObject(StandardPhraseManager.shared)
+        .environmentObject(StandardPhrasePresetManager.shared)
 }

@@ -335,6 +335,7 @@ struct ClipHoldApp: App {
         }
         .environmentObject(clipboardManager)
         .environmentObject(standardPhraseManager)
+        .environmentObject(presetManager)
         .commands {
             CommandGroup(replacing: .appSettings) {
                 Button("設定...") {

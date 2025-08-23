@@ -56,6 +56,8 @@ private func formatFileSize(_ byteCount: UInt64) -> String {
 // MARK: - HistoryItemRow
 struct HistoryItemRow: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
+    @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     
     let item: ClipboardItem
     let index: Int

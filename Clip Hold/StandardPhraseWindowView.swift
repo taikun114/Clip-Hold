@@ -487,7 +487,13 @@ struct StandardPhraseWindowView: View {
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation) {
             Button("削除", role: .destructive) {
                 if let phrase = phraseToDelete {
-                    standardPhraseManager.deletePhrase(id: phrase.id)
+                    // プリセットが選択されている場合はプリセットから削除、そうでなければデフォルトから削除
+                    if var selectedPreset = presetManager.selectedPreset {
+                        selectedPreset.phrases.removeAll { $0.id == phrase.id }
+                        presetManager.updatePreset(selectedPreset)
+                    } else {
+                        standardPhraseManager.deletePhrase(id: phrase.id)
+                    }
                     phraseToDelete = nil
                     selectedPhraseID = nil
                 }
@@ -503,9 +509,10 @@ struct StandardPhraseWindowView: View {
                 QRCodeView(text: phrase.content)
             }
         }
-        .sheet(item: $phraseToEdit) { phrase in // phraseToEditがnilでない場合にシートが表示される
-            AddEditPhraseView(mode: .edit(phrase)) // 編集モードで表示し、対象のフレーズを渡す
+        .sheet(item: $phraseToEdit) { phrase in
+            AddEditPhraseView(mode: .edit(phrase))
                 .environmentObject(standardPhraseManager)
+                .environmentObject(presetManager)
         }
         .onAppear {
             performSearch(searchTerm: searchText)

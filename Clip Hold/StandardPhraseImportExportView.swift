@@ -96,6 +96,7 @@ struct StandardPhraseImportExportView: View {
     @State private var importConflicts: [StandardPhraseDuplicate] = []
     @State private var nonConflictingPhrasesToImport: [StandardPhrase] = []
     @State private var currentSelectedURL: URL? = nil // 追加: 現在選択されているURLを保持
+    @State private var targetPresetIdForConflictResolution: UUID? // 追加: 競合解決用のプリセットID
     
     // プリセット選択シート用の状態変数
     @State private var showingImportPresetSelectionSheet = false
@@ -267,9 +268,12 @@ struct StandardPhraseImportExportView: View {
                 conflicts: $importConflicts,
                 nonConflictingPhrases: $nonConflictingPhrasesToImport
             ) { finalPhrasesToImport in
-                standardPhraseManager.addImportedPhrases(finalPhrasesToImport)
+                if let presetId = targetPresetIdForConflictResolution {
+                    standardPhraseManager.addImportedPhrases(finalPhrasesToImport, toPresetId: presetId)
+                }
                 importConflicts.removeAll() // シートを閉じたらクリア
                 nonConflictingPhrasesToImport.removeAll() // シートを閉じたらクリア
+                targetPresetIdForConflictResolution = nil // リセット
             }
             .environmentObject(standardPhraseManager)
         }
@@ -313,6 +317,7 @@ struct StandardPhraseImportExportView: View {
     
     // MARK: - プリセット選択後の処理
     private func processImportIntoPreset(presetId: UUID) {
+        targetPresetIdForConflictResolution = presetId
         // 保持しているURLを使用して処理を続行
         guard let selectedURL = currentSelectedURL else { return }
         
