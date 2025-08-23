@@ -174,10 +174,15 @@ class StandardPhraseManager: ObservableObject {
             let existingPhraseWithTitle = targetPhrases.first { $0.title == importedPhrase.title }
             let existingPhraseWithContent = targetPhrases.first { $0.content == importedPhrase.content }
             
-            if existingPhraseWithTitle != nil || existingPhraseWithContent != nil {
+            // IDが一致する既存の定型文を探す
+            let existingPhraseWithId = targetPhrases.first { $0.id == importedPhrase.id }
+            
+            // IDが一致する場合も重複として処理
+            if existingPhraseWithId != nil || existingPhraseWithTitle != nil || existingPhraseWithContent != nil {
                 // 既存の定型文と競合している場合
+                let existingPhrase = existingPhraseWithId ?? existingPhraseWithTitle ?? existingPhraseWithContent!
                 let duplicate = StandardPhraseDuplicate(
-                    existingPhrase: existingPhraseWithTitle ?? existingPhraseWithContent!,
+                    existingPhrase: existingPhrase,
                     newPhrase: importedPhrase
                 )
                 conflicts.append(duplicate)
@@ -194,12 +199,56 @@ class StandardPhraseManager: ObservableObject {
         if let presetId = presetId {
             // 指定されたプリセットに定型文を追加
             if var preset = StandardPhrasePresetManager.shared.presets.first(where: { $0.id == presetId }) {
-                preset.phrases.append(contentsOf: phrasesToAdd)
+                var updatedPhrases = preset.phrases
+                
+                for newPhrase in phrasesToAdd {
+                    // 同じIDの定型文が既に存在するかチェック
+                    if let existingIndex = updatedPhrases.firstIndex(where: { $0.id == newPhrase.id }) {
+                        // IDが一致する定型文が存在する場合
+                        let existingPhrase = updatedPhrases[existingIndex]
+                        
+                        // IDとコンテンツの両方が一致する場合はスキップ
+                        if existingPhrase.content == newPhrase.content {
+                            continue
+                        } else {
+                            // IDが一致するがコンテンツが異なる場合は、新しいUUIDを割り当てて追加
+                            let phraseWithNewId = StandardPhrase(id: UUID(), title: newPhrase.title, content: newPhrase.content)
+                            updatedPhrases.append(phraseWithNewId)
+                        }
+                    } else {
+                        // 同じIDの定型文が存在しない場合は追加
+                        updatedPhrases.append(newPhrase)
+                    }
+                }
+                
+                preset.phrases = updatedPhrases
                 StandardPhrasePresetManager.shared.updatePreset(preset)
             }
         } else {
             // デフォルトの動作: 全定型文リストに追加
-            standardPhrases.append(contentsOf: phrasesToAdd)
+            var updatedPhrases = standardPhrases
+            
+            for newPhrase in phrasesToAdd {
+                // 同じIDの定型文が既に存在するかチェック
+                if let existingIndex = updatedPhrases.firstIndex(where: { $0.id == newPhrase.id }) {
+                    // IDが一致する定型文が存在する場合
+                    let existingPhrase = updatedPhrases[existingIndex]
+                    
+                    // IDとコンテンツの両方が一致する場合はスキップ
+                    if existingPhrase.content == newPhrase.content {
+                        continue
+                    } else {
+                        // IDが一致するがコンテンツが異なる場合は、新しいUUIDを割り当てて追加
+                        let phraseWithNewId = StandardPhrase(id: UUID(), title: newPhrase.title, content: newPhrase.content)
+                        updatedPhrases.append(phraseWithNewId)
+                    }
+                } else {
+                    // 同じIDの定型文が存在しない場合は追加
+                    updatedPhrases.append(newPhrase)
+                }
+            }
+            
+            standardPhrases = updatedPhrases
             print("インポートされたフレーズを追加しました。現在の定型文数: \(self.standardPhrases.count)")
         }
     }

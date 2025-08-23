@@ -313,6 +313,8 @@ struct StandardPhraseImportExportView: View {
         // プリセット選択シートを表示
         showingImportPresetSelectionSheet = true
         selectedImportPresetId = presetManager.selectedPresetId
+        // インポートする定型文を一時保存 (ID保持のため)
+        nonConflictingPhrasesToImport = phrases
     }
     
     // MARK: - プリセット選択後の処理
@@ -344,7 +346,7 @@ struct StandardPhraseImportExportView: View {
                 showingImportConflictSheet = true
             } else {
                 // 競合がなければ直接追加
-                standardPhraseManager.addImportedPhrases(nonConflicts, toPresetId: presetId)
+                standardPhraseManager.addImportedPhrases(importedPhrases, toPresetId: presetId)
             }
         } catch {
             importError = "ファイルの読み込みに失敗しました: \(error.localizedDescription)"
@@ -355,11 +357,28 @@ struct StandardPhraseImportExportView: View {
     private func handlePresetFormatImport(_ presets: [StandardPhrasePreset]) {
         presetsToImport = presets
         var conflicts: [StandardPhrasePreset] = []
+        var nonConflictingPresets: [StandardPhrasePreset] = []
         
         // 既存のプリセットと比較して競合をチェック
         for preset in presets {
-            if presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) != nil {
+            // IDが一致するプリセットを探す
+            let existingPresetWithId = presetManager.presets.first(where: { $0.id == preset.id })
+            
+            // 名前が一致するプリセットを探す
+            let existingPresetWithName = presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id })
+            
+            if existingPresetWithId != nil || existingPresetWithName != nil {
                 conflicts.append(preset)
+            } else {
+                nonConflictingPresets.append(preset)
+            }
+        }
+        
+        // 競合しないプリセットを先に追加
+        for preset in nonConflictingPresets {
+            presetManager.addPresetWithId(preset.id, name: preset.name)
+            if let addedPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
+                standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
             }
         }
         
@@ -367,10 +386,8 @@ struct StandardPhraseImportExportView: View {
             // 競合がある場合は競合シートを表示
             conflictingPresets = conflicts
             showingPresetConflictSheet = true
-        } else {
-            // 競合がなければそのまま統合
-            processPresetImportWithAction(.merge)
         }
+        // 競合がない場合は何もしない（すでに非競合のプリセットは追加済み）
     }
     
     // MARK: - プリセット競合後の処理
@@ -378,8 +395,38 @@ struct StandardPhraseImportExportView: View {
         switch action {
         case .merge:
             for preset in presetsToImport {
-                if let existingPreset = presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) {
-                    // 既存のプリセットに定型文を統合
+                // IDが一致するプリセットを探す
+                if let existingPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
+                    // IDが一致するプリセットが存在する場合、定型文を統合
+                    var mergedPhrases = existingPreset.phrases
+                    
+                    // 新しい定型文のみを追加 (内容が一致するものは除外)
+                    for newPhrase in preset.phrases {
+                        // 同じIDの定型文が既に存在するかチェック
+                        if let existingIndex = mergedPhrases.firstIndex(where: { $0.id == newPhrase.id }) {
+                            // IDが一致する定型文が存在する場合
+                            let existingPhrase = mergedPhrases[existingIndex]
+                            
+                            // IDとコンテンツの両方が一致する場合はスキップ
+                            if existingPhrase.content != newPhrase.content {
+                                // IDが一致するがコンテンツが異なる場合は、新しいUUIDを割り当てて追加
+                                let phraseWithNewId = StandardPhrase(id: UUID(), title: newPhrase.title, content: newPhrase.content)
+                                mergedPhrases.append(phraseWithNewId)
+                            }
+                        } else {
+                            // 同じIDの定型文が存在しない場合は追加
+                            mergedPhrases.append(newPhrase)
+                        }
+                    }
+                    
+                    // 更新されたプリセットを保存
+                    var updatedPreset = existingPreset
+                    updatedPreset.phrases = mergedPhrases
+                    presetManager.updatePreset(updatedPreset)
+                } 
+                // 名前が一致するプリセットを探す（IDが異なる場合）
+                else if let existingPreset = presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) {
+                    // 名前が一致する既存のプリセットに定型文を統合
                     var mergedPhrases = existingPreset.phrases
                     
                     // 新しい定型文のみを追加 (内容が一致するものは除外)
@@ -394,43 +441,52 @@ struct StandardPhraseImportExportView: View {
                     updatedPreset.phrases = mergedPhrases
                     presetManager.updatePreset(updatedPreset)
                 } else {
-                    // 新しいプリセットとして追加
-                    presetManager.addPreset(name: preset.name)
+                    // 新しいプリセットとして追加 (元のIDを保持)
+                    presetManager.addPresetWithId(preset.id, name: preset.name)
                     // 追加されたプリセットのIDを取得して、定型文を追加
-                    if let addedPreset = presetManager.presets.first(where: { $0.name == preset.name }) {
+                    if let addedPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
                         standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
                     }
                 }
             }
         case .add:
-            // プリセットをそのまま追加 (名前が同じでも新しいIDで保存)
+            // プリセットをそのまま追加 (新しいIDを割り当て、名前を変更)
             for preset in presetsToImport {
-                // 既存のプリセット名と重複しないように新しい名前を生成
+                // 新しいUUIDを生成
+                let newId = UUID()
+                
+                // デフォルトプリセットの判定と名前変更
+                let defaultPresetId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+                let defaultPresetName = String(localized: "Default")
                 var newPresetName = preset.name
-                var counter = 1
-                while presetManager.presets.contains(where: { $0.name == newPresetName }) {
-                    newPresetName = "\(preset.name) (\(counter))"
-                    counter += 1
+                if preset.id == defaultPresetId {
+                    newPresetName = defaultPresetName
                 }
                 
-                presetManager.addPreset(name: newPresetName)
+                // 新しいIDと名前でプリセットを追加
+                presetManager.addPresetWithId(newId, name: newPresetName)
                 // 追加されたプリセットのIDを取得して、定型文を追加
-                if let addedPreset = presetManager.presets.first(where: { $0.name == newPresetName }) {
+                if let addedPreset = presetManager.presets.first(where: { $0.id == newId }) {
                     standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
                 }
             }
         case .skip:
             // 競合するプリセットを除いて追加
             for preset in presetsToImport {
-                if !conflictingPresets.contains(where: { $0.name == preset.name }) {
-                    presetManager.addPreset(name: preset.name)
-                    // 追加されたプリセットのIDを取得して、定型文を追加
-                    if let addedPreset = presetManager.presets.first(where: { $0.name == preset.name }) {
-                        standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
-                    }
-                } else {
-                    // 競合するプリセットはスキップ
+                // IDが一致するプリセットはスキップ
+                if presetManager.presets.contains(where: { $0.id == preset.id }) {
                     continue
+                }
+                
+                // 名前が一致するプリセットもスキップ
+                if conflictingPresets.contains(where: { $0.name == preset.name }) {
+                    continue
+                }
+                
+                presetManager.addPresetWithId(preset.id, name: preset.name)
+                // 追加されたプリセットのIDを取得して、定型文を追加
+                if let addedPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
+                    standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
                 }
             }
         case .resolveIndividually:
@@ -439,8 +495,37 @@ struct StandardPhraseImportExportView: View {
                 if let individualAction = individualActions[preset.id] {
                     switch individualAction {
                     case .merge:
-                        if let existingPreset = presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) {
-                            // 既存のプリセットに定型文を統合
+                        if let existingPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
+                            // IDが一致するプリセットが存在する場合、定型文を統合
+                            var mergedPhrases = existingPreset.phrases
+                            
+                            // 新しい定型文のみを追加 (内容が一致するものは除外)
+                            for newPhrase in preset.phrases {
+                                // 同じIDの定型文が既に存在するかチェック
+                                if let existingIndex = mergedPhrases.firstIndex(where: { $0.id == newPhrase.id }) {
+                                    // IDが一致する定型文が存在する場合
+                                    let existingPhrase = mergedPhrases[existingIndex]
+                                    
+                                    // IDとコンテンツの両方が一致する場合はスキップ
+                                    if existingPhrase.content != newPhrase.content {
+                                        // IDが一致するがコンテンツが異なる場合は、新しいUUIDを割り当てて追加
+                                        let phraseWithNewId = StandardPhrase(id: UUID(), title: newPhrase.title, content: newPhrase.content)
+                                        mergedPhrases.append(phraseWithNewId)
+                                    }
+                                } else {
+                                    // 同じIDの定型文が存在しない場合は追加
+                                    mergedPhrases.append(newPhrase)
+                                }
+                            }
+                            
+                            // 更新されたプリセットを保存
+                            var updatedPreset = existingPreset
+                            updatedPreset.phrases = mergedPhrases
+                            presetManager.updatePreset(updatedPreset)
+                        } 
+                        // 名前が一致するプリセットを探す（IDが異なる場合）
+                        else if let existingPreset = presetManager.presets.first(where: { $0.name == preset.name && $0.id != preset.id }) {
+                            // 名前が一致する既存のプリセットに定型文を統合
                             var mergedPhrases = existingPreset.phrases
                             
                             // 新しい定型文のみを追加 (内容が一致するものは除外)
@@ -455,26 +540,30 @@ struct StandardPhraseImportExportView: View {
                             updatedPreset.phrases = mergedPhrases
                             presetManager.updatePreset(updatedPreset)
                         } else {
-                            // 新しいプリセットとして追加
-                            presetManager.addPreset(name: preset.name)
+                            // 新しいプリセットとして追加 (元のIDを保持)
+                            presetManager.addPresetWithId(preset.id, name: preset.name)
                             // 追加されたプリセットのIDを取得して、定型文を追加
-                            if let addedPreset = presetManager.presets.first(where: { $0.name == preset.name }) {
+                            if let addedPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
                                 standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
                             }
                         }
                     case .add:
-                        // プリセットをそのまま追加 (名前が同じでも新しいIDで保存)
-                        // 既存のプリセット名と重複しないように新しい名前を生成
+                        // プリセットをそのまま追加 (新しいIDを割り当て、名前を変更)
+                        // 新しいUUIDを生成
+                        let newId = UUID()
+                        
+                        // デフォルトプリセットの判定と名前変更
+                        let defaultPresetId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+                        let defaultPresetName = String(localized: "Default")
                         var newPresetName = preset.name
-                        var counter = 1
-                        while presetManager.presets.contains(where: { $0.name == newPresetName }) {
-                            newPresetName = "\(preset.name) (\(counter))"
-                            counter += 1
+                        if preset.id == defaultPresetId {
+                            newPresetName = defaultPresetName
                         }
                         
-                        presetManager.addPreset(name: newPresetName)
+                        // 新しいIDと名前でプリセットを追加
+                        presetManager.addPresetWithId(newId, name: newPresetName)
                         // 追加されたプリセットのIDを取得して、定型文を追加
-                        if let addedPreset = presetManager.presets.first(where: { $0.name == newPresetName }) {
+                        if let addedPreset = presetManager.presets.first(where: { $0.id == newId }) {
                             standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
                         }
                     case .skip:

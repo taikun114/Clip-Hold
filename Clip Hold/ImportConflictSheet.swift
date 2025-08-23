@@ -106,11 +106,8 @@ struct ImportConflictSheet: View {
                 Spacer()
 
                 Button("すべてスキップ") {
-                    // MARK: - 修正: resolvedPhrasesToImport は新しいID、nonConflictingPhrases は元のIDを保持
-                    let allPhrasesToImport = resolvedPhrasesToImport.map { phrase in
-                        let newPhrase = StandardPhrase(id: UUID(), title: phrase.title, content: phrase.content) // 常に新しいID
-                        return newPhrase
-                    } + nonConflictingPhrases // nonConflictingPhrasesは元のIDを保持
+                    // MARK: - 修正: resolvedPhrasesToImport と nonConflictingPhrases は元のIDを保持
+                    let allPhrasesToImport = resolvedPhrasesToImport + nonConflictingPhrases
 
                     onCompletion(allPhrasesToImport)
                     dismiss()
@@ -126,7 +123,8 @@ struct ImportConflictSheet: View {
 
                 Button {
                     if let currentConflictValue = currentConflict?.wrappedValue {
-                        let newPhrase = StandardPhrase(id: UUID(), title: currentConflictValue.newPhrase.title, content: currentConflictValue.newPhrase.content) // 新しいIDを生成
+                        // 競合を解決した定型文も元のIDを保持
+                        let newPhrase = StandardPhrase(id: currentConflictValue.newPhrase.id, title: currentConflictValue.newPhrase.title, content: currentConflictValue.newPhrase.content)
                         resolvedPhrasesToImport.append(newPhrase)
                     }
                     goToNextConflict()
@@ -146,10 +144,7 @@ struct ImportConflictSheet: View {
         if currentIndex < conflicts.count - 1 {
             currentIndex += 1
         } else {
-            let allPhrasesToImport = resolvedPhrasesToImport.map { phrase in
-                let newPhrase = StandardPhrase(id: UUID(), title: phrase.title, content: phrase.content) // resolvedPhrasesToImportは常に新しいID
-                return newPhrase
-            } + nonConflictingPhrases // nonConflictingPhrasesは元のIDを保持
+            let allPhrasesToImport = resolvedPhrasesToImport + nonConflictingPhrases
 
             onCompletion(allPhrasesToImport)
             dismiss()

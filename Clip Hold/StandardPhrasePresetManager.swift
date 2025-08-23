@@ -249,6 +249,20 @@ class StandardPhrasePresetManager: ObservableObject {
         saveSelectedPresetId()
     }
     
+    func addPresetWithId(_ id: UUID, name: String) {
+        // 既に同じIDのプリセットが存在する場合は追加しない
+        if presets.contains(where: { $0.id == id }) {
+            return
+        }
+        
+        let newPreset = StandardPhrasePreset(id: id, name: name)
+        presets.append(newPreset)
+        selectedPresetId = newPreset.id
+        savePresetToFile(newPreset)
+        savePresetIndex()
+        saveSelectedPresetId()
+    }
+    
     func deletePreset(id: UUID) {
         if id == defaultPresetId {
             setUserDeletedDefaultPreset()
