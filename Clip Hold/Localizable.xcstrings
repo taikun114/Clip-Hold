@@ -42,7 +42,20 @@
       "shouldTranslate" : false
     },
     "\"%@\"の操作を選択してください。" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the operation for “%@”."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%@\"の操作を選択してください。"
+          }
+        }
+      }
     },
     "「%@」" : {
       "localizations" : {
@@ -1848,8 +1861,38 @@
         }
       }
     },
+    "このまま追加する" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add as is"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このまま追加する"
+          }
+        }
+      }
+    },
     "この定型文をインポートしたいプリセットを選択" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the preset you want to import this standard phrases"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この定型文をインポートしたいプリセットを選択"
+          }
+        }
+      }
     },
     "この容量より大きいファイルコピー時にアラートを表示" : {
       "localizations" : {
@@ -2023,6 +2066,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スキップ"
+          }
+        }
+      }
+    },
+    "スキップする" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキップする"
           }
         }
       }
@@ -2908,7 +2968,20 @@
       }
     },
     "プリセットがありません" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットがありません"
+          }
+        }
+      }
     },
     "プリセットの削除" : {
       "localizations" : {
@@ -3246,6 +3319,23 @@
         }
       }
     },
+    "一つ一つ解決する" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolve individually"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一つ一つ解決する"
+          }
+        }
+      }
+    },
     "一時停止" : {
       "localizations" : {
         "en" : {
@@ -3343,7 +3433,20 @@
       }
     },
     "作成" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "作成"
+          }
+        }
+      }
     },
     "保存" : {
       "localizations" : {
@@ -3634,7 +3737,20 @@
       }
     },
     "完了" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        }
+      }
     },
     "定型文" : {
       "localizations" : {
@@ -3781,7 +3897,20 @@
       }
     },
     "定型文のインポート" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Standard Phrases"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文のインポート"
+          }
+        }
+      }
     },
     "定型文のエクスポート" : {
       "localizations" : {
@@ -4424,7 +4553,20 @@
       }
     },
     "戻る" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戻る"
+          }
+        }
+      }
     },
     "数値を入力" : {
       "localizations" : {
@@ -4603,10 +4745,36 @@
       }
     },
     "新規プリセットの作成" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a New Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規プリセットの作成"
+          }
+        }
+      }
     },
     "新規プリセットを作成" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a New Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規プリセットを作成"
+          }
+        }
+      }
     },
     "既存: " : {
       "localizations" : {
@@ -4737,7 +4905,20 @@
       }
     },
     "次のプリセットがすでに存在しています。" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The following presets already exist."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次のプリセットがすでに存在しています。"
+          }
+        }
+      }
     },
     "次の容量より大きいファイルコピー時にアラートを表示:" : {
       "localizations" : {
@@ -4756,7 +4937,20 @@
       }
     },
     "次へ" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次へ"
+          }
+        }
+      }
     },
     "無制限" : {
       "localizations" : {
@@ -4902,11 +5096,54 @@
         }
       }
     },
+    "統合する" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "統合する"
+          }
+        }
+      }
+    },
     "続ける" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続ける"
+          }
+        }
+      }
     },
     "続けるには操作を選択してください。" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select an operation to continue."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続けるには操作を選択してください。"
+          }
+        }
+      }
     },
     "緑茶を奢る" : {
       "localizations" : {
@@ -5229,7 +5466,20 @@
       }
     },
     "重複したプリセット" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重複したプリセット"
+          }
+        }
+      }
     },
     "閉じる" : {
       "localizations" : {

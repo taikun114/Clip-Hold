@@ -56,7 +56,7 @@ struct PresetConflictSheet: View {
             
             Picker("", selection: $selectedAction) {
                 ForEach(PresetConflictAction.allCases, id: \.self) { action in
-                    Text(action.rawValue)
+                    Text(LocalizedStringKey(action.rawValue))
                         .tag(action)
                 }
             }
@@ -103,7 +103,7 @@ struct PresetConflictSheet: View {
                 }
             )) {
                 ForEach([PresetConflictAction.merge, .add, .skip], id: \.self) { action in
-                    Text(action.rawValue)
+                    Text(LocalizedStringKey(action.rawValue))
                         .tag(action)
                 }
             }
