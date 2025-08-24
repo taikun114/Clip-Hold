@@ -363,7 +363,7 @@ private struct PresetAssignmentSection: View {
                         .font(.body)
                         .fontWeight(.medium)
                         .frame(width: 24, height: 24)
-                        .offset(y: -2.0)
+                        .offset(x: -2.0, y: -2.0)
                         .if(!assignedApps.isEmpty) { view in
                             view.foregroundStyle(.red)
                         }
@@ -419,6 +419,7 @@ private struct PhraseSettingsSection: View {
     @State private var selectedPhrase: StandardPhrase?
     @State private var phraseToDelete: StandardPhrase?
     @State private var showingDeleteConfirmation = false
+    @State private var showingClearAllPhrasesConfirmation = false
 
     private var currentPhrases: [StandardPhrase] {
         presetManager.selectedPreset?.phrases ?? []
@@ -478,6 +479,15 @@ private struct PhraseSettingsSection: View {
         }
         .sheet(isPresented: $showingAddPhraseSheet) { addSheet }
         .sheet(item: $selectedPhrase) { phrase in editSheet(for: phrase) }
+        .alert("すべての定型文を削除", isPresented: $showingClearAllPhrasesConfirmation) {
+            Button("削除", role: .destructive) { deleteAllPhrases() }
+        } message: {
+            if let preset = presetManager.selectedPreset {
+                Text("プリセット「\(displayName(for: preset))」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
+            } else {
+                Text("選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。")
+            }
+        }
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation, presenting: phraseToDelete) { phrase in
             Button("削除", role: .destructive) {
                 deletePhrase(id: phrase.id)
@@ -549,6 +559,27 @@ private struct PhraseSettingsSection: View {
                 .buttonStyle(.borderless)
                 .disabled(selectedPhraseId == nil)
                 .help(Text("選択した定型文を編集します。"))
+                
+                Divider()
+                    .frame(width: 1, height: 16)
+                    .background(Color.gray.opacity(0.1))
+                    .padding(.horizontal, 4)
+                
+                Button(action: {
+                    showingClearAllPhrasesConfirmation = true
+                }) {
+                    Image(systemName: "trash")
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .frame(width: 24, height: 24)
+                        .offset(x: -2.0, y: -2.0)
+                        .if(!currentPhrases.isEmpty) { view in
+                            view.foregroundStyle(.red)
+                        }
+                }
+                .buttonStyle(.borderless)
+                .disabled(currentPhrases.isEmpty)
+                .help(Text("このプリセットのすべての定型文を削除します。"))
             }
             .background(Rectangle().opacity(0.04))
         }
@@ -630,6 +661,12 @@ private struct PhraseSettingsSection: View {
     private func movePhrase(from source: IndexSet, to destination: Int) {
         guard var p = presetManager.selectedPreset else { return }
         p.phrases.move(fromOffsets: source, toOffset: destination)
+        presetManager.updatePreset(p)
+    }
+    
+    private func deleteAllPhrases() {
+        guard var p = presetManager.selectedPreset else { return }
+        p.phrases = []
         presetManager.updatePreset(p)
     }
 }

@@ -1959,6 +1959,22 @@
         }
       }
     },
+    "このプリセットのすべての定型文を削除します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all standard phrases in this preset."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このプリセットのすべての定型文を削除します。"
+          }
+        }
+      }
+    },
     "このプリセットを本当に削除しますか？" : {
       "localizations" : {
         "en" : {

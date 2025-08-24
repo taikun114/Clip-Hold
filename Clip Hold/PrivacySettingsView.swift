@@ -368,7 +368,7 @@ struct PrivacySettingsView: View {
                                     .font(.body)
                                     .fontWeight(.medium)
                                     .frame(width: 24, height: 24)
-                                    .offset(y: -2.0)
+                                    .offset(x: -2.0, y: -2.0)
                                     .contentShape(Rectangle())
                                     .if(!excludedAppIdentifiers.isEmpty) { view in
                                         view.foregroundStyle(.red)
