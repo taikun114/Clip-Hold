@@ -1927,6 +1927,38 @@
         }
       }
     },
+    "このプリセットに割り当てられているすべてのアプリをリストから削除しますか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to remove all apps assigned to this preset from the list?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このプリセットに割り当てられているすべてのアプリをリストから削除しますか？"
+          }
+        }
+      }
+    },
+    "このプリセットのすべての割り当てを削除します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove all assignments for this preset."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このプリセットのすべての割り当てを削除します。"
+          }
+        }
+      }
+    },
     "このプリセットを本当に削除しますか？" : {
       "localizations" : {
         "en" : {
@@ -2373,6 +2405,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのプリセットを本当に削除しますか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
+    "すべてのプロセスを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show All Processes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのプロセスを表示"
+          }
+        }
+      }
+    },
+    "すべての割り当てを削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove All Assignments"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての割り当てを削除"
           }
         }
       }
@@ -3161,6 +3225,22 @@
         }
       }
     },
+    "プリセットの割り当て" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assign Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットの割り当て"
+          }
+        }
+      }
+    },
     "プリセットの設定" : {
       "localizations" : {
         "en" : {
@@ -3189,6 +3269,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセットの順番はドラッグアンドドロップで並び替えることができます。"
+          }
+        }
+      }
+    },
+    "プリセットをアプリに割り当てると、そのアプリが最前面の時は、自動で選択されたプリセットに切り替わるようになります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you assign presets to apps, they will automatically switch to the selected preset when the app is on the foreground."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットをアプリに割り当てると、そのアプリが最前面の時は、自動で選択されたプリセットに切り替わるようになります。"
           }
         }
       }
@@ -3926,6 +4022,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除..."
+          }
+        }
+      }
+    },
+    "割り当てるアプリを追加します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add apps to be assigned."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "割り当てるアプリを追加します。"
+          }
+        }
+      }
+    },
+    "割り当てるプリセット" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset to Assign"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "割り当てるプリセット"
           }
         }
       }

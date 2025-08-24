@@ -4,6 +4,7 @@ import UserNotifications
 import KeyboardShortcuts
 
 // アプリケーションのデリゲートクラス
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, NSWindowDelegate {
 
     var historyWindowController: ClipHoldWindowController?
@@ -16,9 +17,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
     private var historyWindowAlwaysOnTopObserver: NSKeyValueObservation?
     private var standardPhraseWindowAlwaysOnTopObserver: NSKeyValueObservation?
+    private let frontmostAppMonitor = FrontmostAppMonitor.shared
 
     // MARK: - Application Lifecycle
     func applicationDidFinishLaunching(_ notification: Notification) {
+        frontmostAppMonitor.startMonitoring()
         print("AppDelegate: finished launching.")
 
         NSApp.setActivationPolicy(.accessory)
@@ -59,23 +62,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             print("AppDelegate: アプリ起動時、クリップボード監視は一時停止状態です。通知をスケジュールしました。")
         }
 
-        historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
-            guard let self = self, let alwaysOnTop = change.newValue else { return }
-            if let historyWindow = self.historyWindowController?.window {
-                historyWindow.level = alwaysOnTop ? .floating : .normal
-                print("DEBUG: historyWindowAlwaysOnTop changed. Level set to: \(historyWindow.level.rawValue)")
-            } else {
-                print("DEBUG: historyWindowAlwaysOnTop changed, but historyWindowController is nil or window is nil.")
+                historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
+            DispatchQueue.main.async {
+                guard let self = self, let alwaysOnTop = change.newValue else { return }
+                if let historyWindow = self.historyWindowController?.window {
+                    historyWindow.level = alwaysOnTop ? .floating : .normal
+                }
             }
         }
 
         standardPhraseWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.standardPhraseWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
-            guard let self = self, let alwaysOnTop = change.newValue else { return }
-            if let standardPhraseWindow = self.standardPhraseWindowController?.window {
-                standardPhraseWindow.level = alwaysOnTop ? .floating : .normal
-                print("DEBUG: standardPhraseWindowAlwaysOnTop changed. Level set to: \(standardPhraseWindow.level.rawValue)")
-            } else {
-                print("DEBUG: standardPhraseWindowAlwaysOnTop changed, but standardPhraseWindowController is nil or window is nil.")
+            DispatchQueue.main.async {
+                guard let self = self, let alwaysOnTop = change.newValue else { return }
+                if let standardPhraseWindow = self.standardPhraseWindowController?.window {
+                    standardPhraseWindow.level = alwaysOnTop ? .floating : .normal
+                }
             }
         }
     }
@@ -329,7 +330,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     }
 
     // MARK: - UNUserNotificationCenterDelegate (通知アクションのハンドリング)
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let actionID = response.actionIdentifier
         let notificationCategory = response.notification.request.content.categoryIdentifier
         
@@ -339,7 +340,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             NotificationManager.shared.resumeClipboardMonitoringAndSendNotification()
 
             // アプリをフォアグラウンドに表示
-            NSApp.activate(ignoringOtherApps: true)
+            DispatchQueue.main.async {
+                NSApp.activate(ignoringOtherApps: true)
+            }
         } else if actionID == "OPEN_DOCUMENTATION_ACTION" && notificationCategory == "MIGRATION_FAILURE_CATEGORY" {
             print("通知アクション: 'ドキュメントを表示…' が選択されました。")
             
@@ -357,12 +360,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
             
             // アプリをフォアグラウンドに表示
-            NSApp.activate(ignoringOtherApps: true)
+            DispatchQueue.main.async {
+                NSApp.activate(ignoringOtherApps: true)
+            }
         }
         completionHandler()
     }
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound])
     }
 }
