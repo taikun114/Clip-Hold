@@ -2393,6 +2393,22 @@
         }
       }
     },
+    "すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete standard phrases from all presets? This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
     "すべてのプリセットを削除" : {
       "localizations" : {
         "en" : {

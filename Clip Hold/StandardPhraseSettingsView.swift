@@ -679,7 +679,11 @@ private struct PhraseManagementSection: View {
     @State private var showingClearAllPhrasesConfirmation = false
     @State private var showingClearAllPresetsConfirmation = false
 
-    private var currentPhrases: [StandardPhrase] { presetManager.selectedPreset?.phrases ?? [] }
+    private var allPhrasesCount: Int {
+        presetManager.presets.reduce(0) { count, preset in
+            count + preset.phrases.count
+        }
+    }
 
     var body: some View {
         Section(header: Text("定型文の管理").font(.headline)) {
@@ -688,7 +692,7 @@ private struct PhraseManagementSection: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             
             HStack {
-                Text("\(presetManager.presets.reduce(0) { $0 + $1.phrases.count })個の定型文").foregroundStyle(.secondary)
+                Text("\(allPhrasesCount)個の定型文").foregroundStyle(.secondary)
                 Spacer()
                 Button(action: {
                     showingClearAllPhrasesConfirmation = true
@@ -697,12 +701,12 @@ private struct PhraseManagementSection: View {
                         Image(systemName: "trash")
                         Text("すべての定型文を削除")
                     }
-                    .if(!currentPhrases.isEmpty) { view in
+                    .if(allPhrasesCount > 0) { view in
                         view.foregroundStyle(.red)
                     }
                 }
                 .buttonStyle(.bordered)
-                .disabled(currentPhrases.isEmpty)
+                .disabled(allPhrasesCount == 0)
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             
@@ -726,13 +730,9 @@ private struct PhraseManagementSection: View {
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         }
         .alert("すべての定型文を削除", isPresented: $showingClearAllPhrasesConfirmation) {
-            Button("削除", role: .destructive) { deleteAllPhrases() }
+            Button("削除", role: .destructive) { deleteAllPhrasesFromAllPresets() }
         } message: {
-            if let preset = presetManager.selectedPreset {
-                Text("プリセット「\(displayName(for: preset))」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
-            } else {
-                Text("選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。")
-            }
+            Text("すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。")
         }
         .alert("すべてのプリセットを削除", isPresented: $showingClearAllPresetsConfirmation) {
             Button("削除", role: .destructive) { presetManager.deleteAllPresets() }
@@ -751,6 +751,13 @@ private struct PhraseManagementSection: View {
         guard var p = presetManager.selectedPreset else { return }
         p.phrases = []
         presetManager.updatePreset(p)
+    }
+    
+    private func deleteAllPhrasesFromAllPresets() {
+        for i in presetManager.presets.indices {
+            presetManager.presets[i].phrases = []
+            presetManager.updatePreset(presetManager.presets[i])
+        }
     }
 }
 
