@@ -257,13 +257,13 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld preset"
+                  "value" : "%lld Preset"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%lld presets"
+                  "value" : "%lld Presets"
                 }
               }
             }
@@ -3349,6 +3349,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセット名を入力"
+          }
+        }
+      }
+    },
+    "プリセット名を編集" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Preset Name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット名を編集"
           }
         }
       }

@@ -33,7 +33,7 @@ private struct PresetSettingsSection: View {
     @State private var editingPreset: StandardPhrasePreset?
     @State private var presetToDelete: StandardPhrasePreset?
     @State private var showingDeletePresetConfirmation = false
-    @AppStorage("sendNotificationOnPresetChange") private var sendNotificationOnPresetChange: Bool = false
+    @AppStorage("sendNotificationOnPresetChange") private var sendNotificationOnPresetChange: Bool = true
 
     var body: some View {
         Section(header:
@@ -127,38 +127,51 @@ private struct PresetSettingsSection: View {
         VStack(alignment: .leading, spacing: 0) {
             Divider()
             HStack(spacing: 0) {
-                button(icon: "plus", help: Text("新しいプリセットをリストに追加します。")) { showingAddPresetSheet = true }
+                Button(action: { showingAddPresetSheet = true }) {
+                    Image(systemName: "plus")
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .frame(width: 24, height: 24)
+                        .offset(x: 2.0, y: -1.0)
+                }
+                .buttonStyle(.borderless)
+                .help(Text("新しいプリセットをリストに追加します。"))
                 divider
-                button(icon: "minus", help: Text("選択したプリセットをリストから削除します。"), disabled: selectedPresetId == nil) {
+                Button(action: {
                     if let selectedId = selectedPresetId, let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         presetToDelete = preset
                         showingDeletePresetConfirmation = true
                     }
+                }) {
+                    Image(systemName: "minus")
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .frame(width: 24, height: 24)
+                        .offset(y: -0.5)
                 }
+                .buttonStyle(.borderless)
+                .disabled(selectedPresetId == nil)
+                .help(Text("選択したプリセットをリストから削除します。"))
                 Spacer()
-                button(icon: "pencil", help: Text("選択したプリセットを編集します。"), disabled: selectedPresetId == nil || isDefaultPreset(id: selectedPresetId)) {
+                Button(action: {
                     if let selectedId = selectedPresetId, let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
                         newPresetName = preset.name
                         showingEditPresetSheet = true
                     }
+                }) {
+                    Image(systemName: "pencil")
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .frame(width: 24, height: 24)
+                        .offset(y: -0.5)
                 }
+                .buttonStyle(.borderless)
+                .disabled(selectedPresetId == nil || isDefaultPreset(id: selectedPresetId))
+                .help(Text("選択したプリセットを編集します。"))
             }
             .background(Rectangle().opacity(0.04))
         }
-    }
-    
-    private func button(icon: String, help: Text, disabled: Bool = false, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.body)
-                .fontWeight(.medium)
-                .frame(width: 24, height: 24)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.borderless)
-        .help(help)
-        .disabled(disabled)
     }
     
     private var divider: some View {
@@ -169,7 +182,7 @@ private struct PresetSettingsSection: View {
     }
 
     private var addPresetSheet: some View {
-        PresetNameSheet(name: $newPresetName, title: "プリセット名を入力") {
+        PresetNameSheet(name: $newPresetName, title: String(localized: "プリセット名を入力")) {
             addPreset(name: newPresetName)
             newPresetName = ""
             showingAddPresetSheet = false
@@ -180,7 +193,7 @@ private struct PresetSettingsSection: View {
     }
 
     private var editPresetSheet: some View {
-        PresetNameSheet(name: $newPresetName, title: "プリセット名を編集") {
+        PresetNameSheet(name: $newPresetName, title: String(localized: "プリセット名を編集")) {
             if let preset = editingPreset {
                 updatePreset(preset, newName: newPresetName)
                 newPresetName = ""
@@ -307,7 +320,7 @@ private struct PresetAssignmentSection: View {
                     runningApplications = NSWorkspace.shared.runningApplications
                     isShowingAddAppPopover = true
                 }) {
-                    Image(systemName: "plus").font(.body).fontWeight(.medium).frame(width: 24, height: 24)
+                    Image(systemName: "plus").font(.body).fontWeight(.medium).frame(width: 24, height: 24).offset(x: 2.0, y: -1.0)
                 }
                 .buttonStyle(.borderless)
                 .help(Text("割り当てるアプリを追加します。"))
@@ -335,7 +348,7 @@ private struct PresetAssignmentSection: View {
                         deleteAssignedApp(bundleIdentifier: selectedId)
                     }
                 }) {
-                    Image(systemName: "minus").font(.body).fontWeight(.medium).frame(width: 24, height: 24)
+                    Image(systemName: "minus").font(.body).fontWeight(.medium).frame(width: 24, height: 24).offset(y: -0.5)
                 }
                 .buttonStyle(.borderless)
                 .disabled(selectedAssignedAppId == nil)
@@ -350,6 +363,7 @@ private struct PresetAssignmentSection: View {
                         .font(.body)
                         .fontWeight(.medium)
                         .frame(width: 24, height: 24)
+                        .offset(y: -2.0)
                         .if(!assignedApps.isEmpty) { view in
                             view.foregroundStyle(.red)
                         }
@@ -495,20 +509,46 @@ private struct PhraseSettingsSection: View {
         VStack(alignment: .leading, spacing: 0) {
             Divider()
             HStack(spacing: 0) {
-                button(icon: "plus", help: Text("新しい定型文をリストに追加します。")) { showingAddPhraseSheet = true }
+                Button(action: { showingAddPhraseSheet = true }) {
+                    Image(systemName: "plus")
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .frame(width: 24, height: 24)
+                        .offset(x: 2.0, y: -1.0)
+                }
+                .buttonStyle(.borderless)
+                .help(Text("新しい定型文をリストに追加します。"))
                 divider
-                button(icon: "minus", help: Text("選択した定型文をリストから削除します。"), disabled: selectedPhraseId == nil) {
+                Button(action: {
                     if let id = selectedPhraseId, let phrase = currentPhrases.first(where: { $0.id == id }) {
                         phraseToDelete = phrase
                         showingDeleteConfirmation = true
                     }
+                }) {
+                    Image(systemName: "minus")
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .frame(width: 24, height: 24)
+                        .offset(y: -0.5)
                 }
+                .buttonStyle(.borderless)
+                .disabled(selectedPhraseId == nil)
+                .help(Text("選択した定型文をリストから削除します。"))
                 Spacer()
-                button(icon: "pencil", help: Text("選択した定型文を編集します。"), disabled: selectedPhraseId == nil) {
+                Button(action: {
                     if let id = selectedPhraseId, let phrase = currentPhrases.first(where: { $0.id == id }) {
                         selectedPhrase = phrase
                     }
+                }) {
+                    Image(systemName: "pencil")
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .frame(width: 24, height: 24)
+                        .offset(y: -0.5)
                 }
+                .buttonStyle(.borderless)
+                .disabled(selectedPhraseId == nil)
+                .help(Text("選択した定型文を編集します。"))
             }
             .background(Rectangle().opacity(0.04))
         }
@@ -611,7 +651,7 @@ private struct PhraseManagementSection: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             
             HStack {
-                Text("\(currentPhrases.count)個の定型文").foregroundStyle(.secondary)
+                Text("\(presetManager.presets.reduce(0) { $0 + $1.phrases.count })個の定型文").foregroundStyle(.secondary)
                 Spacer()
                 Button(action: {
                     showingClearAllPhrasesConfirmation = true

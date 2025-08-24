@@ -12,7 +12,7 @@ struct AddEditPresetView: View {
     var body: some View {
         VStack(spacing: 10) {
             HStack {
-                Text("プリセット名を入力")
+                Text(String(localized: "プリセット名を入力"))
                     .font(.headline)
                 Spacer()
             }
