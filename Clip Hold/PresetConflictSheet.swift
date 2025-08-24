@@ -10,11 +10,24 @@ struct PresetConflictSheet: View {
     @State private var individualActions: [UUID: PresetConflictAction] = [:]
     var onCompletion: (PresetConflictAction, [UUID: PresetConflictAction]) -> Void
     
-    enum PresetConflictAction: String, CaseIterable {
-        case merge = "統合する"
-        case add = "このまま追加する"
-        case skip = "スキップする"
-        case resolveIndividually = "一つ一つ解決する"
+    enum PresetConflictAction: CaseIterable {
+        case merge
+        case add
+        case skip
+        case resolveIndividually
+        
+        var localizedString: LocalizedStringKey {
+            switch self {
+            case .merge:
+                return LocalizedStringKey("統合する")
+            case .add:
+                return LocalizedStringKey("このまま追加する")
+            case .skip:
+                return LocalizedStringKey("スキップする")
+            case .resolveIndividually:
+                return LocalizedStringKey("一つ一つ解決する")
+            }
+        }
     }
     
     private func displayName(for preset: StandardPhrasePreset) -> String {
@@ -63,7 +76,7 @@ struct PresetConflictSheet: View {
             
             Picker("", selection: $selectedAction) {
                 ForEach(PresetConflictAction.allCases, id: \.self) { action in
-                    Text(LocalizedStringKey(action.rawValue))
+                    Text(action.localizedString)
                         .tag(action)
                 }
             }
@@ -110,7 +123,7 @@ struct PresetConflictSheet: View {
                 }
             )) {
                 ForEach([PresetConflictAction.merge, .add, .skip], id: \.self) { action in
-                    Text(LocalizedStringKey(action.rawValue))
+                    Text(action.localizedString)
                         .tag(action)
                 }
             }

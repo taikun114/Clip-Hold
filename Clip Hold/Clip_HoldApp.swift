@@ -444,7 +444,7 @@ struct ClipHoldApp: App {
                     let notificationCenter = UNUserNotificationCenter.current()
                     let content = UNMutableNotificationContent()
                     content.title = nextPreset.name
-                    content.body = "「\(nextPreset.name)」に切り替わりました。"
+                    content.body = String(localized: "「\(nextPreset.name)」に切り替わりました。")
                     content.sound = nil // 音なし
                     
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)

@@ -73,6 +73,22 @@
         }
       }
     },
+    "「%@」に切り替わりました。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switched to “%@”."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」に切り替わりました。"
+          }
+        }
+      }
+    },
     "「%@」を本当に削除しますか？" : {
       "localizations" : {
         "en" : {
@@ -2008,7 +2024,6 @@
       }
     },
     "このまま追加する" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2233,7 +2248,6 @@
       }
     },
     "スキップする" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3722,7 +3736,6 @@
       }
     },
     "一つ一つ解決する" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5547,7 +5560,6 @@
       }
     },
     "統合する" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
