@@ -41,18 +41,18 @@
     "-" : {
       "shouldTranslate" : false
     },
-    "\"%@\"の操作を選択してください。" : {
+    "\"%@\"の操作を選択してください。%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Choose the operation for “%@”."
+            "value" : "Choose the operation for “%1$@”. %2$@"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "\"%@\"の操作を選択してください。"
+            "value" : "\"%1$@\"の操作を選択してください。%2$@"
           }
         }
       }
@@ -85,6 +85,60 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」に切り替わりました。"
+          }
+        }
+      }
+    },
+    "「%@」のインポートの競合 (%lld/%lld)%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%#@arg3@ for “%1$@” (%2$lld/%3$lld)%4$@"
+          },
+          "substitutions" : {
+            "arg3" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "Import Conflict"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "Import Conflicts"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%1$@」の%#@arg3@ (%2$lld/%3$lld)%4$@"
+          },
+          "substitutions" : {
+            "arg3" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "インポートの競合"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1277,60 +1331,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インポートエラー"
-          }
-        }
-      }
-    },
-    "インポートの競合 (%lld / %lld)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%#@arg2@ (%1$lld / %2$lld)"
-          },
-          "substitutions" : {
-            "arg2" : {
-              "argNum" : 2,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "Import Conflict"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "Import Conflicts"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%#@arg2@ (%1$lld / %2$lld)"
-          },
-          "substitutions" : {
-            "arg2" : {
-              "argNum" : 2,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "インポートの競合"
-                    }
-                  }
-                }
-              }
-            }
           }
         }
       }

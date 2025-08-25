@@ -93,10 +93,11 @@ struct StandardPhraseImportExportView: View {
     @State private var showingFileImporter = false
     @State private var importError: String? = nil
     @State private var showingImportConflictSheet = false
-    @State private var importConflicts: [StandardPhraseDuplicate] = []
-    @State private var nonConflictingPhrasesToImport: [StandardPhrase] = []
+    // プリセットごとの競合情報を保持する配列
+    @State private var presetConflicts: [PresetConflictInfo] = []
+    // 現在処理中のプリセットのインデックス
+    @State private var currentPresetIndexForConflictResolution: Int = 0
     @State private var currentSelectedURL: URL? = nil // 追加: 現在選択されているURLを保持
-    @State private var targetPresetIdForConflictResolution: UUID? // 追加: 競合解決用のプリセットID
     
     // プリセット選択シート用の状態変数
     @State private var showingImportPresetSelectionSheet = false
@@ -265,15 +266,19 @@ struct StandardPhraseImportExportView: View {
         }
         .sheet(isPresented: $showingImportConflictSheet) {
             ImportConflictSheet(
-                conflicts: $importConflicts,
-                nonConflictingPhrases: $nonConflictingPhrasesToImport
-            ) { finalPhrasesToImport in
-                if let presetId = targetPresetIdForConflictResolution {
-                    standardPhraseManager.addImportedPhrases(finalPhrasesToImport, toPresetId: presetId)
+                presetConflicts: $presetConflicts,
+                currentPresetIndex: $currentPresetIndexForConflictResolution
+            ) { completedPresetConflicts in
+                // すべてのプリセットの競合解決が完了した後の処理
+                for presetConflict in completedPresetConflicts {
+                    standardPhraseManager.addImportedPhrases(
+                        presetConflict.nonConflictingPhrases, 
+                        toPresetId: presetConflict.preset.id
+                    )
                 }
-                importConflicts.removeAll() // シートを閉じたらクリア
-                nonConflictingPhrasesToImport.removeAll() // シートを閉じたらクリア
-                targetPresetIdForConflictResolution = nil // リセット
+                // 状態をリセット
+                presetConflicts.removeAll()
+                currentPresetIndexForConflictResolution = 0
             }
             .environmentObject(standardPhraseManager)
         }
@@ -314,12 +319,12 @@ struct StandardPhraseImportExportView: View {
         showingImportPresetSelectionSheet = true
         selectedImportPresetId = presetManager.selectedPresetId
         // インポートする定型文を一時保存 (ID保持のため)
-        nonConflictingPhrasesToImport = phrases
+        // nonConflictingPhrasesToImport は不要になったので削除
     }
     
     // MARK: - プリセット選択後の処理
     private func processImportIntoPreset(presetId: UUID) {
-        targetPresetIdForConflictResolution = presetId
+        // targetPresetIdForConflictResolution は不要になったので削除
         // 保持しているURLを使用して処理を続行
         guard let selectedURL = currentSelectedURL else { return }
         
@@ -341,8 +346,14 @@ struct StandardPhraseImportExportView: View {
             let (conflicts, nonConflicts) = standardPhraseManager.checkConflicts(with: importedPhrases, inPresetId: presetId)
             
             if !conflicts.isEmpty {
-                importConflicts = conflicts
-                nonConflictingPhrasesToImport = nonConflicts
+                // 新しい方式で競合を処理
+                let conflictInfo = PresetConflictInfo(
+                    preset: StandardPhrasePreset(id: presetId, name: presetManager.presets.first(where: { $0.id == presetId })?.name ?? "Unknown", phrases: []),
+                    conflicts: conflicts,
+                    nonConflictingPhrases: nonConflicts
+                )
+                presetConflicts = [conflictInfo]
+                currentPresetIndexForConflictResolution = 0
                 showingImportConflictSheet = true
             } else {
                 // 競合がなければ直接追加
@@ -491,6 +502,8 @@ struct StandardPhraseImportExportView: View {
             }
         case .resolveIndividually:
             // 個別に解決
+            var presetsNeedingConflictResolution: [StandardPhrasePreset] = []
+            
             for preset in presetsToImport {
                 if let individualAction = individualActions[preset.id] {
                     switch individualAction {
@@ -570,16 +583,40 @@ struct StandardPhraseImportExportView: View {
                         // プリセットをスキップ
                         continue
                     case .resolveIndividually:
-                        // このケースは発生しないはず
-                        break
+                        // このプリセットは個別に競合解決する必要がある
+                        presetsNeedingConflictResolution.append(preset)
+                        // プリセットを追加 (元のIDを保持)
+                        presetManager.addPresetWithId(preset.id, name: preset.name)
                     }
                 }
             }
+            
+            // 競合解決が必要なプリセットがある場合、ImportConflictSheetを表示
+            if !presetsNeedingConflictResolution.isEmpty {
+                presetConflicts.removeAll()
+                
+                // 各プリセットについて競合チェックを行う
+                for preset in presetsNeedingConflictResolution {
+                    let (conflicts, nonConflicts) = standardPhraseManager.checkConflicts(with: preset.phrases, inPresetId: preset.id)
+                    let conflictInfo = PresetConflictInfo(
+                        preset: preset,
+                        conflicts: conflicts,
+                        nonConflictingPhrases: nonConflicts
+                    )
+                    presetConflicts.append(conflictInfo)
+                }
+                
+                // 最初のプリセットの競合解決を開始
+                currentPresetIndexForConflictResolution = 0
+                showingImportConflictSheet = true
+            }
         }
         
-        // 状態をリセット
-        presetsToImport.removeAll()
-        conflictingPresets.removeAll()
+        // 状態をリセット (競合解決が必要な場合はリセットしない)
+        if presetConflicts.isEmpty {
+            presetsToImport.removeAll()
+            conflictingPresets.removeAll()
+        }
     }
     
     // エクスポートドキュメントを作成するメソッド

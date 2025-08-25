@@ -1,23 +1,43 @@
 import SwiftUI
 import Foundation
 
+// プリセット情報を持つ場合の競合解決シート用のデータ構造
+struct PresetConflictInfo {
+    let preset: StandardPhrasePreset
+    var conflicts: [StandardPhraseDuplicate]
+    let nonConflictingPhrases: [StandardPhrase]
+}
+
 struct ImportConflictSheet: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
 
-    @Binding var conflicts: [StandardPhraseDuplicate]
-    @Binding var nonConflictingPhrases: [StandardPhrase] // 競合しなかったフレーズ
-
-    var onCompletion: ([StandardPhrase]) -> Void // このクロージャが、順序を維持したまま追加されるフレーズのリストを受け取る
-
-    @State private var currentIndex: Int = 0
+    // プリセットごとの競合情報を保持する配列
+    @Binding var presetConflicts: [PresetConflictInfo]
+    
+    // 現在処理中のプリセットのインデックス
+    @Binding var currentPresetIndex: Int
+    
+    // 現在処理中のプリセットの競合情報
+    private var currentPresetConflict: PresetConflictInfo? {
+        guard currentPresetIndex < presetConflicts.count else { return nil }
+        return presetConflicts[currentPresetIndex]
+    }
+    
+    // 現在処理中の競合のインデックス
+    @State private var currentConflictIndex: Int = 0
+    
     // resolvedPhrasesToImport には、ユーザーが「インポート」または「このまま追加」を選択したフレーズが追加される。
     // これらは常に新しいIDを持つべき。
     @State private var resolvedPhrasesToImport: [StandardPhrase] = []
+    
+    // すべてのプリセットの処理が完了したときに呼ばれるクロージャ
+    var onAllPresetsCompleted: ([PresetConflictInfo]) -> Void
 
     private var currentConflict: Binding<StandardPhraseDuplicate>? {
-        guard currentIndex < conflicts.count else { return nil }
-        return $conflicts[currentIndex]
+        guard let currentPreset = currentPresetConflict,
+              currentConflictIndex < currentPreset.conflicts.count else { return nil }
+        return $presetConflicts[currentPresetIndex].conflicts[currentConflictIndex]
     }
 
     private var isConflictUnresolved: Bool {
@@ -26,12 +46,26 @@ struct ImportConflictSheet: View {
         }
         return false
     }
+    
+    // 現在処理中のプリセットの競合配列
+    private var currentConflicts: [StandardPhraseDuplicate] {
+        return currentPresetConflict?.conflicts ?? []
+    }
+    
+    // 現在処理中のプリセットの非競合フレーズ配列
+    private var currentNonConflictingPhrases: [StandardPhrase] {
+        return currentPresetConflict?.nonConflictingPhrases ?? []
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
-            Text("インポートの競合 (\(currentIndex + 1) / \(conflicts.count))")
-                .font(.headline)
-                .fontWeight(.bold)
+            // タイトル: プリセットが複数ある場合は追加のカウンターを表示
+            if let currentPreset = currentPresetConflict {
+                let presetCountText = presetConflicts.count > 1 ? " (\(currentPresetIndex + 1)/\(presetConflicts.count))" : ""
+                Text("「\(currentPreset.preset.name)」のインポートの競合 (\(currentConflictIndex + 1)/\(currentConflicts.count))\(presetCountText)")
+                    .font(.headline)
+                    .fontWeight(.bold)
+            }
 
             Text("以下の定型文は既存の項目とタイトルまたは内容が重複しています。\nタイトルまたは内容のどちらかを編集してください。")
                 .font(.subheadline)
@@ -106,11 +140,8 @@ struct ImportConflictSheet: View {
                 Spacer()
 
                 Button("すべてスキップ") {
-                    // MARK: - 修正: resolvedPhrasesToImport と nonConflictingPhrases は元のIDを保持
-                    let allPhrasesToImport = resolvedPhrasesToImport + nonConflictingPhrases
-
-                    onCompletion(allPhrasesToImport)
-                    dismiss()
+                    // 現在のプリセットの処理を完了し、次のプリセットに進む
+                    completeCurrentPreset()
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
@@ -141,12 +172,45 @@ struct ImportConflictSheet: View {
     }
 
     private func goToNextConflict() {
-        if currentIndex < conflicts.count - 1 {
-            currentIndex += 1
+        if currentConflictIndex < currentConflicts.count - 1 {
+            currentConflictIndex += 1
         } else {
-            let allPhrasesToImport = resolvedPhrasesToImport + nonConflictingPhrases
-
-            onCompletion(allPhrasesToImport)
+            // 現在のプリセットの処理を完了し、次のプリセットに進む
+            completeCurrentPreset()
+        }
+    }
+    
+    // 現在のプリセットの処理を完了し、次のプリセットに進む
+    private func completeCurrentPreset() {
+        // 現在のプリセットの結果を更新
+        if currentPresetIndex < presetConflicts.count {
+            let allPhrasesToImport = resolvedPhrasesToImport + currentNonConflictingPhrases
+            let updatedNonConflictingPhrases = allPhrasesToImport
+            
+            // プリセットの競合情報を更新
+            presetConflicts[currentPresetIndex] = PresetConflictInfo(
+                preset: presetConflicts[currentPresetIndex].preset,
+                conflicts: presetConflicts[currentPresetIndex].conflicts,
+                nonConflictingPhrases: updatedNonConflictingPhrases
+            )
+        }
+        
+        // 次のプリセットに進む
+        moveToNextPreset()
+    }
+    
+    // 次のプリセットに進む
+    private func moveToNextPreset() {
+        // 状態をリセット
+        currentConflictIndex = 0
+        resolvedPhrasesToImport.removeAll()
+        
+        // 次のプリセットに進む
+        if currentPresetIndex < presetConflicts.count - 1 {
+            currentPresetIndex += 1
+        } else {
+            // すべてのプリセットの処理が完了したので、コールバックを呼び出す
+            onAllPresetsCompleted(presetConflicts)
             dismiss()
         }
     }

@@ -93,9 +93,11 @@ struct PresetConflictSheet: View {
                 
                 Spacer()
                 
-                Button(selectedAction == .resolveIndividually ? "次へ" : "続ける") {
+                // メインビューのボタン: resolveIndividuallyの場合は「次へ」、それ以外は「完了」
+                Button(selectedAction == .resolveIndividually ? "次へ" : "完了") {
                     if selectedAction == .resolveIndividually {
                         showIndividualResolution = true
+                        currentPresetIndex = 0 // 個別解決ビューに移行する際にインデックスをリセット
                     } else {
                         onCompletion(selectedAction, [:])
                         dismiss()
@@ -110,7 +112,8 @@ struct PresetConflictSheet: View {
     
     private var individualResolutionView: some View {
         VStack(alignment: .leading, spacing: 15) {
-            Text("\"\(displayName(for: conflictingPresets[currentPresetIndex]))\"の操作を選択してください。")
+            // タイトル: プリセットが2つ以上ある場合はカウンターを表示
+            Text("\"\(displayName(for: conflictingPresets[currentPresetIndex]))\"の操作を選択してください。\(conflictingPresets.count > 1 ? "(\(currentPresetIndex + 1)/\(conflictingPresets.count))" : "")")
                 .font(.headline)
                 .fontWeight(.bold)
             
@@ -122,7 +125,8 @@ struct PresetConflictSheet: View {
                     individualActions[conflictingPresets[currentPresetIndex].id] = newValue
                 }
             )) {
-                ForEach([PresetConflictAction.merge, .add, .skip], id: \.self) { action in
+                // 個別解決ビューにも「一つ一つ解決する」オプションを追加
+                ForEach([PresetConflictAction.merge, .add, .skip, .resolveIndividually], id: \.self) { action in
                     Text(action.localizedString)
                         .tag(action)
                 }
@@ -144,6 +148,10 @@ struct PresetConflictSheet: View {
                 
                 Spacer()
                 
+                // 個別解決ビューのボタン:
+                // - 最後のプリセットでresolveIndividuallyが選択されている場合は「続ける」
+                // - 最後のプリセットでresolveIndividually以外が選択されている場合は「完了」
+                // - それ以外は「次へ」
                 if currentPresetIndex < conflictingPresets.count - 1 {
                     Button("次へ") {
                         currentPresetIndex += 1
@@ -151,7 +159,8 @@ struct PresetConflictSheet: View {
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
                 } else {
-                    Button("完了") {
+                    let currentAction = individualActions[conflictingPresets[currentPresetIndex].id] ?? .merge
+                    Button(currentAction == .resolveIndividually ? "続ける" : "完了") {
                         onCompletion(.resolveIndividually, individualActions)
                         dismiss()
                     }
