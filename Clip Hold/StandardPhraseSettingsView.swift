@@ -287,7 +287,7 @@ private struct PresetAssignmentSection: View {
             List(selection: $selectedAssignedAppId) {
                 ForEach(assignedApps, id: \.self) { bundleIdentifier in
                     AppRowView(bundleIdentifier: bundleIdentifier)
-                        .tag(bundleIdentifier)
+                        .contextMenu { contextMenuItems(for: bundleIdentifier) }
                 }
                 .onDelete(perform: deleteAssignedApp)
             }
@@ -444,6 +444,14 @@ private struct PresetAssignmentSection: View {
         guard let presetId = selectedPresetForAssignmentId else { return }
         assignmentManager.removeAssignment(for: presetId, bundleIdentifier: bundleIdentifier)
         selectedAssignedAppId = nil
+    }
+
+    private func contextMenuItems(for bundleIdentifier: String) -> some View {
+        Button(role: .destructive) {
+            deleteAssignedApp(bundleIdentifier: bundleIdentifier)
+        } label: {
+            Label("削除", systemImage: "trash")
+        }
     }
 
     private func clearAllAssignments() {

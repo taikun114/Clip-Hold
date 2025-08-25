@@ -225,9 +225,11 @@ struct PrivacySettingsView: View {
                                 Text(appName)
                             }
                             .contextMenu {
-                                Button("削除", role: .destructive) {
+                                Button(role: .destructive) {
                                     removeAppFromExclusionList(bundleIdentifier: bundleIdentifier)
                                     selectedExcludedAppId = nil
+                                } label: {
+                                    Label("削除", systemImage: "trash")
                                 }
                             }
                             .tag(bundleIdentifier)
@@ -235,9 +237,11 @@ struct PrivacySettingsView: View {
                             Text(bundleIdentifier)
                                 .foregroundStyle(.secondary)
                                 .contextMenu {
-                                    Button("削除", role: .destructive) {
+                                    Button(role: .destructive) {
                                         removeAppFromExclusionList(bundleIdentifier: bundleIdentifier)
                                         selectedExcludedAppId = nil
+                                    } label: {
+                                        Label("削除", systemImage: "trash")
                                     }
                                 }
                                 .tag(bundleIdentifier)
