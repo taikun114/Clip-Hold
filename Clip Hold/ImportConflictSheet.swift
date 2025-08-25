@@ -154,8 +154,35 @@ struct ImportConflictSheet: View {
 
                 Button {
                     if let currentConflictValue = currentConflict?.wrappedValue {
-                        // 競合を解決した定型文も元のIDを保持
-                        let newPhrase = StandardPhrase(id: currentConflictValue.newPhrase.id, title: currentConflictValue.newPhrase.title, content: currentConflictValue.newPhrase.content)
+                        // 要望の仕様に合わせるため、詳細なチェックを行う
+                        // - ローカルの定型文と同じIDで同じコンテンツの場合、新しいIDを割り振って同じコンテンツを重複保存
+                        // - 同じコンテンツでIDが異なる場合はIDはそのまま(新しいIDを割り振らずに)追加
+                        
+                        let newPhraseContent = currentConflictValue.newPhrase.content
+                        let newPhraseId = currentConflictValue.newPhrase.id
+                        
+                        // 現在処理中のプリセットの既存の定型文リストを取得
+                        let existingPhrasesInPreset = presetConflicts[currentPresetIndex].preset.phrases
+                        
+                        // コンテンツが一致する既存の定型文を探す
+                        let existingPhraseWithSameContent = existingPhrasesInPreset.first { $0.content == newPhraseContent }
+                        
+                        let newPhrase: StandardPhrase
+                        if let existingPhrase = existingPhraseWithSameContent {
+                            // コンテンツが一致する定型文が見つかった場合
+                            if existingPhrase.id == newPhraseId {
+                                // IDも一致する場合は、新しいUUIDを生成して追加
+                                newPhrase = StandardPhrase(id: UUID(), title: currentConflictValue.newPhrase.title, content: newPhraseContent)
+                            } else {
+                                // IDが一致しない場合は、元のIDを保持して追加
+                                newPhrase = StandardPhrase(id: newPhraseId, title: currentConflictValue.newPhrase.title, content: newPhraseContent)
+                            }
+                        } else {
+                            // コンテンツが一致する定型文が見つからない場合は、新しいUUIDを生成して追加
+                            // (このケースは「このまま追加」では発生しないはずだが、念のため)
+                            newPhrase = StandardPhrase(id: UUID(), title: currentConflictValue.newPhrase.title, content: newPhraseContent)
+                        }
+                        
                         resolvedPhrasesToImport.append(newPhrase)
                     }
                     goToNextConflict()
