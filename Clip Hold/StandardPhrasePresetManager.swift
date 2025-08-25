@@ -268,6 +268,9 @@ class StandardPhrasePresetManager: ObservableObject {
             setUserDeletedDefaultPreset()
         }
         
+        // プリセットに割り当てられたアプリの割り当てを解除
+        PresetAppAssignmentManager.shared.clearAssignments(for: id)
+        
         presets.removeAll { $0.id == id }
         deletePresetFile(id: id)
         
@@ -277,6 +280,9 @@ class StandardPhrasePresetManager: ObservableObject {
         
         savePresetIndex()
         saveSelectedPresetId()
+        
+        // 他のプリセットにも影響がないか確認し、存在しないプリセットへの割り当てをクリーンアップ
+        cleanupInvalidAssignments()
     }
     
     func updatePreset(_ preset: StandardPhrasePreset) {
@@ -284,6 +290,18 @@ class StandardPhrasePresetManager: ObservableObject {
             presets[index] = preset
             savePresetToFile(preset)
             savePresetIndex()
+        }
+    }
+    
+    /// 存在しないプリセットへのアプリ割り当てをクリーンアップする
+    private func cleanupInvalidAssignments() {
+        let validPresetIds = Set(presets.map { $0.id })
+        let assignmentManager = PresetAppAssignmentManager.shared
+        
+        for (presetId, _) in assignmentManager.assignments {
+            if !validPresetIds.contains(presetId) {
+                assignmentManager.clearAssignments(for: presetId)
+            }
         }
     }
     
@@ -299,6 +317,9 @@ class StandardPhrasePresetManager: ObservableObject {
             if preset.id == defaultPresetId {
                 userDeletedDefault = true
             }
+            
+            // プリセットに割り当てられたアプリの割り当てを解除
+            PresetAppAssignmentManager.shared.clearAssignments(for: preset.id)
             
             deletePresetFile(id: preset.id)
         }
