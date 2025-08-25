@@ -65,20 +65,18 @@ struct PrivacySettingsView: View {
 
     private func filterRunningApplications(applications: [NSRunningApplication]) -> [NSRunningApplication] {
         var filteredApps = applications.filter { app in
-            guard let appPath = app.bundleURL?.path else { return false }
+            // activationPolicy == .regular のアプリのみを表示するフィルタリングを追加
+            let isRegularApp = app.activationPolicy == .regular
             
-            let userApplicationsPath = FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask).first?.path ?? ""
-            let localApplicationsPath = "/Applications"
-            let isUserApp = appPath.hasPrefix(userApplicationsPath) || appPath.hasPrefix(localApplicationsPath)
-
             if !showAllRunningApps {
-                return isUserApp
+                return isRegularApp
             }
             
-            return true
+            return isRegularApp
         }
         
         // excludedAppIdentifiers に含まれるアプリを除外
+        // これは showAllRunningApps の状態に関係なく行う
         filteredApps.removeAll { app in
             guard let bundleIdentifier = app.bundleIdentifier else { return false }
             return excludedAppIdentifiers.contains(bundleIdentifier)
@@ -279,7 +277,7 @@ struct PrivacySettingsView: View {
                                             .font(.headline)
                                         Spacer()
                                         Toggle(isOn: $showAllRunningApps) {
-                                            Text("すべてのアプリを表示")
+                                            Text("すべてのプロセスを表示")
                                         }
                                         .toggleStyle(.checkbox)
                                         .font(.subheadline)

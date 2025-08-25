@@ -2375,22 +2375,6 @@
         }
       }
     },
-    "すべてのアプリを表示" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show All Apps"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのアプリを表示"
-          }
-        }
-      }
-    },
     "すべてのクリップボード履歴をJSONファイルとして書き出します。" : {
       "localizations" : {
         "en" : {
