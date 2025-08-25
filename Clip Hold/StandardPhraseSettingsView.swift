@@ -190,6 +190,11 @@ private struct PresetSettingsSection: View {
             showingAddPresetSheet = false
             newPresetName = ""
         }
+        .onDisappear {
+            if let lastAddedPresetId = presetManager.presets.last?.id,
+               presetManager.selectedPresetId != lastAddedPresetId {
+            }
+        }
     }
 
     private var editPresetSheet: some View {
@@ -471,6 +476,8 @@ private struct PhraseSettingsSection: View {
     @State private var phraseToDelete: StandardPhrase?
     @State private var showingDeleteConfirmation = false
     @State private var showingClearAllPhrasesConfirmation = false
+    @State private var showingAddPresetSheet = false
+    @State private var newPresetName = ""
 
     private var currentPhrases: [StandardPhrase] {
         presetManager.selectedPreset?.phrases ?? []
@@ -530,6 +537,7 @@ private struct PhraseSettingsSection: View {
         }
         .sheet(isPresented: $showingAddPhraseSheet) { addSheet }
         .sheet(item: $selectedPhrase) { phrase in editSheet(for: phrase) }
+        .sheet(isPresented: $showingAddPresetSheet) { addPresetSheet }
         .alert("すべての定型文を削除", isPresented: $showingClearAllPhrasesConfirmation) {
             Button("削除", role: .destructive) { deleteAllPhrases() }
         } message: {
@@ -554,7 +562,11 @@ private struct PhraseSettingsSection: View {
         Picker("", selection: Binding(
             get: { presetManager.selectedPresetId ?? UUID() },
             set: { newValue in
-                if presetManager.presets.contains(where: { $0.id == newValue }) {
+                let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+                
+                if newValue == newPresetUUID {
+                    showingAddPresetSheet = true
+                } else if presetManager.presets.contains(where: { $0.id == newValue }) {
                     presetManager.selectedPresetId = newValue
                 }
             }
@@ -562,8 +574,21 @@ private struct PhraseSettingsSection: View {
             ForEach(presetManager.presets) { preset in
                 Text(displayName(for: preset)).tag(preset.id)
             }
+            Divider()
+            Text("新規プリセット...").tag(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!)
         }
         .pickerStyle(.menu)
+    }
+
+    private var addPresetSheet: some View {
+        PresetNameSheet(name: $newPresetName, title: String(localized: "プリセット名を入力")) {
+            addPreset(name: newPresetName)
+            newPresetName = ""
+            showingAddPresetSheet = false
+        } onCancel: {
+            showingAddPresetSheet = false
+            newPresetName = ""
+        }
     }
 
     private var bottomToolbar: some View {
@@ -719,6 +744,10 @@ private struct PhraseSettingsSection: View {
         guard var p = presetManager.selectedPreset else { return }
         p.phrases = []
         presetManager.updatePreset(p)
+    }
+    
+    private func addPreset(name: String) {
+        presetManager.addPreset(name: name)
     }
 }
 
