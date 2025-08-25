@@ -22,8 +22,8 @@
   - The existing tabbed style has been greatly revamped to a sidebar style setting screen.
 - **Add Preset feature for Standard Phrases**
   - You can now group your favorite standard phrases by preset. You can switch between presets from the menu or the Standard Phrases window. You can also use shortcut keys to create and switch presets.
-- **Add “Show App Icons” option**
-  - Toggle to show or hide the app icon for each item in the History window.
+- **Add “Assign Preset” settings to “Standard Phrases” settings**
+  - If you assign presets to apps, they will automatically switch to the selected preset when the app is on the foreground.
 - **Add “Developer Features” tab**
   - **Add “Show Character Count” option**
     - Show the character count after the date in the History window and in the menu.
@@ -33,6 +33,8 @@
     - Add “Color Codes Only” to the filtering options in the History window.
   - **Add “Reset All Settings” option**
     - Resets all settings of the app to their defaults. History and standard phrases are not affected.
+- **Add “Show App Icons” option**
+  - Toggle to show or hide the app icon for each item in the History window.
 - **Support link in standard phrases**
   - As in the History window, the Standard Phrases window now displays “Open Link” from the context menu when the item is a link.
 - **Support for copying multiple files at the same time**
@@ -46,6 +48,7 @@
 - **Improve to temporarily disable Quick Paste when clicking on an item from the menu bar while holding down the Option key**
   - Copying from a shortcut key is not affected by this.
 - **Improve the issue causing large disk writes when copying with a large number of history items**
+- **Improve the list of apps displayed on the app adding screen in the “Apps to Exclude” list**
 - **Add an app icon to the list item in the History window**
   - It shows the app icon of the app that was in the foreground when it was copied. The icon will not be shown in the copy history before this feature was added.
   - When you hover the mouse cursor over an app icon, the app name will be displayed in a tooltip.
