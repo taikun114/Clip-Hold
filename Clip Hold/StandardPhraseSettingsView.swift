@@ -251,6 +251,12 @@ private struct PresetAssignmentSection: View {
     @State private var runningApplications: [NSRunningApplication] = []
     @State private var selectedAssignedAppId: String? = nil
     @State private var showingClearAssignmentsConfirmation = false
+    
+    // アラート表示用の状態変数
+    @State private var showingAssignmentConflictAlert = false
+    @State private var conflictingBundleIdentifier: String = ""
+    @State private var conflictingPresetId: UUID?
+    @State private var targetPresetId: UUID?
 
     private var assignedApps: [String] {
         guard let presetId = selectedPresetForAssignmentId else { return [] }
@@ -299,7 +305,7 @@ private struct PresetAssignmentSection: View {
         .background(
             AppSelectionImporterView(isPresented: $showingFinderPanel) { bundleIdentifier in
                 if let presetId = selectedPresetForAssignmentId {
-                    assignmentManager.addAssignment(for: presetId, bundleIdentifier: bundleIdentifier)
+                    handleAppAssignment(for: presetId, bundleIdentifier: bundleIdentifier)
                 }
             } onSelectionCancelled: { }
             .frame(width: 0, height: 0).clipped()
@@ -309,6 +315,28 @@ private struct PresetAssignmentSection: View {
             Button("キャンセル", role: .cancel) { }
         } message: {
             Text("このプリセットに割り当てられているすべてのアプリをリストから削除しますか？")
+        }
+        .alert("すでに割り当てられたアプリ", isPresented: $showingAssignmentConflictAlert) {
+            Button("キャンセル", role: .cancel) {
+                // 何もしない
+            }
+            Button("割り当てる") {
+                if let presetId = targetPresetId, let bundleId = conflictingBundleIdentifier.isEmpty ? nil : conflictingBundleIdentifier {
+                    assignmentManager.removeAssignment(for: bundleId)
+                    assignmentManager.addAssignment(for: presetId, bundleIdentifier: bundleId)
+                }
+            }
+            .keyboardShortcut(.defaultAction) // プライマリアクションとして設定
+        } message: {
+            if let bundleId = conflictingBundleIdentifier.isEmpty ? nil : conflictingBundleIdentifier,
+               let presetId = conflictingPresetId,
+               let preset = presetManager.presets.first(where: { $0.id == presetId }) {
+                // ローカライズされたアプリ名を取得
+                let appName = NSWorkspace.shared.runningApplications.first { $0.bundleIdentifier == bundleId }?.localizedName ?? self.appName(for: bundleId)
+                Text("「\(appName)」は別のプリセット「\(displayName(for: preset))」にすでに割り当てられています。このアプリを割り当てると、「\(displayName(for: preset))」から割り当てが解除されます。アプリを割り当ててもよろしいですか？")
+            } else {
+                Text("このアプリは既に別のプリセットに割り当てられています。上書きしてもよろしいですか？")
+            }
         }
     }
 
@@ -330,7 +358,7 @@ private struct PresetAssignmentSection: View {
                         assignedApps: assignedApps,
                         onAppSelected: { bundleIdentifier in
                             if let presetId = selectedPresetForAssignmentId {
-                                assignmentManager.addAssignment(for: presetId, bundleIdentifier: bundleIdentifier)
+                                handleAppAssignment(for: presetId, bundleIdentifier: bundleIdentifier)
                             }
                             isShowingAddAppPopover = false
                         },
@@ -387,6 +415,21 @@ private struct PresetAssignmentSection: View {
             return name
         }
         return bundleIdentifier
+    }
+
+    private func handleAppAssignment(for presetId: UUID, bundleIdentifier: String) {
+        // 既に他のプリセットに割り当てられているか確認
+        if let existingPresetId = assignmentManager.getPresetId(for: bundleIdentifier),
+           existingPresetId != presetId {
+            // 割り当てが存在し、異なるプリセットへの割り当ての場合はアラートを表示
+            conflictingBundleIdentifier = bundleIdentifier
+            conflictingPresetId = existingPresetId
+            targetPresetId = presetId
+            showingAssignmentConflictAlert = true
+        } else {
+            // 新規割り当てまたは同じプリセットへの再割り当ての場合はそのまま追加
+            assignmentManager.addAssignment(for: presetId, bundleIdentifier: bundleIdentifier)
+        }
     }
 
     private func deleteAssignedApp(at offsets: IndexSet) {
@@ -792,13 +835,26 @@ private struct AppRowView: View {
 
     var body: some View {
         HStack {
+            // bundleIdentifier から NSRunningApplication を取得するロジックを追加
+            let runningApp = NSWorkspace.shared.runningApplications.first { $0.bundleIdentifier == bundleIdentifier }
+            
             if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier) {
                 let icon = NSWorkspace.shared.icon(forFile: url.path)
                 Image(nsImage: icon).resizable().frame(width: 16, height: 16)
-                Text(appName(for: bundleIdentifier))
+                // localizedName が利用できる場合はそれを使い、そうでない場合は従来の appName 関数を使う
+                if let localizedName = runningApp?.localizedName {
+                    Text(localizedName)
+                } else {
+                    Text(appName(for: bundleIdentifier))
+                }
             } else {
                 Image(systemName: "questionmark.app").resizable().frame(width: 16, height: 16)
-                Text(bundleIdentifier).foregroundStyle(.secondary)
+                // localizedName が利用できる場合はそれを使い、そうでない場合は従来の appName 関数を使う
+                if let localizedName = runningApp?.localizedName {
+                    Text(localizedName)
+                } else {
+                    Text(appName(for: bundleIdentifier))
+                }
             }
         }
     }

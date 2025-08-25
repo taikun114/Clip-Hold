@@ -21,9 +21,6 @@ class PresetAppAssignmentManager: ObservableObject {
 
     func addAssignment(for presetId: UUID, bundleIdentifier: String) {
         if assignments[presetId]?.contains(bundleIdentifier) == false || assignments[presetId] == nil {
-            // 他に割り当てられていないか確認し、割り当てられていれば削除
-            removeAssignment(for: bundleIdentifier)
-            
             assignments[presetId, default: []].append(bundleIdentifier)
             objectWillChange.send()
         }

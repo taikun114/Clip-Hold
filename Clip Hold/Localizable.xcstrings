@@ -143,6 +143,22 @@
         }
       }
     },
+    "「%@」は別のプリセット「%@」にすでに割り当てられています。このアプリを割り当てると、「%@」から割り当てが解除されます。アプリを割り当ててもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” is already assigned to another preset “%2$@”. Assigning this app will unassign it from “%3$@”. Are you sure you want to assign this app?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%1$@」は別のプリセット「%2$@」にすでに割り当てられています。このアプリを割り当てると、「%3$@」から割り当てが解除されます。アプリを割り当ててもよろしいですか？"
+          }
+        }
+      }
+    },
     "「%@」を本当に削除しますか？" : {
       "localizations" : {
         "en" : {
@@ -1895,6 +1911,22 @@
         }
       }
     },
+    "このアプリは既に別のプリセットに割り当てられています。上書きしてもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app is already assigned to another preset. Are you sure you want to override it?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリは既に別のプリセットに割り当てられています。上書きしてもよろしいですか？"
+          }
+        }
+      }
+    },
     "このオプションをオンにすると、テキストのみがクイックペーストの対象となります。" : {
       "localizations" : {
         "en" : {
@@ -2275,6 +2307,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スターをつける"
+          }
+        }
+      }
+    },
+    "すでに割り当てられたアプリ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already Assigned App"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すでに割り当てられたアプリ"
           }
         }
       }
@@ -4083,6 +4131,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除..."
+          }
+        }
+      }
+    },
+    "割り当てる" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assign"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "割り当てる"
           }
         }
       }
