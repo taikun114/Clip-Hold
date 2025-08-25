@@ -203,7 +203,7 @@ struct StandardPhraseImportExportView: View {
             isPresented: $showingFileExporter,
             document: createExportDocument(),
             contentType: .json,
-            defaultFilename: "Clip Hold Standard Phrases.json"
+            defaultFilename: getExportFileName()
         ) { result in
             switch result {
             case .success(let url):
@@ -616,6 +616,29 @@ struct StandardPhraseImportExportView: View {
         if presetConflicts.isEmpty {
             presetsToImport.removeAll()
             conflictingPresets.removeAll()
+        }
+    }
+    
+    // エクスポートファイル名を生成するメソッド
+    private func getExportFileName() -> String {
+        if useLegacyFormat {
+            if let presetId = selectedExportPresetId,
+               let preset = presetManager.presets.first(where: { $0.id == presetId }) {
+                // 特定のプリセットをエクスポートする場合
+                return "Clip Hold Standard Phrases \(preset.name).json"
+            } else {
+                // すべてのプリセットをエクスポートする場合
+                return "Clip Hold All Standard Phrases.json"
+            }
+        } else {
+            if let presetId = selectedExportPresetId,
+               let preset = presetManager.presets.first(where: { $0.id == presetId }) {
+                // 特定のプリセットをエクスポートする場合
+                return "Clip Hold Standard Phrases \(preset.name).json"
+            } else {
+                // すべてのプリセットをエクスポートする場合
+                return "Clip Hold All Standard Phrases.json"
+            }
         }
     }
     
