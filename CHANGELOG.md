@@ -44,6 +44,7 @@
 - **Fix issue with two “About QR Code” items being displayed on the license sheet**
 - **Fix issue that an image or image address could not be copied from Safari**
 - **Fix issue that sometimes did not add to the history**
+- **Fix issue that sometimes the background color did not match the theme in the Add a Standard Phrase window**
 - **Improve menu history thumbnails to fit in a square**
 - **Improve to temporarily disable Quick Paste when clicking on an item from the menu bar while holding down the Option key**
   - Copying from a shortcut key is not affected by this.
