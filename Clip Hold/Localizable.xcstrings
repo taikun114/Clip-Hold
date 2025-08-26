@@ -2743,22 +2743,6 @@
         }
       }
     },
-    "タイトルにコンテンツを使用する" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use content as title"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タイトルにコンテンツを使用する"
-          }
-        }
-      }
-    },
     "ダブルクリック時にウィンドウを閉じない" : {
       "localizations" : {
         "en" : {

@@ -76,11 +76,23 @@ struct ImportConflictSheet: View {
                     VStack(alignment: .leading, spacing: 5) {
                         Text("既存: ")
                             .font(.headline)
-                        Text("タイトル: **\(conflictBinding.wrappedValue.existingPhrase.title)**")
-                            .font(.subheadline)
-                        Text("内容: \(conflictBinding.wrappedValue.existingPhrase.content)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                        HStack {
+                            Text("タイトル: **\(conflictBinding.wrappedValue.existingPhrase.title)**")
+                                .font(.subheadline)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                            Spacer()
+                        }
+                        .help(conflictBinding.wrappedValue.existingPhrase.title)
+                        HStack {
+                            Text("内容: \(conflictBinding.wrappedValue.existingPhrase.content)")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(3)
+                                .truncationMode(.tail)
+                            Spacer()
+                        }
+                        .help(conflictBinding.wrappedValue.existingPhrase.content)
 
                         VStack(alignment: .leading) {
                             Text("新しいタイトル:")
@@ -90,18 +102,18 @@ struct ImportConflictSheet: View {
                                     RoundedRectangle(cornerRadius: 5)
                                         .stroke(conflictBinding.wrappedValue.hasTitleConflict ? Color.orange : Color.clear, lineWidth: 1)
                                 )
-                                .disabled(conflictBinding.wrappedValue.useContentAsTitle)
-
-                            Toggle(isOn: conflictBinding.useContentAsTitle) { // Bindingとして渡す
-                                Text("タイトルにコンテンツを使用する")
+                                .disabled(!conflictBinding.wrappedValue.useCustomTitle)
+                            
+                            Toggle(isOn: conflictBinding.useCustomTitle) { // Bindingとして渡す
+                                Text("カスタムタイトルを使用する")
                             }
-                            .onChange(of: conflictBinding.wrappedValue.useContentAsTitle) { _, newValue in
-                                if newValue {
+                            .onChange(of: conflictBinding.wrappedValue.useCustomTitle) { _, newValue in
+                                if !newValue {
                                     conflictBinding.newPhrase.title.wrappedValue = conflictBinding.newPhrase.content.wrappedValue
                                 }
                             }
                             .toggleStyle(.checkbox)
-
+                            
                             Text("新しい内容:")
                             TextEditor(text: conflictBinding.newPhrase.content)
                                 .frame(minHeight: 60, maxHeight: 150)
@@ -111,7 +123,7 @@ struct ImportConflictSheet: View {
                                         .stroke(conflictBinding.wrappedValue.hasContentConflict ? Color.orange : Color.clear, lineWidth: 1)
                                 )
                                 .onChange(of: conflictBinding.wrappedValue.newPhrase.content) { _, newValue in
-                                    if conflictBinding.wrappedValue.useContentAsTitle {
+                                    if !conflictBinding.wrappedValue.useCustomTitle {
                                         conflictBinding.newPhrase.title.wrappedValue = newValue
                                     }
                                 }

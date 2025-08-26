@@ -181,10 +181,12 @@ class StandardPhraseManager: ObservableObject {
             if existingPhraseWithId != nil || existingPhraseWithTitle != nil || existingPhraseWithContent != nil {
                 // 既存の定型文と競合している場合
                 let existingPhrase = existingPhraseWithId ?? existingPhraseWithTitle ?? existingPhraseWithContent!
-                let duplicate = StandardPhraseDuplicate(
+                var duplicate = StandardPhraseDuplicate(
                     existingPhrase: existingPhrase,
                     newPhrase: importedPhrase
                 )
+                // カスタムタイトルを使用するかどうかの初期値を設定
+                duplicate.setInitialUseCustomTitle()
                 conflicts.append(duplicate)
             } else {
                 // 競合していない場合はそのまま追加
