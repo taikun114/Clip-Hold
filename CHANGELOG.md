@@ -49,6 +49,7 @@
   - Copying from a shortcut key is not affected by this.
 - **Improve the issue causing large disk writes when copying with a large number of history items**
 - **Improve the list of apps displayed on the app adding screen in the “Apps to Exclude” list**
+- **Improve the design of the add edit standard phrase screen**
 - **Add an app icon to the list item in the History window**
   - It shows the app icon of the app that was in the foreground when it was copied. The icon will not be shown in the copy history before this feature was added.
   - When you hover the mouse cursor over an app icon, the app name will be displayed in a tooltip.
@@ -56,6 +57,7 @@
 - **Add “Open” to the History window menu when the item is a file**
 - **Add “Add to Apps to Exclude...” to the History window menu**
 - **Add a dedicated alert message when trying to delete a file from the history**
+- **Add a picker that allows you to select a destination preset on the add standard phrase screen**
 - **Change file duplicate detection method to file hash-based**
   - This allows for more accurate duplicate file detection. Existing size-based duplicate detection is used for folders and other items for which file hashes cannot be computed.
 - **Change the default “Maximum Size per File:” from 1 GB to Unlimited**
