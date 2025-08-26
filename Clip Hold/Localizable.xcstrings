@@ -1479,6 +1479,22 @@
         }
       }
     },
+    "カスタムタイトルを使用する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Custom Title"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタムタイトルを使用する"
+          }
+        }
+      }
+    },
     "カラーコード" : {
       "localizations" : {
         "en" : {
