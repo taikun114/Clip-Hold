@@ -17,8 +17,11 @@ struct AddEditPhraseView: View {
     @State private var title: String
     @State private var content: String
     @State private var useContentAsTitle: Bool = false
+    @State private var selectedPresetId: UUID? = nil
+    @State private var showingAddPresetSheet = false
+    @State private var newPresetName = ""
 
-    init(mode: Mode, phraseToEdit: StandardPhrase? = nil, initialContent: String? = nil, onSave: ((StandardPhrase) -> Void)? = nil) {
+    init(mode: Mode, phraseToEdit: StandardPhrase? = nil, initialContent: String? = nil, presetManager: StandardPhrasePresetManager, onSave: ((StandardPhrase) -> Void)? = nil) {
         self.mode = mode
         self.onSave = onSave
         _phraseToEdit = State(initialValue: phraseToEdit ?? StandardPhrase(title: "", content: ""))
@@ -29,15 +32,17 @@ struct AddEditPhraseView: View {
             // MARK: initialContentがあればそれをコンテンツとして使用
             _content = State(initialValue: initialContent ?? "")
             _useContentAsTitle = State(initialValue: false)
+            _selectedPresetId = State(initialValue: presetManager.selectedPresetId)
         case .edit(let phrase):
             _title = State(initialValue: phrase.title)
             _content = State(initialValue: phrase.content)
             _useContentAsTitle = State(initialValue: phrase.title == phrase.content)
+            _selectedPresetId = State(initialValue: presetManager.selectedPresetId)
         }
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text(mode == .add ? "新しい定型文を追加" : "定型文を編集")
                     .font(.headline)
@@ -67,6 +72,25 @@ struct AddEditPhraseView: View {
                     }
                 }
 
+            Picker("保存先のプリセット:", selection: $selectedPresetId) {
+                ForEach(presetManager.presets) { preset in
+                    Text(preset.name).tag(Optional(preset.id))
+                }
+                Divider()
+                Text("新規プリセット...").tag(Optional.some(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!))
+            }
+            .padding(.vertical, 10)
+            .pickerStyle(.menu)
+            .onChange(of: selectedPresetId) { _, newValue in
+                // 新規プリセット...が選択された場合、シートを表示
+                let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+                if newValue == newPresetUUID {
+                    showingAddPresetSheet = true
+                    // ピッカーの選択を元に戻す
+                    selectedPresetId = presetManager.selectedPresetId
+                }
+            }
+
             HStack {
                 Button("キャンセル") {
                     dismiss()
@@ -90,7 +114,8 @@ struct AddEditPhraseView: View {
                             onSave(phrase)
                         } else {
                             // プリセットが選択されている場合はプリセットに追加、そうでなければデフォルトに追加
-                            if var selectedPreset = presetManager.selectedPreset {
+                            if let selectedPresetId = selectedPresetId,
+                               var selectedPreset = presetManager.presets.first(where: { $0.id == selectedPresetId }) {
                                 selectedPreset.phrases.append(phrase)
                                 presetManager.updatePreset(selectedPreset)
                             } else {
@@ -103,7 +128,8 @@ struct AddEditPhraseView: View {
                             onSave(updatedPhrase)
                         } else {
                             // プリセットが選択されている場合はプリセットを更新、そうでなければデフォルトを更新
-                            if var selectedPreset = presetManager.selectedPreset,
+                            if let selectedPresetId = selectedPresetId,
+                               var selectedPreset = presetManager.presets.first(where: { $0.id == selectedPresetId }),
                                let index = selectedPreset.phrases.firstIndex(where: { $0.id == originalPhrase.id }) {
                                 selectedPreset.phrases[index] = updatedPhrase
                                 presetManager.updatePreset(selectedPreset)
@@ -123,6 +149,17 @@ struct AddEditPhraseView: View {
         }
         .padding() // ここで全体にパディングが適用される
         .frame(minWidth: 400, minHeight: 350)
+        .sheet(isPresented: $showingAddPresetSheet) {
+            // プリセット追加画面（シート）を表示
+            AddEditPresetView { 
+                // シートが閉じられたときの処理
+                showingAddPresetSheet = false
+            }
+        }
+        .onAppear {
+            // selectedPresetId を初期化
+            selectedPresetId = presetManager.selectedPresetId ?? presetManager.presets.first?.id
+        }
     }
 }
 
@@ -130,11 +167,11 @@ struct AddEditPhraseView: View {
 // MARK: - Preview Provider
 struct AddEditPhraseView_Previews: PreviewProvider {
     static var previews: some View {
-        AddEditPhraseView(mode: .add)
+        AddEditPhraseView(mode: .add, presetManager: StandardPhrasePresetManager.shared)
             .environmentObject(StandardPhraseManager.shared)
             .environmentObject(StandardPhrasePresetManager.shared)
 
-        AddEditPhraseView(mode: .edit(StandardPhrase(title: "既存の定型文のタイトル", content: "これは既存の定型文の内容です。")))
+        AddEditPhraseView(mode: .edit(StandardPhrase(title: "既存の定型文のタイトル", content: "これは既存の定型文の内容です。")), presetManager: StandardPhrasePresetManager.shared)
             .environmentObject(StandardPhraseManager.shared)
             .environmentObject(StandardPhrasePresetManager.shared)
     }

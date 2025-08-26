@@ -172,7 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     @MainActor
     func showAddPhraseWindow(withContent content: String) {
         if addPhraseWindowController == nil || addPhraseWindowController?.window == nil {
-            let contentView = AddEditPhraseView(mode: .add, initialContent: content)
+            let contentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared)
                 .environmentObject(StandardPhraseManager.shared)
                 .environmentObject(StandardPhrasePresetManager.shared)
 
@@ -212,7 +212,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             print("AppDelegate: Add Phrase window already exists. Updating content and bringing to front.")
             if let window = addPhraseWindowController?.window { // Controller 経由でウィンドウにアクセス
                 // newContentView を、if/else ブロックの外側に移動し、両方からアクセス可能にする
-                let newContentView = AddEditPhraseView(mode: .add, initialContent: content)
+                let newContentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared)
                     .environmentObject(StandardPhraseManager.shared)
                     .environmentObject(StandardPhrasePresetManager.shared)
 

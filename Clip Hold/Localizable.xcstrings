@@ -4007,6 +4007,22 @@
         }
       }
     },
+    "保存先のプリセット:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Preset:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存先のプリセット:"
+          }
+        }
+      }
+    },
     "値を調整" : {
       "localizations" : {
         "en" : {
