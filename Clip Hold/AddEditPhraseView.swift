@@ -72,22 +72,25 @@ struct AddEditPhraseView: View {
                     }
                 }
 
-            Picker("保存先のプリセット:", selection: $selectedPresetId) {
-                ForEach(presetManager.presets) { preset in
-                    Text(preset.name).tag(Optional(preset.id))
+            // プリセット選択ピッカー (追加モードでのみ表示)
+            if case .add = mode {
+                Picker("保存先のプリセット:", selection: $selectedPresetId) {
+                    ForEach(presetManager.presets) { preset in
+                        Text(preset.name).tag(Optional(preset.id))
+                    }
+                    Divider()
+                    Text("新規プリセット...").tag(Optional.some(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!))
                 }
-                Divider()
-                Text("新規プリセット...").tag(Optional.some(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!))
-            }
-            .padding(.vertical, 10)
-            .pickerStyle(.menu)
-            .onChange(of: selectedPresetId) { _, newValue in
-                // 新規プリセット...が選択された場合、シートを表示
-                let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-                if newValue == newPresetUUID {
-                    showingAddPresetSheet = true
-                    // ピッカーの選択を元に戻す
-                    selectedPresetId = presetManager.selectedPresetId
+                .padding(.vertical, 10)
+                .pickerStyle(.menu)
+                .onChange(of: selectedPresetId) { _, newValue in
+                    // 新規プリセット...が選択された場合、シートを表示
+                    let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+                    if newValue == newPresetUUID {
+                        showingAddPresetSheet = true
+                        // ピッカーの選択を元に戻す
+                        selectedPresetId = presetManager.selectedPresetId
+                    }
                 }
             }
 
