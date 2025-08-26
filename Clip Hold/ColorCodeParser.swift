@@ -6,12 +6,12 @@ struct ColorCodeParser {
     private static let hexPattern = #"^#?([A-Fa-f0-9]{3}|[A-Fa-f0-9]{4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"#
     // RGBA形式のパターン (カンマ区切りとスペース区切り、%表記(少数点含む)、アルファ値(%表記含む)に対応)
     private static let rgbaPattern = #"^rgba?\(\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*(?:[, /]\s*(?:(0|1|0?\.\d+)|(\d{1,3}(?:\.\d+)?)%?)\s*)?\)$"#
-    // HSLA形式のパターン (カンマ区切りとスペース区切り、deg表記、%省略、アルファ値(%表記含む)に対応)
-    private static let hslaPattern = #"^hsla?\(\s*(\d{1,3}(?:\.\d+)?)(?:deg)?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*(?:[, /]\s*(?:(0|1|0?\.\d+)|(\d{1,3}(?:\.\d+)?)%?)\s*)?\)$"#
+    // HSLA形式のパターン (カンマ区切りとスペース区切り、deg/turn表記、%省略、アルファ値(%表記含む)に対応)
+    private static let hslaPattern = #"^hsla?\(\s*(\d{1,3}(?:\.\d+)?)((?:deg)|(?:turn))?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*(?:[, /]\s*(?:(0|1|0?\.\d+)|(\d{1,3}(?:\.\d+)?)%?)\s*)?\)$"#
     // RGB形式のパターン (カンマ区切りとスペース区切り、%表記(少数点含む)に対応)
     private static let rgbPattern = #"^rgb\(\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*\)$"#
-    // HSL形式のパターン (カンマ区切りとスペース区切り、deg表記、%省略に対応)
-    private static let hslPattern = #"^hsl\(\s*(\d{1,3}(?:\.\d+)?)(?:deg)?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*\)$"#
+    // HSL形式のパターン (カンマ区切りとスペース区切り、deg/turn表記、%省略に対応)
+    private static let hslPattern = #"^hsl\(\s*(\d{1,3}(?:\.\d+)?)((?:deg)|(?:turn))?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*\)$"#
 
     /// カラーコードを解析して、対応するColorオブジェクトを返す
     /// - Parameter text: 解析する文字列
@@ -236,15 +236,31 @@ struct ColorCodeParser {
         
         guard let match = regex.firstMatch(in: text, options: [], range: nsRange) else { return nil }
         
-        guard let h = Int(String(text[Range(match.range(at: 1), in: text)!])),
-              let s = Int(String(text[Range(match.range(at: 2), in: text)!])),
-              let l = Int(String(text[Range(match.range(at: 3), in: text)!])),
-              h >= 0 && h <= 360,
+        let hString = String(text[Range(match.range(at: 1), in: text)!])
+        let unitString = match.range(at: 2).location != NSNotFound ? String(text[Range(match.range(at: 2), in: text)!]) : nil
+        let sString = String(text[Range(match.range(at: 3), in: text)!])
+        let lString = String(text[Range(match.range(at: 4), in: text)!])
+        
+        guard let s = Int(sString),
+              let l = Int(lString),
               s >= 0 && s <= 100,
               l >= 0 && l <= 100 else { return nil }
-        
+              
+        var hDouble: Double? = nil
+        if let h = Double(hString) {
+            if unitString == "turn" {
+                hDouble = h * 360.0
+            } else {
+                // "deg" または単位なしの場合
+                hDouble = h
+            }
+        }
+              
+        guard let h = hDouble,
+              h >= 0 && h <= 360 else { return nil }
+              
         // HSLをRGBに変換
-        let (r, g, b) = hslToRgb(h: Double(h), s: Double(s), l: Double(l))
+        let (r, g, b) = hslToRgb(h: h, s: Double(s), l: Double(l))
         return Color(.sRGB, red: r, green: g, blue: b, opacity: 1.0)
     }
     
@@ -255,21 +271,37 @@ struct ColorCodeParser {
         
         guard let match = regex.firstMatch(in: text, options: [], range: nsRange) else { return nil }
         
-        guard let h = Double(String(text[Range(match.range(at: 1), in: text)!])),
-              let s = Double(String(text[Range(match.range(at: 2), in: text)!])),
-              let l = Double(String(text[Range(match.range(at: 3), in: text)!])),
-              h >= 0 && h <= 360,
+        let hString = String(text[Range(match.range(at: 1), in: text)!])
+        let unitString = match.range(at: 2).location != NSNotFound ? String(text[Range(match.range(at: 2), in: text)!]) : nil
+        let sString = String(text[Range(match.range(at: 3), in: text)!])
+        let lString = String(text[Range(match.range(at: 4), in: text)!])
+        
+        guard let s = Double(sString),
+              let l = Double(lString),
               s >= 0 && s <= 100,
               l >= 0 && l <= 100 else { return nil }
+              
+        var hDouble: Double? = nil
+        if let h = Double(hString) {
+            if unitString == "turn" {
+                hDouble = h * 360.0
+            } else {
+                // "deg" または単位なしの場合
+                hDouble = h
+            }
+        }
+              
+        guard let h = hDouble,
+              h >= 0 && h <= 360 else { return nil }
         
         var a: Double = 1.0 // デフォルトの不透明度
         // 10進数形式のアルファ値をチェック
-        if let alphaDecimalRange = Range(match.range(at: 4), in: text),
+        if let alphaDecimalRange = Range(match.range(at: 5), in: text),
            let alphaDecimalStr = Double(String(text[alphaDecimalRange])) {
             a = alphaDecimalStr
         }
         // %形式のアルファ値をチェック
-        else if let alphaPercentRange = Range(match.range(at: 5), in: text),
+        else if let alphaPercentRange = Range(match.range(at: 6), in: text),
                 let alphaPercentStr = Double(String(text[alphaPercentRange])),
                 alphaPercentStr >= 0 && alphaPercentStr <= 100 {
             a = alphaPercentStr / 100.0
