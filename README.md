@@ -52,6 +52,8 @@
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
 ## What is Clip Hold?
+![Standard Phrases and Copy History](docs/images/Standard-Phrase-and-History.png)
+
 Clip Hold is a clipboard and standard phrase manager app for macOS.
 
 > [!NOTE]
@@ -88,6 +90,11 @@ Frequently used standard phrases and copy history items can be accessed quickly 
 
 You can list all standard phrases you have set and all saved history items. You can easily copy an item by simply double-clicking on it.
 
+### Standard Phrases Presets and Assign to Apps Feature
+![Presets](docs/images/Presets.png)
+
+Standard Phrases can be grouped into different presets, and the presets can be automatically switched depending on the app that is opened. Presets can also be switched using shortcut keys.
+
 ### Rich Shortcut Keys
 ![Shortcut Keys](docs/images/Shortcuts.png)
 
@@ -102,6 +109,11 @@ With the "Quick Paste” feature, when you copy an item from the menu or use a s
 ![Import and Export Features](docs/images/Import-Export.png)
 
 Standard phrases and clipboard history can be imported and exported. You can share your favorite standard phrases with someone else, or import clipboard history from another Mac.
+
+### Copied Color Codes Can Be Shown
+![Color Codes](docs/images/Color-Codes.png)
+
+By enabling it from the “Developer Features” settings, you can show the color icons based on the copied color codes in the history window and the menu.
 
 ### Perfect Privacy
 Clip Hold does **not collect any user-related information**.\
