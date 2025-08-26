@@ -538,12 +538,12 @@ struct StandardPhraseWindowView: View {
             }
         }
         .sheet(item: $phraseToEdit) { phrase in
-            AddEditPhraseView(mode: .edit(phrase), presetManager: presetManager)
+            AddEditPhraseView(mode: .edit(phrase), presetManager: presetManager, isSheet: true)
                 .environmentObject(standardPhraseManager)
                 .environmentObject(presetManager)
         }
         .sheet(isPresented: $showingAddPresetSheet) {
-            AddEditPresetView()
+            AddEditPresetView(isSheet: true)
                 .environmentObject(presetManager)
         }
         .onAppear {

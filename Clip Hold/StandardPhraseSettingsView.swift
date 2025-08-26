@@ -680,7 +680,7 @@ private struct PhraseSettingsSection: View {
     }
 
     private var addSheet: some View {
-        AddEditPhraseView(mode: .add, presetManager: presetManager) { newPhrase in
+        AddEditPhraseView(mode: .add, presetManager: presetManager, isSheet: true) { newPhrase in
             addPhrase(newPhrase)
         }
         .environmentObject(standardPhraseManager)
@@ -688,7 +688,7 @@ private struct PhraseSettingsSection: View {
     }
 
     private func editSheet(for phrase: StandardPhrase) -> some View {
-        AddEditPhraseView(mode: .edit(phrase), phraseToEdit: phrase, presetManager: presetManager) { editedPhrase in
+        AddEditPhraseView(mode: .edit(phrase), phraseToEdit: phrase, presetManager: presetManager, isSheet: true) { editedPhrase in
             updatePhrase(editedPhrase)
         }
         .environmentObject(standardPhraseManager)

@@ -8,6 +8,12 @@ struct AddEditPresetView: View {
     @FocusState private var isPresetNameFieldFocused: Bool
     
     var onDismiss: (() -> Void)? = nil
+    private var isSheet: Bool = false
+    
+    init(isSheet: Bool = false, onDismiss: (() -> Void)? = nil) {
+        self.isSheet = isSheet
+        self.onDismiss = onDismiss
+    }
     
     var body: some View {
         VStack(spacing: 10) {
@@ -46,6 +52,7 @@ struct AddEditPresetView: View {
         }
         .padding()
         .frame(width: 300, height: 140)
+        .background(!isSheet ? Color(.windowBackgroundColor) : nil)
         .onAppear {
             // ウィンドウを前面に表示
             if let window = NSApp.mainWindow {

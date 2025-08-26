@@ -254,7 +254,7 @@ struct HistoryWindowView: View {
             }
         }
         .sheet(item: $itemForNewPhrase) { item in
-            AddEditPhraseView(mode: .add, initialContent: item.text, presetManager: presetManager)
+            AddEditPhraseView(mode: .add, initialContent: item.text, presetManager: presetManager, isSheet: true)
                 .environmentObject(standardPhraseManager)
                 .environmentObject(presetManager)
         }

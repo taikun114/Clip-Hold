@@ -172,7 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     @MainActor
     func showAddPhraseWindow(withContent content: String) {
         if addPhraseWindowController == nil || addPhraseWindowController?.window == nil {
-            let contentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared)
+            let contentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared, isSheet: false)
                 .environmentObject(StandardPhraseManager.shared)
                 .environmentObject(StandardPhrasePresetManager.shared)
 
@@ -212,7 +212,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             print("AppDelegate: Add Phrase window already exists. Updating content and bringing to front.")
             if let window = addPhraseWindowController?.window { // Controller 経由でウィンドウにアクセス
                 // newContentView を、if/else ブロックの外側に移動し、両方からアクセス可能にする
-                let newContentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared)
+                let newContentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared, isSheet: false)
                     .environmentObject(StandardPhraseManager.shared)
                     .environmentObject(StandardPhrasePresetManager.shared)
 
@@ -238,7 +238,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             // 既存のウィンドウがある場合は、コンテンツを更新して前面に表示
             print("AppDelegate: Add Preset window already exists. Updating content and bringing to front.")
             if let window = addPhraseWindowController?.window { // Controller 経由でウィンドウにアクセス
-                let newContentView = AddEditPresetView() { [weak self] in
+                let newContentView = AddEditPresetView(isSheet: false) { [weak self] in
                     // ウィンドウを閉じたときの後処理
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
@@ -258,7 +258,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
         } else {
             // 新しいウィンドウを作成
-            let contentView = AddEditPresetView() { [weak self] in
+            let contentView = AddEditPresetView(isSheet: false) { [weak self] in
                 // ウィンドウを閉じたときの後処理
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }

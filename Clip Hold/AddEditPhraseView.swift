@@ -20,8 +20,9 @@ struct AddEditPhraseView: View {
     @State private var selectedPresetId: UUID? = nil
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
+    private var isSheet: Bool = false
 
-    init(mode: Mode, phraseToEdit: StandardPhrase? = nil, initialContent: String? = nil, presetManager: StandardPhrasePresetManager, onSave: ((StandardPhrase) -> Void)? = nil) {
+    init(mode: Mode, phraseToEdit: StandardPhrase? = nil, initialContent: String? = nil, presetManager: StandardPhrasePresetManager, isSheet: Bool = false, onSave: ((StandardPhrase) -> Void)? = nil) {
         self.mode = mode
         self.onSave = onSave
         _phraseToEdit = State(initialValue: phraseToEdit ?? StandardPhrase(title: "", content: ""))
@@ -161,6 +162,7 @@ struct AddEditPhraseView: View {
         }
         .padding() // ここで全体にパディングが適用される
         .frame(minWidth: 400, minHeight: 350)
+        .background(!isSheet ? Color(.windowBackgroundColor) : nil)
         .sheet(isPresented: $showingAddPresetSheet) {
             // プリセット追加画面（シート）を表示
             AddEditPresetView { 
