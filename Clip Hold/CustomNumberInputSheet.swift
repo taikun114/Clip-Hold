@@ -24,14 +24,13 @@ struct CustomNumberInputSheet: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(alignment: .leading, spacing: 10) {
             title
                 .font(.headline)
 
             HStack {
                 TextField("数値を入力", text: $inputText)
                     .textFieldStyle(.roundedBorder)
-                    .frame(width: 120)
                     .onSubmit {
                         performSave()
                     }
@@ -41,7 +40,7 @@ struct CustomNumberInputSheet: View {
 
                 // MARK: - 単位選択ピッカーの追加
                 if selectedUnit != nil {
-                    Picker("", selection: Binding<DataSizeUnit>( // 修正箇所: ラベルを空文字列に変更
+                    Picker("", selection: Binding<DataSizeUnit>(
                         get: { selectedUnit ?? .megabytes },
                         set: { selectedUnit = $0 }
                     )) {
@@ -54,7 +53,6 @@ struct CustomNumberInputSheet: View {
                     .frame(width: 80)
                 }
             }
-            .padding(.horizontal)
             .onChange(of: inputText) { oldValue, newValue in
                 let halfWidthConverted = convertFullWidthToHalfWidthNumbers(newValue)
                 let filtered = halfWidthConverted.filter { $0.isNumber }
@@ -86,6 +84,8 @@ struct CustomNumberInputSheet: View {
                     .foregroundStyle(.secondary)
             }
 
+            Spacer(minLength: 0)
+
             HStack {
                 Button("キャンセル") {
                     onCancel()
@@ -93,6 +93,8 @@ struct CustomNumberInputSheet: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
+
+                Spacer()
 
                 Button("保存") {
                     performSave()
@@ -103,7 +105,7 @@ struct CustomNumberInputSheet: View {
             }
         }
         .padding()
-        .frame(minWidth: 200, idealWidth: 250, maxWidth: 300, minHeight: 150)
+        .frame(width: 300, height: (description != nil) ? 180 : 140)
         .alert("入力エラー", isPresented: $showAlert) {
             Button("OK") { }
         } message: {
@@ -148,4 +150,15 @@ func convertFullWidthToHalfWidthNumbers(_ input: String) -> String {
         }
     }
     return output
+}
+
+#Preview {
+    CustomNumberInputSheet(
+        title: Text("テストタイトルテストタイトルテストタイトル"),
+        description: Text("テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明"),
+        currentValue: .constant(10),
+        selectedUnit: .constant(.megabytes),
+        onSave: { _ in },
+        onCancel: {}
+    )
 }
