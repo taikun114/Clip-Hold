@@ -149,7 +149,7 @@ struct StandardPhraseImportExportView: View {
             }
             .buttonStyle(.bordered)
             .disabled(areAllPresetsEmpty)
-            .help("すべての定型文をJSONファイルとして書き出します。") // エクスポートボタンのツールチップ
+            .help("すべて、または特定のプリセットの定型文をJSONファイルとして書き出します。") // エクスポートボタンのツールチップ
         }
         .sheet(isPresented: $showingExportSheet) {
             VStack(alignment: .leading, spacing: 10) {
@@ -179,7 +179,6 @@ struct StandardPhraseImportExportView: View {
                 Spacer()
 
                 HStack {
-                    Spacer()
                     Button("キャンセル") {
                         showingExportSheet = false
                         selectedExportPresetId = nil
@@ -188,6 +187,7 @@ struct StandardPhraseImportExportView: View {
                     .keyboardShortcut(.cancelAction)
                     .controlSize(.large)
                     
+                    Spacer()
                     Button("エクスポート") {
                         showingExportSheet = false
                         showingFileExporter = true

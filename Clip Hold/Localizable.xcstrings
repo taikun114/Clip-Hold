@@ -2359,6 +2359,22 @@
         }
       }
     },
+    "すべて、または特定のプリセットの定型文をJSONファイルとして書き出します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export all or specific preset standard phrases as a JSON file."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて、または特定のプリセットの定型文をJSONファイルとして書き出します。"
+          }
+        }
+      }
+    },
     "すべてスキップ" : {
       "localizations" : {
         "en" : {
@@ -2531,22 +2547,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての割り当てを削除"
-          }
-        }
-      }
-    },
-    "すべての定型文をJSONファイルとして書き出します。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export all standard phrases to a JSON file."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての定型文をJSONファイルとして書き出します。"
           }
         }
       }
