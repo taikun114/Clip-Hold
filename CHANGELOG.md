@@ -51,6 +51,7 @@
 - **Improve the issue causing large disk writes when copying with a large number of history items**
 - **Improve the list of apps displayed on the app adding screen in the “Apps to Exclude” list**
 - **Improve the design of the add edit standard phrase screen**
+- **Improve the design of the custom number input sheet**
 - **Add an app icon to the list item in the History window**
   - It shows the app icon of the app that was in the foreground when it was copied. The icon will not be shown in the copy history before this feature was added.
   - When you hover the mouse cursor over an app icon, the app name will be displayed in a tooltip.
