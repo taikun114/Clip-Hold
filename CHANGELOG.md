@@ -1,7 +1,7 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
-## 1.3.0 (under development)
+## 1.3.0
 
 > [!IMPORTANT]
 > This version has a major change in the way history files are saved.\
