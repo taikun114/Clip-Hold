@@ -133,6 +133,16 @@ struct HistoryItemRow: View {
             } label: {
                 Label("コピー", systemImage: "document.on.document")
             }
+            if let qrContent = item.qrCodeContent {
+                Button {
+                    let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil)
+                    clipboardManager.isPerformingInternalCopy = true
+                    clipboardManager.copyItemToClipboard(newItem)
+                    showCopyConfirmation = true
+                } label: {
+                    Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
+                }
+            }
             if let filePath = item.filePath {
                 Button {
                     NSWorkspace.shared.open(filePath)
@@ -145,16 +155,6 @@ struct HistoryItemRow: View {
                     NSWorkspace.shared.open(url)
                 } label: {
                     Label("リンクを開く", systemImage: "paperclip")
-                }
-            }
-            if let qrContent = item.qrCodeContent {
-                Button {
-                    let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil)
-                    clipboardManager.isPerformingInternalCopy = true
-                    clipboardManager.copyItemToClipboard(newItem)
-                    showCopyConfirmation = true
-                } label: {
-                    Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
                 }
             }
             Divider()

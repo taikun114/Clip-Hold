@@ -173,20 +173,6 @@ struct HistoryContentList: View {
                             } label: {
                                 Label("コピー", systemImage: "document.on.document")
                             }
-                            if let filePath = currentItem.filePath {
-                                Button {
-                                    NSWorkspace.shared.open(filePath)
-                                } label: {
-                                    Label("開く", systemImage: "arrow.up.forward.app")
-                                }
-                            }
-                            if currentItem.isURL, let url = URL(string: currentItem.text) {
-                                Button {
-                                    NSWorkspace.shared.open(url)
-                                } label: {
-                                    Label("リンクを開く", systemImage: "paperclip")
-                                }
-                            }
                             if let qrContent = currentItem.qrCodeContent {
                                 Button {
                                     let newItemToCopy = ClipboardItem(text: qrContent) // 新しいClipboardItemを作成
@@ -204,6 +190,20 @@ struct HistoryContentList: View {
                                     }
                                 } label: {
                                     Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
+                                }
+                            }
+                            if let filePath = currentItem.filePath {
+                                Button {
+                                    NSWorkspace.shared.open(filePath)
+                                } label: {
+                                    Label("開く", systemImage: "arrow.up.forward.app")
+                                }
+                            }
+                            if currentItem.isURL, let url = URL(string: currentItem.text) {
+                                Button {
+                                    NSWorkspace.shared.open(url)
+                                } label: {
+                                    Label("リンクを開く", systemImage: "paperclip")
                                 }
                             }
                             Divider()
