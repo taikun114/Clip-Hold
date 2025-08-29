@@ -3367,22 +3367,6 @@
         }
       }
     },
-    "プリセットを切り替える" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Switch Presets"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プリセットを切り替える"
-          }
-        }
-      }
-    },
     "プリセットを選択" : {
       "localizations" : {
         "en" : {
@@ -4131,6 +4115,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除..."
+          }
+        }
+      }
+    },
+    "前のプリセットに切り替える" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch to Previous Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前のプリセットに切り替える"
           }
         }
       }
@@ -5443,6 +5443,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次のプリセットがすでに存在しています。"
+          }
+        }
+      }
+    },
+    "次のプリセットに切り替える" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch to Next Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次のプリセットに切り替える"
           }
         }
       }

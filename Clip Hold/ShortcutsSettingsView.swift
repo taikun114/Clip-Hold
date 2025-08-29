@@ -87,11 +87,24 @@ struct ShortcutsSettingsView: View {
                     .help("デフォルトのショートカットに戻します。")
                 }
                 HStack {
-                    Text("プリセットを切り替える")
+                    Text("次のプリセットに切り替える")
                     Spacer()
-                    KeyboardShortcuts.Recorder(for: .cyclePresets)
+                    KeyboardShortcuts.Recorder(for: .nextPreset)
                     Button(action: {
-                        KeyboardShortcuts.reset(.cyclePresets)
+                        KeyboardShortcuts.reset(.nextPreset)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+                HStack {
+                    Text("前のプリセットに切り替える")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .previousPreset)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.previousPreset)
                     }) {
                         Image(systemName: "arrow.counterclockwise")
                             .imageScale(.small)

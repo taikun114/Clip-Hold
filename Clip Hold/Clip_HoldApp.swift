@@ -429,9 +429,9 @@ struct ClipHoldApp: App {
             }
         }
 
-        // プリセットを巡回するショートカットの登録
-        KeyboardShortcuts.onKeyDown(for: .cyclePresets) {
-            print("「プリセットを巡回」ショートカットが押されました！")
+        // 次のプリセットに切り替えるショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .nextPreset) {
+            print("「次のプリセットに切り替える」ショートカットが押されました！")
             let presetManager = StandardPhrasePresetManager.shared
             if !presetManager.presets.isEmpty {
                 let currentIndex = presetManager.presets.firstIndex { $0.id == presetManager.selectedPresetId } ?? -1
@@ -445,6 +445,34 @@ struct ClipHoldApp: App {
                     let content = UNMutableNotificationContent()
                     content.title = nextPreset.name
                     content.body = String(localized: "「\(nextPreset.name)」に切り替わりました。")
+                    content.sound = nil // 音なし
+                    
+                    let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
+                    notificationCenter.add(request) { error in
+                        if let error = error {
+                            print("通知の送信に失敗しました: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+        }
+
+        // 前のプリセットに切り替えるショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .previousPreset) {
+            print("「前のプリセットに切り替える」ショートカットが押されました！")
+            let presetManager = StandardPhrasePresetManager.shared
+            if !presetManager.presets.isEmpty {
+                let currentIndex = presetManager.presets.firstIndex { $0.id == presetManager.selectedPresetId } ?? -1
+                let previousIndex = (currentIndex - 1 + presetManager.presets.count) % presetManager.presets.count
+                let previousPreset = presetManager.presets[previousIndex]
+                presetManager.selectedPresetId = previousPreset.id
+                
+                // 通知設定がオンの場合、通知を送信
+                if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
+                    let notificationCenter = UNUserNotificationCenter.current()
+                    let content = UNMutableNotificationContent()
+                    content.title = previousPreset.name
+                    content.body = String(localized: "「\(previousPreset.name)」に切り替わりました。")
                     content.sound = nil // 音なし
                     
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)

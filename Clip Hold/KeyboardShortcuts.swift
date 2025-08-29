@@ -8,7 +8,8 @@ extension KeyboardShortcuts.Name {
     static let addSNewtandardPhrase = Self("addSNewtandardPhrase", default: .init(.a, modifiers: [.control, .command]))
     static let addStandardPhraseFromClipboard = Self("addStandardPhraseFromClipboard", default: .init(.c, modifiers: [.control, .command]))
     static let addNewPreset = Self("addNewPreset", default: .init(.n, modifiers: [.control, .command]))
-    static let cyclePresets = Self("cyclePresets", default: .init(.p, modifiers: [.control, .command]))
+    static let nextPreset = Self("nextPreset", default: .init(.p, modifiers: [.control, .command]))
+    static let previousPreset = Self("previousPreset", default: .init(.p, modifiers: [.shift, .control, .command]))
 
     static let toggleClipboardMonitoring = Self("toggleClipboardMonitoring", default: .init(.m, modifiers: [.option, .command]))
 
