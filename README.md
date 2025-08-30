@@ -162,14 +162,14 @@ If you like Clip Hold, I would appreciate a donation. It will motivate me to con
 You can donate using the following services.
 
 #### Buy Me a Coffee
-You can support me at [Buy Me a Coffee](https://www.buymeacoffee.com/i_am_taikun) from the price of a cup of green tea.
+You can support me at [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_taikun) from the price of a cup of green tea.
 
 <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
   <img alt="Buy Me a Coffee" src="docs/images/blue-button.png">
 </a>
 
 #### PayPal\.Me
-If you have a PayPal account, you can also donate directly at [PayPal](https://paypal.me/taikun114).
+If you have a PayPal account, you can also donate directly at [**PayPal**](https://paypal.me/taikun114).
 
 ## Credits
 ### [Google Gemini](https://gemini.google.com/) by Google
