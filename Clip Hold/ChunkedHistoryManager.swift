@@ -54,6 +54,10 @@ class ChunkedHistoryManager: ObservableObject {
         print("ChunkedHistoryManager: Old history file found. Starting migration...")
         
         do {
+            // 既存の新しい履歴を読み込む
+            let existingHistory = loadHistory()
+            let existingItemIds = Set(existingHistory.map { $0.id })
+            
             // 古い履歴ファイルを読み込む
             let data = try Data(contentsOf: oldHistoryFileURL)
             let decoder = JSONDecoder()
@@ -74,8 +78,12 @@ class ChunkedHistoryManager: ObservableObject {
                 }
             }
             
+            // 既存の新しい履歴と古い履歴を統合（重複するアイテムは除外）
+            let newItems = oldHistory.filter { !existingItemIds.contains($0.id) }
+            let mergedHistory = existingHistory + newItems
+            
             // 新しい形式で保存
-            try saveHistoryItems(oldHistory)
+            try saveHistoryItems(mergedHistory)
             
             // 古いファイルをリネーム
             try FileManager.default.moveItem(at: oldHistoryFileURL, to: newHistoryFileURL)
