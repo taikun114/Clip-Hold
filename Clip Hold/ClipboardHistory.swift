@@ -148,8 +148,8 @@ extension ClipboardManager {
                 self.objectWillChange.send()
                 self.clipboardHistory.append(contentsOf: newItems)
 
-                // 3. 全体を日付（date）の降順でソート
-                self.clipboardHistory.sort { $0.date > $1.date }
+                // 3. 全体を日付（date）の昇順でソート（古い順）
+                self.clipboardHistory.sort { $0.date < $1.date }
 
                 // 4. 最大履歴数を超過した場合の処理
                 self.enforceMaxHistoryCount()
@@ -160,7 +160,9 @@ extension ClipboardManager {
 
                 print("ClipboardManager: 履歴をインポートしました。追加された項目数: \(newItems.count), 総履歴数: \(self.clipboardHistory.count)")
 
-                self.scheduleSaveClipboardHistory()
+                // 新しい履歴管理システムに一括で保存
+                ChunkedHistoryManager.shared.clearAllHistory()
+                try? ChunkedHistoryManager.shared.saveHistoryItems(self.clipboardHistory)
             }
         }
     }
