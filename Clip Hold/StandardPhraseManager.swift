@@ -74,16 +74,15 @@ class StandardPhraseManager: ObservableObject {
             }
         }
 
-        // デフォルトプリセットとして保存 (UUIDは固定)
-        let defaultPresetId = UUID(uuidString: "00000000-0000-0000-0000-000000000000") ?? UUID()
-        let fileURL = presetDirectory.appendingPathComponent("\(defaultPresetId.uuidString).json")
+        // デフォルトプリセットとして保存
+        let defaultFileURL = presetDirectory.appendingPathComponent("default.json")
 
         do {
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted // 可読性のために整形 (Optional)
             
             let data = try encoder.encode(standardPhrases)
-            try data.write(to: fileURL)
+            try data.write(to: defaultFileURL)
         } catch {
             print("StandardPhraseManager: Error saving standard phrases to file: \(error.localizedDescription)")
         }
@@ -108,15 +107,19 @@ class StandardPhraseManager: ObservableObject {
         // デフォルトプリセットファイルをロード
         let defaultPresetId = UUID(uuidString: "00000000-0000-0000-0000-000000000000") ?? UUID()
         let fileURL = presetDirectory.appendingPathComponent("\(defaultPresetId.uuidString).json")
+        let defaultFileURL = presetDirectory.appendingPathComponent("default.json")
         
         // ファイルが存在しない場合は早期リターン
-        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+        guard FileManager.default.fileExists(atPath: fileURL.path) || FileManager.default.fileExists(atPath: defaultFileURL.path) else {
             print("StandardPhraseManager: Default preset file not found, starting with empty phrases.")
             return
         }
         
+        // 存在する方のファイルURLを使用
+        let actualFileURL = FileManager.default.fileExists(atPath: fileURL.path) ? fileURL : defaultFileURL
+        
         do {
-            let data = try Data(contentsOf: fileURL)
+            let data = try Data(contentsOf: actualFileURL)
             let decoder = JSONDecoder()
             
             self.standardPhrases = try decoder.decode([StandardPhrase].self, from: data)
