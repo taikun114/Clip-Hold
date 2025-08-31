@@ -23,8 +23,6 @@
   </a>
 </p>
 
-[![Buy Me a Coffee](docs/images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
-
 ## Table of Contents
 - [What is Clip Hold?](#what-is-clip-hold)
   - [Download](#download)
@@ -169,8 +167,6 @@ You can support me at [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_ta
 <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
   <img alt="Buy Me a Coffee" src="docs/images/blue-button.png">
 </a>
-
-[![Buy Me a Coffee](docs/images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
 
 #### PayPal\.Me
 If you have a PayPal account, you can also donate directly at [**PayPal**](https://paypal.me/taikun114).
