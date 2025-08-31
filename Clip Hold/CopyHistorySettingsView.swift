@@ -11,7 +11,7 @@ struct CopyHistorySettingsView: View {
     @State private var tempSelectedSaveOption: HistoryOption
     @State private var initialSaveOption: HistoryOption
 
-    @AppStorage("maxFileSizeToSave") var maxFileSizeToSave: Int = 1_000_000_000 // デフォルト1GB (1,000,000,000バイト)
+    @AppStorage("maxFileSizeToSave") var maxFileSizeToSave: Int = 0 // デフォルトは無制限
     @State private var tempSelectedFileSizeOption: DataSizeOption
     @State private var initialFileSizeOption: DataSizeOption
 
@@ -49,9 +49,9 @@ struct CopyHistorySettingsView: View {
         // maxHistoryToSaveは0が無制限を表すため、raw値をそのまま使用。nilの場合は0をデフォルトとする。
         let savedMaxHistoryToSave = savedMaxHistoryToSaveRaw ?? 0
 
-        // maxFileSizeToSaveとlargeFileAlertThresholdは、UserDefaultsに値がない場合（nil）にAppStorageのデフォルト値（1GB）を使用。
+        // largeFileAlertThresholdは、UserDefaultsに値がない場合（nil）にAppStorageのデフォルト値（1GB）を使用。
         // 0が明示的に設定されている場合は0として扱う。
-        let savedMaxFileSizeToSave = savedMaxFileSizeToSaveRaw ?? 1_000_000_000
+        let savedMaxFileSizeToSave = savedMaxFileSizeToSaveRaw ?? 0
         let savedLargeFileAlertThreshold = savedLargeFileAlertThresholdRaw ?? 1_000_000_000
 
 
@@ -206,7 +206,7 @@ struct CopyHistorySettingsView: View {
                         Text("ファイル1つあたりの最大容量:")
                         Text("ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Picker("ファイル1つあたりの最大容量", selection: $tempSelectedFileSizeOption) {
@@ -239,7 +239,7 @@ struct CopyHistorySettingsView: View {
                         Text("次の容量より大きいファイルコピー時にアラートを表示:")
                         Text("ここで設定した容量よりも大きいファイルをコピーしようとした際に、コピーしたファイルを履歴に保存するかどうかを求めるアラートが表示されます。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Picker("この容量より大きいファイルコピー時にアラートを表示", selection: $tempSelectedAlertOption) {
@@ -275,7 +275,7 @@ struct CopyHistorySettingsView: View {
                         Text("クリップボード履歴")
                         Text("現在、インポートとエクスポートはテキストのみサポートしています。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
@@ -306,7 +306,7 @@ struct CopyHistorySettingsView: View {
 
                 HStack {
                     Text("\(clipboardManager.clipboardHistory.count)個の履歴")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Spacer()
                     Button(action: {
                         showingClearHistoryConfirmation = true
@@ -331,7 +331,7 @@ struct CopyHistorySettingsView: View {
                     Text("保存フォルダの項目数:")
                     Spacer()
                     Text("\(itemCount)個")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
@@ -339,7 +339,7 @@ struct CopyHistorySettingsView: View {
                     Text("保存フォルダの総容量:")
                     Spacer()
                     Text(ByteCountFormatter.string(fromByteCount: Int64(totalFolderSize), countStyle: .file))
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
@@ -380,7 +380,7 @@ struct CopyHistorySettingsView: View {
 
                     Text("ファイルやフォルダをコピーしたときにデータが保存されるフォルダを管理します。")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.bottom, 4)
@@ -430,7 +430,7 @@ struct CopyHistorySettingsView: View {
             contentType: .json,
             defaultFilename: "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).json"
         ) { result in
-            clipboardImporterExporter.handleExportResult(result)
+            clipboardImporterExporter.handleExportResult(result, from: clipboardManager)
         }
         .fileImporter(
             isPresented: $isShowingImportSheet,

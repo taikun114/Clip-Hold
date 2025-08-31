@@ -21,7 +21,7 @@ extension Int {
 }
 
 struct ShortcutsSettingsView: View {
-    @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @StateObject private var presetManager = StandardPhrasePresetManager.shared
     @EnvironmentObject var clipboardManager: ClipboardManager
 
     var body: some View {
@@ -72,23 +72,67 @@ struct ShortcutsSettingsView: View {
                 }
             }
 
+            Section(header: Text("プリセット").font(.headline)) {
+                HStack {
+                    Text("新しいプリセットを追加する")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .addNewPreset)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.addNewPreset)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+                HStack {
+                    Text("次のプリセットに切り替える")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .nextPreset)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.nextPreset)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+                HStack {
+                    Text("前のプリセットに切り替える")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .previousPreset)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.previousPreset)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+            }
+            
             Section(header: Text("定型文").font(.headline)) {
                 ForEach(0..<10, id: \.self) { index in
                     HStack {
                         VStack(alignment: .leading) {
                             // OrdinalSuffix を使用して英語表記の順序数にする
-                            Text("\((index + 1).ordinalSuffix)定型文をコピーする")                            
-                            let phraseExists = standardPhraseManager.standardPhrases.indices.contains(index)
+                            Text("\((index + 1).ordinalSuffix)定型文をコピーする")
+                            
+                            let currentPhrases = presetManager.selectedPreset?.phrases ?? []
+                            let phraseExists = currentPhrases.indices.contains(index)
                             
                             if phraseExists {
-                                Text("「\(standardPhraseManager.standardPhrases[index].title)」")
+                                Text("「\(currentPhrases[index].title)」")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .lineLimit(1)
                             } else {
                                 Text("定型文が設定されていません")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                         
@@ -140,7 +184,7 @@ struct ShortcutsSettingsView: View {
                         Text("クリップボードの内容から定型文を追加する")
                         Text("現在のクリップボード内容を使って新しい定型文を追加します。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     KeyboardShortcuts.Recorder(for: .addStandardPhraseFromClipboard)

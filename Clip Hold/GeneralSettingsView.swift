@@ -80,6 +80,7 @@ struct GeneralSettingsView: View {
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
+    @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
 
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbersInStandardPhraseWindow: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
@@ -178,7 +179,7 @@ struct GeneralSettingsView: View {
                         Text("クイックペースト")
                         Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $quickPaste) {
@@ -195,7 +196,7 @@ struct GeneralSettingsView: View {
                         Text("テキストのみ")
                         Text("このオプションをオンにすると、テキストのみがクイックペーストの対象となります。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $textOnlyQuickPaste) {
@@ -299,7 +300,7 @@ struct GeneralSettingsView: View {
                         Text("メニューバーアイコンを一時的に非表示")
                         Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $hideMenuBarExtra) {
@@ -315,10 +316,10 @@ struct GeneralSettingsView: View {
             // MARK: - 定型文ウィンドウ
             Section(header: Text("定型文ウィンドウ").font(.headline)) {
                 HStack {
-                    Text("番号を表示する")
+                    Text("番号を表示")
                     Spacer()
                     Toggle(isOn: $showLineNumbersInStandardPhraseWindow) {
-                        Text("定型文ウィンドウに番号を表示する")
+                        Text("定型文ウィンドウに番号を表示")
                         Text("定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
@@ -353,10 +354,21 @@ struct GeneralSettingsView: View {
             // MARK: - 履歴をウィンドウ
             Section(header: Text("履歴ウィンドウ").font(.headline)) {
                 HStack {
-                    Text("番号を表示する")
+                    Text("アプリアイコンを表示")
+                    Spacer()
+                    Toggle(isOn: $showAppIconOverlay) {
+                        Text("アプリアイコンを表示")
+                        Text("履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    Text("番号を表示")
                     Spacer()
                     Toggle(isOn: $showLineNumbersInHistoryWindow) {
-                        Text("履歴ウィンドウに番号を表示する")
+                        Text("履歴ウィンドウに番号を表示")
                         Text("履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)
@@ -387,10 +399,10 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
-                    Text("リストが更新されたら最も上にスクロールする")
+                    Text("リストが更新されたら最も上にスクロール")
                     Spacer()
                     Toggle(isOn: $scrollToTopOnUpdate) {
-                        Text("リストが更新されたら最も上にスクロールする")
+                        Text("リストが更新されたら最も上にスクロール")
                         Text("履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。")
                     }
                     .toggleStyle(.switch)

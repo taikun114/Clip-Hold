@@ -7,7 +7,9 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     @Published var date: Date
     @Published var filePath: URL?
     @Published var fileSize: UInt64?
+    @Published var fileHash: String? // 新しく追加
     @Published var qrCodeContent: String?
+    @Published var sourceAppPath: String?
 
     // ファイルが画像かどうかを判断するヘルパープロパティ
     var isImage: Bool {
@@ -41,23 +43,27 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     }
     
     // 新しいClipboardItemを作成するためのイニシャライザ (テキストのみ)
-    init(text: String, date: Date = Date(), qrCodeContent: String? = nil) {
+    init(text: String, date: Date = Date(), qrCodeContent: String? = nil, sourceAppPath: String? = nil) {
         self.id = UUID()
         self.text = text
         self.date = date
         self.filePath = nil
         self.fileSize = nil
+        self.fileHash = nil // 新しく追加
         self.qrCodeContent = qrCodeContent
+        self.sourceAppPath = sourceAppPath
     }
 
-    // 新しいClipboardItemを作成するためのイニシャライザ (ファイルパスとサイズあり)
-    init(text: String, date: Date = Date(), filePath: URL?, fileSize: UInt64?, qrCodeContent: String? = nil) {
+    // 新しいClipboardItemを作成するためのイニシャライザ (ファイルパス、サイズ、ハッシュあり)
+    init(text: String, date: Date = Date(), filePath: URL?, fileSize: UInt64?, fileHash: String? = nil, qrCodeContent: String? = nil, sourceAppPath: String? = nil) {
         self.id = UUID()
         self.text = text
         self.date = date
         self.filePath = filePath
         self.fileSize = fileSize
+        self.fileHash = fileHash // 新しく追加
         self.qrCodeContent = qrCodeContent
+        self.sourceAppPath = sourceAppPath
     }
 
     // CodableのためのDecodableイニシャライザ
@@ -68,7 +74,9 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.date = try container.decode(Date.self, forKey: .date)
         self.filePath = try container.decodeIfPresent(URL.self, forKey: .filePath)
         self.fileSize = try container.decodeIfPresent(UInt64.self, forKey: .fileSize)
+        self.fileHash = try container.decodeIfPresent(String.self, forKey: .fileHash) // 新しく追加
         self.qrCodeContent = try container.decodeIfPresent(String.self, forKey: .qrCodeContent)
+        self.sourceAppPath = try container.decodeIfPresent(String.self, forKey: .sourceAppPath)
     }
     
     // CodableのためのEncoded関数
@@ -79,10 +87,21 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         try container.encode(date, forKey: .date)
         try container.encodeIfPresent(filePath, forKey: .filePath)
         try container.encodeIfPresent(fileSize, forKey: .fileSize)
+        try container.encodeIfPresent(fileHash, forKey: .fileHash) // 新しく追加
         try container.encodeIfPresent(qrCodeContent, forKey: .qrCodeContent)
+        try container.encodeIfPresent(sourceAppPath, forKey: .sourceAppPath)
     }
     
     enum CodingKeys: String, CodingKey {
-        case id, text, date, filePath, fileSize, qrCodeContent
+        case id, text, date, filePath, fileSize, fileHash, qrCodeContent, sourceAppPath // fileHashを追加
+    }
+}
+
+// NSImageのエクステンション
+extension NSImage {
+    var imageData: Data? {
+        guard let tiffData = self.tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffData) else { return nil }
+        return bitmapImage.representation(using: .png, properties: [:])
     }
 }

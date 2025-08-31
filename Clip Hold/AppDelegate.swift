@@ -4,6 +4,7 @@ import UserNotifications
 import KeyboardShortcuts
 
 // アプリケーションのデリゲートクラス
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, NSWindowDelegate {
 
     var historyWindowController: ClipHoldWindowController?
@@ -16,9 +17,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
     private var historyWindowAlwaysOnTopObserver: NSKeyValueObservation?
     private var standardPhraseWindowAlwaysOnTopObserver: NSKeyValueObservation?
+    private let frontmostAppMonitor = FrontmostAppMonitor.shared
 
     // MARK: - Application Lifecycle
     func applicationDidFinishLaunching(_ notification: Notification) {
+        frontmostAppMonitor.startMonitoring()
         print("AppDelegate: finished launching.")
 
         NSApp.setActivationPolicy(.accessory)
@@ -38,29 +41,42 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         let category = UNNotificationCategory(identifier: clipboardPausedNotificationCategory, actions: [resumeMonitoringAction], intentIdentifiers: [], options: [])
         UNUserNotificationCenter.current().setNotificationCategories([category])
         print("通知カテゴリ '\(clipboardPausedNotificationCategory)' とアクション '\(resumeMonitoringActionID)' を登録しました。")
+        
+        // マイグレーション失敗通知のカテゴリを登録
+        let openDocumentationAction = UNNotificationAction(
+            identifier: "OPEN_DOCUMENTATION_ACTION",
+            title: String(localized: "ドキュメントを表示…"),
+            options: [.foreground]
+        )
+        let migrationFailureCategory = UNNotificationCategory(
+            identifier: "MIGRATION_FAILURE_CATEGORY",
+            actions: [openDocumentationAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        UNUserNotificationCenter.current().setNotificationCategories([migrationFailureCategory])
+        print("マイグレーション失敗通知のカテゴリを登録しました。")
 
         if UserDefaults.standard.bool(forKey: "isClipboardMonitoringPaused") {
             NotificationManager.shared.scheduleClipboardPausedNotification()
             print("AppDelegate: アプリ起動時、クリップボード監視は一時停止状態です。通知をスケジュールしました。")
         }
 
-        historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
-            guard let self = self, let alwaysOnTop = change.newValue else { return }
-            if let historyWindow = self.historyWindowController?.window {
-                historyWindow.level = alwaysOnTop ? .floating : .normal
-                print("DEBUG: historyWindowAlwaysOnTop changed. Level set to: \(historyWindow.level.rawValue)")
-            } else {
-                print("DEBUG: historyWindowAlwaysOnTop changed, but historyWindowController is nil or window is nil.")
+                historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
+            DispatchQueue.main.async {
+                guard let self = self, let alwaysOnTop = change.newValue else { return }
+                if let historyWindow = self.historyWindowController?.window {
+                    historyWindow.level = alwaysOnTop ? .floating : .normal
+                }
             }
         }
 
         standardPhraseWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.standardPhraseWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
-            guard let self = self, let alwaysOnTop = change.newValue else { return }
-            if let standardPhraseWindow = self.standardPhraseWindowController?.window {
-                standardPhraseWindow.level = alwaysOnTop ? .floating : .normal
-                print("DEBUG: standardPhraseWindowAlwaysOnTop changed. Level set to: \(standardPhraseWindow.level.rawValue)")
-            } else {
-                print("DEBUG: standardPhraseWindowAlwaysOnTop changed, but standardPhraseWindowController is nil or window is nil.")
+            DispatchQueue.main.async {
+                guard let self = self, let alwaysOnTop = change.newValue else { return }
+                if let standardPhraseWindow = self.standardPhraseWindowController?.window {
+                    standardPhraseWindow.level = alwaysOnTop ? .floating : .normal
+                }
             }
         }
     }
@@ -73,11 +89,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     // MARK: - Window Management
 
+    func showSettingsWindow() {
+        SettingsWindowController.shared.showWindow()
+    }
+
+    @MainActor
     func showHistoryWindow() {
         if historyWindowController == nil || historyWindowController?.window == nil {
             let contentView = HistoryWindowView()
                 .environmentObject(ClipboardManager.shared)
                 .environmentObject(StandardPhraseManager.shared)
+                .environmentObject(StandardPhrasePresetManager.shared)
             
             let hostingController = NSHostingController(rootView: contentView)
             
@@ -109,11 +131,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
     }
 
+    @MainActor
     func showStandardPhraseWindow() {
         if standardPhraseWindowController == nil || standardPhraseWindowController?.window == nil {
             let contentView = StandardPhraseWindowView()
                 .environmentObject(ClipboardManager.shared)
                 .environmentObject(StandardPhraseManager.shared)
+                .environmentObject(StandardPhrasePresetManager.shared)
 
             let hostingController = NSHostingController(rootView: contentView)
             
@@ -145,10 +169,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
     }
 
+    @MainActor
     func showAddPhraseWindow(withContent content: String) {
         if addPhraseWindowController == nil || addPhraseWindowController?.window == nil {
-            let contentView = AddEditPhraseView(mode: .add, initialContent: content)
+            let contentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared, isSheet: false)
                 .environmentObject(StandardPhraseManager.shared)
+                .environmentObject(StandardPhrasePresetManager.shared)
 
             let hostingController = NSHostingController(rootView: AnyView(contentView))
 
@@ -186,8 +212,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             print("AppDelegate: Add Phrase window already exists. Updating content and bringing to front.")
             if let window = addPhraseWindowController?.window { // Controller 経由でウィンドウにアクセス
                 // newContentView を、if/else ブロックの外側に移動し、両方からアクセス可能にする
-                let newContentView = AddEditPhraseView(mode: .add, initialContent: content)
+                let newContentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared, isSheet: false)
                     .environmentObject(StandardPhraseManager.shared)
+                    .environmentObject(StandardPhrasePresetManager.shared)
 
                 // 既存の NSHostingController の rootView を AnyView としてキャストし、新しい AnyView で更新
                 if let existingHostingController = window.contentViewController as? NSHostingController<AnyView> {
@@ -198,6 +225,81 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 }
             }
         }
+        // ウィンドウを表示し、アプリをアクティブにする
+        addPhraseWindowController?.showWindow(nil) // Controller 経由で表示
+        addPhraseWindowController?.window?.makeKeyAndOrderFront(nil) // 最前面に表示
+        NSApp.activate(ignoringOtherApps: true)
+    }
+    
+    @MainActor
+    func showAddPresetWindow() {
+        // 既存のウィンドウがあればそれを再利用
+        if addPhraseWindowController != nil && addPhraseWindowController?.window != nil {
+            // 既存のウィンドウがある場合は、コンテンツを更新して前面に表示
+            print("AppDelegate: Add Preset window already exists. Updating content and bringing to front.")
+            if let window = addPhraseWindowController?.window { // Controller 経由でウィンドウにアクセス
+                let newContentView = AddEditPresetView(isSheet: false) { [weak self] in
+                    // ウィンドウを閉じたときの後処理
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.addPhraseWindowController = nil
+                        print("AppDelegate: addPhraseWindowController set to nil asynchronously.")
+                    }
+                }
+                .environmentObject(StandardPhrasePresetManager.shared)
+
+                // 既存の NSHostingController の rootView を AnyView としてキャストし、新しい AnyView で更新
+                if let existingHostingController = window.contentViewController as? NSHostingController<AnyView> {
+                    existingHostingController.rootView = AnyView(newContentView)
+                } else {
+                    // もし contentViewController が期待する型でない場合は、新しいものに置き換える
+                    window.contentViewController = NSHostingController(rootView: AnyView(newContentView))
+                }
+            }
+        } else {
+            // 新しいウィンドウを作成
+            let contentView = AddEditPresetView(isSheet: false) { [weak self] in
+                // ウィンドウを閉じたときの後処理
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.addPhraseWindowController = nil
+                    print("AppDelegate: addPhraseWindowController set to nil asynchronously.")
+                }
+            }
+            .environmentObject(StandardPhrasePresetManager.shared)
+
+            let hostingController = NSHostingController(rootView: AnyView(contentView))
+
+            var windowRect = NSRect(x: 0, y: 0, width: 300, height: 140) // ウィンドウの固定サイズを設定
+            
+            if let screenFrame = NSScreen.main?.visibleFrame {
+                // スクリーンの中央に配置するためのX座標とY座標を計算
+                let x = screenFrame.minX + (screenFrame.width - windowRect.width) / 2
+                let y = screenFrame.minY + (screenFrame.height - windowRect.height) / 2
+                windowRect.origin = NSPoint(x: x, y: y) // 計算した座標をウィンドウの原点に設定
+                print("AppDelegate: Calculated window origin: (\(x), \(y)) for screen frame: \(screenFrame)")
+            } else {
+                print("AppDelegate: Could not get main screen frame, falling back to default window position.")
+                // スクリーン情報が取得できない場合のフォールバック（このままでもデフォルトで左上から表示される）
+            }
+
+            let window = NSWindow(
+                contentRect: windowRect,
+                styleMask: [.titled, .closable, .miniaturizable],
+                backing: .buffered, defer: false)
+
+            window.contentViewController = hostingController
+            window.identifier = NSUserInterfaceItemIdentifier("AddPresetWindow")
+
+            // ClipHoldWindowController でウィンドウをラップ
+            addPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: false)
+
+            // ウィンドウのデリゲートを設定 (AppDelegateが最終的なデリゲートになる)
+            addPhraseWindowController?.window?.delegate = self
+
+            print("AppDelegate: Add Preset window created.")
+        }
+        
         // ウィンドウを表示し、アプリをアクティブにする
         addPhraseWindowController?.showWindow(nil) // Controller 経由で表示
         addPhraseWindowController?.window?.makeKeyAndOrderFront(nil) // 最前面に表示
@@ -228,19 +330,44 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     }
 
     // MARK: - UNUserNotificationCenterDelegate (通知アクションのハンドリング)
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        if response.actionIdentifier == resumeMonitoringActionID {
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let actionID = response.actionIdentifier
+        let notificationCategory = response.notification.request.content.categoryIdentifier
+        
+        if actionID == resumeMonitoringActionID {
             print("通知アクション: '再開' が選択されました。")
             // NotificationManager を介して再開ロジックを実行
             NotificationManager.shared.resumeClipboardMonitoringAndSendNotification()
 
             // アプリをフォアグラウンドに表示
-            NSApp.activate(ignoringOtherApps: true)
+            DispatchQueue.main.async {
+                NSApp.activate(ignoringOtherApps: true)
+            }
+        } else if actionID == "OPEN_DOCUMENTATION_ACTION" && notificationCategory == "MIGRATION_FAILURE_CATEGORY" {
+            print("通知アクション: 'ドキュメントを表示…' が選択されました。")
+            
+            // ドキュメントのURLを決定
+            let documentationURL: String
+            if Locale.current.language.languageCode?.identifier == "ja" {
+                documentationURL = "https://clip-hold.taikun.design/jp/docs/upgrade-history-data"
+            } else {
+                documentationURL = "https://clip-hold.taikun.design/docs/upgrade-history-data"
+            }
+            
+            // デフォルトブラウザでURLを開く
+            if let url = URL(string: documentationURL) {
+                NSWorkspace.shared.open(url)
+            }
+            
+            // アプリをフォアグラウンドに表示
+            DispatchQueue.main.async {
+                NSApp.activate(ignoringOtherApps: true)
+            }
         }
         completionHandler()
     }
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound])
     }
 }

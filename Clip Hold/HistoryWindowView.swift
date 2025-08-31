@@ -9,6 +9,7 @@ import QuickLookThumbnailing
 struct HistoryWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
 
     @State private var searchText: String = ""
@@ -32,6 +33,7 @@ struct HistoryWindowView: View {
 
     @State private var selectedFilter: ItemFilter = .all
     @State private var selectedSort: ItemSort = .newest
+    @State private var selectedApp: String? = nil
 
     @State private var searchDebounceTask: Task<Void, Never>? = nil
 
@@ -40,6 +42,7 @@ struct HistoryWindowView: View {
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
+    @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
     private var lineNumberTextWidth: CGFloat? {
         guard showLineNumbersInHistoryWindow, !filteredHistory.isEmpty else { return nil }
@@ -83,8 +86,13 @@ struct HistoryWindowView: View {
             let historyCopy = clipboardManager.clipboardHistory
             
             let filtered = historyCopy.filter { item in
+                // App filter
+                let matchesApp = selectedApp == nil || (item.sourceAppPath?.contains(selectedApp!) ?? false)
+                
+                // Search text filter
                 let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
 
+                // Item type filter
                 let matchesFilter: Bool
                 switch selectedFilter {
                 case .all:
@@ -97,9 +105,11 @@ struct HistoryWindowView: View {
                     matchesFilter = item.filePath != nil
                 case .imageOnly:
                     matchesFilter = item.isImage
+                case .colorCodeOnly:
+                    matchesFilter = item.filePath == nil && ColorCodeParser.parseColor(from: item.text) != nil
                 }
 
-                return matchesSearchText && matchesFilter
+                return matchesApp && matchesSearchText && matchesFilter
             }
 
             let sorted = filtered.sorted { item1, item2 in
@@ -132,7 +142,8 @@ struct HistoryWindowView: View {
                         isSearchFieldFocused: _isSearchFieldFocused,
                         clipboardHistoryCount: clipboardManager.clipboardHistory.count,
                         selectedFilter: $selectedFilter,
-                        selectedSort: $selectedSort
+                        selectedSort: $selectedSort,
+                        selectedApp: $selectedApp
                     )
 
                     Spacer(minLength: 0)
@@ -152,6 +163,7 @@ struct HistoryWindowView: View {
                         showLineNumbersInHistoryWindow: showLineNumbersInHistoryWindow,
                         preventWindowCloseOnDoubleClick: preventWindowCloseOnDoubleClick,
                         scrollToTopOnUpdate: scrollToTopOnUpdate,
+                        showCharacterCount: showCharacterCount,
                         lineNumberTextWidth: lineNumberTextWidth,
                         trailingPaddingForLineNumber: trailingPaddingForLineNumber,
                         searchText: searchText,
@@ -186,6 +198,7 @@ struct HistoryWindowView: View {
         }
         .onChange(of: selectedFilter) { _, _ in performUpdate() }
         .onChange(of: selectedSort) { _, _ in performUpdate() }
+        .onChange(of: selectedApp) { _, _ in performUpdate() }
         .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
         .onAppear {
             performUpdate()
@@ -227,7 +240,13 @@ struct HistoryWindowView: View {
                 itemToDelete = nil
             }
         } message: {
-            Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？")
+            if let item = itemToDelete, item.filePath != nil {
+                // ファイルパスがある場合
+                Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。")
+            } else {
+                // ファイルパスがない場合（テキストなど）
+                Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？")
+            }
         }
         .sheet(isPresented: $showQRCodeSheet) {
             if let item = selectedItemForQRCode {
@@ -235,8 +254,9 @@ struct HistoryWindowView: View {
             }
         }
         .sheet(item: $itemForNewPhrase) { item in
-            AddEditPhraseView(mode: .add, initialContent: item.text)
+            AddEditPhraseView(mode: .add, initialContent: item.text, presetManager: presetManager, isSheet: true)
                 .environmentObject(standardPhraseManager)
+                .environmentObject(presetManager)
         }
     }
 }
@@ -244,4 +264,6 @@ struct HistoryWindowView: View {
 #Preview {
     HistoryWindowView()
         .environmentObject(ClipboardManager.shared)
+        .environmentObject(StandardPhraseManager.shared)
+        .environmentObject(StandardPhrasePresetManager.shared)
 }

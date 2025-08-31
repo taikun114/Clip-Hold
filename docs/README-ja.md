@@ -5,19 +5,23 @@
 
 <p align="center">
   <a href="https://github.com/taikun114/Clip-Hold">
-    <img alt="GitHubリポジトリ スター数" src="https://img.shields.io/github/stars/taikun114/Clip-Hold?style=for-the-badge&label=%E3%82%B9%E3%82%BF%E3%83%BC&labelColor=131838&color=f2f4ff" style="border-radius: 8px;">
+    <img alt="GitHubリポジトリ スター数" src="https://img.shields.io/github/stars/taikun114/Clip-Hold?style=for-the-badge&label=%E3%82%B9%E3%82%BF%E3%83%BC&labelColor=131838&color=f2f4ff">
   </a>
   &nbsp;
   <a href="https://github.com/taikun114/Clip-Hold/releases/latest">
-    <img alt="GitHub リリース" src="https://img.shields.io/github/v/release/taikun114/Clip-Hold?sort=semver&display_name=tag&style=for-the-badge&label=%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9&labelColor=131838&color=f2f4ff" style="border-radius: 8px;">
+    <img alt="GitHub リリース" src="https://img.shields.io/github/v/release/taikun114/Clip-Hold?sort=semver&display_name=tag&style=for-the-badge&label=%E3%83%AA%E3%83%AA%E3%83%BC%E3%82%B9&labelColor=131838&color=f2f4ff">
   </a>
   &nbsp;
   <a href="https://github.com/taikun114/Clip-Hold/releases/latest">
-    <img alt="GitHub ダウンロード数（すべてのアセット、すべてのリリース）" src="https://img.shields.io/github/downloads/taikun114/Clip-Hold/total?style=for-the-badge&label=%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E6%95%B0&labelColor=131838&color=f2f4ff" style="border-radius: 8px;">
+    <img alt="GitHub ダウンロード数（すべてのアセット、すべてのリリース）" src="https://img.shields.io/github/downloads/taikun114/Clip-Hold/total?style=for-the-badge&label=%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E6%95%B0&labelColor=131838&color=f2f4ff">
   </a>
 </p>
 
-[![Buy Me a Coffee](images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
+<p align="center">
+  <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
+    <img alt="Buy Me a Coffee" src="images/blue-button.png">
+  </a>
+</p>
 
 ## 目次
 - [Clip Holdとは？](#clip-holdとは)
@@ -27,9 +31,11 @@
 - [機能紹介](#機能紹介)
   - [メニューから定型文と履歴にすぐアクセス](#メニューから定型文と履歴にすぐアクセス)
   - [定型文ウィンドウと履歴ウィンドウ](#定型文ウィンドウと履歴ウィンドウ)
+  - [定型文のプリセットとアプリ割り当て機能](#定型文のプリセットとアプリ割り当て機能)
   - [充実したショートカットキー](#充実したショートカットキー)
   - [クイックペーストですぐにペースト](#クイックペーストですぐにペースト)
   - [インポートとエクスポート機能](#インポートとエクスポート機能)
+  - [コピーしたカラーコードを表示できる](#コピーしたカラーコードを表示できる)
   - [プライバシーもバッチリ](#プライバシーもバッチリ)
     - [履歴に保存されて欲しくない時はいつでも一時停止](#履歴に保存されて欲しくない時はいつでも一時停止)
     - [クリップボード監視からアプリを除外できる](#クリップボード監視からアプリを除外できる)
@@ -44,10 +50,14 @@
     - [PayPal.Me](#paypalme)
 - [クレジット](#クレジット)
   - [Google Gemini by Google](#google-gemini-by-google)
+  - [Gemini CLI by Google](#gemini-cli-by-google)
+  - [Qwen Code by Qwen](#qwen-code-by-qwen)
   - [KeyboardShortcuts by Sindre Sorhus](#keyboardshortcuts-by-sindre-sorhus)
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
 ## Clip Holdとは？
+![定型文とコピー履歴](images/Standard-Phrase-and-History-ja.png)
+
 Clip Holdは、macOS用のクリップボードと定型文マネージャーアプリです。
 
 > [!NOTE]
@@ -83,6 +93,11 @@ Clip Holdはただのクリップボードマネージャーではありませ�
 
 設定したすべての定型文と、保存されたすべての履歴を一覧表示することができます。項目をダブルクリックするだけで簡単にコピーすることができます。
 
+### 定型文のプリセットとアプリ割り当て機能
+![プリセット](images/Presets-ja.png)
+
+定型文をプリセットごとに分けて、開いたアプリによって自動でプリセットを切り替えることができます。プリセットはショートカットキーで切り替えることもできます。
+
 ### 充実したショートカットキー
 ![ショートカットキー](images/Shortcuts-ja.png)
 
@@ -97,6 +112,11 @@ Clip Holdはただのクリップボードマネージャーではありませ�
 ![インポートとエクスポート機能](images/Import-Export-ja.png)
 
 定型文とクリップボード履歴は、インポートしたりエクスポートしたりすることができます。自分がよく使う定型文を誰かと共有したり、他のMacからのクリップボード履歴を読み込んだりすることができます。
+
+### コピーしたカラーコードを表示できる
+![カラーコード](images/Color-Codes-ja.png)
+
+「開発者向け機能」設定から有効化すると、コピーしたカラーコードに基づくカラーアイコンを、履歴ウィンドウとメニューに表示させることができます。
 
 ### プライバシーもバッチリ
 Clip Holdは**ユーザーに関する情報は一切収集しません**。\
@@ -143,7 +163,9 @@ Clip Holdが気に入ったら寄付してくださると嬉しいです。開�
 #### Buy Me a Coffee
 [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_taikun)で緑茶一杯分の金額からサポートしていただけます。
 
-[![Buy Me a Coffee](images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
+<a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
+  <img alt="Buy Me a Coffee" src="images/blue-button.png">
+</a>
 
 #### PayPal\.Me
 PayPalアカウントをお持ちの方は、[**PayPal**](https://paypal.me/taikun114)で直接寄付していただくこともできます。
@@ -151,6 +173,12 @@ PayPalアカウントをお持ちの方は、[**PayPal**](https://paypal.me/taik
 ## クレジット
 ### [Google Gemini](https://gemini.google.com/) by Google
 Clip Holdの開発には、Googleの生成AIであるGoogle Gemini（2.5 Flash）が使用されました。Swiftを含むプログラムの知識が一切ない自分にとって、生成AIの力がなければこのアプリを完成させることはできなかったでしょう。
+
+### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google
+Google Geminiを開発に組み込む際、Gemini CLIが大変役に立ちました。自動でコードファイルを書き換えてビルドし、自動で修正までしてくれるため開発する際の作業量が大幅に減りました。
+
+### [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen
+Clip Hold 1.3.0以降の開発ではGoogle Geminiに加え、AlibabaのAI開発チームであるQwenによって開発されたQwen Codeが使用されました。Qwen Codeでは高度なコーディングモデル（Clip Hold 1.3.0の開発時点ではQwen3 Coder Plus）が利用でき、1日あたり最大2000リクエストまで無料で使用できるという大変寛大な利用制限のおかげで、開発を中断することなく、スムーズに開発し続けることができました。
 
 ### [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) by Sindre Sorhus
 Clip Holdのグローバルショートカットキーの実装にはKeyboardShortcutsパッケージが使用されました。このパッケージのおかげで、非常にスムーズにショートカット機能を実装することができました。

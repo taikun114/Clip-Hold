@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct HistorySearchBar: View {
+    @EnvironmentObject var clipboardManager: ClipboardManager
     @Binding var searchText: String
     @Binding var isLoading: Bool
     @FocusState var isSearchFieldFocused: Bool
@@ -10,6 +11,10 @@ struct HistorySearchBar: View {
 
     @Binding var selectedFilter: ItemFilter
     @Binding var selectedSort: ItemSort
+    @Binding var selectedApp: String?
+    
+    // カラーコードフィルタリング設定のバインディング
+    @AppStorage("enableColorCodeFilter") var enableColorCodeFilter: Bool = false
 
     var body: some View {
         HStack {
@@ -29,7 +34,7 @@ struct HistorySearchBar: View {
             .overlay(
                 HStack {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .padding(.leading, 8)
                         .offset(y: -1.0)
                     Spacer()
@@ -38,7 +43,7 @@ struct HistorySearchBar: View {
                             searchText = ""
                         }) {
                             Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                         .buttonStyle(BorderlessButtonStyle())
                         .padding(.trailing, 8)
@@ -47,12 +52,14 @@ struct HistorySearchBar: View {
             )
             // フィルターボタン
             Menu {
-                ForEach(ItemFilter.allCases) { filter in
+                ForEach(ItemFilter.allCases.filter { 
+                    // colorCodeOnlyは設定がオンの場合のみ表示
+                    $0 != .colorCodeOnly || enableColorCodeFilter
+                }) { filter in
                     Button {
                         selectedFilter = filter
                     } label: {
                         HStack {
-                            // 選択されている場合にのみチェックマークを表示
                             if selectedFilter == filter {
                                 Image(systemName: "checkmark")
                             }
@@ -60,10 +67,47 @@ struct HistorySearchBar: View {
                         }
                     }
                 }
+                
+                if !clipboardManager.appUsageHistory.isEmpty {
+                    Divider()
+                    Menu {
+                        Button {
+                            selectedApp = nil
+                        } label: {
+                            HStack {
+                                if selectedApp == nil {
+                                    Image(systemName: "checkmark")
+                                }
+                                Text("すべてのアプリ")
+                            }
+                        }
+                        
+                        Divider()
+                        
+                        ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { nonLocalizedName, localizedName in
+                            Button {
+                                selectedApp = nonLocalizedName
+                            } label: {
+                                HStack {
+                                    if selectedApp == nonLocalizedName {
+                                        Image(systemName: "checkmark")
+                                    }
+                                    Text(localizedName)
+                                }
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            if selectedApp != nil {
+                                Image(systemName: "checkmark")
+                            }
+                            Text("アプリ")
+                        }
+                    }
+                }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
-                    // フィルターがデフォルト以外の場合はアクセントカラーを適用
-                    .tint(selectedFilter != .all ? .accentColor : .secondary)
+                    .tint(selectedFilter != .all || selectedApp != nil ? .accentColor : .secondary)
                     .contentShape(Rectangle())
             }
             .menuStyle(.borderlessButton)
@@ -99,4 +143,9 @@ struct HistorySearchBar: View {
         .padding(.horizontal, 10)
         .padding(.bottom, 5)
     }
+}
+
+#Preview {
+    HistoryWindowView()
+        .environmentObject(ClipboardManager.shared)
 }

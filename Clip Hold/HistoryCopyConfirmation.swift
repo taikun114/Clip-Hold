@@ -14,7 +14,7 @@ struct HistoryCopyConfirmation: View {
                     
                     Text("コピーしました！")
                         .font(.headline)
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                         .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 0)
                         .padding(.top, 15)
                 }

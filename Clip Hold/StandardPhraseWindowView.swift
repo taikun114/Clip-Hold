@@ -22,6 +22,7 @@ struct StandardPhraseItemRow: View {
     let phrase: StandardPhrase
     let index: Int
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumber: Bool = false
+    @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     @Binding var phraseToDelete: StandardPhrase?
     @Binding var showingDeleteConfirmation: Bool
     @Binding var selectedPhraseID: UUID?
@@ -38,23 +39,45 @@ struct StandardPhraseItemRow: View {
     let trailingPaddingForLineNumber: CGFloat
 
     var body: some View {
-        HStack {
+        // isURLをbodyのトップレベルで定義
+        let isURL: Bool = {
+            guard !phrase.content.isEmpty,
+                  let url = URL(string: phrase.content) else {
+                return false
+            }
+            return url.scheme == "http" || url.scheme == "https"
+        }()
+
+        HStack(spacing: 8) {
             if showLineNumber {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .frame(width: lineNumberTextWidth, alignment: .trailing)
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
+            
+            // アイコン表示ロジック
+            if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
+                ColorCodeIconView(color: color)
+            } else {
+                Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(4)
+                    .frame(width: 30, height: 30)
+                    .foregroundStyle(.secondary)
+            }
+            
             VStack(alignment: .leading) {
                 Text(phrase.title)
-                    .font(.headline)
+                    .font(.body)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                 Text(phrase.content)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
@@ -67,6 +90,14 @@ struct StandardPhraseItemRow: View {
                     showCopyConfirmation = true
                 } label: {
                     Label("コピー", systemImage: "document.on.document")
+                }
+                // 定型文がURLの場合、「リンクを開く」メニューを表示
+                if isURL, let url = URL(string: phrase.content) {
+                    Button {
+                        NSWorkspace.shared.open(url)
+                    } label: {
+                        Label("リンクを開く", systemImage: "paperclip")
+                    }
                 }
                 Divider()
                 Button {
@@ -90,7 +121,7 @@ struct StandardPhraseItemRow: View {
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .imageScale(.large)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
@@ -104,6 +135,7 @@ struct StandardPhraseItemRow: View {
 
 struct StandardPhraseWindowView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
 
     @State private var searchText: String = ""
@@ -124,6 +156,10 @@ struct StandardPhraseWindowView: View {
 
     @FocusState private var isSearchFieldFocused: Bool
 
+    // 新規プリセット追加シート用の状態変数
+    @State private var showingAddPresetSheet = false
+    @State private var newPresetName = ""
+
     private var lineNumberTextWidth: CGFloat? {
         guard showLineNumbers, !filteredPhrases.isEmpty else { return nil }
         
@@ -140,11 +176,12 @@ struct StandardPhraseWindowView: View {
     private let trailingPaddingForLineNumber: CGFloat = 5
 
     private func performSearch(searchTerm: String) {
+        let currentPhrases = presetManager.selectedPreset?.phrases ?? standardPhraseManager.standardPhrases
         let newFilteredPhrases: [StandardPhrase]
         if searchTerm.isEmpty {
-            newFilteredPhrases = standardPhraseManager.standardPhrases
+            newFilteredPhrases = currentPhrases
         } else {
-            newFilteredPhrases = standardPhraseManager.standardPhrases.filter {
+            newFilteredPhrases = currentPhrases.filter {
                 $0.title.localizedCaseInsensitiveContains(searchTerm) ||
                 $0.content.localizedCaseInsensitiveContains(searchTerm)
             }
@@ -155,10 +192,33 @@ struct StandardPhraseWindowView: View {
     private func movePhrases(from source: IndexSet, to destination: Int) {
         // 検索中の場合は並び替えを許可しない
         if searchText.isEmpty {
-            standardPhraseManager.movePhrase(from: source, to: destination)
+            // プリセットが選択されている場合、プリセットの定型文を更新
+            if let selectedPreset = presetManager.selectedPreset {
+                var updatedPreset = selectedPreset
+                updatedPreset.phrases.move(fromOffsets: source, toOffset: destination)
+                presetManager.updatePreset(updatedPreset)
+            } else {
+                // プリセットが選択されていない場合、標準の定型文マネージャーを使用
+                standardPhraseManager.movePhrase(from: source, to: destination)
+            }
         }
     }
-
+    
+    private func displayName(for preset: StandardPhrasePreset) -> String {
+        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+            return String(localized: "Default")
+        }
+        return preset.name
+    }
+    
+    private func displayName(for preset: StandardPhrasePreset?) -> String {
+        guard let preset = preset else {
+            // 選択されているプリセットがない場合
+            return String(localized: "プリセットがありません")
+        }
+        return displayName(for: preset)
+    }
+    
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
             VisualEffectView(material: .menu, blendingMode: .behindWindow)
@@ -183,7 +243,7 @@ struct StandardPhraseWindowView: View {
                         .overlay(
                             HStack {
                                 Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .padding(.leading, 8)
                                     .offset(y: -1.0)
                                 Spacer()
@@ -192,13 +252,52 @@ struct StandardPhraseWindowView: View {
                                         searchText = ""
                                     }) {
                                         Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.secondary)
+                                            .foregroundStyle(.secondary)
                                     }
                                     .buttonStyle(BorderlessButtonStyle())
                                     .padding(.trailing, 8)
                                 }
                             }
                         )
+                        
+                        // プリセット選択メニューを追加
+                        Menu {
+                            ForEach(presetManager.presets) { preset in
+                                Button {
+                                    presetManager.selectedPresetId = preset.id
+                                } label: {
+                                    HStack {
+                                        if presetManager.selectedPresetId == preset.id {
+                                            Image(systemName: "checkmark")
+                                        }
+                                        Text(displayName(for: preset))
+                                    }
+                                }
+                            }
+                            
+                            // プリセットがない場合の項目
+                            if presetManager.presets.isEmpty {
+                                Button {
+                                    // 何もしない
+                                } label: {
+                                    Text(displayName(for: presetManager.selectedPreset))
+                                }
+                                .disabled(true)
+                            }
+                            
+                            Divider()
+                            
+                            Button("新規プリセット...") {
+                                showingAddPresetSheet = true
+                            }
+                        } label: {
+                            Image(systemName: "line.3.horizontal.decrease")
+                                .imageScale(.large)
+                                .foregroundStyle(.secondary)
+                        }
+                        .menuStyle(.borderlessButton)
+                        .frame(width: 30)
+                        .padding(.horizontal, 4)
                     }
                     .padding(.horizontal, 10)
                     .padding(.bottom, 5)
@@ -230,6 +329,9 @@ struct StandardPhraseWindowView: View {
                     .onChange(of: standardPhraseManager.standardPhrases) { _, _ in
                         performSearch(searchTerm: searchText)
                     }
+                    .onChange(of: presetManager.selectedPreset?.phrases) { _, _ in
+                        performSearch(searchTerm: searchText)
+                    }
                     
                     Spacer(minLength: 0)
                     
@@ -238,7 +340,7 @@ struct StandardPhraseWindowView: View {
                             VStack { // VStackで囲み、Spacerで中央に配置
                                 Spacer()
                                 Text("定型文はありません")
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                                     .font(.title2)
                                     .padding(.bottom, 20)
                                 Spacer()
@@ -293,6 +395,16 @@ struct StandardPhraseWindowView: View {
                             .animation(.easeOut(duration: 0.1), value: isLoading)
                             .contextMenu(forSelectionType: StandardPhrase.ID.self, menu: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
+                                    // 定型文がURLかどうかを判定
+                                    let isURL: Bool = {
+                                        guard !currentPhrase.content.isEmpty,
+                                              let url = URL(string: currentPhrase.content) else {
+                                            return false
+                                        }
+                                        // URLスキームがhttpまたはhttpsであることを確認
+                                        return url.scheme == "http" || url.scheme == "https"
+                                    }()
+                                    
                                     Button {
                                         copyToClipboard(currentPhrase.content)
                                         showCopyConfirmation = true
@@ -306,6 +418,14 @@ struct StandardPhraseWindowView: View {
                                         }
                                     } label: {
                                         Label("コピー", systemImage: "document.on.document")
+                                    }
+                                    // 定型文がURLの場合、「リンクを開く」メニューを表示
+                                    if isURL, let url = URL(string: currentPhrase.content) {
+                                        Button {
+                                            NSWorkspace.shared.open(url)
+                                        } label: {
+                                            Label("リンクを開く", systemImage: "paperclip")
+                                        }
                                     }
                                     Divider()
                                     Button {
@@ -368,7 +488,7 @@ struct StandardPhraseWindowView: View {
                         
                         Text("コピーしました！")
                             .font(.headline)
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 0)
                             .padding(.top, 15)
                     }
@@ -395,7 +515,13 @@ struct StandardPhraseWindowView: View {
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation) {
             Button("削除", role: .destructive) {
                 if let phrase = phraseToDelete {
-                    standardPhraseManager.deletePhrase(id: phrase.id)
+                    // プリセットが選択されている場合はプリセットから削除、そうでなければデフォルトから削除
+                    if var selectedPreset = presetManager.selectedPreset {
+                        selectedPreset.phrases.removeAll { $0.id == phrase.id }
+                        presetManager.updatePreset(selectedPreset)
+                    } else {
+                        standardPhraseManager.deletePhrase(id: phrase.id)
+                    }
                     phraseToDelete = nil
                     selectedPhraseID = nil
                 }
@@ -411,9 +537,14 @@ struct StandardPhraseWindowView: View {
                 QRCodeView(text: phrase.content)
             }
         }
-        .sheet(item: $phraseToEdit) { phrase in // phraseToEditがnilでない場合にシートが表示される
-            AddEditPhraseView(mode: .edit(phrase)) // 編集モードで表示し、対象のフレーズを渡す
+        .sheet(item: $phraseToEdit) { phrase in
+            AddEditPhraseView(mode: .edit(phrase), presetManager: presetManager, isSheet: true)
                 .environmentObject(standardPhraseManager)
+                .environmentObject(presetManager)
+        }
+        .sheet(isPresented: $showingAddPresetSheet) {
+            AddEditPresetView(isSheet: true)
+                .environmentObject(presetManager)
         }
         .onAppear {
             performSearch(searchTerm: searchText)
@@ -440,4 +571,5 @@ struct StandardPhraseWindowView: View {
 #Preview {
     StandardPhraseWindowView()
         .environmentObject(StandardPhraseManager.shared)
+        .environmentObject(StandardPhrasePresetManager.shared)
 }

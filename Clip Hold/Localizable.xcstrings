@@ -4,8 +4,58 @@
     "" : {
       "shouldTranslate" : false
     },
+    " - %lld文字" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : " - %lld character"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : " - %lld characters"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : " - %lld文字"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "-" : {
       "shouldTranslate" : false
+    },
+    "\"%@\"の操作を選択してください。%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the operation for “%1$@”. %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\"%1$@\"の操作を選択してください。%2$@"
+          }
+        }
+      }
     },
     "「%@」" : {
       "localizations" : {
@@ -23,18 +73,136 @@
         }
       }
     },
+    "「%@」に切り替わりました。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switched to “%@”."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」に切り替わりました。"
+          }
+        }
+      }
+    },
+    "「%@」のインポートの競合 (%lld/%lld)%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%#@arg3@ for “%1$@” (%2$lld/%3$lld)%4$@"
+          },
+          "substitutions" : {
+            "arg3" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "Import Conflict"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "Import Conflicts"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%1$@」の%#@arg3@ (%2$lld/%3$lld)%4$@"
+          },
+          "substitutions" : {
+            "arg3" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "インポートの競合"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "「%@」は別のプリセット「%@」にすでに割り当てられています。このアプリを割り当てると、「%@」から割り当てが解除されます。アプリを割り当ててもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” is already assigned to another preset “%2$@”. Assigning this app will unassign it from “%3$@”. Are you sure you want to assign this app?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%1$@」は別のプリセット「%2$@」にすでに割り当てられています。このアプリを割り当てると、「%3$@」から割り当てが解除されます。アプリを割り当ててもよろしいですか？"
+          }
+        }
+      }
+    },
     "「%@」を本当に削除しますか？" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to delete “%@” ?"
+            "value" : "Are you sure you want to delete “%@”?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」を本当に削除しますか？"
+          }
+        }
+      }
+    },
+    "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete “%@”? The file will be removed from the history and any other history items associated with this file will also be deleted."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。"
+          }
+        }
+      }
+    },
+    "「%@」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to add “%@” to the Apps to Exclude? You can change the Apps to Exclude in the “Privacy” settings."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。"
           }
         }
       }
@@ -83,6 +251,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@履歴をコピーする"
+          }
+        }
+      }
+    },
+    "%1$@を超える%2$d個のファイル（合計%3$@）がコピーされました。履歴に保存してもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$d files (total %3$@) have been copied that is greater than %1$@. Are you sure you want to save them in the history?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@を超える%2$d個のファイル（合計%3$@）がコピーされました。履歴に保存してもよろしいですか？"
           }
         }
       }
@@ -151,6 +335,40 @@
         }
       }
     },
+    "%lld個のプリセット" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Preset"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Presets"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld個のプリセット"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "%lld個の定型文" : {
       "localizations" : {
         "en" : {
@@ -212,6 +430,40 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld個の履歴"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld文字" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld character"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld characters"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld文字"
                 }
               }
             }
@@ -401,6 +653,22 @@
         }
       }
     },
+    "Default" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デフォルト"
+          }
+        }
+      }
+    },
     "Finderで選択..." : {
       "localizations" : {
         "en" : {
@@ -413,6 +681,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Finderで選択..."
+          }
+        }
+      }
+    },
+    "Gemini CLI by Google" : {
+      "shouldTranslate" : false
+    },
+    "Gemini CLIのGitHubページへのリンクを開きます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to Gemini CLI GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLIのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Gemini CLIのGitHubページを開いてもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Gemini CLI GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLIのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -529,24 +832,24 @@
         }
       }
     },
-    "Google Geminiと開発" : {
+    "Hello, world!" : {
+      "shouldTranslate" : false
+    },
+    "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Developed with Google Gemini"
+            "value" : "When you copy a color code in HEX, HSL / HSLA, or RGB / RGBA format, an icon for that color will be shown in the History / Standard Phrases window and menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Google Geminiと開発"
+            "value" : "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。"
           }
         }
       }
-    },
-    "Hello, world!" : {
-      "shouldTranslate" : false
     },
     "Image File" : {
       "localizations" : {
@@ -789,6 +1092,41 @@
         }
       }
     },
+    "Qwen Code by Qwen" : {
+      "shouldTranslate" : false
+    },
+    "Qwen CodeのGitHubページへのリンクを開きます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to Qwen Code GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen CodeのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "Qwen CodeのGitHubページを開いてもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the Qwen Code GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen CodeのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
     "rd_suffix" : {
       "localizations" : {
         "en" : {
@@ -885,6 +1223,70 @@
         }
       }
     },
+    "アプリ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリ"
+          }
+        }
+      }
+    },
+    "アプリアイコンを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show App Icons"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリアイコンを表示"
+          }
+        }
+      }
+    },
+    "アプリのすべての設定を初期状態に戻します。コピー履歴と定型文は影響を受けません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resets all settings of the app to their defaults. Copy history and standard phrases are not affected."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリのすべての設定を初期状態に戻します。コピー履歴と定型文は影響を受けません。"
+          }
+        }
+      }
+    },
+    "アプリの全ての設定を初期状態に戻してもよろしいですか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to reset all settings of the app to their defaults? This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリの全ての設定を初期状態に戻してもよろしいですか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
     "アラートを表示する容量を設定" : {
       "localizations" : {
         "en" : {
@@ -949,60 +1351,6 @@
         }
       }
     },
-    "インポートの競合 (%lld / %lld)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%#@arg2@ (%1$lld / %2$lld)"
-          },
-          "substitutions" : {
-            "arg2" : {
-              "argNum" : 2,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "one" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "Import Conflict"
-                    }
-                  },
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "Import Conflicts"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%#@arg2@ (%1$lld / %2$lld)"
-          },
-          "substitutions" : {
-            "arg2" : {
-              "argNum" : 2,
-              "formatSpecifier" : "lld",
-              "variations" : {
-                "plural" : {
-                  "other" : {
-                    "stringUnit" : {
-                      "state" : "translated",
-                      "value" : "インポートの競合"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "ウィンドウ操作" : {
       "localizations" : {
         "en" : {
@@ -1031,6 +1379,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エクスポート"
+          }
+        }
+      }
+    },
+    "エクスポートしたいプリセットを選択" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the presets you want to export"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エクスポートしたいプリセットを選択"
           }
         }
       }
@@ -1111,6 +1475,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カスタム..."
+          }
+        }
+      }
+    },
+    "カスタムタイトルを使用する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Custom Title"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタムタイトルを使用する"
+          }
+        }
+      }
+    },
+    "カラーコード" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color Codes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーコード"
+          }
+        }
+      }
+    },
+    "カラーコードでフィルタリングできるようにする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Filtering by Color Codes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーコードでフィルタリングできるようにする"
+          }
+        }
+      }
+    },
+    "カラーコードに基づくカラーアイコンを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show a Color Icon Based on Color Code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーコードに基づくカラーアイコンを表示"
+          }
+        }
+      }
+    },
+    "カラーコードのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color Codes Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラーコードのみ"
           }
         }
       }
@@ -1483,6 +1927,22 @@
         }
       }
     },
+    "このアプリは既に別のプリセットに割り当てられています。上書きしてもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This app is already assigned to another preset. Are you sure you want to override it?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリは既に別のプリセットに割り当てられています。上書きしてもよろしいですか？"
+          }
+        }
+      }
+    },
     "このオプションをオンにすると、テキストのみがクイックペーストの対象となります。" : {
       "localizations" : {
         "en" : {
@@ -1531,6 +1991,70 @@
         }
       }
     },
+    "このプリセットに割り当てられているすべてのアプリをリストから削除しますか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to remove all apps assigned to this preset from the list?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このプリセットに割り当てられているすべてのアプリをリストから削除しますか？"
+          }
+        }
+      }
+    },
+    "このプリセットのすべての割り当てを削除します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove all assignments for this preset."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このプリセットのすべての割り当てを削除します。"
+          }
+        }
+      }
+    },
+    "このプリセットのすべての定型文を削除します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all standard phrases in this preset."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このプリセットのすべての定型文を削除します。"
+          }
+        }
+      }
+    },
+    "このプリセットを本当に削除しますか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete this preset?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このプリセットを本当に削除しますか？"
+          }
+        }
+      }
+    },
     "このまま追加" : {
       "localizations" : {
         "en" : {
@@ -1543,6 +2067,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このまま追加"
+          }
+        }
+      }
+    },
+    "このまま追加する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add as is"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このまま追加する"
+          }
+        }
+      }
+    },
+    "この定型文をインポートしたいプリセットを選択" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the preset you want to import this standard phrases"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この定型文をインポートしたいプリセットを選択"
           }
         }
       }
@@ -1707,6 +2263,22 @@
         }
       }
     },
+    "ショートカットキーで切り替えたときに通知を送信する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send a Notification When Switching with Shortcut Keys"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ショートカットキーで切り替えたときに通知を送信する"
+          }
+        }
+      }
+    },
     "スキップ" : {
       "localizations" : {
         "en" : {
@@ -1719,6 +2291,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スキップ"
+          }
+        }
+      }
+    },
+    "スキップする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキップする"
           }
         }
       }
@@ -1739,6 +2327,54 @@
         }
       }
     },
+    "すでに割り当てられたアプリ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already Assigned App"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すでに割り当てられたアプリ"
+          }
+        }
+      }
+    },
+    "すべて" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて"
+          }
+        }
+      }
+    },
+    "すべて、または特定のプリセットの定型文をJSONファイルとして書き出します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export all or specific preset standard phrases as a JSON file."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて、または特定のプリセットの定型文をJSONファイルとして書き出します。"
+          }
+        }
+      }
+    },
     "すべてスキップ" : {
       "localizations" : {
         "en" : {
@@ -1755,18 +2391,18 @@
         }
       }
     },
-    "すべてのアプリを表示" : {
+    "すべてのアプリ" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show All Apps"
+            "value" : "All Apps"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべてのアプリを表示"
+            "value" : "すべてのアプリ"
           }
         }
       }
@@ -1835,18 +2471,82 @@
         }
       }
     },
-    "すべての定型文をJSONファイルとして書き出します。" : {
+    "すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Export all standard phrases to a JSON file."
+            "value" : "Are you sure you want to delete standard phrases from all presets? This cannot be undone."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべての定型文をJSONファイルとして書き出します。"
+            "value" : "すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
+    "すべてのプリセットを削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのプリセットを削除"
+          }
+        }
+      }
+    },
+    "すべてのプリセットを本当に削除しますか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete all presets? This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのプリセットを本当に削除しますか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
+    "すべてのプロセスを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show All Processes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのプロセスを表示"
+          }
+        }
+      }
+    },
+    "すべての割り当てを削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove All Assignments"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての割り当てを削除"
           }
         }
       }
@@ -1863,22 +2563,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての定型文を削除"
-          }
-        }
-      }
-    },
-    "すべての定型文を本当に削除しますか？この操作は元に戻せません。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Are you sure you want to delete all standard phrases? This cannot be undone."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべての定型文を本当に削除しますか？この操作は元に戻せません。"
           }
         }
       }
@@ -1927,6 +2611,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての競合を処理しました。"
+          }
+        }
+      }
+    },
+    "すべての設定が初期状態に戻りました。変更を完全に適用するにはアプリを再起動してください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All settings have been reset to their defaults. Please restart the app to fully apply the changes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての設定が初期状態に戻りました。変更を完全に適用するにはアプリを再起動してください。"
+          }
+        }
+      }
+    },
+    "すべての設定をリセット" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset All Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての設定をリセット"
           }
         }
       }
@@ -2027,22 +2743,6 @@
         }
       }
     },
-    "タイトルにコンテンツを使用する" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use content as title"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "タイトルにコンテンツを使用する"
-          }
-        }
-      }
-    },
     "ダブルクリック時にウィンドウを閉じない" : {
       "localizations" : {
         "en" : {
@@ -2064,7 +2764,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close the standard phrases window on double click"
+            "value" : "Do not close the Standard Phrases window on double click"
           }
         },
         "ja" : {
@@ -2080,7 +2780,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close the history window on double click"
+            "value" : "Do not close the History window on double click"
           }
         },
         "ja" : {
@@ -2103,6 +2803,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ディスカッションページへのリンクを開きます."
+          }
+        }
+      }
+    },
+    "テキスト" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキスト"
           }
         }
       }
@@ -2155,6 +2871,22 @@
         }
       }
     },
+    "デバッグ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デバッグ"
+          }
+        }
+      }
+    },
     "デフォルトのショートカットに戻します。" : {
       "localizations" : {
         "en" : {
@@ -2167,6 +2899,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "デフォルトのショートカットに戻します。"
+          }
+        }
+      }
+    },
+    "ドキュメントを表示…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Document..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ドキュメントを表示…"
           }
         }
       }
@@ -2475,6 +3223,214 @@
         }
       }
     },
+    "プリセット" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット"
+          }
+        }
+      }
+    },
+    "プリセット: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット: %@"
+          }
+        }
+      }
+    },
+    "プリセット「%@」からすべての定型文を本当に削除しますか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete all standard phrases from the preset “%@”? This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット「%@」からすべての定型文を本当に削除しますか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
+    "プリセットがありません" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットがありません"
+          }
+        }
+      }
+    },
+    "プリセットの削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットの削除"
+          }
+        }
+      }
+    },
+    "プリセットの割り当て" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assign Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットの割り当て"
+          }
+        }
+      }
+    },
+    "プリセットの設定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットの設定"
+          }
+        }
+      }
+    },
+    "プリセットの順番はドラッグアンドドロップで並び替えることができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can drag and drop to change the order of the presets."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットの順番はドラッグアンドドロップで並び替えることができます。"
+          }
+        }
+      }
+    },
+    "プリセットをアプリに割り当てると、そのアプリが最前面の時は、自動で選択されたプリセットに切り替わるようになります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you assign presets to apps, they will automatically switch to the selected preset when the app is on the foreground."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットをアプリに割り当てると、そのアプリが最前面の時は、自動で選択されたプリセットに切り替わるようになります。"
+          }
+        }
+      }
+    },
+    "プリセットを選択" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットを選択"
+          }
+        }
+      }
+    },
+    "プリセット名" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset Name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット名"
+          }
+        }
+      }
+    },
+    "プリセット名を入力" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter Preset Name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット名を入力"
+          }
+        }
+      }
+    },
+    "プリセット名を編集" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Preset Name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセット名を編集"
+          }
+        }
+      }
+    },
     "メール送信画面を開きますか？" : {
       "localizations" : {
         "en" : {
@@ -2651,7 +3607,7 @@
         }
       }
     },
-    "リストが更新されたら最も上にスクロールする" : {
+    "リストが更新されたら最も上にスクロール" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2662,7 +3618,55 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "リストが更新されたら最も上にスクロールする"
+            "value" : "リストが更新されたら最も上にスクロール"
+          }
+        }
+      }
+    },
+    "リセット" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセット"
+          }
+        }
+      }
+    },
+    "リセット..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセット..."
+          }
+        }
+      }
+    },
+    "リセット完了" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Completed"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセット完了"
           }
         }
       }
@@ -2715,18 +3719,18 @@
         }
       }
     },
-    "リンクを開く..." : {
+    "リンクを開く" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Link…"
+            "value" : "Open Link"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "リンクを開く…"
+            "value" : "リンクを開く"
           }
         }
       }
@@ -2743,6 +3747,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ログイン時に開く"
+          }
+        }
+      }
+    },
+    "一つ一つ解決する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolve individually"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一つ一つ解決する"
           }
         }
       }
@@ -2823,6 +3843,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "以下の定型文は既存の項目とタイトルまたは内容が重複しています。\nタイトルまたは内容のどちらかを編集してください。"
+          }
+        }
+      }
+    },
+    "以前の履歴ファイルが使用されています。アップグレード方法はドキュメントをご覧ください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous history ﬁle is used. See documentation for upgrade instructions."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以前の履歴ファイルが使用されています。アップグレード方法はドキュメントをご覧ください。"
+          }
+        }
+      }
+    },
+    "作成" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "作成"
           }
         }
       }
@@ -2939,6 +3991,22 @@
         }
       }
     },
+    "保存先のプリセット:" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save to Preset:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存先のプリセット:"
+          }
+        }
+      }
+    },
     "値を調整" : {
       "localizations" : {
         "en" : {
@@ -3051,6 +4119,70 @@
         }
       }
     },
+    "前のプリセットに切り替える" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch to Previous Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前のプリセットに切り替える"
+          }
+        }
+      }
+    },
+    "割り当てる" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assign"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "割り当てる"
+          }
+        }
+      }
+    },
+    "割り当てるアプリを追加します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add apps to be assigned."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "割り当てるアプリを追加します。"
+          }
+        }
+      }
+    },
+    "割り当てるプリセット" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset to Assign"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "割り当てるプリセット"
+          }
+        }
+      }
+    },
     "動作中" : {
       "localizations" : {
         "en" : {
@@ -3099,6 +4231,38 @@
         }
       }
     },
+    "大容量ファイルの複数コピー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copying Multiple Large Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大容量ファイルの複数コピー"
+          }
+        }
+      }
+    },
+    "完了" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        }
+      }
+    },
     "定型文" : {
       "localizations" : {
         "en" : {
@@ -3131,18 +4295,18 @@
         }
       }
     },
-    "定型文ウィンドウに番号を表示する" : {
+    "定型文ウィンドウに番号を表示" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show numbers in the standard phrases window"
+            "value" : "Show Numbers in the Standard Phrases Window"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "定型文ウィンドウに番号を表示する"
+            "value" : "定型文ウィンドウに番号を表示"
           }
         }
       }
@@ -3152,7 +4316,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the standard phrases window."
+            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the Standard Phrases window."
           }
         },
         "ja" : {
@@ -3168,7 +4332,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show or not show numbers for each item in the standard phrases window."
+            "value" : "Toggle to show or not show numbers for each item in the Standard Phrases window."
           }
         },
         "ja" : {
@@ -3184,7 +4348,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show the standard phrases window always on top"
+            "value" : "Show the Standard Phrases window always on top"
           }
         },
         "ja" : {
@@ -3200,7 +4364,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show the standard phrases window always on top"
+            "value" : "Toggle to show the Standard Phrases window always on top."
           }
         },
         "ja" : {
@@ -3239,6 +4403,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文が設定されていません"
+          }
+        }
+      }
+    },
+    "定型文のインポート" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Standard Phrases"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文のインポート"
+          }
+        }
+      }
+    },
+    "定型文のエクスポート" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Standard Phrases"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文のエクスポート"
           }
         }
       }
@@ -3403,18 +4599,34 @@
         }
       }
     },
-    "履歴ウィンドウに番号を表示する" : {
+    "履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show numbers in the history window"
+            "value" : "Show the character count after the date in the History window and in the menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "履歴ウィンドウに番号を表示する"
+            "value" : "履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウに番号を表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Numbers in the History Window"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウに番号を表示"
           }
         }
       }
@@ -3424,7 +4636,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the history window."
+            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the History window."
           }
         },
         "ja" : {
@@ -3435,12 +4647,44 @@
         }
       }
     },
+    "履歴ウィンドウのフィルタリングオプションに「カラーコードのみ」を追加します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add “Color Codes Only” to the filtering options in the History window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウのフィルタリングオプションに「カラーコードのみ」を追加します。"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle to show or hide the app icon for each item in the History window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。"
+          }
+        }
+      }
+    },
     "履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show or not show numbers for each item in the history window."
+            "value" : "Toggle to show or not show numbers for each item in the History window."
           }
         },
         "ja" : {
@@ -3456,7 +4700,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show the history window always on top"
+            "value" : "Show the History window always on top"
           }
         },
         "ja" : {
@@ -3472,7 +4716,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show the history window always on top"
+            "value" : "Toggle to show the History window always on top."
           }
         },
         "ja" : {
@@ -3607,6 +4851,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴はありません"
+          }
+        }
+      }
+    },
+    "履歴ファイルが最新の形式に正しく変換されました。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History file has been converted to the latest format successfully."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ファイルが最新の形式に正しく変換されました。"
+          }
+        }
+      }
+    },
+    "履歴ファイルのアップグレードに失敗しました" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to Upgrade History File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ファイルのアップグレードに失敗しました"
+          }
+        }
+      }
+    },
+    "履歴ファイルのアップグレードに成功しました" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Successfully Upgraded History File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ファイルのアップグレードに成功しました"
           }
         }
       }
@@ -3771,6 +5063,22 @@
         }
       }
     },
+    "戻る" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戻る"
+          }
+        }
+      }
+    },
     "数値を入力" : {
       "localizations" : {
         "en" : {
@@ -3783,6 +5091,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "数値を入力"
+          }
+        }
+      }
+    },
+    "文字数カウントを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Character Count"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字数カウントを表示"
           }
         }
       }
@@ -3815,6 +5139,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新しいタイトル:"
+          }
+        }
+      }
+    },
+    "新しいプリセットをリストに追加します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a new preset to the list."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいプリセットをリストに追加します。"
+          }
+        }
+      }
+    },
+    "新しいプリセットを追加する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a New Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいプリセットを追加する"
           }
         }
       }
@@ -3899,6 +5255,54 @@
         }
       }
     },
+    "新規プリセット..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Preset..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規プリセット…"
+          }
+        }
+      }
+    },
+    "新規プリセットの作成" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a New Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規プリセットの作成"
+          }
+        }
+      }
+    },
+    "新規プリセットを作成" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a New Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規プリセットを作成"
+          }
+        }
+      }
+    },
     "既存: " : {
       "localizations" : {
         "en" : {
@@ -3927,6 +5331,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "既知のバグ一覧と報告ページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "旧バージョンで使用できるようにする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make it work with older versions"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "旧バージョンで使用できるようにする"
           }
         }
       }
@@ -3979,6 +5399,22 @@
         }
       }
     },
+    "有効にすると、プリセット情報なしで定型文のみをエクスポートします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, only standard phrases are exported without preset information."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有効にすると、プリセット情報なしで定型文のみをエクスポートします。"
+          }
+        }
+      }
+    },
     "権限" : {
       "localizations" : {
         "en" : {
@@ -3995,6 +5431,38 @@
         }
       }
     },
+    "次のプリセットがすでに存在しています。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The following presets already exist."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次のプリセットがすでに存在しています。"
+          }
+        }
+      }
+    },
+    "次のプリセットに切り替える" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch to Next Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次のプリセットに切り替える"
+          }
+        }
+      }
+    },
     "次の容量より大きいファイルコピー時にアラートを表示:" : {
       "localizations" : {
         "en" : {
@@ -4007,6 +5475,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次の容量より大きいファイルコピー時にアラートを表示:"
+          }
+        }
+      }
+    },
+    "次へ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次へ"
           }
         }
       }
@@ -4059,6 +5543,22 @@
         }
       }
     },
+    "生成AIと開発" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developed with Generative AI"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生成AIと開発"
+          }
+        }
+      }
+    },
     "画像のみ" : {
       "localizations" : {
         "en" : {
@@ -4107,7 +5607,7 @@
         }
       }
     },
-    "番号を表示する" : {
+    "番号を表示" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4118,7 +5618,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "番号を表示する"
+            "value" : "番号を表示"
           }
         }
       }
@@ -4135,6 +5635,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "終了"
+          }
+        }
+      }
+    },
+    "統合する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merge"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "統合する"
+          }
+        }
+      }
+    },
+    "続ける" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続ける"
+          }
+        }
+      }
+    },
+    "続けるには操作を選択してください。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select an operation to continue."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "続けるには操作を選択してください。"
           }
         }
       }
@@ -4167,22 +5715,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "緑茶を買ってあげる"
-          }
-        }
-      }
-    },
-    "編集" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編集"
           }
         }
       }
@@ -4395,6 +5927,22 @@
         }
       }
     },
+    "選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete all standard phrases from the selected preset? This cannot be undone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
     "選択したアプリをリストから削除します。" : {
       "localizations" : {
         "en" : {
@@ -4407,6 +5955,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択したアプリをリストから削除します。"
+          }
+        }
+      }
+    },
+    "選択したプリセットをリストから削除します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete a selected preset from the list."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択したプリセットをリストから削除します。"
+          }
+        }
+      }
+    },
+    "選択したプリセットを編集します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit a selected preset."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択したプリセットを編集します。"
           }
         }
       }
@@ -4439,6 +6019,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択した定型文を編集します。"
+          }
+        }
+      }
+    },
+    "重複したプリセット" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate Presets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重複したプリセット"
           }
         }
       }
@@ -4507,6 +6103,22 @@
         }
       }
     },
+    "開発者向け機能" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developer Features"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開発者向け機能"
+          }
+        }
+      }
+    },
     "除外するアプリ" : {
       "localizations" : {
         "en" : {
@@ -4519,6 +6131,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "除外するアプリ"
+          }
+        }
+      }
+    },
+    "除外するアプリに追加" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Apps to Exclude"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外するアプリに追加"
+          }
+        }
+      }
+    },
+    "除外するアプリに追加..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Apps to Exclude…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外するアプリに追加..."
           }
         }
       }

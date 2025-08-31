@@ -8,6 +8,8 @@ class NotificationManager {
     private let monitoringStatusNotificationID = "monitoringStatusNotification"
     private let testNotificationID = "testNotification"
     let clipboardPausedNotificationIdentifier = "clipboardPausedNotification" // 一時停止通知の識別子を定数として定義
+    private let migrationSuccessNotificationID = "migrationSuccessNotification"
+    private let migrationFailureNotificationID = "migrationFailureNotification"
 
     private init() {}
 
@@ -106,6 +108,65 @@ class NotificationManager {
                 print("テスト通知の送信エラー: \(error.localizedDescription)")
             } else {
                 print("テスト通知を送信しました。")
+            }
+        }
+    }
+    
+    // マイグレーション成功通知
+    func sendMigrationSuccessNotification() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [migrationSuccessNotificationID])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [migrationSuccessNotificationID])
+
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "履歴ファイルのアップグレードに成功しました")
+        content.body = String(localized: "履歴ファイルが最新の形式に正しく変換されました。")
+        content.sound = .default // 音を鳴らす
+
+        let request = UNNotificationRequest(identifier: migrationSuccessNotificationID, content: content, trigger: nil)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("マイグレーション成功通知の送信エラー: \(error.localizedDescription)")
+            } else {
+                print("マイグレーション成功通知を送信しました。")
+            }
+        }
+    }
+    
+    // マイグレーション失敗通知
+    func sendMigrationFailureNotification() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [migrationFailureNotificationID])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [migrationFailureNotificationID])
+
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "履歴ファイルのアップグレードに失敗しました")
+        content.body = String(localized: "以前の履歴ファイルが使用されています。アップグレード方法はドキュメントをご覧ください。")
+        content.sound = .default // 音を鳴らす
+        
+        // ドキュメントを開くアクションを追加
+        let openDocumentationAction = UNNotificationAction(
+            identifier: "OPEN_DOCUMENTATION_ACTION",
+            title: String(localized: "ドキュメントを表示…"),
+            options: [.foreground]
+        )
+        
+        let category = UNNotificationCategory(
+            identifier: "MIGRATION_FAILURE_CATEGORY",
+            actions: [openDocumentationAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        
+        UNUserNotificationCenter.current().setNotificationCategories([category])
+        content.categoryIdentifier = "MIGRATION_FAILURE_CATEGORY"
+
+        let request = UNNotificationRequest(identifier: migrationFailureNotificationID, content: content, trigger: nil)
+
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("マイグレーション失敗通知の送信エラー: \(error.localizedDescription)")
+            } else {
+                print("マイグレーション失敗通知を送信しました。")
             }
         }
     }
