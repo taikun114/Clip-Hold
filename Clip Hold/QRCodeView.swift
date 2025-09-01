@@ -44,12 +44,12 @@ struct QRCodeView: View {
                     Text("QRコードの生成に失敗しました。")
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(.red)
+                        .foregroundStyle(.red)
                         .multilineTextAlignment(.center)
                     
                     Text("入力された情報が長すぎるか、無効な文字が含まれている可能性があります。")
                         .font(.body)
-                        .foregroundColor(.red)
+                        .foregroundStyle(.red)
                         .multilineTextAlignment(.center)
                     Spacer()
                 }

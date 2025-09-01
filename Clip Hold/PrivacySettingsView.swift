@@ -65,20 +65,18 @@ struct PrivacySettingsView: View {
 
     private func filterRunningApplications(applications: [NSRunningApplication]) -> [NSRunningApplication] {
         var filteredApps = applications.filter { app in
-            guard let appPath = app.bundleURL?.path else { return false }
+            // activationPolicy == .regular のアプリのみを表示するフィルタリングを追加
+            let isRegularApp = app.activationPolicy == .regular
             
-            let userApplicationsPath = FileManager.default.urls(for: .applicationDirectory, in: .userDomainMask).first?.path ?? ""
-            let localApplicationsPath = "/Applications"
-            let isUserApp = appPath.hasPrefix(userApplicationsPath) || appPath.hasPrefix(localApplicationsPath)
-
             if !showAllRunningApps {
-                return isUserApp
+                return isRegularApp
             }
             
-            return true
+            return isRegularApp
         }
         
         // excludedAppIdentifiers に含まれるアプリを除外
+        // これは showAllRunningApps の状態に関係なく行う
         filteredApps.removeAll { app in
             guard let bundleIdentifier = app.bundleIdentifier else { return false }
             return excludedAppIdentifiers.contains(bundleIdentifier)
@@ -99,7 +97,7 @@ struct PrivacySettingsView: View {
                         Text("クリップボード監視")
                         Text(isClipboardMonitoringPaused ? "一時停止中" : "動作中")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
@@ -122,7 +120,7 @@ struct PrivacySettingsView: View {
                         .font(.headline)
                     Text("一部の機能には、システムの許可が必要です。")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             ) {
@@ -135,7 +133,7 @@ struct PrivacySettingsView: View {
                         Text("通知")
                         Text("通知機能を使用する場合は許可を与える必要があります。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
 
@@ -173,7 +171,7 @@ struct PrivacySettingsView: View {
                         Text("アクセシビリティ")
                         Text("クイックペースト機能を使用する場合は許可を与える必要があります。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
@@ -227,19 +225,23 @@ struct PrivacySettingsView: View {
                                 Text(appName)
                             }
                             .contextMenu {
-                                Button("削除", role: .destructive) {
+                                Button(role: .destructive) {
                                     removeAppFromExclusionList(bundleIdentifier: bundleIdentifier)
                                     selectedExcludedAppId = nil
+                                } label: {
+                                    Label("削除", systemImage: "trash")
                                 }
                             }
                             .tag(bundleIdentifier)
                         } else {
                             Text(bundleIdentifier)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                                 .contextMenu {
-                                    Button("削除", role: .destructive) {
+                                    Button(role: .destructive) {
                                         removeAppFromExclusionList(bundleIdentifier: bundleIdentifier)
                                         selectedExcludedAppId = nil
+                                    } label: {
+                                        Label("削除", systemImage: "trash")
                                     }
                                 }
                                 .tag(bundleIdentifier)
@@ -279,7 +281,7 @@ struct PrivacySettingsView: View {
                                             .font(.headline)
                                         Spacer()
                                         Toggle(isOn: $showAllRunningApps) {
-                                            Text("すべてのアプリを表示")
+                                            Text("すべてのプロセスを表示")
                                         }
                                         .toggleStyle(.checkbox)
                                         .font(.subheadline)
@@ -303,7 +305,7 @@ struct PrivacySettingsView: View {
                                                         Spacer()
                                                         Text(String(describing: app.processIdentifier))
                                                             .font(.caption)
-                                                            .foregroundColor(.secondary)
+                                                            .foregroundStyle(.secondary)
                                                     }
                                                     .contentShape(Rectangle())
                                                 }
@@ -368,7 +370,7 @@ struct PrivacySettingsView: View {
                                     .font(.body)
                                     .fontWeight(.medium)
                                     .frame(width: 24, height: 24)
-                                    .offset(y: -2.0)
+                                    .offset(x: -2.0, y: -2.0)
                                     .contentShape(Rectangle())
                                     .if(!excludedAppIdentifiers.isEmpty) { view in
                                         view.foregroundStyle(.red)
@@ -388,7 +390,7 @@ struct PrivacySettingsView: View {
                     
                     Text("ここに追加したアプリが最前面にあるときはコピー履歴に追加されません。")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.bottom, 4)

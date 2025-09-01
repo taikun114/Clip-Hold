@@ -37,9 +37,11 @@ struct ClipHoldApp: App {
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
+    @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
+    @StateObject var presetManager = StandardPhrasePresetManager.shared
 
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
@@ -85,30 +87,42 @@ struct ClipHoldApp: App {
             set: { self.hideMenuBarExtra = !$0 } // isInserted の変更で hideMenuBarExtra を反転させる
         )
     }
+    
+    private func displayName(for preset: StandardPhrasePreset?) -> String {
+        guard let preset = preset else {
+            // 選択されているプリセットがない場合
+            return String(localized: "プリセットがありません")
+        }
+        return displayName(for: preset)
+    }
+
+    private func displayName(for preset: StandardPhrasePreset) -> String {
+        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+            return String(localized: "Default")
+        }
+        return preset.name
+    }
         
     var body: some Scene {
-        Settings {
-            SettingsView()
-                .frame(width: 500, height: 500)
-                .environmentObject(clipboardManager)
-                .environmentObject(standardPhraseManager)
-        }
-
         MenuBarExtra(
             "Clip Hold", // <- titleKey
             image: isClipboardMonitoringPaused ? "Menubar Icon Dimmed" : "Menubar Icon",
             isInserted: menuBarExtraInsertionBinding
         ) {
             // --- 定型文セクション ---
-            Label("よく使う定型文", systemImage: "star")
-                .font(.headline)
-                .padding(.bottom, 5)
-            
-            if standardPhraseManager.standardPhrases.isEmpty {
+            HStack {
+                Label("よく使う定型文", systemImage: "star")
+                    .font(.headline)
+            }
+            .padding(.bottom, 5)
+                        
+            let phrasesToShow = presetManager.selectedPreset?.phrases ?? []
+            if phrasesToShow.isEmpty {
                 Text("定型文はありません")
             } else {
-                let displayLimit = min(standardPhraseManager.standardPhrases.count, maxPhrasesInMenu)
-                ForEach(standardPhraseManager.standardPhrases.prefix(displayLimit)) { phrase in
+                let displayLimit = min(phrasesToShow.count, maxPhrasesInMenu)
+                ForEach(phrasesToShow.prefix(displayLimit)) {
+                    phrase in
                     let displayText: String = {
                         let displayContent = phrase.title.replacingOccurrences(of: "\n", with: " ")
                         if displayContent.count > 40 {
@@ -147,7 +161,7 @@ struct ClipHoldApp: App {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 16, height: 16)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                             Text(displayText)
                                 .font(.body)
@@ -159,6 +173,60 @@ struct ClipHoldApp: App {
             }
             
             Divider()
+
+            // プリセット選択メニュー
+            Menu {
+                Picker("プリセット", selection: Binding(
+                    get: {
+                        // プリセットが空の場合、特別なUUIDを返す
+                        if presetManager.presets.isEmpty {
+                            return UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+                        }
+                        return presetManager.selectedPresetId
+                    },
+                    set: { newValue in
+                        // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
+                        if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+                            // プリセットがない場合は何もしない
+                            // 選択を元に戻す
+                            if let firstPreset = presetManager.presets.first {
+                                presetManager.selectedPresetId = firstPreset.id
+                            } else {
+                                // まだプリセットがない場合はnilのまま
+                                presetManager.selectedPresetId = nil
+                            }
+                        } else {
+                            presetManager.selectedPresetId = newValue
+                        }
+                    }
+                )) {
+                    ForEach(presetManager.presets) {
+                        preset in
+                        Text(displayName(for: preset)).tag(preset.id as UUID?)
+                    }
+                    
+                    // プリセットがない場合の項目
+                    if presetManager.presets.isEmpty {
+                        Text("プリセットがありません")
+                            .tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
+                    }
+                }
+                .pickerStyle(.inline)
+                
+                Divider()
+                
+                Button("新規プリセット...") {
+                    if let delegate = NSApp.delegate as? AppDelegate {
+                        delegate.showAddPresetWindow()
+                    }
+                }
+            } label: {
+                HStack {
+                    Text("プリセット: \(displayName(for: presetManager.selectedPreset))")
+                    Image(systemName: "line.3.horizontal.decrease")
+                        .foregroundStyle(.secondary)
+                }
+            }
             Button {
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showStandardPhraseWindow()
@@ -177,7 +245,8 @@ struct ClipHoldApp: App {
                 // clipboardHistoryを日付の新しい順にソート
                 let sortedHistory = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
                 let displayLimit = min(sortedHistory.count, maxHistoryInMenu)
-                ForEach(sortedHistory.prefix(displayLimit)) { item in
+                ForEach(sortedHistory.prefix(displayLimit)) {
+                    item in
                     
                     let itemDateFormatter: DateFormatter = {
                         let formatter = DateFormatter()
@@ -189,12 +258,14 @@ struct ClipHoldApp: App {
                     let displayText: String = {
                         var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
                         let dateString = itemDateFormatter.string(from: item.date)
-                                                 
+                        
+                        let characterCountText = showCharacterCount ? String(localized:" - \(item.text.count)文字") : ""
+                        
                         if displayContent.count > 40 {
                             displayContent = String(displayContent.prefix(40)) + "..."
                         }
-                                                 
-                        return "\(displayContent) (\(dateString))"
+                        
+                        return "\(displayContent) (\(dateString)\(characterCountText))"
                     }()
                     
                     Button {
@@ -231,7 +302,7 @@ struct ClipHoldApp: App {
                                     .scaledToFit()
                                     .padding(4)
                                     .frame(width: 16, height: 16)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             } else if let cachedImage = item.cachedThumbnailImage {
                                 Image(nsImage: cachedImage)
                                     .resizable()
@@ -254,14 +325,14 @@ struct ClipHoldApp: App {
                                         .scaledToFit()
                                         .padding(4)
                                         .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                 } else {
                                     Image(systemName: "doc.plaintext")
                                         .resizable()
                                         .scaledToFit()
                                         .padding(4)
                                         .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                        .foregroundColor(.secondary)
+                                        .foregroundStyle(.secondary)
                                 }
                             }
 
@@ -286,13 +357,11 @@ struct ClipHoldApp: App {
             
             Divider()
             
-            SettingsLink {
+            Button(action: {
+                SettingsWindowController.shared.showWindow()
+            }) {
                 Label("設定...", systemImage: "gear")
             }
-            .buttonStyle(.preAction {
-                NSApp.activate(ignoringOtherApps: true)
-            })
-            .keyboardShortcut(",", modifiers: .command)
             
             Divider()
             
@@ -303,6 +372,15 @@ struct ClipHoldApp: App {
         }
         .environmentObject(clipboardManager)
         .environmentObject(standardPhraseManager)
+        .environmentObject(presetManager)
+        .commands {
+            CommandGroup(replacing: .appSettings) {
+                Button("設定...") {
+                    SettingsWindowController.shared.showWindow()
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            }
+        }
     }
     
     static func setupGlobalShortcuts() {
@@ -343,6 +421,70 @@ struct ClipHoldApp: App {
             }
         }
 
+        // 新しいプリセットの追加ショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .addNewPreset) {
+            print("「新しいプリセットを追加」ショートカットが押されました！")
+            if let delegate = NSApp.delegate as? AppDelegate {
+                delegate.showAddPresetWindow()
+            }
+        }
+
+        // 次のプリセットに切り替えるショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .nextPreset) {
+            print("「次のプリセットに切り替える」ショートカットが押されました！")
+            let presetManager = StandardPhrasePresetManager.shared
+            if !presetManager.presets.isEmpty {
+                let currentIndex = presetManager.presets.firstIndex { $0.id == presetManager.selectedPresetId } ?? -1
+                let nextIndex = (currentIndex + 1) % presetManager.presets.count
+                let nextPreset = presetManager.presets[nextIndex]
+                presetManager.selectedPresetId = nextPreset.id
+                
+                // 通知設定がオンの場合、通知を送信
+                if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
+                    let notificationCenter = UNUserNotificationCenter.current()
+                    let content = UNMutableNotificationContent()
+                    content.title = nextPreset.name
+                    content.body = String(localized: "「\(nextPreset.name)」に切り替わりました。")
+                    content.sound = nil // 音なし
+                    
+                    let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
+                    notificationCenter.add(request) { error in
+                        if let error = error {
+                            print("通知の送信に失敗しました: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+        }
+
+        // 前のプリセットに切り替えるショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .previousPreset) {
+            print("「前のプリセットに切り替える」ショートカットが押されました！")
+            let presetManager = StandardPhrasePresetManager.shared
+            if !presetManager.presets.isEmpty {
+                let currentIndex = presetManager.presets.firstIndex { $0.id == presetManager.selectedPresetId } ?? -1
+                let previousIndex = (currentIndex - 1 + presetManager.presets.count) % presetManager.presets.count
+                let previousPreset = presetManager.presets[previousIndex]
+                presetManager.selectedPresetId = previousPreset.id
+                
+                // 通知設定がオンの場合、通知を送信
+                if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
+                    let notificationCenter = UNUserNotificationCenter.current()
+                    let content = UNMutableNotificationContent()
+                    content.title = previousPreset.name
+                    content.body = String(localized: "「\(previousPreset.name)」に切り替わりました。")
+                    content.sound = nil // 音なし
+                    
+                    let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
+                    notificationCenter.add(request) { error in
+                        if let error = error {
+                            print("通知の送信に失敗しました: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            }
+        }
+
         // クリップボードから新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addStandardPhraseFromClipboard) {
             print("「クリップボードから定型文を追加」ショートカットが押されました！")
@@ -356,19 +498,14 @@ struct ClipHoldApp: App {
         for i in 0..<KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts.count {
             let shortcutName = KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts[i]
             KeyboardShortcuts.onKeyDown(for: shortcutName) {
-                // StandardPhraseManager はシングルトンなので、static context からも .shared でアクセス可能
-                let standardPhraseManager = StandardPhraseManager.shared
-
-                if standardPhraseManager.standardPhrases.indices.contains(i) {
-                    let phrase = standardPhraseManager.standardPhrases[i]
+                let presetManager = StandardPhrasePresetManager.shared
+                if let selectedPreset = presetManager.selectedPreset, selectedPreset.phrases.indices.contains(i) {
+                    let phrase = selectedPreset.phrases[i]
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(phrase.content, forType: .string)
                     print("定型文「\(phrase.title)」がショートカットでコピーされました。")
 
-                    // quickPaste の最新の値を取得
                     let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
-                    
-                    // quickPaste がオンの場合、定型文は常にテキストなのでそのままペースト
                     if currentQuickPaste {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                             performPaste() // static メソッドとして呼び出し

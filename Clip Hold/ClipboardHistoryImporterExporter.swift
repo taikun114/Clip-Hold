@@ -54,7 +54,10 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                 let decoder = JSONDecoder()
                 decoder.dateDecodingStrategy = .iso8601
 
-                let importedHistory = try decoder.decode([ClipboardItem].self, from: data)
+                var importedHistory = try decoder.decode([ClipboardItem].self, from: data)
+                
+                // 履歴を古い順に並べ替え
+                importedHistory.sort { $0.date < $1.date }
                 
                 DispatchQueue.main.async {
                     clipboardManager.importHistory(from: importedHistory)

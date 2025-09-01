@@ -54,6 +54,10 @@ class ChunkedHistoryManager: ObservableObject {
         print("ChunkedHistoryManager: Old history file found. Starting migration...")
         
         do {
+            // 既存の新しい履歴を読み込む
+            let existingHistory = loadHistory()
+            let existingItemIds = Set(existingHistory.map { $0.id })
+            
             // 古い履歴ファイルを読み込む
             let data = try Data(contentsOf: oldHistoryFileURL)
             let decoder = JSONDecoder()
@@ -74,8 +78,12 @@ class ChunkedHistoryManager: ObservableObject {
                 }
             }
             
+            // 既存の新しい履歴と古い履歴を統合（重複するアイテムは除外）
+            let newItems = oldHistory.filter { !existingItemIds.contains($0.id) }
+            let mergedHistory = existingHistory + newItems
+            
             // 新しい形式で保存
-            try saveHistoryItems(oldHistory)
+            try saveHistoryItems(mergedHistory)
             
             // 古いファイルをリネーム
             try FileManager.default.moveItem(at: oldHistoryFileURL, to: newHistoryFileURL)
@@ -157,10 +165,36 @@ class ChunkedHistoryManager: ObservableObject {
         print("ChunkedHistoryManager: Saved \(items.count) items to chunk \(chunkIndex).")
     }
     
-    private func saveHistoryItems(_ items: [ClipboardItem]) throws {
-        // 全てのアイテムをチャンクに分割して保存
-        let chunks = stride(from: 0, to: items.count, by: itemsPerChunk).map {
-            Array(items[$0..<Swift.min($0 + itemsPerChunk, items.count)])
+    func saveHistoryItems(_ items: [ClipboardItem]) throws {
+        // 既存のすべてのアイテムを読み込む
+        let existingItems = loadHistory()
+        
+        // 既存のアイテムのIDセットを作成
+        let existingItemIds = Set(existingItems.map { $0.id })
+        
+        // 新しいアイテムの中で、既存のIDと異なるもののみをフィルタリング
+        let newItems = items.filter { !existingItemIds.contains($0.id) }
+        
+        // 既存のアイテムと新しいアイテムを結合
+        var allItems = existingItems + newItems
+        
+        // 日付でソート（古い順）
+        allItems.sort { $0.date < $1.date }
+        
+        // 既存のチャンクファイルをクリア
+        let chunkCount = try getChunkCount()
+        for index in 0..<chunkCount {
+            if let historyFileURL = getHistoryFileURL(for: index), FileManager.default.fileExists(atPath: historyFileURL.path) {
+                try FileManager.default.removeItem(at: historyFileURL)
+            }
+            if let indexFileURL = getHistoryIndexFileURL(for: index), FileManager.default.fileExists(atPath: indexFileURL.path) {
+                try FileManager.default.removeItem(at: indexFileURL)
+            }
+        }
+        
+        // 新しいチャンクを保存
+        let chunks = stride(from: 0, to: allItems.count, by: itemsPerChunk).map {
+            Array(allItems[$0..<Swift.min($0 + itemsPerChunk, allItems.count)])
         }
         
         for (index, chunk) in chunks.enumerated() {
@@ -285,6 +319,9 @@ class ChunkedHistoryManager: ObservableObject {
                 try FileManager.default.removeItem(at: dataDir)
                 print("ChunkedHistoryManager: Cleared all history data.")
             }
+            
+            // ディレクトリを再作成
+            _ = getOrCreateDirectory(historyDataDirectory)
         } catch {
             print("ChunkedHistoryManager: Error clearing all history: \(error.localizedDescription)")
         }

@@ -21,6 +21,24 @@ private struct IconViewAccessor: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
+// sourceAppPathからローカライズされたアプリ名を取得するヘルパー関数
+private func getLocalizedName(for sourceAppPath: String?) -> String? {
+    guard let sourceAppPath = sourceAppPath else { return nil }
+    
+    let appURL = URL(fileURLWithPath: sourceAppPath)
+    let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
+
+    if let appBundle = Bundle(url: appURL) {
+        let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? 
+                     appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? 
+                     appBundle.infoDictionary?["CFBundleName"] as? String ?? 
+                     nonLocalizedName
+        return appName
+    } else {
+        return nonLocalizedName
+    }
+}
+
 private let itemDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .short
@@ -38,6 +56,8 @@ private func formatFileSize(_ byteCount: UInt64) -> String {
 // MARK: - HistoryItemRow
 struct HistoryItemRow: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
+    @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     
     let item: ClipboardItem
     let index: Int
@@ -59,11 +79,16 @@ struct HistoryItemRow: View {
     
     // アイコンビューの参照を格納する辞書へのBinding
     @Binding var rowIconViews: [UUID: NSView]
+    
+    let showCharacterCount: Bool
+    @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
 
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
 
     @State private var iconLoadTask: Task<Void, Never>?
+    @State private var showingExcludeAppAlert = false
+    @State private var appToExclude: String?
 
     init(item: ClipboardItem,
          index: Int,
@@ -78,7 +103,8 @@ struct HistoryItemRow: View {
          itemForNewPhrase: Binding<ClipboardItem?>,
          lineNumberTextWidth: CGFloat?,
          trailingPaddingForLineNumber: CGFloat,
-         rowIconViews: Binding<[UUID: NSView]>) { // initにBindingを追加
+         rowIconViews: Binding<[UUID: NSView]>,
+         showCharacterCount: Bool) { // initにBindingを追加
             
         self.item = item
         self.index = index
@@ -94,6 +120,7 @@ struct HistoryItemRow: View {
         self.lineNumberTextWidth = lineNumberTextWidth
         self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
         self._rowIconViews = rowIconViews // Bindingを初期化
+        self.showCharacterCount = showCharacterCount
     }
 
     private var actionMenuItems: some View {
@@ -106,13 +133,6 @@ struct HistoryItemRow: View {
             } label: {
                 Label("コピー", systemImage: "document.on.document")
             }
-            if item.isURL, let url = URL(string: item.text) {
-                Button {
-                    NSWorkspace.shared.open(url)
-                } label: {
-                    Label("リンクを開く", systemImage: "paperclip")
-                }
-            }
             if let qrContent = item.qrCodeContent {
                 Button {
                     let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil)
@@ -121,6 +141,20 @@ struct HistoryItemRow: View {
                     showCopyConfirmation = true
                 } label: {
                     Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
+                }
+            }
+            if let filePath = item.filePath {
+                Button {
+                    NSWorkspace.shared.open(filePath)
+                } label: {
+                    Label("開く", systemImage: "arrow.up.forward.app")
+                }
+            }
+            if item.isURL, let url = URL(string: item.text) {
+                Button {
+                    NSWorkspace.shared.open(url)
+                } label: {
+                    Label("リンクを開く", systemImage: "paperclip")
                 }
             }
             Divider()
@@ -149,6 +183,15 @@ struct HistoryItemRow: View {
                 }
             }
             Divider()
+            // "除外するアプリに追加..." menu item
+            if let sourceAppPath = item.sourceAppPath {
+                Button {
+                    appToExclude = sourceAppPath
+                    showingExcludeAppAlert = true
+                } label: {
+                    Label("除外するアプリに追加...", systemImage: "hand.raised.circle")
+                }
+            }
             Button(role: .destructive) {
                 itemToDelete = item
                 showingDeleteConfirmation = true
@@ -163,7 +206,7 @@ struct HistoryItemRow: View {
             if showLineNumber {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                     .frame(width: lineNumberTextWidth, alignment: .trailing)
                     .padding(.trailing, trailingPaddingForLineNumber)
             }
@@ -175,8 +218,9 @@ struct HistoryItemRow: View {
                     // カラーコードが解析できた場合、専用のカラーアイコンを表示
                     let baseIconView = ColorCodeIconView(color: color)
                     
-                    // カラーアイコンにもアプリアイコンを表示する
-                    if let sourceAppPath = item.sourceAppPath {
+                    // カラーアイコンにもアプリアイコンを表示する (showAppIconOverlayがtrueの場合のみ)
+                    if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
+                        let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView
                                 .overlay(
@@ -190,6 +234,7 @@ struct HistoryItemRow: View {
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
+                                .help(appName) // ツールチップを追加
                         )
                     } else {
                         return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: $rowIconViews)))
@@ -203,7 +248,7 @@ struct HistoryItemRow: View {
                                             .scaledToFit()
                                             .padding(4)
                                             .frame(width: 30, height: 30)
-                                            .foregroundColor(.secondary))
+                                            .foregroundStyle(.secondary))
                         } else if let cachedIcon = item.cachedThumbnailImage {
                             return AnyView(Image(nsImage: cachedIcon)
                                             .resizable()
@@ -222,19 +267,21 @@ struct HistoryItemRow: View {
                                                 .scaledToFit()
                                                 .padding(4)
                                                 .frame(width: 30, height: 30)
-                                                .foregroundColor(.secondary))
+                                                .foregroundStyle(.secondary))
                             } else {
                                 return AnyView(Image(systemName: "doc.plaintext")
                                                 .resizable()
                                                 .scaledToFit()
                                                 .padding(4)
                                                 .frame(width: 30, height: 30)
-                                                .foregroundColor(.secondary))
+                                                .foregroundStyle(.secondary))
                             }
                         }
                     }()
                     
-                    if let sourceAppPath = item.sourceAppPath {
+                    // アプリアイコンをオーバーレイ表示 (showAppIconOverlayがtrueの場合のみ)
+                    if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
+                        let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView
                                 .overlay(
@@ -248,6 +295,7 @@ struct HistoryItemRow: View {
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
+                                .help(appName) // ツールチップを追加
                         )
                     } else {
                         return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: $rowIconViews)))
@@ -263,9 +311,14 @@ struct HistoryItemRow: View {
                     .lineLimit(1)
                     .font(.body)
                     .truncationMode(.tail)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
                 HStack(spacing: 4) {
                     Text(item.date, formatter: itemDateFormatter)
+                    
+                    if showCharacterCount {
+                        Text("-")
+                        Text("\(item.text.count)文字")
+                    }
                     
                     if let fileSize = item.fileSize, item.filePath != nil {
                         Text("-")
@@ -273,8 +326,9 @@ struct HistoryItemRow: View {
                     }
                 }
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             }
+            .help(item.text) // コンテンツテキスト部分にツールチップを追加
 
             Spacer()
 
@@ -283,7 +337,7 @@ struct HistoryItemRow: View {
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .imageScale(.large)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(.primary)
             }
             .menuStyle(.borderlessButton)
             .fixedSize()
@@ -291,7 +345,6 @@ struct HistoryItemRow: View {
         .padding(.vertical, 4)
         .padding(.leading, 2)
         .contentShape(Rectangle())
-        .help(item.text)
         .onAppear {
             if item.cachedThumbnailImage == nil, let filePath = item.filePath {
                 iconLoadTask?.cancel() // 既存のタスクをキャンセル
@@ -317,6 +370,34 @@ struct HistoryItemRow: View {
         }
         .onDisappear {
             iconLoadTask?.cancel()
+        }
+        .alert(String(localized: "除外するアプリに追加"), isPresented: $showingExcludeAppAlert) {
+            Button("キャンセル", role: .cancel) { }
+            Button("追加") {
+                if let appPath = appToExclude {
+                    // Get the bundle identifier from the app path
+                    let appURL = URL(fileURLWithPath: appPath)
+                    if let appBundle = Bundle(url: appURL),
+                       let bundleIdentifier = appBundle.bundleIdentifier {
+                        // Update the excluded app identifiers in ClipboardManager
+                        var currentExcludedIdentifiers = clipboardManager.excludedAppIdentifiers
+                        if !currentExcludedIdentifiers.contains(bundleIdentifier) {
+                            currentExcludedIdentifiers.append(bundleIdentifier)
+                            clipboardManager.updateExcludedAppIdentifiers(currentExcludedIdentifiers)
+                            
+                            // Also update UserDefaults
+                            if let encoded = try? JSONEncoder().encode(currentExcludedIdentifiers) {
+                                UserDefaults.standard.set(encoded, forKey: "excludedAppIdentifiersData")
+                            }
+                        }
+                    }
+                }
+            }
+        } message: {
+            if let appPath = appToExclude {
+                let appName = getLocalizedName(for: appPath) ?? appPath
+                Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
+            }
         }
     }
 }

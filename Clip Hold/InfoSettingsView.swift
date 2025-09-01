@@ -54,18 +54,18 @@ struct InfoSettingsView: View {
 
                             Text("バージョン: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "N/A"))")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
 
                         Spacer()
 
                         Text("生成AIと開発")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
 
                         Text("Copyright ©︎ 2025 今浦大雅")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
 
                         Spacer()
                     }
@@ -208,7 +208,7 @@ struct InfoSettingsView: View {
                             .font(.body)
                         Text("リポジトリにスターをつけてくれるととてもうれしいです！")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
@@ -245,7 +245,7 @@ struct InfoSettingsView: View {
                             .font(.body)
                         Text("Buy Me a Coffeeで、緑茶一杯分の金額からサポートしていただけます。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
@@ -282,7 +282,7 @@ struct InfoSettingsView: View {
                             .font(.body)
                         Text("PayPalで直接寄付していただくこともできます。")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {

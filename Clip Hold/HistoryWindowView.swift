@@ -9,6 +9,7 @@ import QuickLookThumbnailing
 struct HistoryWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
 
     @State private var searchText: String = ""
@@ -41,6 +42,7 @@ struct HistoryWindowView: View {
     @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
+    @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
     private var lineNumberTextWidth: CGFloat? {
         guard showLineNumbersInHistoryWindow, !filteredHistory.isEmpty else { return nil }
@@ -161,6 +163,7 @@ struct HistoryWindowView: View {
                         showLineNumbersInHistoryWindow: showLineNumbersInHistoryWindow,
                         preventWindowCloseOnDoubleClick: preventWindowCloseOnDoubleClick,
                         scrollToTopOnUpdate: scrollToTopOnUpdate,
+                        showCharacterCount: showCharacterCount,
                         lineNumberTextWidth: lineNumberTextWidth,
                         trailingPaddingForLineNumber: trailingPaddingForLineNumber,
                         searchText: searchText,
@@ -237,7 +240,13 @@ struct HistoryWindowView: View {
                 itemToDelete = nil
             }
         } message: {
-            Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？")
+            if let item = itemToDelete, item.filePath != nil {
+                // ファイルパスがある場合
+                Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。")
+            } else {
+                // ファイルパスがない場合（テキストなど）
+                Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？")
+            }
         }
         .sheet(isPresented: $showQRCodeSheet) {
             if let item = selectedItemForQRCode {
@@ -245,8 +254,9 @@ struct HistoryWindowView: View {
             }
         }
         .sheet(item: $itemForNewPhrase) { item in
-            AddEditPhraseView(mode: .add, initialContent: item.text)
+            AddEditPhraseView(mode: .add, initialContent: item.text, presetManager: presetManager, isSheet: true)
                 .environmentObject(standardPhraseManager)
+                .environmentObject(presetManager)
         }
     }
 }
@@ -254,4 +264,6 @@ struct HistoryWindowView: View {
 #Preview {
     HistoryWindowView()
         .environmentObject(ClipboardManager.shared)
+        .environmentObject(StandardPhraseManager.shared)
+        .environmentObject(StandardPhrasePresetManager.shared)
 }

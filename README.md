@@ -5,19 +5,23 @@
 
 <p align="center">
   <a href="https://github.com/taikun114/Clip-Hold">
-    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/taikun114/Clip-Hold?style=for-the-badge&labelColor=131838&color=f2f4ff" style="border-radius: 8px;">
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/taikun114/Clip-Hold?style=for-the-badge&labelColor=131838&color=f2f4ff">
   </a>
   &nbsp;
   <a href="https://github.com/taikun114/Clip-Hold/releases/latest">
-    <img alt="GitHub Release" src="https://img.shields.io/github/v/release/taikun114/Clip-Hold?sort=semver&display_name=tag&style=for-the-badge&labelColor=131838&color=f2f4ff" style="border-radius: 8px;">
+    <img alt="GitHub Release" src="https://img.shields.io/github/v/release/taikun114/Clip-Hold?sort=semver&display_name=tag&style=for-the-badge&labelColor=131838&color=f2f4ff">
   </a>
   &nbsp;
   <a href="https://github.com/taikun114/Clip-Hold/releases/latest">
-    <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/taikun114/Clip-Hold/total?style=for-the-badge&labelColor=131838&color=f2f4ff" style="border-radius: 8px;">
+    <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/taikun114/Clip-Hold/total?style=for-the-badge&labelColor=131838&color=f2f4ff">
   </a>
 </p>
 
-[![Buy Me a Coffee](docs/images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
+<p align="center">
+  <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
+    <img alt="Buy Me a Coffee" src="docs/images/blue-button.png">
+  </a>
+</p>
 
 ## Table of Contents
 - [What is Clip Hold?](#what-is-clip-hold)
@@ -27,9 +31,11 @@
 - [Introduction of Features](#introduction-of-features)
   - [Quick Access to Standard Phrases and History from the Menu](#quick-access-to-standard-phrases-and-history-from-the-menu)
   - [Standard Phrases Window and History Window](#standard-phrases-window-and-history-window)
+  - [Standard Phrases Presets and Assign to Apps Feature](#standard-phrases-presets-and-assign-to-apps-feature)
   - [Rich Shortcut Keys](#rich-shortcut-keys)
   - [Quickly Paste with Quick Paste](#quickly-paste-with-quick-paste)
   - [Import and Export Features](#import-and-export-features)
+  - [Copied Color Codes Can Be Shown](#copied-color-codes-can-be-shown)
   - [Perfect Privacy](#perfect-privacy)
     - [Pause anytime you do not want it saved in the history](#pause-anytime-you-do-not-want-it-saved-in-the-history)
     - [You can exclude apps from clipboard monitoring](#you-can-exclude-apps-from-clipboard-monitoring)
@@ -44,10 +50,14 @@
     - [PayPal.Me](#paypalme)
 - [Credits](#credits)
   - [Google Gemini by Google](#google-gemini-by-google)
+  - [Gemini CLI by Google](#gemini-cli-by-google)
+  - [Qwen Code by Qwen](#qwen-code-by-qwen)
   - [KeyboardShortcuts by Sindre Sorhus](#keyboardshortcuts-by-sindre-sorhus)
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
 ## What is Clip Hold?
+![Standard Phrases and Copy History](docs/images/Standard-Phrase-and-History.png)
+
 Clip Hold is a clipboard and standard phrase manager app for macOS.
 
 > [!NOTE]
@@ -84,6 +94,11 @@ Frequently used standard phrases and copy history items can be accessed quickly 
 
 You can list all standard phrases you have set and all saved history items. You can easily copy an item by simply double-clicking on it.
 
+### Standard Phrases Presets and Assign to Apps Feature
+![Presets](docs/images/Presets.png)
+
+Standard Phrases can be grouped into different presets, and the presets can be automatically switched depending on the app that is opened. Presets can also be switched using shortcut keys.
+
 ### Rich Shortcut Keys
 ![Shortcut Keys](docs/images/Shortcuts.png)
 
@@ -98,6 +113,11 @@ With the "Quick Paste” feature, when you copy an item from the menu or use a s
 ![Import and Export Features](docs/images/Import-Export.png)
 
 Standard phrases and clipboard history can be imported and exported. You can share your favorite standard phrases with someone else, or import clipboard history from another Mac.
+
+### Copied Color Codes Can Be Shown
+![Color Codes](docs/images/Color-Codes.png)
+
+By enabling it from the “Developer Features” settings, you can show the color icons based on the copied color codes in the history window and the menu.
 
 ### Perfect Privacy
 Clip Hold does **not collect any user-related information**.\
@@ -142,16 +162,24 @@ If you like Clip Hold, I would appreciate a donation. It will motivate me to con
 You can donate using the following services.
 
 #### Buy Me a Coffee
-You can support me at [Buy Me a Coffee](https://www.buymeacoffee.com/i_am_taikun) from the price of a cup of green tea.
+You can support me at [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_taikun) from the price of a cup of green tea.
 
-[![Buy Me a Coffee](docs/images/blue-button.png)](https://www.buymeacoffee.com/i_am_taikun)
+<a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
+  <img alt="Buy Me a Coffee" src="docs/images/blue-button.png">
+</a>
 
 #### PayPal\.Me
-If you have a PayPal account, you can also donate directly at [PayPal](https://paypal.me/taikun114).
+If you have a PayPal account, you can also donate directly at [**PayPal**](https://paypal.me/taikun114).
 
 ## Credits
 ### [Google Gemini](https://gemini.google.com/) by Google
 Clip Hold was developed using Google's generative AI, Google Gemini (2.5 Flash). As I have no knowledge of programming, including Swift, I would not have been able to complete this app without the help of the generative AI.
+
+### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google
+Gemini CLI has been very helpful in integrating Google Gemini into development. It automatically rewrites the code files, builds them, and even fixes them automatically, which has greatly reduced the amount of work I have to do when developing.
+
+### [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen
+In addition to Google Gemini, Clip Hold 1.3.0 and later were developed using Qwen Code, which was developed by Qwen, the Alibaba AI development team. Qwen Code offers an advanced coding model (Qwen3 Coder Plus at the time of development of Clip Hold 1.3.0) and a very generous usage limit of up to 2000 requests per day for free, which allowed me to continue developing smoothly and without interruption.
 
 ### [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) by Sindre Sorhus
 The KeyboardShortcuts package was used to implement the global shortcut keys for Clip Hold. Thanks to this package, I was able to implement the shortcut functionality very smoothly.

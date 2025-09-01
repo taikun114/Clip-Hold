@@ -34,7 +34,7 @@ struct HistorySearchBar: View {
             .overlay(
                 HStack {
                     Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .padding(.leading, 8)
                         .offset(y: -1.0)
                     Spacer()
@@ -43,7 +43,7 @@ struct HistorySearchBar: View {
                             searchText = ""
                         }) {
                             Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                         .buttonStyle(BorderlessButtonStyle())
                         .padding(.trailing, 8)

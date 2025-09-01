@@ -7,7 +7,7 @@ struct StandardPhraseDuplicate: Identifiable {
     var newPhrase: StandardPhrase     // インポートしようとしている新しいフレーズ
     
     // UIの状態を追跡するためのプロパティ
-    var useContentAsTitle: Bool = false // 本文をタイトルとして使うかどうかのフラグ
+    var useCustomTitle: Bool = false // カスタムタイトルを使用するかどうかのフラグ
 
     // タイトルが既存のフレーズと重複しているか
     var hasTitleConflict: Bool {
@@ -17,5 +17,10 @@ struct StandardPhraseDuplicate: Identifiable {
     // 内容が既存のフレーズと重複しているか
     var hasContentConflict: Bool {
         return newPhrase.content == existingPhrase.content
+    }
+    
+    // カスタムタイトルを使用するかどうかの初期値を設定
+    mutating func setInitialUseCustomTitle() {
+        useCustomTitle = newPhrase.title != newPhrase.content
     }
 }
