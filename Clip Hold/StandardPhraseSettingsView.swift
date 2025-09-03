@@ -478,6 +478,9 @@ private struct PhraseSettingsSection: View {
     @State private var showingClearAllPhrasesConfirmation = false
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
+    @State private var showingMoveSheet = false
+    @State private var phraseToMove: StandardPhrase?
+    @State private var destinationPresetId: UUID?
 
     private var currentPhrases: [StandardPhrase] {
         presetManager.selectedPreset?.phrases ?? []
@@ -538,6 +541,15 @@ private struct PhraseSettingsSection: View {
         .sheet(isPresented: $showingAddPhraseSheet) { addSheet }
         .sheet(item: $selectedPhrase) { phrase in editSheet(for: phrase) }
         .sheet(isPresented: $showingAddPresetSheet) { addPresetSheet }
+        .sheet(isPresented: $showingMoveSheet) {
+            if let sourceId = presetManager.selectedPresetId {
+                MovePhrasePresetSelectionSheet(presetManager: StandardPhrasePresetManager.shared, sourcePresetId: sourceId, selectedPresetId: $destinationPresetId) {
+                    if let phrase = phraseToMove, let destinationId = destinationPresetId {
+                        presetManager.move(phrase: phrase, to: destinationId)
+                    }
+                }
+            }
+        }
         .alert("すべての定型文を削除", isPresented: $showingClearAllPhrasesConfirmation) {
             Button("削除", role: .destructive) { deleteAllPhrases() }
         } message: {
@@ -668,6 +680,12 @@ private struct PhraseSettingsSection: View {
             Button("編集...") {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     selectedPhrase = phrase
+                }
+            }
+            Button("別のプリセットに移動...") {
+                if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
+                    phraseToMove = phrase
+                    showingMoveSheet = true
                 }
             }
             Button("複製") {
