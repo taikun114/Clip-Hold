@@ -18,6 +18,13 @@ struct AddEditPhraseView: View {
     @State private var content: String
     @State private var useCustomTitle: Bool = false
     @State private var selectedPresetId: UUID? = nil
+    private func isDefaultPreset(id: UUID?) -> Bool {
+        id?.uuidString == "00000000-0000-0000-0000-000000000000"
+    }
+    
+    private func displayName(for preset: StandardPhrasePreset) -> String {
+        isDefaultPreset(id: preset.id) ? String(localized: "Default") : preset.name
+    }
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
     private var isSheet: Bool = false
@@ -88,7 +95,7 @@ struct AddEditPhraseView: View {
             if case .add = mode {
                 Picker("保存先のプリセット:", selection: $selectedPresetId) {
                     ForEach(presetManager.presets) { preset in
-                        Text(preset.name).tag(Optional(preset.id))
+                        Text(displayName(for: preset)).tag(Optional(preset.id))
                     }
                     Divider()
                     Text("新規プリセット...").tag(Optional.some(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!))
