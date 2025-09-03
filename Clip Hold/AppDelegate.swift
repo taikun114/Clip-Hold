@@ -9,6 +9,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
     var historyWindowController: ClipHoldWindowController?
     var standardPhraseWindowController: ClipHoldWindowController?
+    var settingsWindowController: ClipHoldWindowController?
 
     private var addPhraseWindowController: ClipHoldWindowController?
 
@@ -90,7 +91,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Window Management
 
     func showSettingsWindow() {
-        SettingsWindowController.shared.showWindow()
+        if settingsWindowController == nil || settingsWindowController?.window == nil {
+            let settingsView = SettingsView()
+                .environmentObject(ClipboardManager.shared)
+                .environmentObject(StandardPhraseManager.shared)
+            
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 700, height: 550),
+                styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
+                backing: .buffered,
+                defer: false
+            )
+            window.contentView = NSHostingView(rootView: settingsView)
+            
+            settingsWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: false, windowFrameAutosaveKey: "SettingsWindowFrame")
+            settingsWindowController?.showWindow(nil)
+            
+            NSApp.activate(ignoringOtherApps: true)
+        } else {
+            settingsWindowController?.showWindow(nil)
+            settingsWindowController?.window?.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
 
     @MainActor

@@ -359,7 +359,9 @@ struct ClipHoldApp: App {
             Divider()
             
             Button(action: {
-                SettingsWindowController.shared.showWindow()
+                if let delegate = NSApp.delegate as? AppDelegate {
+                    delegate.showSettingsWindow()
+                }
             }) {
                 Label("設定...", systemImage: "gear")
             }
@@ -377,7 +379,9 @@ struct ClipHoldApp: App {
         .commands {
             CommandGroup(replacing: .appSettings) {
                 Button("設定...") {
-                    SettingsWindowController.shared.showWindow()
+                    if let delegate = NSApp.delegate as? AppDelegate {
+                    delegate.showSettingsWindow()
+                }
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
