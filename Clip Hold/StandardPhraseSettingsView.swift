@@ -670,6 +670,13 @@ private struct PhraseSettingsSection: View {
                     selectedPhrase = phrase
                 }
             }
+            Button("複製") {
+                if let id = selection.first,
+                   let phrase = currentPhrases.first(where: { $0.id == id }),
+                   let selectedPreset = presetManager.selectedPreset {
+                    presetManager.duplicate(phrase: phrase, in: selectedPreset)
+                }
+            }
             Divider()
             Button("削除...", role: .destructive) {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
