@@ -1,6 +1,11 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+## 1.3.1 (under development)
+### New Features
+- **Add the feature to allow drag and drop to copy items in the History and Standard Phrases windows**
+  - You can drag and drop icons shown for each item in the History window, or list items in the Standard Phrases window to copy text or files to the dropped location.
+
 ## 1.3.0
 
 > [!IMPORTANT]
