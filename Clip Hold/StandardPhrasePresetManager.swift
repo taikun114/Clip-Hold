@@ -307,6 +307,26 @@ class StandardPhrasePresetManager: ObservableObject {
             updatePreset(presets[index])
         }
     }
+
+    func move(phrase: StandardPhrase, to destinationPresetId: UUID) {
+        guard let sourcePresetId = selectedPresetId,
+              sourcePresetId != destinationPresetId,
+              var sourcePreset = presets.first(where: { $0.id == sourcePresetId }),
+              var destinationPreset = presets.first(where: { $0.id == destinationPresetId })
+        else {
+            return
+        }
+
+        // Remove from source
+        sourcePreset.phrases.removeAll { $0.id == phrase.id }
+
+        // Add to destination
+        destinationPreset.phrases.append(phrase)
+
+        // Update both presets
+        updatePreset(sourcePreset)
+        updatePreset(destinationPreset)
+    }
     
     /// 存在しないプリセットへのアプリ割り当てをクリーンアップする
     private func cleanupInvalidAssignments() {

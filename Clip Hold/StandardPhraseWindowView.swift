@@ -36,6 +36,9 @@ struct StandardPhraseItemRow: View {
     @Binding var selectedPhraseForQRCode: StandardPhrase?
     @Binding var phraseToEdit: StandardPhrase?
 
+    @Binding var showingMoveSheet: Bool
+    @Binding var phraseToMove: StandardPhrase?
+
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
 
@@ -107,6 +110,12 @@ struct StandardPhraseItemRow: View {
                     Label("編集...", systemImage: "pencil")
                 }
                 Button {
+                    phraseToMove = phrase
+                    showingMoveSheet = true
+                } label: {
+                    Label("別のプリセットに移動...", systemImage: "folder")
+                }
+                Button {
                     if let selectedPreset = presetManager.selectedPreset {
                         presetManager.duplicate(phrase: phrase, in: selectedPreset)
                     }
@@ -158,6 +167,9 @@ struct StandardPhraseWindowView: View {
     @State private var showQRCodeSheet: Bool = false
     @State private var selectedPhraseForQRCode: StandardPhrase?
     @State private var phraseToEdit: StandardPhrase? = nil
+    @State private var showingMoveSheet = false
+    @State private var phraseToMove: StandardPhrase?
+    @State private var destinationPresetId: UUID?
 
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbers: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
@@ -368,6 +380,8 @@ struct StandardPhraseWindowView: View {
                                             showQRCodeSheet: $showQRCodeSheet,
                                             selectedPhraseForQRCode: $selectedPhraseForQRCode,
                                             phraseToEdit: $phraseToEdit,
+                                            showingMoveSheet: $showingMoveSheet,
+                                            phraseToMove: $phraseToMove,
                                             lineNumberTextWidth: lineNumberTextWidth,
                                             trailingPaddingForLineNumber: trailingPaddingForLineNumber
                                         )
@@ -389,6 +403,8 @@ struct StandardPhraseWindowView: View {
                                             showQRCodeSheet: $showQRCodeSheet,
                                             selectedPhraseForQRCode: $selectedPhraseForQRCode,
                                             phraseToEdit: $phraseToEdit,
+                                            showingMoveSheet: $showingMoveSheet,
+                                            phraseToMove: $phraseToMove,
                                             lineNumberTextWidth: lineNumberTextWidth,
                                             trailingPaddingForLineNumber: trailingPaddingForLineNumber
                                         )
@@ -442,6 +458,12 @@ struct StandardPhraseWindowView: View {
                                         phraseToEdit = currentPhrase // 編集対象のフレーズをセット
                                     } label: {
                                         Label("編集...", systemImage: "pencil")
+                                    }
+                                    Button {
+                                        phraseToMove = currentPhrase
+                                        showingMoveSheet = true
+                                    } label: {
+                                        Label("別のプリセットに移動...", systemImage: "folder")
                                     }
                                     Button {
                                         if let selectedPreset = presetManager.selectedPreset {
@@ -562,6 +584,15 @@ struct StandardPhraseWindowView: View {
         .sheet(isPresented: $showingAddPresetSheet) {
             AddEditPresetView(isSheet: true)
                 .environmentObject(presetManager)
+        }
+        .sheet(isPresented: $showingMoveSheet) {
+            if let phrase = phraseToMove, let sourceId = presetManager.selectedPresetId {
+                MovePhrasePresetSelectionSheet(presetManager: presetManager, sourcePresetId: sourceId, selectedPresetId: $destinationPresetId) {
+                    if let destinationId = destinationPresetId {
+                        presetManager.move(phrase: phrase, to: destinationId)
+                    }
+                }
+            }
         }
         .onAppear {
             performSearch(searchTerm: searchText)

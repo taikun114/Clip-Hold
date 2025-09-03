@@ -2103,6 +2103,22 @@
         }
       }
     },
+    "この定型文を移動したいプリセットを選択" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the preset to which you want to move this standard phrase"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この定型文を移動したいプリセットを選択"
+          }
+        }
+      }
+    },
     "この容量より大きいファイルコピー時にアラートを表示" : {
       "localizations" : {
         "en" : {
@@ -4087,6 +4103,38 @@
         }
       }
     },
+    "別のプリセットに移動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to Another Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "別のプリセットに移動"
+          }
+        }
+      }
+    },
+    "別のプリセットに移動..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to Another Preset..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "別のプリセットに移動..."
+          }
+        }
+      }
+    },
     "削除" : {
       "localizations" : {
         "en" : {
@@ -5619,6 +5667,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番号を表示"
+          }
+        }
+      }
+    },
+    "移動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動"
           }
         }
       }
