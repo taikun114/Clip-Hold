@@ -5,6 +5,16 @@
 ### New Features
 - **Add the feature to allow drag and drop to copy items in the History and Standard Phrases windows**
   - You can drag and drop icons shown for each item in the History window, or list items in the Standard Phrases window to copy text or files to the dropped location.
+- **Add the feature to duplicate a standard phrase**
+  - You can duplicate a standard phrase by clicking on “Duplicate” which has been added to the context menu and the action menu (Standard Phrases window only) in the Standard Phrases window or in standard phrases list in the “Standard Phrases Settings” section of the Standard Phrases Settings.
+- **Add the feature to move a standard phrase to another preset**
+  - You can move a standard phrase to another preset by clicking on “Move to Another Preset...” which has been added to the context menu and the action menu (Standard Phrases window only) in the Standard Phrases window or in standard phrases list in the “Standard Phrases Settings” section of the Standard Phrases Settings.
+
+### Bug Fixes and Improvements
+- **Fix issue that the last selected preset is not remembered**
+- **Fix issue that the last position in the settings window is not remembered**
+- **Fix issue that default presets are not localized in some places**
+- **Fix issue that description text was sometimes cut off in import to preset sheet**
 
 ## 1.3.0
 
