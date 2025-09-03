@@ -17,6 +17,7 @@ private func truncateString(_ text: String?, maxLength: Int) -> String {
 
 struct StandardPhraseItemRow: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
     
     let phrase: StandardPhrase
@@ -104,6 +105,13 @@ struct StandardPhraseItemRow: View {
                     phraseToEdit = phrase // 編集対象のフレーズをセット
                 } label: {
                     Label("編集...", systemImage: "pencil")
+                }
+                Button {
+                    if let selectedPreset = presetManager.selectedPreset {
+                        presetManager.duplicate(phrase: phrase, in: selectedPreset)
+                    }
+                } label: {
+                    Label("複製", systemImage: "plus.square.on.square")
                 }
                 Button {
                     selectedPhraseForQRCode = phrase
@@ -434,6 +442,13 @@ struct StandardPhraseWindowView: View {
                                         phraseToEdit = currentPhrase // 編集対象のフレーズをセット
                                     } label: {
                                         Label("編集...", systemImage: "pencil")
+                                    }
+                                    Button {
+                                        if let selectedPreset = presetManager.selectedPreset {
+                                            presetManager.duplicate(phrase: currentPhrase, in: selectedPreset)
+                                        }
+                                    } label: {
+                                        Label("複製", systemImage: "plus.square.on.square")
                                     }
                                     Button {
                                         selectedPhraseForQRCode = currentPhrase

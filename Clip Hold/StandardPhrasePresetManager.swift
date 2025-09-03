@@ -300,6 +300,14 @@ class StandardPhrasePresetManager: ObservableObject {
         }
     }
     
+    func duplicate(phrase: StandardPhrase, in preset: StandardPhrasePreset) {
+        let newPhrase = StandardPhrase(title: phrase.title, content: phrase.content)
+        if let index = presets.firstIndex(where: { $0.id == preset.id }) {
+            presets[index].phrases.append(newPhrase)
+            updatePreset(presets[index])
+        }
+    }
+    
     /// 存在しないプリセットへのアプリ割り当てをクリーンアップする
     private func cleanupInvalidAssignments() {
         let validPresetIds = Set(presets.map { $0.id })

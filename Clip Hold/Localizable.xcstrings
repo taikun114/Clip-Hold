@@ -5751,6 +5751,22 @@
         }
       }
     },
+    "複製" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複製"
+          }
+        }
+      }
+    },
     "設定..." : {
       "localizations" : {
         "en" : {
