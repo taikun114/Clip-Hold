@@ -365,6 +365,7 @@ struct StandardPhraseWindowView: View {
                                         )
                                         .tag(phrase.id)
                                         .listRowBackground(Color.clear)
+                                        .draggable(phrase.content) // テキストをドラッグ可能にする
                                     }
                                     .onMove(perform: movePhrases)
                                 } else {
@@ -385,6 +386,7 @@ struct StandardPhraseWindowView: View {
                                         )
                                         .tag(phrase.id)
                                         .listRowBackground(Color.clear)
+                                        .draggable(phrase.content) // テキストをドラッグ可能にする
                                     }
                                 }
                             }
