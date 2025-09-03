@@ -88,8 +88,15 @@ class StandardPhrasePresetManager: ObservableObject {
         loadSelectedPresetId()
         
         // Ensure a preset is selected if any exist
+        // Only set a default preset if selectedPresetId is nil or the selected preset doesn't exist
         if selectedPresetId == nil || !presets.contains(where: { $0.id == selectedPresetId }) {
-            selectedPresetId = presets.first?.id
+            // Try to select the default preset first
+            if let defaultPreset = presets.first(where: { $0.id == defaultPresetId }) {
+                selectedPresetId = defaultPreset.id
+            } else {
+                // If default preset doesn't exist, select the first available preset
+                selectedPresetId = presets.first?.id
+            }
             saveSelectedPresetId()
         }
     }
@@ -231,7 +238,7 @@ class StandardPhrasePresetManager: ObservableObject {
         }
     }
     
-    private func saveSelectedPresetId() {
+    func saveSelectedPresetId() {
         if let selectedPresetId = selectedPresetId,
            let encodedId = try? JSONEncoder().encode(selectedPresetId) {
             UserDefaults.standard.set(encodedId, forKey: "SelectedStandardPhrasePresetId")

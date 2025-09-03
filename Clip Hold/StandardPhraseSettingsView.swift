@@ -568,6 +568,7 @@ private struct PhraseSettingsSection: View {
                     showingAddPresetSheet = true
                 } else if presetManager.presets.contains(where: { $0.id == newValue }) {
                     presetManager.selectedPresetId = newValue
+                    presetManager.saveSelectedPresetId()
                 }
             }
         )) {

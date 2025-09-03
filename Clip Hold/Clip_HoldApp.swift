@@ -197,6 +197,7 @@ struct ClipHoldApp: App {
                             }
                         } else {
                             presetManager.selectedPresetId = newValue
+                            presetManager.saveSelectedPresetId()
                         }
                     }
                 )) {
@@ -438,6 +439,7 @@ struct ClipHoldApp: App {
                 let nextIndex = (currentIndex + 1) % presetManager.presets.count
                 let nextPreset = presetManager.presets[nextIndex]
                 presetManager.selectedPresetId = nextPreset.id
+                presetManager.saveSelectedPresetId()
                 
                 // 通知設定がオンの場合、通知を送信
                 if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
@@ -466,6 +468,7 @@ struct ClipHoldApp: App {
                 let previousIndex = (currentIndex - 1 + presetManager.presets.count) % presetManager.presets.count
                 let previousPreset = presetManager.presets[previousIndex]
                 presetManager.selectedPresetId = previousPreset.id
+                presetManager.saveSelectedPresetId()
                 
                 // 通知設定がオンの場合、通知を送信
                 if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
