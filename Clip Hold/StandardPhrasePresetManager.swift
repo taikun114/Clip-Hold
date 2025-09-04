@@ -322,9 +322,13 @@ class StandardPhrasePresetManager: ObservableObject {
     
     func duplicate(phrase: StandardPhrase, in preset: StandardPhrasePreset) {
         let newPhrase = StandardPhrase(title: phrase.title, content: phrase.content)
-        if let index = presets.firstIndex(where: { $0.id == preset.id }) {
-            presets[index].phrases.append(newPhrase)
-            updatePreset(presets[index])
+        if let presetIndex = presets.firstIndex(where: { $0.id == preset.id }) {
+            if let phraseIndex = presets[presetIndex].phrases.firstIndex(where: { $0.id == phrase.id }) {
+                presets[presetIndex].phrases.insert(newPhrase, at: phraseIndex + 1)
+            } else {
+                presets[presetIndex].phrases.append(newPhrase) // Fallback
+            }
+            updatePreset(presets[presetIndex])
         }
     }
 
