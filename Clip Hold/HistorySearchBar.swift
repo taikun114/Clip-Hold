@@ -16,6 +16,18 @@ struct HistorySearchBar: View {
     // カラーコードフィルタリング設定のバインディング
     @AppStorage("enableColorCodeFilter") var enableColorCodeFilter: Bool = false
 
+    private func resizedAppIcon(for path: String) -> NSImage {
+        let originalIcon = NSWorkspace.shared.icon(forFile: path)
+        let resizedIcon = NSImage(size: CGSize(width: 16, height: 16))
+        resizedIcon.lockFocus()
+        originalIcon.draw(in: NSRect(origin: .zero, size: CGSize(width: 16, height: 16)),
+                           from: NSRect(origin: .zero, size: originalIcon.size),
+                           operation: .sourceOver,
+                           fraction: 1.0)
+        resizedIcon.unlockFocus()
+        return resizedIcon
+    }
+
     var body: some View {
         HStack {
             TextField(
@@ -71,14 +83,20 @@ struct HistorySearchBar: View {
                 if !clipboardManager.appUsageHistory.isEmpty {
                     Divider()
                     Picker(selection: $selectedApp) {
-                        Text("すべてのアプリ").tag(nil as String?)
+                        Label("すべてのアプリ", systemImage: "app").tag(nil as String?)
                         Divider()
-                        ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { nonLocalizedName, localizedName in
-                            Text(localizedName).tag(nonLocalizedName as String?)
+                        ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { path, localizedName in
+                            Label {
+                                Text(localizedName)
+                            } icon: {
+                                Image(nsImage: resizedAppIcon(for: path))
+                            }
+                            .tag(path as String?)
                         }
                     } label: {
                         Text("アプリ")
                     }
+                    .labelStyle(.titleAndIcon)
                 }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
