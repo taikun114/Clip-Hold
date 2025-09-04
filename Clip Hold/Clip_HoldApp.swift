@@ -224,7 +224,7 @@ struct ClipHoldApp: App {
             } label: {
                 HStack {
                     Text("プリセット: \(displayName(for: presetManager.selectedPreset))")
-                    Image(systemName: "line.3.horizontal.decrease")
+                    Image(systemName: "star.square")
                         .foregroundStyle(.secondary)
                 }
             }

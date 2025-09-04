@@ -305,7 +305,7 @@ struct StandardPhraseWindowView: View {
                                 showingAddPresetSheet = true
                             }
                         } label: {
-                            Image(systemName: "line.3.horizontal.decrease")
+                            Image(systemName: "star.square")
                                 .imageScale(.large)
                                 .foregroundStyle(.secondary)
                         }
