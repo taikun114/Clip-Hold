@@ -9,6 +9,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
     var historyWindowController: ClipHoldWindowController?
     var standardPhraseWindowController: ClipHoldWindowController?
+    var settingsWindowController: SettingsWindowController?
 
     private var addPhraseWindowController: ClipHoldWindowController?
 
@@ -90,7 +91,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Window Management
 
     func showSettingsWindow() {
-        SettingsWindowController.shared.showWindow()
+        if settingsWindowController == nil || settingsWindowController?.window == nil {
+            settingsWindowController = SettingsWindowController()
+            settingsWindowController?.showWindow(nil)
+            
+            NSApp.activate(ignoringOtherApps: true)
+        } else {
+            settingsWindowController?.showWindow(nil)
+            settingsWindowController?.window?.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+        }
     }
 
     @MainActor

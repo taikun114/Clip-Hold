@@ -2103,6 +2103,22 @@
         }
       }
     },
+    "この定型文を移動したいプリセットを選択" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the preset to which you want to move this standard phrase"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この定型文を移動したいプリセットを選択"
+          }
+        }
+      }
+    },
     "この容量より大きいファイルコピー時にアラートを表示" : {
       "localizations" : {
         "en" : {
@@ -3207,6 +3223,22 @@
         }
       }
     },
+    "フィルター" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィルター"
+          }
+        }
+      }
+    },
     "プライバシー" : {
       "localizations" : {
         "en" : {
@@ -3831,6 +3863,22 @@
         }
       }
     },
+    "並び替え" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並び替え"
+          }
+        }
+      }
+    },
     "以下の定型文は既存の項目とタイトルまたは内容が重複しています。\nタイトルまたは内容のどちらかを編集してください。" : {
       "localizations" : {
         "en" : {
@@ -4083,6 +4131,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再開"
+          }
+        }
+      }
+    },
+    "別のプリセットに移動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to Another Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "別のプリセットに移動"
+          }
+        }
+      }
+    },
+    "別のプリセットに移動..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move to Another Preset..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "別のプリセットに移動..."
           }
         }
       }
@@ -5623,6 +5703,22 @@
         }
       }
     },
+    "移動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移動"
+          }
+        }
+      }
+    },
     "終了" : {
       "localizations" : {
         "en" : {
@@ -5747,6 +5843,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示しない"
+          }
+        }
+      }
+    },
+    "複製" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複製"
           }
         }
       }

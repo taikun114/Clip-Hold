@@ -17,6 +17,7 @@ private func truncateString(_ text: String?, maxLength: Int) -> String {
 
 struct StandardPhraseItemRow: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
     
     let phrase: StandardPhrase
@@ -34,6 +35,9 @@ struct StandardPhraseItemRow: View {
     @Binding var showQRCodeSheet: Bool
     @Binding var selectedPhraseForQRCode: StandardPhrase?
     @Binding var phraseToEdit: StandardPhrase?
+
+    @Binding var showingMoveSheet: Bool
+    @Binding var phraseToMove: StandardPhrase?
 
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
@@ -106,6 +110,19 @@ struct StandardPhraseItemRow: View {
                     Label("編集...", systemImage: "pencil")
                 }
                 Button {
+                    phraseToMove = phrase
+                    showingMoveSheet = true
+                } label: {
+                    Label("別のプリセットに移動...", systemImage: "folder")
+                }
+                Button {
+                    if let selectedPreset = presetManager.selectedPreset {
+                        presetManager.duplicate(phrase: phrase, in: selectedPreset)
+                    }
+                } label: {
+                    Label("複製", systemImage: "plus.square.on.square")
+                }
+                Button {
                     selectedPhraseForQRCode = phrase
                     showQRCodeSheet = true
                 } label: {
@@ -151,6 +168,9 @@ struct StandardPhraseWindowView: View {
     @State private var showQRCodeSheet: Bool = false
     @State private var selectedPhraseForQRCode: StandardPhrase?
     @State private var phraseToEdit: StandardPhrase? = nil
+    @State private var showingMoveSheet = false
+    @State private var phraseToMove: StandardPhrase?
+    @State private var destinationPresetId: UUID?
 
     @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbers: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
@@ -270,19 +290,13 @@ struct StandardPhraseWindowView: View {
                         
                         // プリセット選択メニューを追加
                         Menu {
-                            ForEach(presetManager.presets) { preset in
-                                Button {
-                                    presetManager.selectedPresetId = preset.id
-                                } label: {
-                                    HStack {
-                                        if presetManager.selectedPresetId == preset.id {
-                                            Image(systemName: "checkmark")
-                                        }
-                                        Text(displayName(for: preset))
-                                    }
+                            Picker("プリセット", selection: $presetManager.selectedPresetId) {
+                                ForEach(presetManager.presets) { preset in
+                                    Text(displayName(for: preset)).tag(preset.id as UUID?)
                                 }
                             }
-                            
+                            .pickerStyle(.inline)
+
                             // プリセットがない場合の項目
                             if presetManager.presets.isEmpty {
                                 Button {
@@ -299,7 +313,7 @@ struct StandardPhraseWindowView: View {
                                 showingAddPresetSheet = true
                             }
                         } label: {
-                            Image(systemName: "line.3.horizontal.decrease")
+                            Image(systemName: "star.square")
                                 .imageScale(.large)
                                 .foregroundStyle(.secondary)
                         }
@@ -368,11 +382,14 @@ struct StandardPhraseWindowView: View {
                                             showQRCodeSheet: $showQRCodeSheet,
                                             selectedPhraseForQRCode: $selectedPhraseForQRCode,
                                             phraseToEdit: $phraseToEdit,
+                                            showingMoveSheet: $showingMoveSheet,
+                                            phraseToMove: $phraseToMove,
                                             lineNumberTextWidth: lineNumberTextWidth,
                                             trailingPaddingForLineNumber: trailingPaddingForLineNumber
                                         )
                                         .tag(phrase.id)
                                         .listRowBackground(Color.clear)
+                                        .draggable(phrase.content) // テキストをドラッグ可能にする
                                     }
                                     .onMove(perform: movePhrases)
                                 } else {
@@ -388,11 +405,14 @@ struct StandardPhraseWindowView: View {
                                             showQRCodeSheet: $showQRCodeSheet,
                                             selectedPhraseForQRCode: $selectedPhraseForQRCode,
                                             phraseToEdit: $phraseToEdit,
+                                            showingMoveSheet: $showingMoveSheet,
+                                            phraseToMove: $phraseToMove,
                                             lineNumberTextWidth: lineNumberTextWidth,
                                             trailingPaddingForLineNumber: trailingPaddingForLineNumber
                                         )
                                         .tag(phrase.id)
                                         .listRowBackground(Color.clear)
+                                        .draggable(phrase.content) // テキストをドラッグ可能にする
                                     }
                                 }
                             }
@@ -440,6 +460,19 @@ struct StandardPhraseWindowView: View {
                                         phraseToEdit = currentPhrase // 編集対象のフレーズをセット
                                     } label: {
                                         Label("編集...", systemImage: "pencil")
+                                    }
+                                    Button {
+                                        phraseToMove = currentPhrase
+                                        showingMoveSheet = true
+                                    } label: {
+                                        Label("別のプリセットに移動...", systemImage: "folder")
+                                    }
+                                    Button {
+                                        if let selectedPreset = presetManager.selectedPreset {
+                                            presetManager.duplicate(phrase: currentPhrase, in: selectedPreset)
+                                        }
+                                    } label: {
+                                        Label("複製", systemImage: "plus.square.on.square")
                                     }
                                     Button {
                                         selectedPhraseForQRCode = currentPhrase
@@ -553,6 +586,15 @@ struct StandardPhraseWindowView: View {
         .sheet(isPresented: $showingAddPresetSheet) {
             AddEditPresetView(isSheet: true)
                 .environmentObject(presetManager)
+        }
+        .sheet(isPresented: $showingMoveSheet) {
+            if let phrase = phraseToMove, let sourceId = presetManager.selectedPresetId {
+                MovePhrasePresetSelectionSheet(presetManager: presetManager, sourcePresetId: sourceId, selectedPresetId: $destinationPresetId) {
+                    if let destinationId = destinationPresetId {
+                        presetManager.move(phrase: phrase, to: destinationId)
+                    }
+                }
+            }
         }
         .onAppear {
             performSearch(searchTerm: searchText)
