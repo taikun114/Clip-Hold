@@ -300,6 +300,26 @@ class StandardPhrasePresetManager: ObservableObject {
         }
     }
     
+    func duplicatePreset(_ preset: StandardPhrasePreset) {
+        // Create a new preset with a new ID, but same content
+        let newPreset = StandardPhrasePreset(
+            id: UUID(), // New ID
+            name: preset.name, // Keep the same name
+            phrases: preset.phrases // Copy phrases
+        )
+        
+        // Add the new preset to the array
+        if let index = presets.firstIndex(where: { $0.id == preset.id }) {
+            presets.insert(newPreset, at: index + 1)
+        } else {
+            presets.append(newPreset)
+        }
+        
+        // Save the new preset and update the index
+        savePresetToFile(newPreset)
+        savePresetIndex()
+    }
+    
     func duplicate(phrase: StandardPhrase, in preset: StandardPhrasePreset) {
         let newPhrase = StandardPhrase(title: phrase.title, content: phrase.content)
         if let index = presets.firstIndex(where: { $0.id == preset.id }) {

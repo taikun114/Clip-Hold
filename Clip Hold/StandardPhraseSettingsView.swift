@@ -83,6 +83,11 @@ private struct PresetSettingsSection: View {
                         }
                     } label: { Label("編集...", systemImage: "pencil") }
                     .disabled(isDefaultPreset(id: selectedId))
+                    Button {
+                        if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
+                            presetManager.duplicatePreset(preset)
+                        }
+                    } label: { Label("複製", systemImage: "plus.square.on.square") }
                     Divider()
                     Button(role: .destructive) {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
