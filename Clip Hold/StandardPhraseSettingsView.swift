@@ -682,30 +682,38 @@ private struct PhraseSettingsSection: View {
     @ViewBuilder
     private func contextMenuItems(for selection: Set<UUID>) -> some View {
         if !selection.isEmpty {
-            Button("編集...") {
+            Button {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     selectedPhrase = phrase
                 }
+            } label: {
+                Label("編集...", systemImage: "pencil")
             }
-            Button("別のプリセットに移動...") {
+            Button {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     phraseToMove = phrase
                     showingMoveSheet = true
                 }
+            } label: {
+                Label("別のプリセットに移動...", systemImage: "folder")
             }
-            Button("複製") {
+            Button {
                 if let id = selection.first,
                    let phrase = currentPhrases.first(where: { $0.id == id }),
                    let selectedPreset = presetManager.selectedPreset {
                     presetManager.duplicate(phrase: phrase, in: selectedPreset)
                 }
+            } label: {
+                Label("複製", systemImage: "plus.square.on.square")
             }
             Divider()
-            Button("削除...", role: .destructive) {
+            Button(role: .destructive) {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     phraseToDelete = phrase
                     showingDeleteConfirmation = true
                 }
+            } label: {
+                Label("削除...", systemImage: "trash")
             }
         }
     }
