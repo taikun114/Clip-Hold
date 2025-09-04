@@ -282,19 +282,13 @@ struct StandardPhraseWindowView: View {
                         
                         // プリセット選択メニューを追加
                         Menu {
-                            ForEach(presetManager.presets) { preset in
-                                Button {
-                                    presetManager.selectedPresetId = preset.id
-                                } label: {
-                                    HStack {
-                                        if presetManager.selectedPresetId == preset.id {
-                                            Image(systemName: "checkmark")
-                                        }
-                                        Text(displayName(for: preset))
-                                    }
+                            Picker("プリセット", selection: $presetManager.selectedPresetId) {
+                                ForEach(presetManager.presets) { preset in
+                                    Text(displayName(for: preset)).tag(preset.id as UUID?)
                                 }
                             }
-                            
+                            .pickerStyle(.inline)
+
                             // プリセットがない場合の項目
                             if presetManager.presets.isEmpty {
                                 Button {
