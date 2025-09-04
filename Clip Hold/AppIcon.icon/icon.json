@@ -1,117 +1,181 @@
 {
   "fill" : {
     "linear-gradient" : [
-      "srgb:0.55528,0.64543,0.87099,1.00000",
-      "srgb:0.20411,0.34060,0.60315,1.00000"
+      "srgb:0.55907,0.67282,0.91445,1.00000",
+      "srgb:0.22301,0.35357,0.63189,1.00000"
     ]
   },
   "groups" : [
     {
+      "blend-mode-specializations" : [
+        {
+          "appearance" : "dark",
+          "value" : "normal"
+        }
+      ],
       "blur-material" : 0.5,
       "layers" : [
         {
-          "blend-mode-specializations" : [
+          "fill-specializations" : [
             {
-              "appearance" : "tinted",
-              "value" : "normal"
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "srgb:0.80392,0.85882,0.94902,1.00000"
+              }
             }
           ],
+          "glass" : true,
+          "image-name" : "h_Top.png",
+          "name" : "h_Top"
+        }
+      ],
+      "position" : {
+        "scale" : 0.5,
+        "translation-in-points" : [
+          -8,
+          0
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "specular" : true,
+      "translucency-specializations" : [
+        {
+          "value" : {
+            "enabled" : true,
+            "value" : 0.5
+          }
+        },
+        {
+          "appearance" : "dark",
+          "value" : {
+            "enabled" : true,
+            "value" : 0.6
+          }
+        }
+      ]
+    },
+    {
+      "blend-mode-specializations" : [
+        {
+          "appearance" : "dark",
+          "value" : "normal"
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "normal"
+        }
+      ],
+      "blur-material" : 0.5,
+      "layers" : [
+        {
           "fill-specializations" : [
             {
               "appearance" : "dark",
               "value" : {
                 "linear-gradient" : [
-                  "srgb:0.59947,0.70771,1.00000,1.00000",
-                  "srgb:0.03377,0.33388,1.00000,1.00000"
+                  "srgb:0.55729,0.72746,1.00000,1.00000",
+                  "srgb:0.00000,0.27367,1.00000,1.00000"
                 ]
               }
-            },
-            {
-              "appearance" : "tinted",
-              "value" : {
-                "solid" : "srgb:1.00000,1.00000,1.00000,1.00000"
-              }
             }
           ],
-          "image-name" : "Clip@2x.png",
-          "name" : "Clip@2x",
-          "opacity-specializations" : [
-            {
-              "appearance" : "tinted",
-              "value" : 0.5
-            }
-          ],
-          "position" : {
-            "scale" : 1.15,
-            "translation-in-points" : [
-              0,
-              0
-            ]
-          }
+          "image-name" : "Clip.png",
+          "name" : "Clip"
         }
       ],
       "position" : {
-        "scale" : 1,
+        "scale" : 0.5,
         "translation-in-points" : [
-          0,
+          -8,
           0
         ]
       },
-      "shadow" : {
-        "kind" : "layer-color",
-        "opacity" : 0.5
-      },
-      "specular" : true,
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.5
-      }
+      "shadow-specializations" : [
+        {
+          "value" : {
+            "kind" : "layer-color",
+            "opacity" : 0.5
+          }
+        },
+        {
+          "appearance" : "tinted",
+          "value" : {
+            "kind" : "neutral",
+            "opacity" : 1
+          }
+        }
+      ],
+      "translucency-specializations" : [
+        {
+          "value" : {
+            "enabled" : true,
+            "value" : 0.75
+          }
+        },
+        {
+          "appearance" : "dark",
+          "value" : {
+            "enabled" : true,
+            "value" : 0.5
+          }
+        },
+        {
+          "appearance" : "tinted",
+          "value" : {
+            "enabled" : true,
+            "value" : 0.5
+          }
+        }
+      ]
     },
     {
-      "blur-material" : 0.5,
       "layers" : [
         {
-          "blend-mode-specializations" : [
-            {
-              "appearance" : "tinted",
-              "value" : "normal"
-            }
-          ],
           "fill-specializations" : [
             {
               "appearance" : "dark",
               "value" : {
-                "solid" : "srgb:0.72757,0.78010,0.86588,1.00000"
+                "solid" : "srgb:0.80534,0.85861,0.94902,1.00000"
               }
             },
             {
               "appearance" : "tinted",
-              "value" : {
-                "solid" : "srgb:1.00000,1.00000,1.00000,1.00000"
-              }
+              "value" : "automatic"
             }
           ],
-          "hidden" : false,
-          "image-name" : "h@2x.png",
-          "name" : "h@2x",
-          "position" : {
-            "scale" : 1.15,
-            "translation-in-points" : [
-              0,
-              0
-            ]
-          }
+          "image-name" : "h_Bottom.png",
+          "name" : "h_Bottom"
         }
       ],
-      "lighting" : "individual",
+      "position" : {
+        "scale" : 0.5,
+        "translation-in-points" : [
+          -8,
+          0
+        ]
+      },
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.5
       },
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.5
-      }
+      "translucency-specializations" : [
+        {
+          "value" : {
+            "enabled" : true,
+            "value" : 0.5
+          }
+        },
+        {
+          "appearance" : "dark",
+          "value" : {
+            "enabled" : true,
+            "value" : 0.6
+          }
+        }
+      ]
     }
   ],
   "supported-platforms" : {
