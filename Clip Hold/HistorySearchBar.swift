@@ -70,39 +70,14 @@ struct HistorySearchBar: View {
                 
                 if !clipboardManager.appUsageHistory.isEmpty {
                     Divider()
-                    Menu {
-                        Button {
-                            selectedApp = nil
-                        } label: {
-                            HStack {
-                                if selectedApp == nil {
-                                    Image(systemName: "checkmark")
-                                }
-                                Text("すべてのアプリ")
-                            }
-                        }
-                        
+                    Picker(selection: $selectedApp) {
+                        Text("すべてのアプリ").tag(nil as String?)
                         Divider()
-                        
                         ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { nonLocalizedName, localizedName in
-                            Button {
-                                selectedApp = nonLocalizedName
-                            } label: {
-                                HStack {
-                                    if selectedApp == nonLocalizedName {
-                                        Image(systemName: "checkmark")
-                                    }
-                                    Text(localizedName)
-                                }
-                            }
+                            Text(localizedName).tag(nonLocalizedName as String?)
                         }
                     } label: {
-                        HStack {
-                            if selectedApp != nil {
-                                Image(systemName: "checkmark")
-                            }
-                            Text("アプリ")
-                        }
+                        Text("アプリ")
                     }
                 }
             } label: {
