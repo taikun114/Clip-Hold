@@ -3223,6 +3223,22 @@
         }
       }
     },
+    "フィルター" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィルター"
+          }
+        }
+      }
+    },
     "プライバシー" : {
       "localizations" : {
         "en" : {
@@ -3843,6 +3859,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一部の機能には、システムの許可が必要です。"
+          }
+        }
+      }
+    },
+    "並び替え" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並び替え"
           }
         }
       }

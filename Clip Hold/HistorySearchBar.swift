@@ -64,21 +64,15 @@ struct HistorySearchBar: View {
             )
             // フィルターボタン
             Menu {
-                ForEach(ItemFilter.allCases.filter { 
-                    // colorCodeOnlyは設定がオンの場合のみ表示
-                    $0 != .colorCodeOnly || enableColorCodeFilter
-                }) { filter in
-                    Button {
-                        selectedFilter = filter
-                    } label: {
-                        HStack {
-                            if selectedFilter == filter {
-                                Image(systemName: "checkmark")
-                            }
-                            Text(filter.displayName)
-                        }
+                Picker("フィルター", selection: $selectedFilter) {
+                    ForEach(ItemFilter.allCases.filter {
+                        // colorCodeOnlyは設定がオンの場合のみ表示
+                        $0 != .colorCodeOnly || enableColorCodeFilter
+                    }) { filter in
+                        Text(filter.displayName).tag(filter)
                     }
                 }
+                .pickerStyle(.inline)
                 
                 if !clipboardManager.appUsageHistory.isEmpty {
                     Divider()
@@ -109,19 +103,12 @@ struct HistorySearchBar: View {
 
             // 並び替えボタン
             Menu {
-                ForEach(ItemSort.allCases) { sort in
-                    Button {
-                        selectedSort = sort
-                    } label: {
-                        HStack {
-                            // 選択されている場合にのみチェックマークを表示
-                            if selectedSort == sort {
-                                Image(systemName: "checkmark")
-                            }
-                            Text(sort.displayName)
-                        }
+                Picker("並び替え", selection: $selectedSort) {
+                    ForEach(ItemSort.allCases, id: \.self) { sort in
+                        Text(sort.displayName).tag(sort)
                     }
                 }
+                .pickerStyle(.inline)
             } label: {
                 Image(systemName: "arrow.up.arrow.down")
                     // 並び替えがデフォルト以外の場合はアクセントカラーを適用
