@@ -7,6 +7,8 @@
   - You can drag and drop icons shown for each item in the History window, or list items in the Standard Phrases window to copy text or files to the dropped location.
 - **Add the feature to duplicate a standard phrase**
   - You can duplicate a standard phrase by clicking on “Duplicate” which has been added to the context menu and the action menu (Standard Phrases window only) in the Standard Phrases window or in standard phrases list in the “Standard Phrases Settings” section of the Standard Phrases Settings.
+- **Add the feature to duplicate a preset**
+  - You can duplicate a preset by clicking on “Duplicate” which has been added to the context menu in the preset list in the “Preset Settings” section of the Standard Phrases Settings.
 - **Add the feature to move a standard phrase to another preset**
   - You can move a standard phrase to another preset by clicking on “Move to Another Preset...” which has been added to the context menu and the action menu (Standard Phrases window only) in the Standard Phrases window or in standard phrases list in the “Standard Phrases Settings” section of the Standard Phrases Settings.
 
@@ -15,6 +17,11 @@
 - **Fix issue that the last position in the settings window is not remembered**
 - **Fix issue that default presets are not localized in some places**
 - **Fix issue that description text was sometimes cut off in import to preset sheet**
+- **Fix issue that some of the context menus in the Standard Phrases Settings did not have icons**
+- **Add app icons to the app picker in the filtering options in the History window**
+- **Change the filtering and sorting buttons in the History window and the preset button in the Standard Phrases window to a picker**
+- **Change preset icons to `star.square`**
+  - The icon has been changed in the Standard Phrases window and in the menu so you can recognize the preset feature at a glance.
 
 ## 1.3.0
 
