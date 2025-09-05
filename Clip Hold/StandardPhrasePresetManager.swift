@@ -88,8 +88,15 @@ class StandardPhrasePresetManager: ObservableObject {
         loadSelectedPresetId()
         
         // Ensure a preset is selected if any exist
+        // Only set a default preset if selectedPresetId is nil or the selected preset doesn't exist
         if selectedPresetId == nil || !presets.contains(where: { $0.id == selectedPresetId }) {
-            selectedPresetId = presets.first?.id
+            // Try to select the default preset first
+            if let defaultPreset = presets.first(where: { $0.id == defaultPresetId }) {
+                selectedPresetId = defaultPreset.id
+            } else {
+                // If default preset doesn't exist, select the first available preset
+                selectedPresetId = presets.first?.id
+            }
             saveSelectedPresetId()
         }
     }
@@ -231,7 +238,7 @@ class StandardPhrasePresetManager: ObservableObject {
         }
     }
     
-    private func saveSelectedPresetId() {
+    func saveSelectedPresetId() {
         if let selectedPresetId = selectedPresetId,
            let encodedId = try? JSONEncoder().encode(selectedPresetId) {
             UserDefaults.standard.set(encodedId, forKey: "SelectedStandardPhrasePresetId")
@@ -291,6 +298,58 @@ class StandardPhrasePresetManager: ObservableObject {
             savePresetToFile(preset)
             savePresetIndex()
         }
+    }
+    
+    func duplicatePreset(_ preset: StandardPhrasePreset) {
+        // Create a new preset with a new ID, but same content
+        let newPreset = StandardPhrasePreset(
+            id: UUID(), // New ID
+            name: preset.name, // Keep the same name
+            phrases: preset.phrases // Copy phrases
+        )
+        
+        // Add the new preset to the array
+        if let index = presets.firstIndex(where: { $0.id == preset.id }) {
+            presets.insert(newPreset, at: index + 1)
+        } else {
+            presets.append(newPreset)
+        }
+        
+        // Save the new preset and update the index
+        savePresetToFile(newPreset)
+        savePresetIndex()
+    }
+    
+    func duplicate(phrase: StandardPhrase, in preset: StandardPhrasePreset) {
+        let newPhrase = StandardPhrase(title: phrase.title, content: phrase.content)
+        if let presetIndex = presets.firstIndex(where: { $0.id == preset.id }) {
+            if let phraseIndex = presets[presetIndex].phrases.firstIndex(where: { $0.id == phrase.id }) {
+                presets[presetIndex].phrases.insert(newPhrase, at: phraseIndex + 1)
+            } else {
+                presets[presetIndex].phrases.append(newPhrase) // Fallback
+            }
+            updatePreset(presets[presetIndex])
+        }
+    }
+
+    func move(phrase: StandardPhrase, to destinationPresetId: UUID) {
+        guard let sourcePresetId = selectedPresetId,
+              sourcePresetId != destinationPresetId,
+              var sourcePreset = presets.first(where: { $0.id == sourcePresetId }),
+              var destinationPreset = presets.first(where: { $0.id == destinationPresetId })
+        else {
+            return
+        }
+
+        // Remove from source
+        sourcePreset.phrases.removeAll { $0.id == phrase.id }
+
+        // Add to destination
+        destinationPreset.phrases.append(phrase)
+
+        // Update both presets
+        updatePreset(sourcePreset)
+        updatePreset(destinationPreset)
     }
     
     /// 存在しないプリセットへのアプリ割り当てをクリーンアップする

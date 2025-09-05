@@ -83,6 +83,11 @@ private struct PresetSettingsSection: View {
                         }
                     } label: { Label("編集...", systemImage: "pencil") }
                     .disabled(isDefaultPreset(id: selectedId))
+                    Button {
+                        if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
+                            presetManager.duplicatePreset(preset)
+                        }
+                    } label: { Label("複製", systemImage: "plus.square.on.square") }
                     Divider()
                     Button(role: .destructive) {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
@@ -478,6 +483,9 @@ private struct PhraseSettingsSection: View {
     @State private var showingClearAllPhrasesConfirmation = false
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
+    @State private var showingMoveSheet = false
+    @State private var phraseToMove: StandardPhrase?
+    @State private var destinationPresetId: UUID?
 
     private var currentPhrases: [StandardPhrase] {
         presetManager.selectedPreset?.phrases ?? []
@@ -538,6 +546,15 @@ private struct PhraseSettingsSection: View {
         .sheet(isPresented: $showingAddPhraseSheet) { addSheet }
         .sheet(item: $selectedPhrase) { phrase in editSheet(for: phrase) }
         .sheet(isPresented: $showingAddPresetSheet) { addPresetSheet }
+        .sheet(isPresented: $showingMoveSheet) {
+            if let sourceId = presetManager.selectedPresetId {
+                MovePhrasePresetSelectionSheet(presetManager: StandardPhrasePresetManager.shared, sourcePresetId: sourceId, selectedPresetId: $destinationPresetId) {
+                    if let phrase = phraseToMove, let destinationId = destinationPresetId {
+                        presetManager.move(phrase: phrase, to: destinationId)
+                    }
+                }
+            }
+        }
         .alert("すべての定型文を削除", isPresented: $showingClearAllPhrasesConfirmation) {
             Button("削除", role: .destructive) { deleteAllPhrases() }
         } message: {
@@ -568,6 +585,7 @@ private struct PhraseSettingsSection: View {
                     showingAddPresetSheet = true
                 } else if presetManager.presets.contains(where: { $0.id == newValue }) {
                     presetManager.selectedPresetId = newValue
+                    presetManager.saveSelectedPresetId()
                 }
             }
         )) {
@@ -664,17 +682,38 @@ private struct PhraseSettingsSection: View {
     @ViewBuilder
     private func contextMenuItems(for selection: Set<UUID>) -> some View {
         if !selection.isEmpty {
-            Button("編集...") {
+            Button {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     selectedPhrase = phrase
                 }
+            } label: {
+                Label("編集...", systemImage: "pencil")
+            }
+            Button {
+                if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
+                    phraseToMove = phrase
+                    showingMoveSheet = true
+                }
+            } label: {
+                Label("別のプリセットに移動...", systemImage: "folder")
+            }
+            Button {
+                if let id = selection.first,
+                   let phrase = currentPhrases.first(where: { $0.id == id }),
+                   let selectedPreset = presetManager.selectedPreset {
+                    presetManager.duplicate(phrase: phrase, in: selectedPreset)
+                }
+            } label: {
+                Label("複製", systemImage: "plus.square.on.square")
             }
             Divider()
-            Button("削除...", role: .destructive) {
+            Button(role: .destructive) {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     phraseToDelete = phrase
                     showingDeleteConfirmation = true
                 }
+            } label: {
+                Label("削除...", systemImage: "trash")
             }
         }
     }

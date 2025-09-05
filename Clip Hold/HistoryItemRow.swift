@@ -305,6 +305,14 @@ struct HistoryItemRow: View {
             
             // アイコンにIconViewAccessorを適用して、NSViewの参照を保存する
             iconView
+                .onDrag {
+                    if let filePath = item.filePath {
+                        return NSItemProvider(object: filePath as NSURL)
+                    } else {
+                        return NSItemProvider(object: item.text as NSString)
+                    }
+                }
+                .contentShape(Rectangle())
 
             VStack(alignment: .leading) {
                 Text(item.text)
@@ -342,9 +350,9 @@ struct HistoryItemRow: View {
             .menuStyle(.borderlessButton)
             .fixedSize()
         }
+        .contentShape(Rectangle())
         .padding(.vertical, 4)
         .padding(.leading, 2)
-        .contentShape(Rectangle())
         .onAppear {
             if item.cachedThumbnailImage == nil, let filePath = item.filePath {
                 iconLoadTask?.cancel() // 既存のタスクをキャンセル

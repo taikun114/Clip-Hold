@@ -16,6 +16,18 @@ struct HistorySearchBar: View {
     // カラーコードフィルタリング設定のバインディング
     @AppStorage("enableColorCodeFilter") var enableColorCodeFilter: Bool = false
 
+    private func resizedAppIcon(for path: String) -> NSImage {
+        let originalIcon = NSWorkspace.shared.icon(forFile: path)
+        let resizedIcon = NSImage(size: CGSize(width: 16, height: 16))
+        resizedIcon.lockFocus()
+        originalIcon.draw(in: NSRect(origin: .zero, size: CGSize(width: 16, height: 16)),
+                           from: NSRect(origin: .zero, size: originalIcon.size),
+                           operation: .sourceOver,
+                           fraction: 1.0)
+        resizedIcon.unlockFocus()
+        return resizedIcon
+    }
+
     var body: some View {
         HStack {
             TextField(
@@ -52,58 +64,33 @@ struct HistorySearchBar: View {
             )
             // フィルターボタン
             Menu {
-                ForEach(ItemFilter.allCases.filter { 
-                    // colorCodeOnlyは設定がオンの場合のみ表示
-                    $0 != .colorCodeOnly || enableColorCodeFilter
-                }) { filter in
-                    Button {
-                        selectedFilter = filter
-                    } label: {
-                        HStack {
-                            if selectedFilter == filter {
-                                Image(systemName: "checkmark")
-                            }
-                            Text(filter.displayName)
-                        }
+                Picker("フィルター", selection: $selectedFilter) {
+                    ForEach(ItemFilter.allCases.filter {
+                        // colorCodeOnlyは設定がオンの場合のみ表示
+                        $0 != .colorCodeOnly || enableColorCodeFilter
+                    }) { filter in
+                        Text(filter.displayName).tag(filter)
                     }
                 }
+                .pickerStyle(.inline)
                 
                 if !clipboardManager.appUsageHistory.isEmpty {
                     Divider()
-                    Menu {
-                        Button {
-                            selectedApp = nil
-                        } label: {
-                            HStack {
-                                if selectedApp == nil {
-                                    Image(systemName: "checkmark")
-                                }
-                                Text("すべてのアプリ")
-                            }
-                        }
-                        
+                    Picker(selection: $selectedApp) {
+                        Label("すべてのアプリ", systemImage: "app").tag(nil as String?)
                         Divider()
-                        
-                        ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { nonLocalizedName, localizedName in
-                            Button {
-                                selectedApp = nonLocalizedName
-                            } label: {
-                                HStack {
-                                    if selectedApp == nonLocalizedName {
-                                        Image(systemName: "checkmark")
-                                    }
-                                    Text(localizedName)
-                                }
+                        ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { path, localizedName in
+                            Label {
+                                Text(localizedName)
+                            } icon: {
+                                Image(nsImage: resizedAppIcon(for: path))
                             }
+                            .tag(path as String?)
                         }
                     } label: {
-                        HStack {
-                            if selectedApp != nil {
-                                Image(systemName: "checkmark")
-                            }
-                            Text("アプリ")
-                        }
+                        Text("アプリ")
                     }
+                    .labelStyle(.titleAndIcon)
                 }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
@@ -116,19 +103,12 @@ struct HistorySearchBar: View {
 
             // 並び替えボタン
             Menu {
-                ForEach(ItemSort.allCases) { sort in
-                    Button {
-                        selectedSort = sort
-                    } label: {
-                        HStack {
-                            // 選択されている場合にのみチェックマークを表示
-                            if selectedSort == sort {
-                                Image(systemName: "checkmark")
-                            }
-                            Text(sort.displayName)
-                        }
+                Picker("並び替え", selection: $selectedSort) {
+                    ForEach(ItemSort.allCases, id: \.self) { sort in
+                        Text(sort.displayName).tag(sort)
                     }
                 }
+                .pickerStyle(.inline)
             } label: {
                 Image(systemName: "arrow.up.arrow.down")
                     // 並び替えがデフォルト以外の場合はアクセントカラーを適用

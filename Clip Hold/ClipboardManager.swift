@@ -107,9 +107,9 @@ class ClipboardManager: ObservableObject {
 
             if let appBundle = Bundle(url: appURL) {
                 let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? appBundle.infoDictionary?["CFBundleName"] as? String ?? nonLocalizedName
-                appNames[nonLocalizedName] = appName
+                appNames[path] = appName
             } else {
-                appNames[nonLocalizedName] = nonLocalizedName
+                appNames[path] = nonLocalizedName
             }
         }
         return appNames

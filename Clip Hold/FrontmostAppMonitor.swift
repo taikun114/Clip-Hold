@@ -39,6 +39,7 @@ class FrontmostAppMonitor {
                 }
                 // 割り当てられたプリセットに切り替え
                 presetManager.selectedPresetId = assignedPresetId
+                presetManager.saveSelectedPresetId()
             }
         } else {
             // アプリにプリセットが割り当てられていない場合
@@ -46,6 +47,7 @@ class FrontmostAppMonitor {
                 // 保存されている直前のプリセットに戻す
                 if presetManager.selectedPresetId != previousId {
                     presetManager.selectedPresetId = previousId
+                    presetManager.saveSelectedPresetId()
                 }
                 // 直前のプリセット情報をクリア
                 previousPresetId = nil

@@ -114,7 +114,7 @@ struct ImportPresetSelectionSheet: View {
                     }
                 }
                 .padding()
-                .frame(width: 300, height: 170)
+                .frame(minWidth: 300, maxWidth: 300, minHeight: 150, maxHeight: 200)
             }
         }
         .animation(.default, value: showCreatePresetView)
