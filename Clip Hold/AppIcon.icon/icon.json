@@ -9,12 +9,71 @@
     {
       "blend-mode-specializations" : [
         {
+          "value" : "overlay"
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "plus-darker"
+        }
+      ],
+      "blur-material" : null,
+      "hidden" : false,
+      "layers" : [
+        {
+          "glass" : false,
+          "image-name" : "Shardow.png",
+          "name" : "Shardow"
+        }
+      ],
+      "position" : {
+        "scale" : 0.5,
+        "translation-in-points" : [
+          -8,
+          0
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blend-mode-specializations" : [
+        {
           "appearance" : "dark",
           "value" : "normal"
         }
       ],
       "blur-material" : 0.5,
       "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "srgb:0.11873,0.28694,0.52567,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "srgb:0.07255,0.18601,0.34069,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "automatic"
+            }
+          ],
+          "glass" : false,
+          "image-name" : "h_Top_Shadow.png",
+          "name" : "h_Top_Shadow"
+        },
         {
           "fill-specializations" : [
             {
