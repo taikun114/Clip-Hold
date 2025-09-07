@@ -11,8 +11,8 @@ struct AddEditPhraseView: View {
     }
 
     let mode: Mode
-    var onSave: ((StandardPhrase) -> Void)? // コールバック追加
-    @State var phraseToEdit: StandardPhrase // editモードの場合の元のphraseを保持
+    var onSave: ((StandardPhrase) -> Void)?
+    @State var phraseToEdit: StandardPhrase
 
     @State private var title: String
     @State private var content: String
@@ -30,6 +30,9 @@ struct AddEditPhraseView: View {
     private var isSheet: Bool = false
     @FocusState private var isContentFocused: Bool
 
+    private let noPresetsUUID = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
+    private let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+
     init(mode: Mode, phraseToEdit: StandardPhrase? = nil, initialContent: String? = nil, presetManager: StandardPhrasePresetManager, isSheet: Bool = false, onSave: ((StandardPhrase) -> Void)? = nil) {
         self.mode = mode
         self.onSave = onSave
@@ -41,7 +44,11 @@ struct AddEditPhraseView: View {
             // MARK: initialContentがあればそれをコンテンツとして使用
             _content = State(initialValue: initialContent ?? "")
             _useCustomTitle = State(initialValue: false)
-            _selectedPresetId = State(initialValue: presetManager.selectedPresetId)
+            if presetManager.presets.isEmpty {
+                _selectedPresetId = State(initialValue: noPresetsUUID)
+            } else {
+                _selectedPresetId = State(initialValue: presetManager.selectedPresetId)
+            }
         case .edit(let phrase):
             _title = State(initialValue: phrase.title)
             _content = State(initialValue: phrase.content)
@@ -94,20 +101,26 @@ struct AddEditPhraseView: View {
             // プリセット選択ピッカー (追加モードでのみ表示)
             if case .add = mode {
                 Picker("保存先のプリセット:", selection: $selectedPresetId) {
+                    if presetManager.presets.isEmpty {
+                        Text("プリセットがありません").tag(noPresetsUUID as UUID?)
+                    }
                     ForEach(presetManager.presets) { preset in
-                        Text(displayName(for: preset)).tag(Optional(preset.id))
+                        Text(displayName(for: preset)).tag(preset.id as UUID?)
                     }
                     Divider()
-                    Text("新規プリセット...").tag(Optional.some(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!))
+                    Text("新規プリセット...").tag(newPresetUUID as UUID?)
                 }
                 .pickerStyle(.menu)
                 .onChange(of: selectedPresetId) { _, newValue in
                     // 新規プリセット...が選択された場合、シートを表示
-                    let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
                     if newValue == newPresetUUID {
                         showingAddPresetSheet = true
                         // ピッカーの選択を元に戻す
-                        selectedPresetId = presetManager.selectedPresetId
+                        if presetManager.presets.isEmpty {
+                            selectedPresetId = noPresetsUUID
+                        } else {
+                            selectedPresetId = presetManager.selectedPresetId
+                        }
                     }
                 }
                 .padding(.top, 10)
@@ -164,7 +177,7 @@ struct AddEditPhraseView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .keyboardShortcut(.defaultAction)
-                .disabled(content.isEmpty || (useCustomTitle && title.isEmpty))
+                .disabled(content.isEmpty || (useCustomTitle && title.isEmpty) || selectedPresetId == noPresetsUUID)
                 .controlSize(.large)
                 .padding(.top, 10)
             }
@@ -182,9 +195,10 @@ struct AddEditPhraseView: View {
                 showingAddPresetSheet = false
             }
         }
-        .onAppear {
-            // selectedPresetId を初期化
-            selectedPresetId = presetManager.selectedPresetId ?? presetManager.presets.first?.id
+        .onReceive(presetManager.presetAddedSubject) { _ in
+            if selectedPresetId == noPresetsUUID {
+                selectedPresetId = presetManager.presets.first?.id
+            }
         }
     }
 }
