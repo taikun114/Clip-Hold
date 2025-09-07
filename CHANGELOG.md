@@ -3,7 +3,7 @@
 
 ## 1.3.2
 ### New Features
-- **Add “Exclude Clip Hold windows” option to the “Assign Presets” section of the Standard Phrases Settings**
+- **Add “Exclude Clip Hold Windows” option to the “Assign Presets” section of the Standard Phrases Settings**
   - Prevents the preset switching when the Clip Hold window (such as the Standard Phrases window) is focused.
 
 ### Bug Fixes and Improvements
