@@ -1,6 +1,16 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+## 1.3.2
+### New Features
+- **Add “Exclude Clip Hold Windows” option to the “Assign Presets” section of the Standard Phrases Settings**
+  - Prevents the preset switching when the Clip Hold window (such as the Standard Phrases window) is focused.
+
+### Bug Fixes and Improvements
+- **Fix the issue (#2) that when “Maximum number of history items to save” is set, old history items are saved instead of the set number of new history items**
+- **Improve margins on the edit standard phrase screen**
+- **Improve to remember the last selected preset when importing presets**
+
 ## 1.3.1
 ### New Features
 - **Add the feature to allow drag and drop to copy items in the History and Standard Phrases windows**

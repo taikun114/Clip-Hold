@@ -110,7 +110,7 @@ struct AddEditPhraseView: View {
                         selectedPresetId = presetManager.selectedPresetId
                     }
                 }
-                .padding(.vertical, 10)
+                .padding(.top, 10)
             }
 
             HStack {
@@ -166,7 +166,7 @@ struct AddEditPhraseView: View {
                 .keyboardShortcut(.defaultAction)
                 .disabled(content.isEmpty || (useCustomTitle && title.isEmpty))
                 .controlSize(.large)
-
+                .padding(.top, 10)
             }
         }
         .padding() // ここで全体にパディングが適用される

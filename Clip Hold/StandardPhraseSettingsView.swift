@@ -261,6 +261,7 @@ private struct PresetAssignmentSection: View {
     @State private var runningApplications: [NSRunningApplication] = []
     @State private var selectedAssignedAppId: String? = nil
     @State private var showingClearAssignmentsConfirmation = false
+    @AppStorage("excludeStandardPhraseWindowFromPresetSwitching") private var excludeStandardPhraseWindowFromPresetSwitching: Bool = false
     
     // アラート表示用の状態変数
     @State private var showingAssignmentConflictAlert = false
@@ -286,6 +287,23 @@ private struct PresetAssignmentSection: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         ) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Clip Holdのウィンドウを除外する")
+                    Text("Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $excludeStandardPhraseWindowFromPresetSwitching) {
+                    Text("Clip Holdのウィンドウを除外する")
+                    Text("Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
             Picker("割り当てるプリセット", selection: $selectedPresetForAssignmentId) {
                 ForEach(presetManager.presets) { preset in
                     Text(displayName(for: preset)).tag(preset.id as UUID?)

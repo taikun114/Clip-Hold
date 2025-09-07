@@ -26,6 +26,16 @@ class FrontmostAppMonitor {
     }
 
     private func handleAppActivation(bundleIdentifier: String) {
+        // 定型文ウィンドウが除外設定になっている場合は処理を中断
+        if UserDefaults.standard.bool(forKey: "excludeStandardPhraseWindowFromPresetSwitching") {
+            // 定型文ウィンドウが最前面にあるか確認
+            if let frontmostApp = NSWorkspace.shared.frontmostApplication,
+               frontmostApp.bundleIdentifier == "design.taikun.Clip-Hold" {
+                // 定型文ウィンドウが最前面にある場合はプリセット切り替えをしない
+                return
+            }
+        }
+
         let presetManager = StandardPhrasePresetManager.shared
         let assignmentManager = PresetAppAssignmentManager.shared
 

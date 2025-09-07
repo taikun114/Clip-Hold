@@ -114,6 +114,9 @@ struct StandardPhraseImportExportView: View {
     @State private var selectedExportPresetId: UUID?
     @State private var useLegacyFormat = false
     
+    // インポート前の選択プリセットIDを保持
+    @State private var presetIdBeforeImport: UUID? = nil
+    
     // すべてのプリセットが空かどうかを判定する計算プロパティ
     private var areAllPresetsEmpty: Bool {
         return presetManager.presets.allSatisfy { $0.phrases.isEmpty }
@@ -231,6 +234,9 @@ struct StandardPhraseImportExportView: View {
         ) { result in
             switch result {
             case .success(let urls):
+                // インポート開始前に現在の選択を保存
+                presetIdBeforeImport = presetManager.selectedPresetId
+                
                 guard let selectedURL = urls.first else { return }
                 currentSelectedURL = selectedURL // 追加: 選択されたURLを保持
                 let gotAccess = selectedURL.startAccessingSecurityScopedResource()
@@ -287,6 +293,13 @@ struct StandardPhraseImportExportView: View {
                 // 状態をリセット
                 presetConflicts.removeAll()
                 currentPresetIndexForConflictResolution = 0
+                
+                // インポート前の選択を復元
+                if let presetId = presetIdBeforeImport {
+                    presetManager.selectedPresetId = presetId
+                    presetManager.saveSelectedPresetId()
+                }
+                presetIdBeforeImport = nil
             }
             .environmentObject(standardPhraseManager)
         }
@@ -366,6 +379,13 @@ struct StandardPhraseImportExportView: View {
             } else {
                 // 競合がなければ直接追加
                 standardPhraseManager.addImportedPhrases(importedPhrases, toPresetId: presetId)
+                
+                // インポート前の選択を復元
+                if let presetId = presetIdBeforeImport {
+                    presetManager.selectedPresetId = presetId
+                    presetManager.saveSelectedPresetId()
+                }
+                presetIdBeforeImport = nil
             }
         } catch {
             importError = "ファイルの読み込みに失敗しました: \(error.localizedDescription)"
@@ -407,6 +427,13 @@ struct StandardPhraseImportExportView: View {
             showingPresetConflictSheet = true
         }
         // 競合がない場合は何もしない（すでに非競合のプリセットは追加済み）
+        
+        // インポート前の選択を復元
+        if let presetId = presetIdBeforeImport {
+            presetManager.selectedPresetId = presetId
+            presetManager.saveSelectedPresetId()
+        }
+        presetIdBeforeImport = nil
     }
     
     // MARK: - プリセット競合後の処理
@@ -625,6 +652,13 @@ struct StandardPhraseImportExportView: View {
             presetsToImport.removeAll()
             conflictingPresets.removeAll()
         }
+        
+        // インポート前の選択を復元
+        if let presetId = presetIdBeforeImport {
+            presetManager.selectedPresetId = presetId
+            presetManager.saveSelectedPresetId()
+        }
+        presetIdBeforeImport = nil
     }
     
     // エクスポートファイル名を生成するメソッド

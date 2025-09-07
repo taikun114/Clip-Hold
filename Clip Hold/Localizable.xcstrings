@@ -554,6 +554,38 @@
         }
       }
     },
+    "Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prevents the preset switching when the Clip Hold window (such as the Standard Phrases window) is focused."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。"
+          }
+        }
+      }
+    },
+    "Clip Holdのウィンドウを除外する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exclude Clip Hold Windows"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Holdのウィンドウを除外する"
+          }
+        }
+      }
+    },
     "Clip Holdの設定" : {
       "localizations" : {
         "en" : {
