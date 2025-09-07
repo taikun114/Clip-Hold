@@ -79,24 +79,30 @@ struct AddEditPhraseView: View {
                 }
             }
 
-            TextEditor(text: $content)
-                .frame(minHeight: 100, maxHeight: 300)
-                .scrollContentBackground(.hidden)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 4)
-                .focused($isContentFocused)
-                .background(Color.white.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                )
-
-                .onChange(of: content) {
-                    if !useCustomTitle {
-                        title = content
+            if !showingAddPresetSheet {
+                TextEditor(text: $content)
+                    .frame(minHeight: 100, maxHeight: 300)
+                    .scrollContentBackground(.hidden)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 4)
+                    .focused($isContentFocused)
+                    .background(Color.white.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    )
+                    .onChange(of: content) {
+                        if !useCustomTitle {
+                            title = content
+                        }
                     }
-                }
+            } else {
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(minHeight: 100, maxHeight: 300)
+                    .padding(.vertical, 8)
+            }
 
             // プリセット選択ピッカー (追加モードでのみ表示)
             if case .add = mode {
@@ -114,6 +120,7 @@ struct AddEditPhraseView: View {
                 .onChange(of: selectedPresetId) { _, newValue in
                     // 新規プリセット...が選択された場合、シートを表示
                     if newValue == newPresetUUID {
+                        isContentFocused = false
                         showingAddPresetSheet = true
                         // ピッカーの選択を元に戻す
                         if presetManager.presets.isEmpty {
@@ -179,11 +186,11 @@ struct AddEditPhraseView: View {
                 .keyboardShortcut(.defaultAction)
                 .disabled(content.isEmpty || (useCustomTitle && title.isEmpty) || selectedPresetId == noPresetsUUID)
                 .controlSize(.large)
-                .padding(.top, 10)
             }
+            .padding(.vertical, 10)
         }
         .padding() // ここで全体にパディングが適用される
-        .frame(minWidth: 400, minHeight: 350)
+        .frame(minWidth: 400, minHeight: 310)
         .background(!isSheet ? Color(.windowBackgroundColor) : nil)
         .onAppear {
             isContentFocused = true
@@ -193,6 +200,11 @@ struct AddEditPhraseView: View {
             AddEditPresetView { 
                 // シートが閉じられたときの処理
                 showingAddPresetSheet = false
+            }
+        }
+        .onChange(of: showingAddPresetSheet) { _, isShowing in
+            if !isShowing {
+                isContentFocused = true
             }
         }
         .onReceive(presetManager.presetAddedSubject) { _ in
