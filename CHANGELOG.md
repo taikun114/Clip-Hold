@@ -1,6 +1,12 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+## 1.3.3 (under development)
+### Bug Fixes and Improvements
+- **Fix issue that voice input is entered in the standard phrase input field when the preset add screen is opened from the standard phrase add screen**
+- **Improve the Settings screen and add standard phrase screen when no presets exist**
+- **Improve the focus back to the input field when returning to the add standard phrase screen after adding a preset from the add standard phrase screen**
+
 ## 1.3.2
 ### New Features
 - **Add “Exclude Clip Hold Windows” option to the “Assign Presets” section of the Standard Phrases Settings**
