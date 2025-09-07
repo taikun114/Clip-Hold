@@ -304,9 +304,38 @@ private struct PresetAssignmentSection: View {
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
-            Picker("割り当てるプリセット", selection: $selectedPresetForAssignmentId) {
+            Picker("割り当てるプリセット", selection: Binding(
+                get: {
+                    // プリセットが空の場合、特別なUUIDを返す
+                    if presetManager.presets.isEmpty {
+                        return UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+                    }
+                    return selectedPresetForAssignmentId
+                },
+                set: { newValue in
+                    // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
+                    if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+                        // プリセットがない場合は何もしない
+                        // 選択を元に戻す
+                        if let firstPreset = presetManager.presets.first {
+                            selectedPresetForAssignmentId = firstPreset.id
+                        } else {
+                            // まだプリセットがない場合はnilのまま
+                            selectedPresetForAssignmentId = nil
+                        }
+                    } else {
+                        selectedPresetForAssignmentId = newValue
+                    }
+                }
+            )) {
                 ForEach(presetManager.presets) { preset in
                     Text(displayName(for: preset)).tag(preset.id as UUID?)
+                }
+                
+                // プリセットがない場合の項目
+                if presetManager.presets.isEmpty {
+                    Text("プリセットがありません")
+                        .tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
                 }
             }
             .pickerStyle(.menu)
@@ -326,7 +355,10 @@ private struct PresetAssignmentSection: View {
             .overlay(alignment: .bottom) { bottomToolbar }
         }
         .onAppear {
-            if selectedPresetForAssignmentId == nil {
+            if presetManager.presets.isEmpty {
+                // プリセットがない場合は、特別なUUIDを設定
+                selectedPresetForAssignmentId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+            } else if selectedPresetForAssignmentId == nil || selectedPresetForAssignmentId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
                 selectedPresetForAssignmentId = presetManager.presets.first?.id
             }
         }
@@ -380,6 +412,7 @@ private struct PresetAssignmentSection: View {
                 }
                 .buttonStyle(.borderless)
                 .help(Text("割り当てるアプリを追加します。"))
+                .disabled(presetManager.presets.isEmpty) // プリセットがない場合は無効化
                 .popover(isPresented: $isShowingAddAppPopover, arrowEdge: .leading) {
                     AppSelectionPopoverView(
                         runningApplications: $runningApplications,
@@ -595,11 +628,27 @@ private struct PhraseSettingsSection: View {
     
     private var presetPicker: some View {
         Picker("", selection: Binding(
-            get: { presetManager.selectedPresetId ?? UUID() },
+            get: {
+                // プリセットが空の場合、特別なUUIDを返す
+                if presetManager.presets.isEmpty {
+                    return UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+                }
+                return presetManager.selectedPresetId ?? UUID()
+            },
             set: { newValue in
                 let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
                 
-                if newValue == newPresetUUID {
+                // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
+                if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+                    // プリセットがない場合は何もしない
+                    // 選択を元に戻す
+                    if let firstPreset = presetManager.presets.first {
+                        presetManager.selectedPresetId = firstPreset.id
+                    } else {
+                        // まだプリセットがない場合はnilのまま
+                        presetManager.selectedPresetId = nil
+                    }
+                } else if newValue == newPresetUUID {
                     showingAddPresetSheet = true
                 } else if presetManager.presets.contains(where: { $0.id == newValue }) {
                     presetManager.selectedPresetId = newValue
@@ -610,6 +659,13 @@ private struct PhraseSettingsSection: View {
             ForEach(presetManager.presets) { preset in
                 Text(displayName(for: preset)).tag(preset.id)
             }
+            
+            // プリセットがない場合の項目
+            if presetManager.presets.isEmpty {
+                Text("プリセットがありません")
+                    .tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!)
+            }
+            
             Divider()
             Text("新規プリセット...").tag(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!)
         }
@@ -640,6 +696,7 @@ private struct PhraseSettingsSection: View {
                 }
                 .buttonStyle(.borderless)
                 .help(Text("新しい定型文をリストに追加します。"))
+                .disabled(presetManager.presets.isEmpty) // プリセットがない場合は無効化
                 divider
                 Button(action: {
                     if let id = selectedPhraseId, let phrase = currentPhrases.first(where: { $0.id == id }) {
