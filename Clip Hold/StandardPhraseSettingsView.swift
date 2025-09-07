@@ -362,6 +362,13 @@ private struct PresetAssignmentSection: View {
                 selectedPresetForAssignmentId = presetManager.presets.first?.id
             }
         }
+        .onReceive(presetManager.presetAddedSubject) { _ in
+            if presetManager.presets.isEmpty {
+                selectedPresetForAssignmentId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+            } else if selectedPresetForAssignmentId == nil || selectedPresetForAssignmentId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+                selectedPresetForAssignmentId = presetManager.presets.first?.id
+            }
+        }
         .background(
             AppSelectionImporterView(isPresented: $showingFinderPanel) { bundleIdentifier in
                 if let presetId = selectedPresetForAssignmentId {

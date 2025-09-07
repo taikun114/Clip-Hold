@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 @MainActor
 class StandardPhrasePresetManager: ObservableObject {
@@ -7,6 +8,8 @@ class StandardPhrasePresetManager: ObservableObject {
     
     @Published var presets: [StandardPhrasePreset] = []
     @Published var selectedPresetId: UUID?
+    
+    let presetAddedSubject = PassthroughSubject<Void, Never>()
     
     private let presetDirectoryName = "standardPhrasesPreset"
     private let presetIndexFileName = "presetIndex.json"
@@ -254,6 +257,7 @@ class StandardPhrasePresetManager: ObservableObject {
         savePresetToFile(newPreset)
         savePresetIndex()
         saveSelectedPresetId()
+        presetAddedSubject.send()
     }
     
     func addPresetWithId(_ id: UUID, name: String) {
@@ -268,6 +272,7 @@ class StandardPhrasePresetManager: ObservableObject {
         savePresetToFile(newPreset)
         savePresetIndex()
         saveSelectedPresetId()
+        presetAddedSubject.send()
     }
     
     func deletePreset(id: UUID) {
