@@ -148,10 +148,7 @@ extension ClipboardManager {
                 self.objectWillChange.send()
                 self.clipboardHistory.append(contentsOf: newItems)
 
-                // 3. 全体を日付（date）の昇順でソート（古い順）
-                self.clipboardHistory.sort { $0.date < $1.date }
-
-                // 4. 最大履歴数を超過した場合の処理
+                // 3. 最大履歴数を超過した場合の処理
                 self.enforceMaxHistoryCount()
 
                 for item in self.clipboardHistory where item.filePath != nil {
@@ -171,16 +168,23 @@ extension ClipboardManager {
     func enforceMaxHistoryCount() {
         print("DEBUG: enforceMaxHistoryCount() - maxHistoryToSave: \(self.maxHistoryToSave), 現在の履歴数: \(self.clipboardHistory.count)")
         if self.maxHistoryToSave > 0 && self.clipboardHistory.count > self.maxHistoryToSave {
+            // 履歴を日付の新しい順に並べ替える（メモリ内でのみ）
+            let sortedHistory = self.clipboardHistory.sorted { $0.date > $1.date }
+            
+            // 設定された数の最新の履歴のみを保持
+            let itemsToKeep = Array(sortedHistory.prefix(self.maxHistoryToSave))
+            
             // 削除されるアイテムから関連するファイルも削除
-            let itemsToRemove = self.clipboardHistory.suffix(self.clipboardHistory.count - self.maxHistoryToSave)
+            let itemsToRemove = sortedHistory.suffix(sortedHistory.count - self.maxHistoryToSave)
             for item in itemsToRemove {
                 if let filePath = item.filePath {
                     deleteFileFromSandbox(at: filePath)
                 }
             }
+            
             // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
             self.objectWillChange.send()
-            self.clipboardHistory.removeLast(self.clipboardHistory.count - self.maxHistoryToSave)
+            self.clipboardHistory = itemsToKeep
             print("DEBUG: enforceMaxHistoryCount() - 履歴を \(self.maxHistoryToSave) に調整しました。現在の履歴数: \(self.clipboardHistory.count)")
         } else if self.maxHistoryToSave == 0 { // 無制限の場合
             print("DEBUG: enforceMaxHistoryCount() - 無制限設定のため調整なし。")
@@ -206,9 +210,12 @@ extension ClipboardManager {
             return true // ファイルパスがない場合は常に有効とみなす
         }
         
+        // 履歴を日付の新しい順に並べ替える（メモリ内でのみ）
+        validHistory.sort { $0.date > $1.date }
+        
         // 最大履歴数を超過した場合の処理を適用
         if self.maxHistoryToSave > 0 && validHistory.count > self.maxHistoryToSave {
-            // 古いアイテム（配列の末尾）を削除
+            // 古いアイテムを削除
             validHistory = Array(validHistory.prefix(self.maxHistoryToSave))
         }
         
