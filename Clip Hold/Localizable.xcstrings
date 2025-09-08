@@ -5527,6 +5527,22 @@
         }
       }
     },
+    "標準テキストとしてコピー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy as Plain Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準テキストとしてコピー"
+          }
+        }
+      }
+    },
     "権限" : {
       "localizations" : {
         "en" : {

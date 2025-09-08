@@ -133,6 +133,16 @@ struct HistoryItemRow: View {
             } label: {
                 Label("コピー", systemImage: "document.on.document")
             }
+            if item.richText != nil {
+                Button {
+                    // リッチテキストアイテムの場合、プレーンテキストとしてコピー
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(item.text, forType: .string)
+                    showCopyConfirmation = true
+                } label: {
+                    Label("標準テキストとしてコピー", systemImage: "doc.plaintext")
+                }
+            }
             if let qrContent = item.qrCodeContent {
                 Button {
                     let newItem = ClipboardItem(text: qrContent, qrCodeContent: nil)
