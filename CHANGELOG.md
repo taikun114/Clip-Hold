@@ -12,8 +12,14 @@
 - **Fix issue that voice input is entered in the standard phrase input field when the preset add screen is opened from the standard phrase add screen**
 - **Fix issue that “Show All Processes” does not work on the add apps to exclude screen in Privacy Settings**
 - **Fix issue that default preset name was not localized in the notification shown when switching presets using shortcut keys**
+- **Fix issue that the “Preset to Assign” picker in Standard Phrases Settings becomes empty when the selected preset is deleted**
 - **Improve the Settings screen and add standard phrase screen when no presets exist**
+- **Improve the Settings screen and Standard Phrases window when all presets are deleted**
 - **Improve the focus back to the input field when returning to the add standard phrase screen after adding a preset from the add standard phrase screen**
+- **Improve the alert message when deleting presets**
+  - Added a message indicating the number of standard phrases within the preset being deleted and that they will be removed.
+- **Improve focus detection in the Settings window**
+   - Improved the styling of the “Information” button in the Settings window to ensure it is properly set.
 
 ## 1.3.2
 ### New Features
