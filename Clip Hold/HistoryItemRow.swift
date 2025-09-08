@@ -260,21 +260,41 @@ struct HistoryItemRow: View {
                                             .scaledToFit()
                                             .frame(width: 30, height: 30))
                         } else {
-                            // テキストアイコン (macOSバージョンによる分岐)
-                            if #available(macOS 15.0, *) {
-                                return AnyView(Image(systemName: "text.page")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .padding(4)
-                                                .frame(width: 30, height: 30)
-                                                .foregroundStyle(.secondary))
+                            // テキストアイコン (リッチテキストかどうかで分岐)
+                            if item.richText != nil {
+                                // リッチテキストの場合、append.pageアイコンを使用 (macOSバージョンによる分岐)
+                                if #available(macOS 15.0, *) {
+                                    return AnyView(Image(systemName: "append.page")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .padding(4)
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundStyle(.secondary))
+                                } else {
+                                    return AnyView(Image(systemName: "doc.append")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .padding(4)
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundStyle(.secondary))
+                                }
                             } else {
-                                return AnyView(Image(systemName: "doc.plaintext")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .padding(4)
-                                                .frame(width: 30, height: 30)
-                                                .foregroundStyle(.secondary))
+                                // 標準テキストの場合、text.pageアイコンを使用 (macOSバージョンによる分岐)
+                                if #available(macOS 15.0, *) {
+                                    return AnyView(Image(systemName: "text.page")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .padding(4)
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundStyle(.secondary))
+                                } else {
+                                    return AnyView(Image(systemName: "doc.plaintext")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .padding(4)
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundStyle(.secondary))
+                                }
                             }
                         }
                     }()

@@ -319,21 +319,41 @@ struct ClipHoldApp: App {
                                     .frame(width: 16, height: 16)
                             } else {
                                 // ファイルパスもキャッシュもなければテキストアイコン
-                                // macOS 15 以降では text.page、それ以前では doc.plaintext を使用
-                                if #available(macOS 15.0, *) {
-                                    Image(systemName: "text.page")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding(4)
-                                        .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                        .foregroundStyle(.secondary)
+                                // リッチテキストかどうかでアイコンを分岐
+                                if item.richText != nil {
+                                    // リッチテキストの場合、append.pageアイコンを使用 (macOSバージョンによる分岐)
+                                    if #available(macOS 14.0, *) {
+                                        Image(systemName: "append.page")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
+                                            .foregroundStyle(.secondary)
+                                    } else {
+                                        Image(systemName: "doc.append")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
+                                            .foregroundStyle(.secondary)
+                                    }
                                 } else {
-                                    Image(systemName: "doc.plaintext")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding(4)
-                                        .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                        .foregroundStyle(.secondary)
+                                    // 標準テキストの場合、text.pageアイコンを使用 (macOSバージョンによる分岐)
+                                    if #available(macOS 15.0, *) {
+                                        Image(systemName: "text.page")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
+                                            .foregroundStyle(.secondary)
+                                    } else {
+                                        Image(systemName: "doc.plaintext")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
                             }
 

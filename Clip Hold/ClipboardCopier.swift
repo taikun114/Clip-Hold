@@ -40,10 +40,26 @@ extension ClipboardManager {
             // ファイルパスがない場合、テキストをコピー
             // item.text は非オプショナルなので、直接使用する
             await MainActor.run {
-                if NSPasteboard.general.string(forType: .string) != item.text { // クリップボードの内容がすでに同じでなければコピー
-                    if NSPasteboard.general.setString(item.text, forType: .string) {
-                        print("クリップボードにテキストがコピーされました: \(item.text.prefix(20))...")
-                        // success = true
+                let pasteboard = NSPasteboard.general
+                pasteboard.clearContents()
+                
+                // リッチテキストが存在する場合は、リッチテキストとプレーンテキストの両方を書き込む
+                if let richText = item.richText {
+                    // リッチテキストを書き込む
+                    if pasteboard.setString(richText, forType: .rtf) {
+                        print("クリップボードにリッチテキストがコピーされました: \(richText.prefix(20))...")
+                    }
+                    // プレーンテキストも書き込む (フォールバック用)
+                    if pasteboard.setString(item.text, forType: .string) {
+                        print("クリップボードにプレーンテキストがコピーされました: \(item.text.prefix(20))...")
+                    }
+                } else {
+                    // リッチテキストがない場合は、プレーンテキストのみを書き込む
+                    if pasteboard.string(forType: .string) != item.text { // クリップボードの内容がすでに同じでなければコピー
+                        if pasteboard.setString(item.text, forType: .string) {
+                            print("クリップボードにテキストがコピーされました: \(item.text.prefix(20))...")
+                            // success = true
+                        }
                     }
                 }
             }
