@@ -72,7 +72,8 @@ struct PrivacySettingsView: View {
                 return isRegularApp
             }
             
-            return isRegularApp
+            // showAllRunningApps が true の場合は、すべてのアプリを表示
+            return true
         }
         
         // excludedAppIdentifiers に含まれるアプリを除外
