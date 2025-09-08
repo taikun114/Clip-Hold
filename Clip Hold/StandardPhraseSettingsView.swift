@@ -422,9 +422,13 @@ private struct PresetAssignmentSection: View {
             }
         }
         .onReceive(presetManager.$presets) { presets in
+            let selectionExists = presets.contains(where: { $0.id == selectedPresetForAssignmentId })
+
             if presets.isEmpty {
+                // プリセットが空になったら、選択を「なし」状態にする
                 selectedPresetForAssignmentId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
-            } else if selectedPresetForAssignmentId == nil || selectedPresetForAssignmentId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+            } else if !selectionExists {
+                // 選択中のプリセットが存在しない（削除されたか、初期状態）場合、最初のプリセットを選択する
                 selectedPresetForAssignmentId = presets.first?.id
             }
         }
