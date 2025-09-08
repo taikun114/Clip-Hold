@@ -175,6 +175,40 @@
         }
       }
     },
+    "「%@」を本当に削除しますか？このプリセットに含まれる%lld個の定型文も削除されます。この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete “%1$@”? This will also delete %2$lld standard phrase included in this preset. This cannot be undone."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete “%1$@”? This will also delete %2$lld standard phrases included in this preset. This cannot be undone."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "「%1$@」を本当に削除しますか？このプリセットに含まれる%2$lld個の定型文も削除されます。この操作は元に戻せません。"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。" : {
       "localizations" : {
         "en" : {

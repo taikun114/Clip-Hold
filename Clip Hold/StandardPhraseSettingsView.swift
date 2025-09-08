@@ -121,7 +121,8 @@ private struct PresetSettingsSection: View {
             }
         } message: {
             if let preset = presetToDelete {
-                Text("「\(displayName(for: preset))」を本当に削除しますか？")
+                let phraseCount = preset.phrases.count
+                Text("「\(displayName(for: preset))」を本当に削除しますか？このプリセットに含まれる\(phraseCount)個の定型文も削除されます。この操作は元に戻せません。")
             } else {
                 Text("このプリセットを本当に削除しますか？")
             }
