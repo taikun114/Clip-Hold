@@ -4311,6 +4311,22 @@
         }
       }
     },
+    "割り当てるプリセットにはアプリのみ追加することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only apps can be added to the Preset to Assign."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "割り当てるプリセットにはアプリのみ追加することができます。"
+          }
+        }
+      }
+    },
     "動作中" : {
       "localizations" : {
         "en" : {

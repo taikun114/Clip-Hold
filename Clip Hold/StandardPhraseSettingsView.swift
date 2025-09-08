@@ -258,6 +258,7 @@ private struct PresetAssignmentSection: View {
     @State private var selectedPresetForAssignmentId: UUID? = StandardPhrasePresetManager.shared.presets.first?.id
     @State private var isShowingAddAppPopover: Bool = false
     @State private var showingFinderPanel = false
+    @State private var showingInvalidAppAlert = false
     @State private var runningApplications: [NSRunningApplication] = []
     @State private var selectedAssignedAppId: String? = nil
     @State private var showingClearAssignmentsConfirmation = false
@@ -348,6 +349,57 @@ private struct PresetAssignmentSection: View {
                 }
                 .onDelete(perform: deleteAssignedApp)
             }
+            .onDrop(of: [.fileURL], isTargeted: nil) { providers in
+                guard let selectedPresetId = selectedPresetForAssignmentId,
+                      selectedPresetId.uuidString != "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" else {
+                    return false
+                }
+                
+                let group = DispatchGroup()
+                var invalidItemsCount = 0
+                let lock = NSLock()
+                
+                for provider in providers {
+                    group.enter()
+                    provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { (urlData, error) in
+                        defer { group.leave() }
+                        
+                        guard let urlData = urlData as? Data,
+                              let url = URL(dataRepresentation: urlData, relativeTo: nil) else {
+                            lock.lock()
+                            invalidItemsCount += 1
+                            lock.unlock()
+                            return
+                        }
+                        
+                        if url.pathExtension == "app" || FileManager.default.fileExists(atPath: url.appendingPathComponent("Contents/Info.plist").path) {
+                            guard let bundle = Bundle(url: url),
+                                  let bundleIdentifier = bundle.bundleIdentifier else {
+                                lock.lock()
+                                invalidItemsCount += 1
+                                lock.unlock()
+                                return
+                            }
+                            
+                            DispatchQueue.main.async {
+                                handleAppAssignment(for: selectedPresetId, bundleIdentifier: bundleIdentifier)
+                            }
+                        } else {
+                            lock.lock()
+                            invalidItemsCount += 1
+                            lock.unlock()
+                        }
+                    }
+                }
+                
+                group.notify(queue: .main) {
+                    if invalidItemsCount > 0 {
+                        showingInvalidAppAlert = true
+                    }
+                }
+                
+                return true
+            }
             .listStyle(.plain)
             .frame(minHeight: 100)
             .scrollContentBackground(.hidden)
@@ -382,6 +434,11 @@ private struct PresetAssignmentSection: View {
             Button("キャンセル", role: .cancel) { }
         } message: {
             Text("このプリセットに割り当てられているすべてのアプリをリストから削除しますか？")
+        }
+        .alert("アプリではありません", isPresented: $showingInvalidAppAlert) {
+            Button("OK") { }
+        } message: {
+            Text("割り当てるプリセットにはアプリのみ追加することができます。")
         }
         .alert("すでに割り当てられたアプリ", isPresented: $showingAssignmentConflictAlert) {
             Button("キャンセル", role: .cancel) {
