@@ -196,7 +196,18 @@ struct StandardPhraseWindowView: View {
     private let trailingPaddingForLineNumber: CGFloat = 5
 
     private func performSearch(searchTerm: String) {
-        let currentPhrases = presetManager.selectedPreset?.phrases ?? standardPhraseManager.standardPhrases
+        let currentPhrases: [StandardPhrase]
+        if presetManager.selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+            // 「プリセットがありません」が選択されている場合は空のリスト
+            currentPhrases = []
+        } else if let selectedPreset = presetManager.selectedPreset {
+            // プリセットが選択されている場合はそのプリセットの定型文
+            currentPhrases = selectedPreset.phrases
+        } else {
+            // プリセットが選択されていない場合はデフォルトの定型文
+            currentPhrases = standardPhraseManager.standardPhrases
+        }
+        
         let newFilteredPhrases: [StandardPhrase]
         if searchTerm.isEmpty {
             newFilteredPhrases = currentPhrases
@@ -286,19 +297,14 @@ struct StandardPhraseWindowView: View {
                                 ForEach(presetManager.presets) { preset in
                                     Text(displayName(for: preset)).tag(preset.id as UUID?)
                                 }
+                                
+                                // プリセットがない場合の項目
+                                if presetManager.presets.isEmpty {
+                                    Text(displayName(for: nil)).tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
+                                }
                             }
                             .pickerStyle(.inline)
 
-                            // プリセットがない場合の項目
-                            if presetManager.presets.isEmpty {
-                                Button {
-                                    // 何もしない
-                                } label: {
-                                    Text(displayName(for: presetManager.selectedPreset))
-                                }
-                                .disabled(true)
-                            }
-                            
                             Divider()
                             
                             Button("新規プリセット...") {
@@ -315,6 +321,28 @@ struct StandardPhraseWindowView: View {
                     }
                     .padding(.horizontal, 10)
                     .padding(.bottom, 5)
+                    .onAppear {
+                        if presetManager.presets.isEmpty {
+                            // プリセットがない場合は、特別なUUIDを設定
+                            presetManager.selectedPresetId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+                        } else if presetManager.selectedPresetId == nil || presetManager.selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+                            presetManager.selectedPresetId = presetManager.presets.first?.id
+                        }
+                    }
+                    .onReceive(presetManager.presetAddedSubject) { _ in
+                        if presetManager.presets.isEmpty {
+                            presetManager.selectedPresetId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+                        } else if presetManager.selectedPresetId == nil || presetManager.selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+                            presetManager.selectedPresetId = presetManager.presets.first?.id
+                        }
+                    }
+                    .onReceive(presetManager.$presets) { presets in
+                        if presets.isEmpty {
+                            presetManager.selectedPresetId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
+                        } else if presetManager.selectedPresetId == nil || presetManager.selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" || !presets.contains(where: { $0.id == presetManager.selectedPresetId }) {
+                            presetManager.selectedPresetId = presets.first?.id
+                        }
+                    }
                     .onChange(of: searchText) { _, newValue in
                         searchTask?.cancel()
                         

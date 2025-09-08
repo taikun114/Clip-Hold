@@ -6,7 +6,15 @@ import Combine
 class StandardPhrasePresetManager: ObservableObject {
     static let shared = StandardPhrasePresetManager()
     
-    @Published var presets: [StandardPhrasePreset] = []
+    @Published var presets: [StandardPhrasePreset] = [] {
+        didSet {
+            // 「プリセットなし」が選択されている状態でプリセットが利用可能になった場合、最初のプリセットを選択
+            if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" && !presets.isEmpty {
+                selectedPresetId = presets.first?.id
+                saveSelectedPresetId()
+            }
+        }
+    }
     @Published var selectedPresetId: UUID?
     
     let presetAddedSubject = PassthroughSubject<Void, Never>()
@@ -44,7 +52,7 @@ class StandardPhrasePresetManager: ObservableObject {
         let standardPhraseManager = StandardPhraseManager.shared
         let defaultPreset = StandardPhrasePreset(
             id: defaultPresetId,
-            name: "Default", // Non-localized name
+            name: "Default", // ローカライズされない名前
             phrases: standardPhraseManager.standardPhrases
         )
         presets.append(defaultPreset)
@@ -60,7 +68,7 @@ class StandardPhrasePresetManager: ObservableObject {
             return
         }
         
-        // Ensure preset directory exists
+        // プリセットディレクトリが存在することを確認
         if !FileManager.default.fileExists(atPath: presetDirectory.path) {
             do {
                 try FileManager.default.createDirectory(at: presetDirectory, withIntermediateDirectories: true, attributes: nil)
@@ -71,36 +79,48 @@ class StandardPhrasePresetManager: ObservableObject {
             }
         }
         
-        // Try to load from index first
+        // まずインデックスから読み込みを試行
         if !loadPresetIndex() {
-            // If index fails, rebuild from file system
+            // インデックスの読み込みに失敗した場合、ファイルシステムから再構築
             rebuildPresetIndexFromFileSystem()
         }
         
-        // Load phrases for each preset
+        // 各プリセットのフレーズを読み込む
         for preset in presets {
             loadPresetPhrases(for: preset.id)
         }
         
-        // If no presets exist after loading/rebuilding, create the default one
+        // 読み込み/再構築後にプリセットが存在しない場合、デフォルトを作成
         if presets.isEmpty && !didUserDeleteDefaultPreset() {
             createDefaultPreset()
         }
         
-        // Load selected preset ID
+        // 選択されたプリセットIDを読み込む
         loadSelectedPresetId()
         
-        // Ensure a preset is selected if any exist
-        // Only set a default preset if selectedPresetId is nil or the selected preset doesn't exist
+        // プリセットが存在する場合、いずれかが選択されていることを確認
+        // selectedPresetIdがnilか、選択されたプリセットが存在しない場合のみデフォルトのプリセットを設定
+        var selectedPresetWasUpdated = false
         if selectedPresetId == nil || !presets.contains(where: { $0.id == selectedPresetId }) {
-            // Try to select the default preset first
+            // まずデフォルトのプリセットを選択してみる
             if let defaultPreset = presets.first(where: { $0.id == defaultPresetId }) {
                 selectedPresetId = defaultPreset.id
             } else {
-                // If default preset doesn't exist, select the first available preset
+                // デフォルトのプリセットが存在しない場合、利用可能な最初のプリセットを選択
                 selectedPresetId = presets.first?.id
             }
             saveSelectedPresetId()
+            selectedPresetWasUpdated = true
+        } else if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" && !presets.isEmpty {
+            // 「プリセットなし」が選択されている状態でプリセットが利用可能になった場合、最初のプリセットを選択
+            selectedPresetId = presets.first?.id
+            saveSelectedPresetId()
+            selectedPresetWasUpdated = true
+        }
+        
+        // selectedPresetIdが更新された場合、ビューに通知
+        if selectedPresetWasUpdated {
+            presetAddedSubject.send()
         }
     }
     
@@ -120,7 +140,7 @@ class StandardPhrasePresetManager: ObservableObject {
                 if fileName == defaultPresetFileName {
                     if !didUserDeleteDefaultPreset() {
                         let preset = StandardPhrasePreset(id: defaultPresetId, name: "Default", phrases: [])
-                        newPresets.insert(preset, at: 0) // Ensure default is first
+                        newPresets.insert(preset, at: 0) // デフォルトが最初に来るようにする
                     }
                 } else if let uuid = UUID(uuidString: fileName) {
                     let presetName = "Preset \(presetCounter)"
@@ -151,13 +171,13 @@ class StandardPhrasePresetManager: ObservableObject {
             
             var loadedPresets: [StandardPhrasePreset] = []
             for presetInfo in presetInfos {
-                // Self-healing: check if the actual preset file exists
+                // 自己修復：実際のプリセットファイルが存在するか確認
                 let fileName = presetInfo.id == defaultPresetId ? defaultPresetFileName : presetInfo.id.uuidString
                 let presetFileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
                 if FileManager.default.fileExists(atPath: presetFileURL.path) {
                     loadedPresets.append(StandardPhrasePreset(id: presetInfo.id, name: presetInfo.name, phrases: []))
                 } else if presetInfo.id == defaultPresetId && didUserDeleteDefaultPreset() {
-                    // If default preset file is missing and user deleted it, do nothing
+                    // デフォルトのプリセットファイルがなく、ユーザーが削除した場合は何もしない
                     continue
                 }
             }
@@ -242,7 +262,9 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     func saveSelectedPresetId() {
+        // FFFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF は保存しない
         if let selectedPresetId = selectedPresetId,
+           selectedPresetId.uuidString != "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF",
            let encodedId = try? JSONEncoder().encode(selectedPresetId) {
             UserDefaults.standard.set(encodedId, forKey: "SelectedStandardPhrasePresetId")
         } else {
@@ -253,7 +275,10 @@ class StandardPhrasePresetManager: ObservableObject {
     func addPreset(name: String) {
         let newPreset = StandardPhrasePreset(name: name)
         presets.append(newPreset)
-        selectedPresetId = newPreset.id
+        // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
+        if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+            selectedPresetId = newPreset.id
+        }
         savePresetToFile(newPreset)
         savePresetIndex()
         saveSelectedPresetId()
@@ -268,7 +293,10 @@ class StandardPhrasePresetManager: ObservableObject {
         
         let newPreset = StandardPhrasePreset(id: id, name: name)
         presets.append(newPreset)
-        selectedPresetId = newPreset.id
+        // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
+        if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+            selectedPresetId = newPreset.id
+        }
         savePresetToFile(newPreset)
         savePresetIndex()
         saveSelectedPresetId()
@@ -295,6 +323,9 @@ class StandardPhrasePresetManager: ObservableObject {
         
         // 他のプリセットにも影響がないか確認し、存在しないプリセットへの割り当てをクリーンアップ
         cleanupInvalidAssignments()
+        
+        // ビューに通知してselectedPresetIdを更新
+        presetAddedSubject.send()
     }
     
     func updatePreset(_ preset: StandardPhrasePreset) {
@@ -302,27 +333,31 @@ class StandardPhrasePresetManager: ObservableObject {
             presets[index] = preset
             savePresetToFile(preset)
             savePresetIndex()
+            presetAddedSubject.send()
         }
     }
     
     func duplicatePreset(_ preset: StandardPhrasePreset) {
-        // Create a new preset with a new ID, but same content
+        // 新しいIDで、ただし同じ内容の新しいプリセットを作成
         let newPreset = StandardPhrasePreset(
-            id: UUID(), // New ID
-            name: preset.name, // Keep the same name
-            phrases: preset.phrases // Copy phrases
+            id: UUID(), // 新しいID
+            name: preset.name, // 同じ名前を維持
+            phrases: preset.phrases // フレーズをコピー
         )
         
-        // Add the new preset to the array
+        // 新しいプリセットを配列に追加
         if let index = presets.firstIndex(where: { $0.id == preset.id }) {
             presets.insert(newPreset, at: index + 1)
         } else {
             presets.append(newPreset)
         }
         
-        // Save the new preset and update the index
+        // 新しいプリセットを保存してインデックスを更新
         savePresetToFile(newPreset)
         savePresetIndex()
+        
+        // ビューに通知
+        presetAddedSubject.send()
     }
     
     func duplicate(phrase: StandardPhrase, in preset: StandardPhrasePreset) {
@@ -331,7 +366,7 @@ class StandardPhrasePresetManager: ObservableObject {
             if let phraseIndex = presets[presetIndex].phrases.firstIndex(where: { $0.id == phrase.id }) {
                 presets[presetIndex].phrases.insert(newPhrase, at: phraseIndex + 1)
             } else {
-                presets[presetIndex].phrases.append(newPhrase) // Fallback
+                presets[presetIndex].phrases.append(newPhrase) // フォールバック
             }
             updatePreset(presets[presetIndex])
         }
@@ -346,13 +381,13 @@ class StandardPhrasePresetManager: ObservableObject {
             return
         }
 
-        // Remove from source
+        // 元の場所から削除
         sourcePreset.phrases.removeAll { $0.id == phrase.id }
 
-        // Add to destination
+        // 移動先に追加
         destinationPreset.phrases.append(phrase)
 
-        // Update both presets
+        // 両方のプリセットを更新
         updatePreset(sourcePreset)
         updatePreset(destinationPreset)
     }
@@ -393,16 +428,19 @@ class StandardPhrasePresetManager: ObservableObject {
         }
         
         presets.removeAll()
-        selectedPresetId = nil
+        selectedPresetId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
         
         savePresetIndex()
         saveSelectedPresetId()
         
         // デフォルトプリセットは再作成しない
+        
+        // ビューに通知してselectedPresetIdを更新
+        presetAddedSubject.send()
     }
 }
 
-// For storing preset info in the index file
+// プリセット情報をインデックスファイルに保存するため
 struct PresetInfo: Codable {
     let id: UUID
     let name: String
