@@ -322,7 +322,7 @@ struct ClipHoldApp: App {
                                 // リッチテキストかどうかでアイコンを分岐
                                 if item.richText != nil {
                                     // リッチテキストの場合、append.pageアイコンを使用 (macOSバージョンによる分岐)
-                                    if #available(macOS 14.0, *) {
+                                    if #available(macOS 15.0, *) {
                                         Image(systemName: "append.page")
                                             .resizable()
                                             .scaledToFit()
