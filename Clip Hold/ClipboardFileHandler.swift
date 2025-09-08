@@ -352,9 +352,20 @@ extension ClipboardManager {
                 return newFilePath == existingFilePath && newItem.fileSize == existingItem.fileSize
             }
         }
-        // テキストアイテムの場合、テキスト内容で重複を判定
+        // テキストアイテムの場合、リッチテキストと標準テキストを区別して重複を判定
         else if newItem.filePath == nil && existingItem.filePath == nil {
-            return newItem.text == existingItem.text
+            // 両方ともリッチテキストの場合、リッチテキストの内容で比較
+            if let newRichText = newItem.richText, let existingRichText = existingItem.richText {
+                return newRichText == existingRichText
+            }
+            // 片方だけがリッチテキストの場合、重複ではない
+            else if (newItem.richText != nil) != (existingItem.richText != nil) {
+                return false
+            }
+            // 両方ともリッチテキストでない（標準テキスト）場合、標準テキストの内容で比較
+            else {
+                return newItem.text == existingItem.text
+            }
         }
         // 片方だけがファイルアイテムの場合は重複ではない
         return false
