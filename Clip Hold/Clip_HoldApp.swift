@@ -469,8 +469,8 @@ struct ClipHoldApp: App {
                 if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
                     let notificationCenter = UNUserNotificationCenter.current()
                     let content = UNMutableNotificationContent()
-                    content.title = nextPreset.name
-                    content.body = String(localized: "「\(nextPreset.name)」に切り替わりました。")
+                    content.title = nextPreset.displayName
+                    content.body = String(localized: "「\(nextPreset.displayName)」に切り替わりました。")
                     content.sound = nil // 音なし
                     
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
@@ -498,8 +498,8 @@ struct ClipHoldApp: App {
                 if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
                     let notificationCenter = UNUserNotificationCenter.current()
                     let content = UNMutableNotificationContent()
-                    content.title = previousPreset.name
-                    content.body = String(localized: "「\(previousPreset.name)」に切り替わりました。")
+                    content.title = previousPreset.displayName
+                    content.body = String(localized: "「\(previousPreset.displayName)」に切り替わりました。")
                     content.sound = nil // 音なし
                     
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)

@@ -10,4 +10,12 @@ struct StandardPhrasePreset: Identifiable, Codable {
         self.name = name
         self.phrases = phrases
     }
+    
+    var displayName: String {
+        if id.uuidString == "00000000-0000-0000-0000-000000000000" {
+            return String(localized: "Default")
+        } else {
+            return name
+        }
+    }
 }
