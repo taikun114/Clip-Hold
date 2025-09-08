@@ -45,13 +45,26 @@ extension ClipboardManager {
                 
                 // リッチテキストが存在する場合は、リッチテキストとプレーンテキストの両方を書き込む
                 if let richText = item.richText {
-                    // リッチテキストを書き込む
-                    if pasteboard.setString(richText, forType: .rtf) {
-                        print("クリップボードにリッチテキストがコピーされました: \(richText.prefix(20))...")
-                    }
-                    // プレーンテキストも書き込む (フォールバック用)
-                    if pasteboard.setString(item.text, forType: .string) {
-                        print("クリップボードにプレーンテキストがコピーされました: \(item.text.prefix(20))...")
+                    // リッチテキストがHTMLの場合
+                    if richText.hasPrefix("<!DOCTYPE html") || richText.hasPrefix("<html") || richText.hasPrefix("<HTML") || richText.hasPrefix("<meta") {
+                        // Apple HTML pasteboard type を使用してHTMLフラグメントを書き込む
+                        let appleHTMLType = NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type")
+                        if pasteboard.setString(richText, forType: appleHTMLType) {
+                            print("クリップボードにApple HTMLがコピーされました: \(richText.prefix(20))...")
+                        }
+                        // プレーンテキストも書き込む (フォールバック用)
+                        if pasteboard.setString(item.text, forType: .string) {
+                            print("クリップボードにプレーンテキストがコピーされました: \(item.text.prefix(20))...")
+                        }
+                    } else {
+                        // RTFを書き込む
+                        if pasteboard.setString(richText, forType: .rtf) {
+                            print("クリップボードにリッチテキストがコピーされました: \(richText.prefix(20))...")
+                        }
+                        // プレーンテキストも書き込む (フォールバック用)
+                        if pasteboard.setString(item.text, forType: .string) {
+                            print("クリップボードにプレーンテキストがコピーされました: \(item.text.prefix(20))...")
+                        }
                     }
                 } else {
                     // リッチテキストがない場合は、プレーンテキストのみを書き込む

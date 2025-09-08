@@ -96,8 +96,10 @@ extension ClipboardManager {
                     
                     // 1. ペーストボードの主要なデータタイプを事前にチェック
                     let availableTypes = pasteboard.types ?? []
+                    print("DEBUG: checkPasteboard - Available pasteboard types: \(availableTypes.map { $0.rawValue })")
                     let hasFileURLType = availableTypes.contains(.fileURL)
                     let hasRTFType = availableTypes.contains(.rtf) // RTFタイプのチェックを追加
+                    let hasHTMLType = availableTypes.contains(.html) || availableTypes.contains(NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type"))
                     let hasImageDataType = availableTypes.contains(.tiff) || availableTypes.contains(.png) || (pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage) != nil
                     let hasURLType = availableTypes.contains(.URL) || pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.URL.rawValue])
                     
@@ -252,6 +254,38 @@ extension ClipboardManager {
                         }
                         success = true
                         return
+                    }
+                    
+                    // 5. HTMLデータをチェック (中優先度)
+                    // 画像データがある場合は、HTMLは無視する
+                    // RTFがある場合も、HTMLは無視する
+                    if hasHTMLType && !hasImageDataType && !hasRTFType {
+                        var htmlString: String? = nil
+                        if availableTypes.contains(.html) {
+                            htmlString = pasteboard.string(forType: .html)
+                        } else if availableTypes.contains(NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type")) {
+                            htmlString = pasteboard.string(forType: NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type"))
+                        }
+                        
+                        if let htmlString = htmlString {
+                            print("DEBUG: checkPasteboard - HTML String detected (first 200 chars): \(htmlString.prefix(200))...")
+                            // HTMLのプレーンテキスト表現も取得 (表示用)
+                            let plainText = pasteboard.string(forType: .string) ?? htmlString // HTMLからプレーンテキストを抽出できない場合は、HTML自体をプレーンテキストとして使用
+                            
+                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let newItem = ClipboardItem(richText: htmlString, text: plainText, date: Date(), qrCodeContent: nil, sourceAppPath: sourceAppPath)
+                            await MainActor.run {
+                                self.addAndSaveItem(newItem)
+                            }
+                            if wasInternalCopyInitially {
+                                await MainActor.run {
+                                    self.isPerformingInternalCopy = false
+                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after HTML string processing.")
+                                }
+                            }
+                            success = true
+                            return
+                        }
                     }
                     
                     // 4. ローカルファイルURLが有効でない場合、またはWeb URLと画像データが両方存在する場合 -> 画像データを優先 (高優先度)
