@@ -1287,6 +1287,22 @@
         }
       }
     },
+    "アプリではありません" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not the App"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリではありません"
+          }
+        }
+      }
+    },
     "アプリのすべての設定を初期状態に戻します。コピー履歴と定型文は影響を受けません。" : {
       "localizations" : {
         "en" : {
@@ -6291,6 +6307,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "除外するアプリ"
+          }
+        }
+      }
+    },
+    "除外するアプリにはアプリのみ追加することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only apps can be added to the list of Apps to Exclude."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外するアプリにはアプリのみ追加することができます。"
           }
         }
       }
