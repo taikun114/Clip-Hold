@@ -1,14 +1,17 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
-## 1.3.3 (under development)
+## 1.4.0 (under development)
 ### New Features
 - **Support for Rich Text**
   - This fixes a issue ([**#3**](https://github.com/taikun114/Clip-Hold/issues/3)) that caused text to be copied as an image in Microsoft Office software.
 - **Add “Copy as Plain Text” in the History window when the history item is rich text**
+- **Add the feature to be able to add apps by drag and drop to the Preset to Assign list in Standard Phrases Settings and the Apps to Exclude list in Privacy Settings**
 
 ### Bug Fixes and Improvements
 - **Fix issue that voice input is entered in the standard phrase input field when the preset add screen is opened from the standard phrase add screen**
+- **Fix issue that “Show All Processes” does not work on the add apps to exclude screen in Privacy Settings**
+- **Fix issue that default preset name was not localized in the notification shown when switching presets using shortcut keys**
 - **Improve the Settings screen and add standard phrase screen when no presets exist**
 - **Improve the focus back to the input field when returning to the add standard phrase screen after adding a preset from the add standard phrase screen**
 
