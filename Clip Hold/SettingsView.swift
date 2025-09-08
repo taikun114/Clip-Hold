@@ -141,11 +141,15 @@ struct SettingsView: View {
                 historyIndex = navigationHistory.count - 1
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            isWindowFocused = true
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeMainNotification)) { notification in
+            if let window = notification.object as? NSWindow, window.identifier == NSUserInterfaceItemIdentifier("SettingsWindow") {
+                isWindowFocused = true
+            }
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
-            isWindowFocused = false
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didResignMainNotification)) { notification in
+            if let window = notification.object as? NSWindow, window.identifier == NSUserInterfaceItemIdentifier("SettingsWindow") {
+                isWindowFocused = false
+            }
         }
     }
 
