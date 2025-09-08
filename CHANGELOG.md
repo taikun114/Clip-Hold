@@ -2,6 +2,11 @@
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
 ## 1.3.3 (under development)
+### New Features
+- **Support for Rich Text**
+  - This fixes a issue ([**#3**](https://github.com/taikun114/Clip-Hold/issues/3)) that caused text to be copied as an image in Microsoft Office software.
+- **Add “Copy as Plain Text” in the History window when the history item is rich text**
+
 ### Bug Fixes and Improvements
 - **Fix issue that voice input is entered in the standard phrase input field when the preset add screen is opened from the standard phrase add screen**
 - **Improve the Settings screen and add standard phrase screen when no presets exist**
@@ -13,7 +18,7 @@
   - Prevents the preset switching when the Clip Hold window (such as the Standard Phrases window) is focused.
 
 ### Bug Fixes and Improvements
-- **Fix the issue (#2) that when “Maximum number of history items to save” is set, old history items are saved instead of the set number of new history items**
+- **Fix the issue ([#2](https://github.com/taikun114/Clip-Hold/issues/2)) that when “Maximum number of history items to save” is set, old history items are saved instead of the set number of new history items**
 - **Improve margins on the edit standard phrase screen**
 - **Improve to remember the last selected preset when importing presets**
 
