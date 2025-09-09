@@ -10,6 +10,7 @@ struct HistoryWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
+    @EnvironmentObject var frontmostAppMonitor: FrontmostAppMonitor
     @Environment(\.dismiss) var dismiss
 
     @State private var searchText: String = ""
@@ -87,7 +88,22 @@ struct HistoryWindowView: View {
             
             let filtered = historyCopy.filter { item in
                 // App filter
-                let matchesApp = selectedApp == nil || (item.sourceAppPath?.contains(selectedApp!) ?? false)
+                let matchesApp: Bool
+                if selectedApp == "auto_filter_mode" {
+                    if let frontmostID = frontmostAppMonitor.frontmostAppBundleIdentifier {
+                        if let path = item.sourceAppPath, let itemBundle = Bundle(path: path) {
+                            matchesApp = itemBundle.bundleIdentifier == frontmostID
+                        } else {
+                            matchesApp = false
+                        }
+                    } else {
+                        matchesApp = false
+                    }
+                } else if selectedApp == nil {
+                    matchesApp = true
+                } else {
+                    matchesApp = item.sourceAppPath == selectedApp
+                }
                 
                 // Search text filter
                 let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
@@ -199,6 +215,11 @@ struct HistoryWindowView: View {
         .onChange(of: selectedFilter) { _, _ in performUpdate() }
         .onChange(of: selectedSort) { _, _ in performUpdate() }
         .onChange(of: selectedApp) { _, _ in performUpdate() }
+        .onChange(of: frontmostAppMonitor.frontmostAppBundleIdentifier) { _, _ in
+            if selectedApp == "auto_filter_mode" {
+                performUpdate()
+            }
+        }
         .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
         .onAppear {
             performUpdate()

@@ -78,6 +78,7 @@ struct HistorySearchBar: View {
                     Divider()
                     Picker(selection: $selectedApp) {
                         Label("すべてのアプリ", systemImage: "app").tag(nil as String?)
+                        Label("自動", systemImage: "app.badge.checkmark").tag("auto_filter_mode" as String?)
                         Divider()
                         ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { path, localizedName in
                             Label {

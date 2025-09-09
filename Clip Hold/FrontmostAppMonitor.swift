@@ -3,12 +3,17 @@ import AppKit
 import Combine
 
 @MainActor
-class FrontmostAppMonitor {
+class FrontmostAppMonitor: ObservableObject {
     static let shared = FrontmostAppMonitor()
+    
+    @Published var frontmostAppBundleIdentifier: String?
+    
     private var cancellables = Set<AnyCancellable>()
     private var previousPresetId: UUID? = nil
 
-    private init() {}
+    private init() {
+        self.frontmostAppBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+    }
 
     func startMonitoring() {
         NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didActivateApplicationNotification)
@@ -20,6 +25,7 @@ class FrontmostAppMonitor {
             }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] bundleIdentifier in
+                self?.frontmostAppBundleIdentifier = bundleIdentifier
                 self?.handleAppActivation(bundleIdentifier: bundleIdentifier)
             }
             .store(in: &cancellables)

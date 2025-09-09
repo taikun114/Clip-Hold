@@ -42,6 +42,7 @@ struct ClipHoldApp: App {
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
     @StateObject var presetManager = StandardPhrasePresetManager.shared
+    @StateObject var frontmostAppMonitor = FrontmostAppMonitor.shared
 
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
@@ -49,6 +50,7 @@ struct ClipHoldApp: App {
     init() {
         print("ClipHoldApp: Initializing with ClipboardManager and StandardPhraseManager.")
         
+        frontmostAppMonitor.startMonitoring()
         ClipHoldApp.setupGlobalShortcuts()
     }
     
@@ -396,6 +398,7 @@ struct ClipHoldApp: App {
         .environmentObject(clipboardManager)
         .environmentObject(standardPhraseManager)
         .environmentObject(presetManager)
+        .environmentObject(frontmostAppMonitor)
         .commands {
             CommandGroup(replacing: .appSettings) {
                 Button("設定...") {

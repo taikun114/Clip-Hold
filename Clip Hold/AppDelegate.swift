@@ -110,6 +110,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 .environmentObject(ClipboardManager.shared)
                 .environmentObject(StandardPhraseManager.shared)
                 .environmentObject(StandardPhrasePresetManager.shared)
+                .environmentObject(frontmostAppMonitor)
             
             let hostingController = NSHostingController(rootView: contentView)
             
