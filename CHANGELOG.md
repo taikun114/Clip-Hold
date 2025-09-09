@@ -8,6 +8,10 @@
 - **Support for PDF**
   - Software that stores data as PDF in the clipboard can now copy vector data as PDF.
 - **Add “Copy as Plain Text” in the History window when the history item is rich text**
+- **Add “Automatic” to the app filtering options in the History window**
+  - This option automatically filters based on the app currently in focus.
+- **Add “Exclude Clip Hold Windows with App's ‘Automatic’ Filtering” to the History Window section in General Settings**
+  - Do not switch the filtered app when you focus the Clip Hold window (such as the History window) while the app's “Automatic” filtering is active.
 - **Add the feature to be able to add apps by drag and drop to the Preset to Assign list in Standard Phrases Settings and the Apps to Exclude list in Privacy Settings**
 
 ### Bug Fixes and Improvements
