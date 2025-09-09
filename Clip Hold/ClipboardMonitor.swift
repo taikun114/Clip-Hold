@@ -100,6 +100,7 @@ extension ClipboardManager {
                     let hasFileURLType = availableTypes.contains(.fileURL)
                     let hasRTFType = availableTypes.contains(.rtf) // RTFタイプのチェックを追加
                     let hasHTMLType = availableTypes.contains(.html) || availableTypes.contains(NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type"))
+                    let hasPDFType = availableTypes.contains(.pdf) || availableTypes.contains(NSPasteboard.PasteboardType(rawValue: "Apple PDF pasteboard type"))
                     let hasImageDataType = availableTypes.contains(.tiff) || availableTypes.contains(.png) || (pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage) != nil
                     let hasURLType = availableTypes.contains(.URL) || pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.URL.rawValue])
                     
@@ -281,6 +282,27 @@ extension ClipboardManager {
                                 await MainActor.run {
                                     self.isPerformingInternalCopy = false
                                     print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after HTML string processing.")
+                                }
+                            }
+                            success = true
+                            return
+                        }
+                    }
+                    
+                    // PDFデータをチェック (画像データより優先)
+                    if hasPDFType {
+                        if let pdfData = pasteboard.data(forType: .pdf) ?? pasteboard.data(forType: NSPasteboard.PasteboardType(rawValue: "Apple PDF pasteboard type")) {
+                            print("DEBUG: checkPasteboard - PDF data detected.")
+                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            if let newItem = await self.createClipboardItemFromPDFData(pdfData, sourceAppPath: sourceAppPath) {
+                                await MainActor.run {
+                                    self.addAndSaveItem(newItem)
+                                }
+                            }
+                            if wasInternalCopyInitially {
+                                await MainActor.run {
+                                    self.isPerformingInternalCopy = false
+                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after PDF data processing.")
                                 }
                             }
                             success = true

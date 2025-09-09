@@ -1059,6 +1059,22 @@
         }
       }
     },
+    "PDF File" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFファイル"
+          }
+        }
+      }
+    },
     "PID: %@" : {
       "shouldTranslate" : false
     },

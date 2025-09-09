@@ -337,6 +337,68 @@ extension ClipboardManager {
         }
     }
 
+    // MARK: - New Helper function for PDF duplication check and saving
+    func createClipboardItemFromPDFData(_ pdfData: Data, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? {
+        guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
+
+        let newPDFSize = UInt64(pdfData.count)
+        // PDFデータのハッシュを計算
+        let newPDFHash = HashCalculator.calculateImageDataHash(pdfData)
+
+        print("DEBUG: createClipboardItemFromPDFData - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
+
+        // MARK: - PDFサイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
+        if !isPerformingInternalCopy {
+            if !isFromAlertConfirmation {
+                if maxFileSizeToSave > 0 && newPDFSize > maxFileSizeToSave {
+                    print("ClipboardManager: PDF not saved due to size limit. PDF size: \(newPDFSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
+                    return nil
+                } else if largeFileAlertThreshold > 0 && newPDFSize > largeFileAlertThreshold {
+                    await MainActor.run {
+                        // PDFはpendingLargeImageDataを再利用する（タイプを区別する必要があれば新しいプロパティを追加）
+                        self.pendingLargeImageData = (pdfData, nil)
+                        self.pendingLargeFileItemsSourceAppPath = sourceAppPath
+                        self.showingLargeFileAlert = true
+                        print("DEBUG: createClipboardItemFromPDFData - Setting showingLargeFileAlert to true for PDF data (size: \(newPDFSize))")
+                    }
+                    return nil
+                }
+            }
+        }
+
+        do {
+            let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles)
+
+            for sandboxedFileURL in sandboxedFileContents {
+                if sandboxedFileURL.pathExtension.lowercased() == "pdf" {
+                    if let sandboxedData = try? Data(contentsOf: sandboxedFileURL) {
+                        let sandboxedPDFHash = HashCalculator.calculateImageDataHash(sandboxedData)
+                        if newPDFHash == sandboxedPDFHash {
+                            print("ClipboardManager: Found duplicate PDF in sandbox based on file hash: \(sandboxedFileURL.lastPathComponent)")
+                            let attributes = getFileAttributes(sandboxedFileURL)
+                            return ClipboardItem(text: String(localized: "PDF File"), date: Date(), filePath: sandboxedFileURL, fileSize: attributes.fileSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+                        }
+                    }
+                }
+            }
+        } catch {
+            print("ClipboardManager: Error getting contents of sandbox directory for PDF duplicate check: \(error.localizedDescription)")
+        }
+
+        // 重複が見つからなかった場合、新しいPDFを保存
+        let uniqueFileName = "\(UUID().uuidString)-file.pdf"
+        let destinationURL = filesDirectory.appendingPathComponent(uniqueFileName)
+
+        do {
+            try pdfData.write(to: destinationURL)
+            print("ClipboardManager: New PDF saved to sandbox as \(destinationURL.lastPathComponent)")
+            return ClipboardItem(text: String(localized: "PDF File"), date: Date(), filePath: destinationURL, fileSize: newPDFSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+        } catch {
+            print("ClipboardManager: Error saving new PDF to sandbox: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     // MARK: - Helper function for duplication check
     func isDuplicate(_ newItem: ClipboardItem, of existingItem: ClipboardItem) -> Bool { // private から internal に変更
         // ファイルアイテムの場合、ファイルハッシュで重複を判定（ハッシュが利用可能な場合）
