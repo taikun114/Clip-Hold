@@ -123,6 +123,16 @@ struct HistoryItemRow: View {
         self.showCharacterCount = showCharacterCount
     }
 
+    private var itemDisplayText: Text {
+        if item.text == "Image File" {
+            return Text("Image File")
+        } else if item.text == "PDF File" {
+            return Text("PDF File")
+        } else {
+            return Text(verbatim: item.text)
+        }
+    }
+
     private var actionMenuItems: some View {
         Group {
             Button {
@@ -345,7 +355,7 @@ struct HistoryItemRow: View {
                 .contentShape(Rectangle())
 
             VStack(alignment: .leading) {
-                Text(item.text)
+                itemDisplayText
                     .lineLimit(1)
                     .font(.body)
                     .truncationMode(.tail)

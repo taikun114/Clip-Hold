@@ -307,7 +307,7 @@ extension ClipboardManager {
                         if newImageHash == sandboxedImageHash {
                             print("ClipboardManager: Found duplicate image in sandbox based on file hash: \(sandboxedFileURL.lastPathComponent)")
                             // ファイルサイズとハッシュもセット
-                            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: sandboxedImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+                            return ClipboardItem(text: "Image File", date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: sandboxedImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
                         }
                     } else {
                         // データが読み込めなかった場合、従来のファイルサイズによるチェックを行う
@@ -330,7 +330,7 @@ extension ClipboardManager {
             try imageData.write(to: destinationURL)
             print("ClipboardManager: New image saved to sandbox as \(destinationURL.lastPathComponent)")
             // ファイルサイズとハッシュもセット
-            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: newImageSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+            return ClipboardItem(text: "Image File", date: Date(), filePath: destinationURL, fileSize: newImageSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
         } catch {
             print("ClipboardManager: Error saving new image to sandbox: \(error.localizedDescription)")
             return nil
@@ -376,7 +376,7 @@ extension ClipboardManager {
                         if newPDFHash == sandboxedPDFHash {
                             print("ClipboardManager: Found duplicate PDF in sandbox based on file hash: \(sandboxedFileURL.lastPathComponent)")
                             let attributes = getFileAttributes(sandboxedFileURL)
-                            return ClipboardItem(text: String(localized: "PDF File"), date: Date(), filePath: sandboxedFileURL, fileSize: attributes.fileSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+                            return ClipboardItem(text: "PDF File", date: Date(), filePath: sandboxedFileURL, fileSize: attributes.fileSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
                         }
                     }
                 }
@@ -392,7 +392,7 @@ extension ClipboardManager {
         do {
             try pdfData.write(to: destinationURL)
             print("ClipboardManager: New PDF saved to sandbox as \(destinationURL.lastPathComponent)")
-            return ClipboardItem(text: String(localized: "PDF File"), date: Date(), filePath: destinationURL, fileSize: newPDFSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+            return ClipboardItem(text: "PDF File", date: Date(), filePath: destinationURL, fileSize: newPDFSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
         } catch {
             print("ClipboardManager: Error saving new PDF to sandbox: \(error.localizedDescription)")
             return nil
