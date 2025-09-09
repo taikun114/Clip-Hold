@@ -5,6 +5,8 @@
 ### New Features
 - **Support for Rich Text**
   - This fixes a issue ([**#3**](https://github.com/taikun114/Clip-Hold/issues/3)) that caused text to be copied as an image in Microsoft Office software.
+- **Support for PDF**
+  - Software that stores data as PDF in the clipboard can now copy vector data as PDF.
 - **Add “Copy as Plain Text” in the History window when the history item is rich text**
 - **Add the feature to be able to add apps by drag and drop to the Preset to Assign list in Standard Phrases Settings and the Apps to Exclude list in Privacy Settings**
 
@@ -20,6 +22,8 @@
   - Added a message indicating the number of standard phrases within the preset being deleted and that they will be removed.
 - **Improve focus detection in the Settings window**
    - Improved the styling of the “Information” button in the Settings window to ensure it is properly set.
+- **Improve only the display name of image files to be localized**
+    - Image files that cannot be obtained by name such as images copied from a web browser are now properly localized when copied and then the system language is changed.
 
 ## 1.3.2
 ### New Features
