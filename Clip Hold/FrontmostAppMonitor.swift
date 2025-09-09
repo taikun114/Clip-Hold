@@ -25,8 +25,14 @@ class FrontmostAppMonitor: ObservableObject {
             }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] bundleIdentifier in
-                self?.frontmostAppBundleIdentifier = bundleIdentifier
-                self?.handleAppActivation(bundleIdentifier: bundleIdentifier)
+                guard let self = self else { return }
+
+                if UserDefaults.standard.bool(forKey: "excludeClipHoldWindowsFromAutoFilter") && bundleIdentifier == "design.taikun.Clip-Hold" {
+                    return
+                }
+
+                self.frontmostAppBundleIdentifier = bundleIdentifier
+                self.handleAppActivation(bundleIdentifier: bundleIdentifier)
             }
             .store(in: &cancellables)
     }

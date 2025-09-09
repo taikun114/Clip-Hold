@@ -291,14 +291,14 @@ private struct PresetAssignmentSection: View {
         ) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text("Clip Holdのウィンドウを除外する")
+                    Text("Clip Holdのウィンドウを除外")
                     Text("Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
                 Toggle(isOn: $excludeStandardPhraseWindowFromPresetSwitching) {
-                    Text("Clip Holdのウィンドウを除外する")
+                    Text("Clip Holdのウィンドウを除外")
                     Text("Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。")
                 }
                 .toggleStyle(.switch)
