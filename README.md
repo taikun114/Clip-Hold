@@ -1,7 +1,7 @@
 # Clip Hold
 **English** | [日本語](docs/README-ja.md)
 
-![Clip Hold Clipboard and Standard Phrase Manager](docs/images/Clip-Hold_Banner.png)
+![Clip Hold Clipboard and Standard Phrase Manager](docs/images/Clip-Hold_Banner.webp)
 
 <p align="center">
   <a href="https://github.com/taikun114/Clip-Hold">
@@ -19,7 +19,7 @@
 
 <p align="center">
   <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
-    <img alt="Buy Me a Coffee" src="docs/images/blue-button.png">
+    <img alt="Buy Me a Coffee" src="docs/images/blue-button.webp">
   </a>
 </p>
 
@@ -56,7 +56,7 @@
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
 ## What is Clip Hold?
-![Standard Phrases and Copy History](docs/images/Standard-Phrase-and-History.png)
+![Standard Phrases and Copy History](docs/images/Standard-Phrase-and-History.webp)
 
 Clip Hold is a clipboard and standard phrase manager app for macOS.
 
@@ -85,37 +85,37 @@ Clip Hold is not just a clipboard manager. \
 It is a clipboard manager app with a lot of very useful features that were designed by me, a power user who has been using Mac for more than 10 years.
 
 ### Quick Access to Standard Phrases and History from the Menu
-![Standard Phrases and Copy History](docs/images/Standard-Phrase-and-History.png)
+![Standard Phrases and Copy History](docs/images/Standard-Phrase-and-History.webp)
 
 Frequently used standard phrases and copy history items can be accessed quickly from the menu. You can easily copy an item by simply clicking on it.
 
 ### Standard Phrases Window and History Window
-![Standard Phrases Window and History Window](docs/images/Standard-Phrase-and-History-Window.png)
+![Standard Phrases Window and History Window](docs/images/Standard-Phrase-and-History-Window.webp)
 
 You can list all standard phrases you have set and all saved history items. You can easily copy an item by simply double-clicking on it.
 
 ### Standard Phrases Presets and Assign to Apps Feature
-![Presets](docs/images/Presets.png)
+![Presets](docs/images/Presets.webp)
 
 Standard Phrases can be grouped into different presets, and the presets can be automatically switched depending on the app that is opened. Presets can also be switched using shortcut keys.
 
 ### Rich Shortcut Keys
-![Shortcut Keys](docs/images/Shortcuts.png)
+![Shortcut Keys](docs/images/Shortcuts.webp)
 
 Dedicated shortcut keys allow you to quickly copy up to 10 standard phrases and 10 copy history items. You can also open the standard phrases and history windows instantly.
 
 ### Quickly Paste with Quick Paste
-![Quick Paste](docs/images/Quick-Paste.gif)
+![Quick Paste](docs/images/Quick-Paste.webp)
 
 With the "Quick Paste” feature, when you copy an item from the menu or use a shortcut key, the copied content is immediately pasted. You don't need to paste it yourself.
 
 ### Import and Export Features
-![Import and Export Features](docs/images/Import-Export.png)
+![Import and Export Features](docs/images/Import-Export.webp)
 
 Standard phrases and clipboard history can be imported and exported. You can share your favorite standard phrases with someone else, or import clipboard history from another Mac.
 
 ### Copied Color Codes Can Be Shown
-![Color Codes](docs/images/Color-Codes.png)
+![Color Codes](docs/images/Color-Codes.webp)
 
 By enabling it from the “Developer Features” settings, you can show the color icons based on the copied color codes in the history window and the menu.
 
@@ -126,13 +126,13 @@ While usage data and crash reports may be shared if users have enabled "Share wi
 Below is an introduction of the privacy features included in the app.
 
 #### Pause anytime you do not want it saved in the history
-![Pause Clipboard Monitoring](docs/images/Pause-Clipboard-Monitoring.png)
+![Pause Clipboard Monitoring](docs/images/Pause-Clipboard-Monitoring.webp)
 
 You can pause clipboard monitoring when you do not want the copied contents to be saved in the history, such as when copying passwords or confidential information.\
 While paused, the menu bar icon becomes translucent so you can see the current status at a glance. You will receive a notification when you start the app while it is paused, so you will never forget to resume clipboard monitoring.
 
 #### You can exclude apps from clipboard monitoring
-![Apps to Exclude](docs/images/Apps-to-Exclude.png)
+![Apps to Exclude](docs/images/Apps-to-Exclude.webp)
 
 If you do not want the history to be saved only in specific apps, no problem, you can add apps to exclude from clipboard monitoring. There is no need to pause clipboard monitoring.
 
@@ -165,7 +165,7 @@ You can donate using the following services.
 You can support me at [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_taikun) from the price of a cup of green tea.
 
 <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
-  <img alt="Buy Me a Coffee" src="docs/images/blue-button.png">
+  <img alt="Buy Me a Coffee" src="docs/images/blue-button.webp">
 </a>
 
 #### PayPal\.Me
