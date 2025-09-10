@@ -9,6 +9,7 @@ class ClipboardManager: ObservableObject {
     static let shared = ClipboardManager()
 
     @Published var clipboardHistory: [ClipboardItem] = []
+    @Published var filteredHistoryForShortcuts: [ClipboardItem]? = nil
 
     // MARK: - Properties that need to remain in the main class
     var saveTask: Task<Void, Never>?

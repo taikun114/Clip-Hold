@@ -4825,6 +4825,38 @@
         }
       }
     },
+    "履歴ウィンドウが開いていてフィルタリングが適用されている場合、ショートカットキーでフィルタリングされた履歴をコピーできるようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow copying filtered history using shortcut keys when the History window is open and filtering is applied."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウが開いていてフィルタリングが適用されている場合、ショートカットキーでフィルタリングされた履歴をコピーできるようにします。"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウでフィルタリングされたコピー履歴を使用" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Filtered Copy History in the History Window"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウでフィルタリングされたコピー履歴を使用"
+          }
+        }
+      }
+    },
     "履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。" : {
       "localizations" : {
         "en" : {

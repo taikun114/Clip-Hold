@@ -554,13 +554,18 @@ struct ClipHoldApp: App {
             KeyboardShortcuts.onKeyDown(for: shortcutName) {
                 // ClipboardManager はシングルトンなので、static context からも .shared でアクセス可能
                 let clipboardManager = ClipboardManager.shared
+                let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
 
-                // UI表示順序（日付の新しい順）に並び替えた配列を一時的に作成
-                let sortedHistoryForUI = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+                let historySource: [ClipboardItem]
+                if useFiltered, let filteredList = clipboardManager.filteredHistoryForShortcuts {
+                    historySource = filteredList
+                } else {
+                    historySource = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+                }
 
                 // 並び替えた配列に対してインデックスを適用
-                if sortedHistoryForUI.indices.contains(i) {
-                    let historyItem = sortedHistoryForUI[i]
+                if historySource.indices.contains(i) {
+                    let historyItem = historySource[i]
                     NSPasteboard.general.clearContents()
 
                     // 内部コピーフラグをtrueに設定
