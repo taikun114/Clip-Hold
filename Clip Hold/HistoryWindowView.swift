@@ -72,6 +72,7 @@ struct HistoryWindowView: View {
     private func performUpdate(isIncrementalUpdate: Bool = false) {
         if !isIncrementalUpdate {
             isLoading = true
+            self.filteredHistory = []
             clipboardManager.filteredHistoryForShortcuts = []
         }
         
@@ -140,6 +141,7 @@ struct HistoryWindowView: View {
                 }
             }
 
+            self.filteredHistory = sorted
             clipboardManager.filteredHistoryForShortcuts = sorted
             isLoading = false
         }
@@ -221,7 +223,9 @@ struct HistoryWindowView: View {
         }
         .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
         .onChange(of: clipboardManager.filteredHistoryForShortcuts) { _, newValue in
-            filteredHistory = newValue ?? []
+            withAnimation {
+                filteredHistory = newValue ?? []
+            }
         }
         .onAppear {
             clipboardManager.filteredHistoryForShortcuts = []
