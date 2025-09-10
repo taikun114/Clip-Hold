@@ -1,7 +1,7 @@
 # Clip Hold 変更ログ
 [English](/CHANGELOG.md) | **日本語**
 
-## 1.4.0（開発中）
+## 1.4.0
 ### 新機能
 - **リッチテキストに対応**
   - これにより、Microsoft Officeソフトでテキストが画像としてコピーされてしまう問題（[**#3**](https://github.com/taikun114/Clip-Hold/issues/3)）が修正されました。

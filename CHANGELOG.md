@@ -1,7 +1,7 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
-## 1.4.0 (under development)
+## 1.4.0
 ### New Features
 - **Support for Rich Text**
   - This fixes a issue ([**#3**](https://github.com/taikun114/Clip-Hold/issues/3)) that caused text to be copied as an image in Microsoft Office software.
