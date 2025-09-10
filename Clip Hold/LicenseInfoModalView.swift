@@ -298,10 +298,16 @@ struct LicenseInfoModalView: View {
         }
         .frame(width: 650, height: 450) // モーダル全体のサイズ
         .background(Color(.controlBackgroundColor)) // モーダル全体の背景色
-        .overlay(alignment: .bottom) { // 下部にオーバーレイとしてVisualEffectViewとボタンを配置
+        .overlay(alignment: .bottom) {
             ZStack(alignment: .center) {
-                VisualEffectView(material: .headerView, blendingMode: .withinWindow)
-                    .edgesIgnoringSafeArea(.horizontal) // 水平方向いっぱいに広がるようにする
+                if #available(macOS 26, *) {
+                    Color.clear
+                        .glassEffect()
+                        .edgesIgnoringSafeArea(.horizontal)
+                } else {
+                    VisualEffectView(material: .headerView, blendingMode: .withinWindow)
+                        .edgesIgnoringSafeArea(.horizontal)
+                }
 
                 HStack {
                     Spacer()

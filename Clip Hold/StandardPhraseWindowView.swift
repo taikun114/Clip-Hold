@@ -154,6 +154,7 @@ struct StandardPhraseWindowView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
 
     @State private var searchText: String = ""
     @State private var filteredPhrases: [StandardPhrase] = []
@@ -252,8 +253,15 @@ struct StandardPhraseWindowView: View {
     
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
-            VisualEffectView(material: .menu, blendingMode: .behindWindow)
-                .ignoresSafeArea()
+            if #available(macOS 26, *) {
+                Color.clear
+                    .glassEffect(in: .rect(cornerRadius: 16.0))
+                    .overlay(colorScheme == .dark ? Color.black.opacity(0.2) : Color.white.opacity(0.5))
+                    .ignoresSafeArea()
+            } else {
+                VisualEffectView(material: .menu, blendingMode: .behindWindow)
+                    .ignoresSafeArea()
+            }
 
             ZStack { // メインコンテンツを囲むZStack
                 VStack(spacing: 0) {
