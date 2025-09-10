@@ -50,7 +50,6 @@ struct ClipHoldApp: App {
     init() {
         print("ClipHoldApp: Initializing with ClipboardManager and StandardPhraseManager.")
         
-        frontmostAppMonitor.startMonitoring()
         ClipHoldApp.setupGlobalShortcuts()
     }
     
