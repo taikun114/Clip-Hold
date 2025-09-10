@@ -125,7 +125,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
             window.contentViewController = hostingController
             
+            
             historyWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: true, windowFrameAutosaveKey: "HistoryWindowFrame")
+            historyWindowController?.onWindowWillClose = { [weak self] in
+                ClipboardManager.shared.resetHistoryViewFilters()
+                self?.historyWindowController = nil
+                print("AppDelegate: History window closed and filters reset.")
+            }
             historyWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
@@ -164,6 +170,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             window.contentViewController = hostingController
             
             standardPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: true, windowFrameAutosaveKey: "StandardPhraseWindowFrame")
+            standardPhraseWindowController?.onWindowWillClose = { [weak self] in
+                self?.standardPhraseWindowController = nil
+                print("AppDelegate: Standard Phrase window closed.")
+            }
             standardPhraseWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
@@ -319,7 +329,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
     // MARK: - NSWindowDelegate
     func windowWillClose(_ notification: Notification) {
-        if let closedWindow = notification.object as? NSWindow, closedWindow == addPhraseWindowController?.window {
+        guard let closedWindow = notification.object as? NSWindow else { return }
+
+        if closedWindow == addPhraseWindowController?.window {
             print("AppDelegate: Add Phrase window will close. Setting addPhraseWindowController to nil (async).")
             // ここで参照をnilにするのを遅延させ、システムがウィンドウのクローズ処理を完了する時間を確保する
             DispatchQueue.main.async { [weak self] in

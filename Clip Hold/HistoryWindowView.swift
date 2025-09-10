@@ -33,9 +33,7 @@ struct HistoryWindowView: View {
 
     @State private var previousClipboardHistoryCount: Int = 0
 
-    @State private var selectedFilter: ItemFilter = .all
-    @State private var selectedSort: ItemSort = .newest
-    @State private var selectedApp: String? = nil
+    
 
     @State private var searchDebounceTask: Task<Void, Never>? = nil
 
@@ -90,7 +88,7 @@ struct HistoryWindowView: View {
             let filtered = historyCopy.filter { item in
                 // App filter
                 let matchesApp: Bool
-                if selectedApp == "auto_filter_mode" {
+                if clipboardManager.historySelectedApp == "auto_filter_mode" {
                     if let frontmostID = frontmostAppMonitor.frontmostAppBundleIdentifier {
                         if let path = item.sourceAppPath, let itemBundle = Bundle(path: path) {
                             matchesApp = itemBundle.bundleIdentifier == frontmostID
@@ -100,10 +98,10 @@ struct HistoryWindowView: View {
                     } else {
                         matchesApp = false
                     }
-                } else if selectedApp == nil {
+                } else if clipboardManager.historySelectedApp == nil {
                     matchesApp = true
                 } else {
-                    matchesApp = item.sourceAppPath == selectedApp
+                    matchesApp = item.sourceAppPath == clipboardManager.historySelectedApp
                 }
                 
                 // Search text filter
@@ -111,7 +109,7 @@ struct HistoryWindowView: View {
 
                 // Item type filter
                 let matchesFilter: Bool
-                switch selectedFilter {
+                switch clipboardManager.historySelectedFilter {
                 case .all:
                     matchesFilter = true
                 case .textOnly:
@@ -130,7 +128,7 @@ struct HistoryWindowView: View {
             }
 
             let sorted = filtered.sorted { item1, item2 in
-                switch selectedSort {
+                switch clipboardManager.historySelectedSort {
                 case .newest:
                     return item1.date > item2.date
                 case .oldest:
@@ -158,9 +156,9 @@ struct HistoryWindowView: View {
                         isLoading: $isLoading,
                         isSearchFieldFocused: _isSearchFieldFocused,
                         clipboardHistoryCount: clipboardManager.clipboardHistory.count,
-                        selectedFilter: $selectedFilter,
-                        selectedSort: $selectedSort,
-                        selectedApp: $selectedApp
+                        selectedFilter: $clipboardManager.historySelectedFilter,
+                        selectedSort: $clipboardManager.historySelectedSort,
+                        selectedApp: $clipboardManager.historySelectedApp
                     )
 
                     Spacer(minLength: 0)
@@ -213,11 +211,11 @@ struct HistoryWindowView: View {
                 performUpdate()
             }
         }
-        .onChange(of: selectedFilter) { _, _ in performUpdate() }
-        .onChange(of: selectedSort) { _, _ in performUpdate() }
-        .onChange(of: selectedApp) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.historySelectedFilter) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.historySelectedSort) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.historySelectedApp) { _, _ in performUpdate() }
         .onChange(of: frontmostAppMonitor.frontmostAppBundleIdentifier) { _, _ in
-            if selectedApp == "auto_filter_mode" {
+            if clipboardManager.historySelectedApp == "auto_filter_mode" {
                 performUpdate()
             }
         }
@@ -248,9 +246,7 @@ struct HistoryWindowView: View {
         .onDisappear {
             clipboardManager.filteredHistoryForShortcuts = nil
             
-            selectedFilter = .all
-            selectedSort = .newest
-            selectedApp = nil
+            
             
             // ウインドウが閉じる際に実行中のタスクをキャンセルしてメモリを解放
             searchDebounceTask?.cancel()
