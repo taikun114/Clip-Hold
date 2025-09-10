@@ -7,6 +7,10 @@
   - This fixes a issue ([**#3**](https://github.com/taikun114/Clip-Hold/issues/3)) that caused text to be copied as an image in Microsoft Office software.
 - **Support for PDF**
   - Software that stores data as PDF in the clipboard can now copy vector data as PDF.
+- **Support Liquid Glass**
+   - New app icons designed for Liquid Glass have been added.
+   - Liquid Glass effects have been added to the background of the History and Standard Phrases windows, and to the overlay background of the License Information screen.
+   - Liquid Glass is available on macOS Tahoe or later.
 - **Add “Copy as Plain Text” in the History window when the history item is rich text**
 - **Add “Automatic” to the app filtering options in the History window**
   - This option automatically filters based on the app currently in focus.
