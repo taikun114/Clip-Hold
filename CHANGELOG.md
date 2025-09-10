@@ -12,6 +12,8 @@
   - This option automatically filters based on the app currently in focus.
 - **Add “Exclude Clip Hold Windows with App's ‘Automatic’ Filtering” to the History Window section in General Settings**
   - Do not switch the filtered app when you focus the Clip Hold window (such as the History window) while the app's “Automatic” filtering is active.
+- **Add “Use Filtered Copy History in the History Window” to the “Copy History” section in Shortcuts Settings**
+  - Allow copying filtered history using shortcut keys when the History window is open and filtering is applied.
 - **Add the feature to be able to add apps by drag and drop to the Preset to Assign list in Standard Phrases Settings and the Apps to Exclude list in Privacy Settings**
 
 ### Bug Fixes and Improvements
@@ -19,6 +21,8 @@
 - **Fix issue that “Show All Processes” does not work on the add apps to exclude screen in Privacy Settings**
 - **Fix issue that default preset name was not localized in the notification shown when switching presets using shortcut keys**
 - **Fix issue that the “Preset to Assign” picker in Standard Phrases Settings becomes empty when the selected preset is deleted**
+- **Fix issue that the remove app button (minus button on the list) does not update when switching the Preset to Assign list in Standard Phrases Settings**
+- **Fix issue that memory is not released even after closing the History and Standard Phrases windows**
 - **Improve the Settings screen and add standard phrase screen when no presets exist**
 - **Improve the Settings screen and Standard Phrases window when all presets are deleted**
 - **Improve the focus back to the input field when returning to the add standard phrase screen after adding a preset from the add standard phrase screen**
