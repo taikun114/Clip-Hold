@@ -342,6 +342,9 @@ private struct PresetAssignmentSection: View {
             }
             .pickerStyle(.menu)
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            .onChange(of: selectedPresetForAssignmentId) { _, _ in
+                selectedAssignedAppId = nil
+            }
 
             List(selection: $selectedAssignedAppId) {
                 ForEach(assignedApps, id: \.self) { bundleIdentifier in
