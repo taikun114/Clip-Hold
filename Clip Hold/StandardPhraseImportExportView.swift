@@ -294,12 +294,7 @@ struct StandardPhraseImportExportView: View {
                 presetConflicts.removeAll()
                 currentPresetIndexForConflictResolution = 0
                 
-                // インポート前の選択を復元
-                if let presetId = presetIdBeforeImport {
-                    presetManager.selectedPresetId = presetId
-                    presetManager.saveSelectedPresetId()
-                }
-                presetIdBeforeImport = nil
+                restoreSelectionAfterImport()
             }
             .environmentObject(standardPhraseManager)
         }
@@ -332,6 +327,14 @@ struct StandardPhraseImportExportView: View {
         } catch {
             importError = "ファイルの読み込みに失敗しました: \(error.localizedDescription)"
         }
+    }
+
+    private func restoreSelectionAfterImport() {
+        if let presetId = presetIdBeforeImport, presetId.uuidString != "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+            presetManager.selectedPresetId = presetId
+            presetManager.saveSelectedPresetId()
+        }
+        presetIdBeforeImport = nil
     }
     
     // MARK: - レガシーフォーマットインポート処理
@@ -380,12 +383,7 @@ struct StandardPhraseImportExportView: View {
                 // 競合がなければ直接追加
                 standardPhraseManager.addImportedPhrases(importedPhrases, toPresetId: presetId)
                 
-                // インポート前の選択を復元
-                if let presetId = presetIdBeforeImport {
-                    presetManager.selectedPresetId = presetId
-                    presetManager.saveSelectedPresetId()
-                }
-                presetIdBeforeImport = nil
+                restoreSelectionAfterImport()
             }
         } catch {
             importError = "ファイルの読み込みに失敗しました: \(error.localizedDescription)"
@@ -428,12 +426,7 @@ struct StandardPhraseImportExportView: View {
         }
         // 競合がない場合は何もしない（すでに非競合のプリセットは追加済み）
         
-        // インポート前の選択を復元
-        if let presetId = presetIdBeforeImport {
-            presetManager.selectedPresetId = presetId
-            presetManager.saveSelectedPresetId()
-        }
-        presetIdBeforeImport = nil
+        restoreSelectionAfterImport()
     }
     
     // MARK: - プリセット競合後の処理
@@ -653,12 +646,7 @@ struct StandardPhraseImportExportView: View {
             conflictingPresets.removeAll()
         }
         
-        // インポート前の選択を復元
-        if let presetId = presetIdBeforeImport {
-            presetManager.selectedPresetId = presetId
-            presetManager.saveSelectedPresetId()
-        }
-        presetIdBeforeImport = nil
+        restoreSelectionAfterImport()
     }
     
     // エクスポートファイル名を生成するメソッド

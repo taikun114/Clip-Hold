@@ -14,6 +14,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
     var applyTransparentBackground: Bool = true
 
     var windowFrameAutosaveKey: String?
+    var onWindowWillClose: (() -> Void)?
 
     // MARK: - Quick Look Properties
     private var quickLookItem: QLPreviewItem?
@@ -72,6 +73,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
             if let key = self.windowFrameAutosaveKey {
                 saveCurrentFrame(of: window, for: key)
             }
+            onWindowWillClose?()
         } else {
             print("ClipHoldWindowController: Window will close (object unknown).")
         }

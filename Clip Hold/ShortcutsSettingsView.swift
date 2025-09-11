@@ -23,6 +23,7 @@ extension Int {
 struct ShortcutsSettingsView: View {
     @StateObject private var presetManager = StandardPhrasePresetManager.shared
     @EnvironmentObject var clipboardManager: ClipboardManager
+    @AppStorage("useFilteredHistoryForShortcuts") private var useFilteredHistoryForShortcuts: Bool = false
 
     var body: some View {
         Form {
@@ -200,6 +201,18 @@ struct ShortcutsSettingsView: View {
             }
             
             Section(header: Text("コピー履歴").font(.headline)) {
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading) {
+                        Text("履歴ウィンドウでフィルタリングされたコピー履歴を使用")
+                        Text("履歴ウィンドウが開いていてフィルタリングが適用されている場合、ショートカットキーでフィルタリングされた履歴をコピーできるようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $useFilteredHistoryForShortcuts)
+                        .labelsHidden()
+                }
+
                 ForEach(0..<10, id: \.self) { index in
                     HStack {
                         Text("\((index + 1).ordinalSuffix)履歴をコピーする")

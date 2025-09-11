@@ -175,6 +175,40 @@
         }
       }
     },
+    "「%@」を本当に削除しますか？このプリセットに含まれる%lld個の定型文も削除されます。この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete “%1$@”? This will also delete %2$lld standard phrase included in this preset. This cannot be undone."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete “%1$@”? This will also delete %2$lld standard phrases included in this preset. This cannot be undone."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "「%1$@」を本当に削除しますか？このプリセットに含まれる%2$lld個の定型文も削除されます。この操作は元に戻せません。"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。" : {
       "localizations" : {
         "en" : {
@@ -570,7 +604,7 @@
         }
       }
     },
-    "Clip Holdのウィンドウを除外する" : {
+    "Clip Holdのウィンドウを除外" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -581,7 +615,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clip Holdのウィンドウを除外する"
+            "value" : "Clip Holdのウィンドウを除外"
           }
         }
       }
@@ -1025,6 +1059,22 @@
         }
       }
     },
+    "PDF File" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFファイル"
+          }
+        }
+      }
+    },
     "PID: %@" : {
       "shouldTranslate" : false
     },
@@ -1283,6 +1333,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリアイコンを表示"
+          }
+        }
+      }
+    },
+    "アプリではありません" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not the App"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリではありません"
+          }
+        }
+      }
+    },
+    "アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do not switch the filtered app when you focus the Clip Hold window (such as the History window) while the app's “Automatic” filtering is active."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。"
+          }
+        }
+      }
+    },
+    "アプリの「自動」フィルタリングでClip Holdのウィンドウを除外" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exclude Clip Hold Windows with App's “Automatic” Filtering"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリの「自動」フィルタリングでClip Holdのウィンドウを除外"
           }
         }
       }
@@ -4295,6 +4393,22 @@
         }
       }
     },
+    "割り当てるプリセットにはアプリのみ追加することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only apps can be added to the Preset to Assign."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "割り当てるプリセットにはアプリのみ追加することができます。"
+          }
+        }
+      }
+    },
     "動作中" : {
       "localizations" : {
         "en" : {
@@ -4707,6 +4821,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウ"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウが開いていてフィルタリングが適用されている場合、ショートカットキーでフィルタリングされた履歴をコピーできるようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow copying filtered history using shortcut keys when the History window is open and filtering is applied."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウが開いていてフィルタリングが適用されている場合、ショートカットキーでフィルタリングされた履歴をコピーできるようにします。"
+          }
+        }
+      }
+    },
+    "履歴ウィンドウでフィルタリングされたコピー履歴を使用" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Filtered Copy History in the History Window"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴ウィンドウでフィルタリングされたコピー履歴を使用"
           }
         }
       }
@@ -5527,6 +5673,22 @@
         }
       }
     },
+    "標準テキストとしてコピー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy as Plain Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準テキストとしてコピー"
+          }
+        }
+      }
+    },
     "権限" : {
       "localizations" : {
         "en" : {
@@ -5859,6 +6021,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集…"
+          }
+        }
+      }
+    },
+    "自動" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動"
           }
         }
       }
@@ -6275,6 +6453,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "除外するアプリ"
+          }
+        }
+      }
+    },
+    "除外するアプリにはアプリのみ追加することができます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only apps can be added to the list of Apps to Exclude."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "除外するアプリにはアプリのみ追加することができます。"
           }
         }
       }

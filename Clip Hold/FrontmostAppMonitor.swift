@@ -3,12 +3,17 @@ import AppKit
 import Combine
 
 @MainActor
-class FrontmostAppMonitor {
+class FrontmostAppMonitor: ObservableObject {
     static let shared = FrontmostAppMonitor()
+    
+    @Published var frontmostAppBundleIdentifier: String?
+    
     private var cancellables = Set<AnyCancellable>()
     private var previousPresetId: UUID? = nil
 
-    private init() {}
+    private init() {
+        self.frontmostAppBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+    }
 
     func startMonitoring() {
         NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didActivateApplicationNotification)
@@ -20,7 +25,14 @@ class FrontmostAppMonitor {
             }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] bundleIdentifier in
-                self?.handleAppActivation(bundleIdentifier: bundleIdentifier)
+                guard let self = self else { return }
+
+                if UserDefaults.standard.bool(forKey: "excludeClipHoldWindowsFromAutoFilter") && bundleIdentifier == "design.taikun.Clip-Hold" {
+                    return
+                }
+
+                self.frontmostAppBundleIdentifier = bundleIdentifier
+                self.handleAppActivation(bundleIdentifier: bundleIdentifier)
             }
             .store(in: &cancellables)
     }

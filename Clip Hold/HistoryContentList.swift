@@ -173,6 +173,24 @@ struct HistoryContentList: View {
                             } label: {
                                 Label("コピー", systemImage: "document.on.document")
                             }
+                            if currentItem.richText != nil {
+                                Button {
+                                    // リッチテキストアイテムの場合、プレーンテキストとしてコピー
+                                    NSPasteboard.general.clearContents()
+                                    NSPasteboard.general.setString(currentItem.text, forType: .string)
+                                    showCopyConfirmation = true
+                                    currentCopyConfirmationTask?.cancel()
+                                    currentCopyConfirmationTask = Task { @MainActor in
+                                        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
+                                        guard !Task.isCancelled else { return }
+                                        withAnimation {
+                                            showCopyConfirmation = false
+                                        }
+                                    }
+                                } label: {
+                                    Label("標準テキストとしてコピー", systemImage: "doc.plaintext")
+                                }
+                            }
                             if let qrContent = currentItem.qrCodeContent {
                                 Button {
                                     let newItemToCopy = ClipboardItem(text: qrContent) // 新しいClipboardItemを作成

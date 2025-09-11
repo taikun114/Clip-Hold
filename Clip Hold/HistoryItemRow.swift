@@ -123,6 +123,16 @@ struct HistoryItemRow: View {
         self.showCharacterCount = showCharacterCount
     }
 
+    private var itemDisplayText: Text {
+        if item.text == "Image File" {
+            return Text("Image File")
+        } else if item.text == "PDF File" {
+            return Text("PDF File")
+        } else {
+            return Text(verbatim: item.text)
+        }
+    }
+
     private var actionMenuItems: some View {
         Group {
             Button {
@@ -132,6 +142,16 @@ struct HistoryItemRow: View {
                 showCopyConfirmation = true
             } label: {
                 Label("コピー", systemImage: "document.on.document")
+            }
+            if item.richText != nil {
+                Button {
+                    // リッチテキストアイテムの場合、プレーンテキストとしてコピー
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(item.text, forType: .string)
+                    showCopyConfirmation = true
+                } label: {
+                    Label("標準テキストとしてコピー", systemImage: "doc.plaintext")
+                }
             }
             if let qrContent = item.qrCodeContent {
                 Button {
@@ -260,21 +280,41 @@ struct HistoryItemRow: View {
                                             .scaledToFit()
                                             .frame(width: 30, height: 30))
                         } else {
-                            // テキストアイコン (macOSバージョンによる分岐)
-                            if #available(macOS 15.0, *) {
-                                return AnyView(Image(systemName: "text.page")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .padding(4)
-                                                .frame(width: 30, height: 30)
-                                                .foregroundStyle(.secondary))
+                            // テキストアイコン (リッチテキストかどうかで分岐)
+                            if item.richText != nil {
+                                // リッチテキストの場合、append.pageアイコンを使用 (macOSバージョンによる分岐)
+                                if #available(macOS 15.0, *) {
+                                    return AnyView(Image(systemName: "append.page")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .padding(4)
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundStyle(.secondary))
+                                } else {
+                                    return AnyView(Image(systemName: "doc.append")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .padding(4)
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundStyle(.secondary))
+                                }
                             } else {
-                                return AnyView(Image(systemName: "doc.plaintext")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .padding(4)
-                                                .frame(width: 30, height: 30)
-                                                .foregroundStyle(.secondary))
+                                // 標準テキストの場合、text.pageアイコンを使用 (macOSバージョンによる分岐)
+                                if #available(macOS 15.0, *) {
+                                    return AnyView(Image(systemName: "text.page")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .padding(4)
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundStyle(.secondary))
+                                } else {
+                                    return AnyView(Image(systemName: "doc.plaintext")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .padding(4)
+                                                    .frame(width: 30, height: 30)
+                                                    .foregroundStyle(.secondary))
+                                }
                             }
                         }
                     }()
@@ -315,7 +355,7 @@ struct HistoryItemRow: View {
                 .contentShape(Rectangle())
 
             VStack(alignment: .leading) {
-                Text(item.text)
+                itemDisplayText
                     .lineLimit(1)
                     .font(.body)
                     .truncationMode(.tail)

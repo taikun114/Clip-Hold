@@ -1,13 +1,49 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+## 1.4.0
+### New Features
+- **Support for Rich Text**
+  - This fixes a issue ([**#3**](https://github.com/taikun114/Clip-Hold/issues/3)) that caused text to be copied as an image in Microsoft Office software.
+- **Support for PDF**
+  - Software that stores data as PDF in the clipboard can now copy vector data as PDF.
+- **Support Liquid Glass**
+   - New app icons designed for Liquid Glass have been added.
+   - Liquid Glass effects have been added to the background of the History and Standard Phrases windows, and to the overlay background of the License Information screen.
+   - Liquid Glass is available on macOS Tahoe or later.
+- **Add “Copy as Plain Text” in the History window when the history item is rich text**
+- **Add “Automatic” to the app filtering options in the History window**
+  - This option automatically filters based on the app currently in focus.
+- **Add “Exclude Clip Hold Windows with App's ‘Automatic’ Filtering” to the History Window section in General Settings**
+  - Do not switch the filtered app when you focus the Clip Hold window (such as the History window) while the app's “Automatic” filtering is active.
+- **Add “Use Filtered Copy History in the History Window” to the “Copy History” section in Shortcuts Settings**
+  - Allow copying filtered history using shortcut keys when the History window is open and filtering is applied.
+- **Add the feature to be able to add apps by drag and drop to the Preset to Assign list in Standard Phrases Settings and the Apps to Exclude list in Privacy Settings**
+
+### Bug Fixes and Improvements
+- **Fix issue that voice input is entered in the standard phrase input field when the preset add screen is opened from the standard phrase add screen**
+- **Fix issue that “Show All Processes” does not work on the add apps to exclude screen in Privacy Settings**
+- **Fix issue that default preset name was not localized in the notification shown when switching presets using shortcut keys**
+- **Fix issue that the “Preset to Assign” picker in Standard Phrases Settings becomes empty when the selected preset is deleted**
+- **Fix issue that the remove app button (minus button on the list) does not update when switching the Preset to Assign list in Standard Phrases Settings**
+- **Fix issue that memory is not released even after closing the History and Standard Phrases windows**
+- **Improve the Settings screen and add standard phrase screen when no presets exist**
+- **Improve the Settings screen and Standard Phrases window when all presets are deleted**
+- **Improve the focus back to the input field when returning to the add standard phrase screen after adding a preset from the add standard phrase screen**
+- **Improve the alert message when deleting presets**
+  - Added a message indicating the number of standard phrases within the preset being deleted and that they will be removed.
+- **Improve focus detection in the Settings window**
+   - Improved the styling of the “Information” button in the Settings window to ensure it is properly set.
+- **Improve only the display name of image files to be localized**
+    - Image files that cannot be obtained by name such as images copied from a web browser are now properly localized when copied and then the system language is changed.
+
 ## 1.3.2
 ### New Features
 - **Add “Exclude Clip Hold Windows” option to the “Assign Presets” section of the Standard Phrases Settings**
   - Prevents the preset switching when the Clip Hold window (such as the Standard Phrases window) is focused.
 
 ### Bug Fixes and Improvements
-- **Fix the issue (#2) that when “Maximum number of history items to save” is set, old history items are saved instead of the set number of new history items**
+- **Fix the issue ([#2](https://github.com/taikun114/Clip-Hold/issues/2)) that when “Maximum number of history items to save” is set, old history items are saved instead of the set number of new history items**
 - **Improve margins on the edit standard phrase screen**
 - **Improve to remember the last selected preset when importing presets**
 

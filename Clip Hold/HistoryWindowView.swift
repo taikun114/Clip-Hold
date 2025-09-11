@@ -10,10 +10,12 @@ struct HistoryWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
+    @EnvironmentObject var frontmostAppMonitor: FrontmostAppMonitor
     @Environment(\.dismiss) var dismiss
 
     @State private var searchText: String = ""
     @State private var filteredHistory: [ClipboardItem] = []
+    
     @State private var showingDeleteConfirmation = false
     @State private var itemToDelete: ClipboardItem?
     @State private var selectedItemID: UUID?
@@ -31,9 +33,7 @@ struct HistoryWindowView: View {
 
     @State private var previousClipboardHistoryCount: Int = 0
 
-    @State private var selectedFilter: ItemFilter = .all
-    @State private var selectedSort: ItemSort = .newest
-    @State private var selectedApp: String? = nil
+    
 
     @State private var searchDebounceTask: Task<Void, Never>? = nil
 
@@ -45,9 +45,9 @@ struct HistoryWindowView: View {
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
     private var lineNumberTextWidth: CGFloat? {
-        guard showLineNumbersInHistoryWindow, !filteredHistory.isEmpty else { return nil }
+        guard showLineNumbersInHistoryWindow, !(clipboardManager.filteredHistoryForShortcuts ?? []).isEmpty else { return nil }
         
-        let maxIndex = filteredHistory.count
+        let maxIndex = (clipboardManager.filteredHistoryForShortcuts ?? []).count
         let numDigits = String(maxIndex).count
 
         let digitWidth: CGFloat = 7.0
@@ -72,7 +72,8 @@ struct HistoryWindowView: View {
     private func performUpdate(isIncrementalUpdate: Bool = false) {
         if !isIncrementalUpdate {
             isLoading = true
-            filteredHistory = []
+            self.filteredHistory = []
+            clipboardManager.filteredHistoryForShortcuts = []
         }
         
         historyUpdateTask?.cancel()
@@ -87,14 +88,29 @@ struct HistoryWindowView: View {
             
             let filtered = historyCopy.filter { item in
                 // App filter
-                let matchesApp = selectedApp == nil || (item.sourceAppPath?.contains(selectedApp!) ?? false)
+                let matchesApp: Bool
+                if clipboardManager.historySelectedApp == "auto_filter_mode" {
+                    if let frontmostID = frontmostAppMonitor.frontmostAppBundleIdentifier {
+                        if let path = item.sourceAppPath, let itemBundle = Bundle(path: path) {
+                            matchesApp = itemBundle.bundleIdentifier == frontmostID
+                        } else {
+                            matchesApp = false
+                        }
+                    } else {
+                        matchesApp = false
+                    }
+                } else if clipboardManager.historySelectedApp == nil {
+                    matchesApp = true
+                } else {
+                    matchesApp = item.sourceAppPath == clipboardManager.historySelectedApp
+                }
                 
                 // Search text filter
                 let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
 
                 // Item type filter
                 let matchesFilter: Bool
-                switch selectedFilter {
+                switch clipboardManager.historySelectedFilter {
                 case .all:
                     matchesFilter = true
                 case .textOnly:
@@ -113,7 +129,7 @@ struct HistoryWindowView: View {
             }
 
             let sorted = filtered.sorted { item1, item2 in
-                switch selectedSort {
+                switch clipboardManager.historySelectedSort {
                 case .newest:
                     return item1.date > item2.date
                 case .oldest:
@@ -125,7 +141,8 @@ struct HistoryWindowView: View {
                 }
             }
 
-            filteredHistory = sorted
+            self.filteredHistory = sorted
+            clipboardManager.filteredHistoryForShortcuts = sorted
             isLoading = false
         }
     }
@@ -141,9 +158,9 @@ struct HistoryWindowView: View {
                         isLoading: $isLoading,
                         isSearchFieldFocused: _isSearchFieldFocused,
                         clipboardHistoryCount: clipboardManager.clipboardHistory.count,
-                        selectedFilter: $selectedFilter,
-                        selectedSort: $selectedSort,
-                        selectedApp: $selectedApp
+                        selectedFilter: $clipboardManager.historySelectedFilter,
+                        selectedSort: $clipboardManager.historySelectedSort,
+                        selectedApp: $clipboardManager.historySelectedApp
                     )
 
                     Spacer(minLength: 0)
@@ -196,11 +213,22 @@ struct HistoryWindowView: View {
                 performUpdate()
             }
         }
-        .onChange(of: selectedFilter) { _, _ in performUpdate() }
-        .onChange(of: selectedSort) { _, _ in performUpdate() }
-        .onChange(of: selectedApp) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.historySelectedFilter) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.historySelectedSort) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.historySelectedApp) { _, _ in performUpdate() }
+        .onChange(of: frontmostAppMonitor.frontmostAppBundleIdentifier) { _, _ in
+            if clipboardManager.historySelectedApp == "auto_filter_mode" {
+                performUpdate()
+            }
+        }
         .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
+        .onChange(of: clipboardManager.filteredHistoryForShortcuts) { _, newValue in
+            withAnimation {
+                filteredHistory = newValue ?? []
+            }
+        }
         .onAppear {
+            clipboardManager.filteredHistoryForShortcuts = []
             performUpdate()
             DispatchQueue.main.async {
                 isSearchFieldFocused = true
@@ -220,6 +248,10 @@ struct HistoryWindowView: View {
             }
         }
         .onDisappear {
+            clipboardManager.filteredHistoryForShortcuts = nil
+            
+            
+            
             // ウインドウが閉じる際に実行中のタスクをキャンセルしてメモリを解放
             searchDebounceTask?.cancel()
             searchDebounceTask = nil // タスクの参照をnilに設定

@@ -96,7 +96,11 @@ extension ClipboardManager {
                     
                     // 1. ペーストボードの主要なデータタイプを事前にチェック
                     let availableTypes = pasteboard.types ?? []
+                    print("DEBUG: checkPasteboard - Available pasteboard types: \(availableTypes.map { $0.rawValue })")
                     let hasFileURLType = availableTypes.contains(.fileURL)
+                    let hasRTFType = availableTypes.contains(.rtf) // RTFタイプのチェックを追加
+                    let hasHTMLType = availableTypes.contains(.html) || availableTypes.contains(NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type"))
+                    let hasPDFType = availableTypes.contains(.pdf) || availableTypes.contains(NSPasteboard.PasteboardType(rawValue: "Apple PDF pasteboard type"))
                     let hasImageDataType = availableTypes.contains(.tiff) || availableTypes.contains(.png) || (pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage) != nil
                     let hasURLType = availableTypes.contains(.URL) || pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.URL.rawValue])
                     
@@ -196,7 +200,117 @@ extension ClipboardManager {
                         }
                     }
                     
-                    // 3. ローカルファイルURLが有効でない場合、またはWeb URLと画像データが両方存在する場合 -> 画像データを優先 (高優先度)
+                    // 3. URLタイプをチェック (高優先度)
+                    // 画像データがある場合は、URLは無視する
+                    if hasURLType && !hasImageDataType {
+                        if let url = pasteboard.readObjects(forClasses: [NSURL.self], options: nil)?.first as? URL {
+                            print("DEBUG: checkPasteboard - URL object detected (no image data): \(url.absoluteString.prefix(50))...")
+                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let newItem = ClipboardItem(text: url.absoluteString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
+                            await MainActor.run {
+                                self.addAndSaveItem(newItem)
+                            }
+                            if wasInternalCopyInitially {
+                                await MainActor.run {
+                                    self.isPerformingInternalCopy = false
+                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after URL object processing.")
+                                }
+                            }
+                            success = true
+                            return
+                        } else if let urlString = pasteboard.string(forType: .URL) {
+                            print("DEBUG: checkPasteboard - URL string detected (no image data): \(urlString.prefix(50))...")
+                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let newItem = ClipboardItem(text: urlString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
+                            await MainActor.run {
+                                self.addAndSaveItem(newItem)
+                            }
+                            if wasInternalCopyInitially {
+                                await MainActor.run {
+                                    self.isPerformingInternalCopy = false
+                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after URL string processing.")
+                                }
+                            }
+                            success = true
+                            return
+                        }
+                    }
+                    
+                    // 4. リッチテキストデータをチェック (中高優先度)
+                    if hasRTFType, let rtfString = pasteboard.string(forType: .rtf) {
+                        print("DEBUG: checkPasteboard - RTF String detected: \(rtfString.prefix(50))...")
+                        // RTFのプレーンテキスト表現も取得 (表示用)
+                        let plainText = pasteboard.string(forType: .string) ?? rtfString // RTFからプレーンテキストを抽出できない場合は、RTF自体をプレーンテキストとして使用
+                        
+                        let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                        let newItem = ClipboardItem(richText: rtfString, text: plainText, date: Date(), qrCodeContent: nil, sourceAppPath: sourceAppPath)
+                        await MainActor.run {
+                            self.addAndSaveItem(newItem)
+                        }
+                        if wasInternalCopyInitially {
+                            await MainActor.run {
+                                self.isPerformingInternalCopy = false
+                                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after RTF string processing.")
+                            }
+                        }
+                        success = true
+                        return
+                    }
+                    
+                    // 5. HTMLデータをチェック (中優先度)
+                    // 画像データがある場合は、HTMLは無視する
+                    // RTFがある場合も、HTMLは無視する
+                    if hasHTMLType && !hasImageDataType && !hasRTFType {
+                        var htmlString: String? = nil
+                        if availableTypes.contains(.html) {
+                            htmlString = pasteboard.string(forType: .html)
+                        } else if availableTypes.contains(NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type")) {
+                            htmlString = pasteboard.string(forType: NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type"))
+                        }
+                        
+                        if let htmlString = htmlString {
+                            print("DEBUG: checkPasteboard - HTML String detected (first 200 chars): \(htmlString.prefix(200))...")
+                            // HTMLのプレーンテキスト表現も取得 (表示用)
+                            let plainText = pasteboard.string(forType: .string) ?? htmlString // HTMLからプレーンテキストを抽出できない場合は、HTML自体をプレーンテキストとして使用
+                            
+                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let newItem = ClipboardItem(richText: htmlString, text: plainText, date: Date(), qrCodeContent: nil, sourceAppPath: sourceAppPath)
+                            await MainActor.run {
+                                self.addAndSaveItem(newItem)
+                            }
+                            if wasInternalCopyInitially {
+                                await MainActor.run {
+                                    self.isPerformingInternalCopy = false
+                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after HTML string processing.")
+                                }
+                            }
+                            success = true
+                            return
+                        }
+                    }
+                    
+                    // PDFデータをチェック (画像データより優先)
+                    if hasPDFType {
+                        if let pdfData = pasteboard.data(forType: .pdf) ?? pasteboard.data(forType: NSPasteboard.PasteboardType(rawValue: "Apple PDF pasteboard type")) {
+                            print("DEBUG: checkPasteboard - PDF data detected.")
+                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            if let newItem = await self.createClipboardItemFromPDFData(pdfData, sourceAppPath: sourceAppPath) {
+                                await MainActor.run {
+                                    self.addAndSaveItem(newItem)
+                                }
+                            }
+                            if wasInternalCopyInitially {
+                                await MainActor.run {
+                                    self.isPerformingInternalCopy = false
+                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after PDF data processing.")
+                                }
+                            }
+                            success = true
+                            return
+                        }
+                    }
+                    
+                    // 4. ローカルファイルURLが有効でない場合、またはWeb URLと画像データが両方存在する場合 -> 画像データを優先 (高優先度)
                     if hasImageDataType {
                         var imageDataFromPasteboard: Data?
                         var imageFromPasteboard: NSImage?
@@ -237,35 +351,40 @@ extension ClipboardManager {
                         }
                     }
                     
-                    // 4. 画像データもローカルファイルURLもない場合、またはWeb URLのみで画像データがある場合 -> URLタイプをチェック (中優先度)
-                    // 画像データがある場合は、URLは無視する
-                    if hasURLType && !hasImageDataType {
-                        if let url = pasteboard.readObjects(forClasses: [NSURL.self], options: nil)?.first as? URL {
-                            print("DEBUG: checkPasteboard - URL object detected: \(url.absoluteString.prefix(50))...")
-                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
-                            let newItem = ClipboardItem(text: url.absoluteString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                            await MainActor.run {
-                                self.addAndSaveItem(newItem)
+                    // 5. 画像データをチェック (中高優先度)
+                    if hasImageDataType {
+                        var imageDataFromPasteboard: Data?
+                        var imageFromPasteboard: NSImage?
+
+                        if let tiffData = pasteboard.data(forType: .tiff) {
+                            imageDataFromPasteboard = tiffData
+                            imageFromPasteboard = NSImage(data: tiffData)
+                            print("DEBUG: checkPasteboard - Image data detected on pasteboard (TIFF).")
+                        } else if let pngData = pasteboard.data(forType: .png) {
+                            imageDataFromPasteboard = pngData
+                            imageFromPasteboard = NSImage(data: pngData)
+                            print("DEBUG: checkPasteboard - Image data detected on pasteboard (PNG).")
+                        } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
+                            imageDataFromPasteboard = image.tiffRepresentation
+                            imageFromPasteboard = image
+                            if imageDataFromPasteboard != nil {
+                                print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage).")
                             }
-                            if wasInternalCopyInitially {
+                        }
+
+                        if let imageData = imageDataFromPasteboard, let image = imageFromPasteboard {
+                            let qrCodeContent = self.decodeQRCode(from: image)
+                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+
+                            if let newItem = await self.createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
                                 await MainActor.run {
-                                    self.isPerformingInternalCopy = false
-                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after URL object processing.")
+                                    self.addAndSaveItem(newItem)
                                 }
                             }
-                            success = true
-                            return
-                        } else if let urlString = pasteboard.string(forType: .URL) {
-                            print("DEBUG: checkPasteboard - URL string detected: \(urlString.prefix(50))...")
-                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
-                            let newItem = ClipboardItem(text: urlString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                            await MainActor.run {
-                                self.addAndSaveItem(newItem)
-                            }
                             if wasInternalCopyInitially {
                                 await MainActor.run {
                                     self.isPerformingInternalCopy = false
-                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after URL string processing.")
+                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after image data processing.")
                                 }
                             }
                             success = true
@@ -273,7 +392,28 @@ extension ClipboardManager {
                         }
                     }
 
-                    // 5. 最後に、テキストデータをチェック (低優先度)
+                    // 5. リッチテキストデータをチェック (中間優先度)
+                    if let rtfString = pasteboard.string(forType: .rtf) {
+                        print("DEBUG: checkPasteboard - RTF String detected: \(rtfString.prefix(50))...")
+                        // RTFのプレーンテキスト表現も取得 (表示用)
+                        let plainText = pasteboard.string(forType: .string) ?? rtfString // RTFからプレーンテキストを抽出できない場合は、RTF自体をプレーンテキストとして使用
+                        
+                        let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                        let newItem = ClipboardItem(richText: rtfString, text: plainText, date: Date(), qrCodeContent: nil, sourceAppPath: sourceAppPath)
+                        await MainActor.run {
+                            self.addAndSaveItem(newItem)
+                        }
+                        if wasInternalCopyInitially {
+                            await MainActor.run {
+                                self.isPerformingInternalCopy = false
+                                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after RTF string processing.")
+                            }
+                        }
+                        success = true
+                        return
+                    }
+                    
+                    // 6. 最後に、テキストデータをチェック (低優先度)
                     if let newString = pasteboard.string(forType: .string) {
                         print("DEBUG: checkPasteboard - String detected: \(newString.prefix(50))...")
                         let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path

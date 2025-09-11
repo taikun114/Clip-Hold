@@ -42,6 +42,7 @@ struct ClipHoldApp: App {
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
     @StateObject var presetManager = StandardPhrasePresetManager.shared
+    @StateObject var frontmostAppMonitor = FrontmostAppMonitor.shared
 
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
@@ -319,21 +320,41 @@ struct ClipHoldApp: App {
                                     .frame(width: 16, height: 16)
                             } else {
                                 // ファイルパスもキャッシュもなければテキストアイコン
-                                // macOS 15 以降では text.page、それ以前では doc.plaintext を使用
-                                if #available(macOS 15.0, *) {
-                                    Image(systemName: "text.page")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding(4)
-                                        .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                        .foregroundStyle(.secondary)
+                                // リッチテキストかどうかでアイコンを分岐
+                                if item.richText != nil {
+                                    // リッチテキストの場合、append.pageアイコンを使用 (macOSバージョンによる分岐)
+                                    if #available(macOS 15.0, *) {
+                                        Image(systemName: "append.page")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
+                                            .foregroundStyle(.secondary)
+                                    } else {
+                                        Image(systemName: "doc.append")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
+                                            .foregroundStyle(.secondary)
+                                    }
                                 } else {
-                                    Image(systemName: "doc.plaintext")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding(4)
-                                        .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                        .foregroundStyle(.secondary)
+                                    // 標準テキストの場合、text.pageアイコンを使用 (macOSバージョンによる分岐)
+                                    if #available(macOS 15.0, *) {
+                                        Image(systemName: "text.page")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
+                                            .foregroundStyle(.secondary)
+                                    } else {
+                                        Image(systemName: "doc.plaintext")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .padding(4)
+                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
                             }
 
@@ -376,6 +397,7 @@ struct ClipHoldApp: App {
         .environmentObject(clipboardManager)
         .environmentObject(standardPhraseManager)
         .environmentObject(presetManager)
+        .environmentObject(frontmostAppMonitor)
         .commands {
             CommandGroup(replacing: .appSettings) {
                 Button("設定...") {
@@ -449,8 +471,8 @@ struct ClipHoldApp: App {
                 if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
                     let notificationCenter = UNUserNotificationCenter.current()
                     let content = UNMutableNotificationContent()
-                    content.title = nextPreset.name
-                    content.body = String(localized: "「\(nextPreset.name)」に切り替わりました。")
+                    content.title = nextPreset.displayName
+                    content.body = String(localized: "「\(nextPreset.displayName)」に切り替わりました。")
                     content.sound = nil // 音なし
                     
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
@@ -478,8 +500,8 @@ struct ClipHoldApp: App {
                 if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
                     let notificationCenter = UNUserNotificationCenter.current()
                     let content = UNMutableNotificationContent()
-                    content.title = previousPreset.name
-                    content.body = String(localized: "「\(previousPreset.name)」に切り替わりました。")
+                    content.title = previousPreset.displayName
+                    content.body = String(localized: "「\(previousPreset.displayName)」に切り替わりました。")
                     content.sound = nil // 音なし
                     
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
@@ -531,13 +553,18 @@ struct ClipHoldApp: App {
             KeyboardShortcuts.onKeyDown(for: shortcutName) {
                 // ClipboardManager はシングルトンなので、static context からも .shared でアクセス可能
                 let clipboardManager = ClipboardManager.shared
+                let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
 
-                // UI表示順序（日付の新しい順）に並び替えた配列を一時的に作成
-                let sortedHistoryForUI = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+                let historySource: [ClipboardItem]
+                if useFiltered, let filteredList = clipboardManager.filteredHistoryForShortcuts {
+                    historySource = filteredList
+                } else {
+                    historySource = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+                }
 
                 // 並び替えた配列に対してインデックスを適用
-                if sortedHistoryForUI.indices.contains(i) {
-                    let historyItem = sortedHistoryForUI[i]
+                if historySource.indices.contains(i) {
+                    let historyItem = historySource[i]
                     NSPasteboard.general.clearContents()
 
                     // 内部コピーフラグをtrueに設定

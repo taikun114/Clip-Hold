@@ -86,6 +86,7 @@ struct GeneralSettingsView: View {
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
     @AppStorage("historyWindowAlwaysOnTop") var historyWindowAlwaysOnTop: Bool = false
     @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
+    @AppStorage("excludeClipHoldWindowsFromAutoFilter") var excludeClipHoldWindowsFromAutoFilter: Bool = false
 
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
@@ -404,6 +405,22 @@ struct GeneralSettingsView: View {
                     Toggle(isOn: $scrollToTopOnUpdate) {
                         Text("リストが更新されたら最も上にスクロール")
                         Text("履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("アプリの「自動」フィルタリングでClip Holdのウィンドウを除外")
+                        Text("アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $excludeClipHoldWindowsFromAutoFilter) {
+                        Text("アプリの「自動」フィルタリングでClip Holdのウィンドウを除外")
+                        Text("アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()

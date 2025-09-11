@@ -38,6 +38,7 @@ struct PrivacySettingsView: View {
     @State private var selectedExcludedAppId: String? = nil
     @State private var runningApplications: [NSRunningApplication] = []
     @State private var showingFinderPanel = false
+    @State private var showingInvalidAppAlert = false
 
     @State private var notificationAuthorizationStatus: UNAuthorizationStatus = .notDetermined
 
@@ -72,7 +73,8 @@ struct PrivacySettingsView: View {
                 return isRegularApp
             }
             
-            return isRegularApp
+            // showAllRunningApps が true の場合は、すべてのアプリを表示
+            return true
         }
         
         // excludedAppIdentifiers に含まれるアプリを除外
@@ -254,10 +256,67 @@ struct PrivacySettingsView: View {
                         }
                     }
                 }
+                .onDrop(of: [.fileURL], isTargeted: nil) { providers in
+                    let group = DispatchGroup()
+                    var invalidItemsCount = 0
+                    let lock = NSLock()
+                    
+                    for provider in providers {
+                        group.enter()
+                        provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { (urlData, error) in
+                            defer { group.leave() }
+                            
+                            guard let urlData = urlData as? Data,
+                                  let url = URL(dataRepresentation: urlData, relativeTo: nil) else {
+                                lock.lock()
+                                invalidItemsCount += 1
+                                lock.unlock()
+                                return
+                            }
+                            
+                            if url.pathExtension == "app" || FileManager.default.fileExists(atPath: url.appendingPathComponent("Contents/Info.plist").path) {
+                                guard let bundle = Bundle(url: url),
+                                      let bundleIdentifier = bundle.bundleIdentifier else {
+                                    lock.lock()
+                                    invalidItemsCount += 1
+                                    lock.unlock()
+                                    return
+                                }
+                                
+                                DispatchQueue.main.async {
+                                    if !excludedAppIdentifiers.contains(bundleIdentifier) {
+                                        excludedAppIdentifiers.append(bundleIdentifier)
+                                        print("Excluded app added via drag and drop: \(bundleIdentifier)")
+                                    } else {
+                                        print("App already in exclusion list: \(bundleIdentifier)")
+                                    }
+                                }
+                            } else {
+                                lock.lock()
+                                invalidItemsCount += 1
+                                lock.unlock()
+                            }
+                        }
+                    }
+                    
+                    group.notify(queue: .main) {
+                        if invalidItemsCount > 0 {
+                            showingInvalidAppAlert = true
+                            print("Dropped items include \(invalidItemsCount) non-application item(s).")
+                        }
+                    }
+                    
+                    return true
+                }
                 .frame(minHeight: 100)
                 .scrollContentBackground(.hidden)
                 .padding(.bottom, 24)
                 .accessibilityLabel("除外するアプリリスト")
+                .alert("アプリではありません", isPresented: $showingInvalidAppAlert) {
+                    Button("OK") { }
+                } message: {
+                    Text("除外するアプリにはアプリのみ追加することができます。")
+                }
                 .overlay(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 0) {
                         Divider()

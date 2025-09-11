@@ -24,13 +24,25 @@ struct InfoSettingsView: View {
         Form { // 全体をFormで囲む
             Section(header: Text("Clip Holdについて").font(.headline)) {
                 HStack(alignment: .top, spacing: 20) {
-                    Image(nsImage: NSImage(named: NSImage.Name("AppIcon")) ?? NSImage())
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 128, height: 128)
-                        .padding(.vertical, 0)
-                        .padding(.leading, 0)
-                        .padding(.trailing, -10)
+                    if #available(macOS 26, *) {
+                        // macOS 26以降の場合、"AppIconLiquidGlass"を使用
+                        Image(nsImage: NSImage(named: NSImage.Name("AppIconLiquidGlass")) ?? NSImage())
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 96, height: 96)
+                            .padding(.vertical, 10)
+                            .padding(.leading, 10)
+                            .id(colorScheme)
+                    } else {
+                        // macOS 15以前の場合、既存の"AppIcon"を使用
+                        Image(nsImage: NSImage(named: NSImage.Name("AppIcon")) ?? NSImage())
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 128, height: 128)
+                            .padding(.vertical, 0)
+                            .padding(.leading, 0)
+                            .padding(.trailing, -10)
+                    }
 
                     VStack(alignment: .leading) {
                         Spacer()

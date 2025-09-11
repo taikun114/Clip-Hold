@@ -1,7 +1,7 @@
 # Clip Hold
 [English](/README.md) | **日本語**
 
-![Clip Hold クリップボードと定型文マネージャー](images/Clip-Hold_Banner-ja.png)
+![Clip Hold クリップボードと定型文マネージャー](images/Clip-Hold_Banner-ja.webp)
 
 <p align="center">
   <a href="https://github.com/taikun114/Clip-Hold">
@@ -19,7 +19,7 @@
 
 <p align="center">
   <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
-    <img alt="Buy Me a Coffee" src="images/blue-button.png">
+    <img alt="Buy Me a Coffee" src="images/blue-button.webp">
   </a>
 </p>
 
@@ -56,7 +56,7 @@
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
 ## Clip Holdとは？
-![定型文とコピー履歴](images/Standard-Phrase-and-History-ja.png)
+![定型文とコピー履歴](images/Standard-Phrase-and-History-ja.webp)
 
 Clip Holdは、macOS用のクリップボードと定型文マネージャーアプリです。
 
@@ -84,37 +84,37 @@ Clip Holdはただのクリップボードマネージャーではありませ�
 10年以上Macを使い続けているパワーユーザーの私が考えた、大変便利な機能がたくさん詰まったクリップボードマネージャーアプリです。
 
 ### メニューから定型文と履歴に素早くアクセス
-![定型文とコピー履歴](images/Standard-Phrase-and-History-ja.png)
+![定型文とコピー履歴](images/Standard-Phrase-and-History-ja.webp)
 
 よく使う定型文とコピー履歴には、メニューからすぐにアクセスできます。項目をクリックするだけで簡単にコピーすることができます。
 
 ### 定型文ウィンドウと履歴ウィンドウ
-![定型文ウィンドウと履歴ウィンドウ](images/Standard-Phrase-and-History-Window-ja.png)
+![定型文ウィンドウと履歴ウィンドウ](images/Standard-Phrase-and-History-Window-ja.webp)
 
 設定したすべての定型文と、保存されたすべての履歴を一覧表示することができます。項目をダブルクリックするだけで簡単にコピーすることができます。
 
 ### 定型文のプリセットとアプリ割り当て機能
-![プリセット](images/Presets-ja.png)
+![プリセット](images/Presets-ja.webp)
 
 定型文をプリセットごとに分けて、開いたアプリによって自動でプリセットを切り替えることができます。プリセットはショートカットキーで切り替えることもできます。
 
 ### 充実したショートカットキー
-![ショートカットキー](images/Shortcuts-ja.png)
+![ショートカットキー](images/Shortcuts-ja.webp)
 
 各10個までの定型文とコピー履歴をすぐさまコピーできるショートカットキーが用意されており、素早くコピーすることができます。定型文や履歴ウィンドウを開くのも一瞬。
 
 ### クイックペーストですぐにペースト
-![クイックペースト](images/Quick-Paste-ja.gif)
+![クイックペースト](images/Quick-Paste-ja.webp)
 
 「クイックペースト」機能を使えば、メニューで項目をコピーした時やショートカットキーを使ってコピーしたとき、コピーした内容が即座にペーストされます。わざわざ自分でペーストする必要はありません。
 
 ### インポートとエクスポート機能
-![インポートとエクスポート機能](images/Import-Export-ja.png)
+![インポートとエクスポート機能](images/Import-Export-ja.webp)
 
 定型文とクリップボード履歴は、インポートしたりエクスポートしたりすることができます。自分がよく使う定型文を誰かと共有したり、他のMacからのクリップボード履歴を読み込んだりすることができます。
 
 ### コピーしたカラーコードを表示できる
-![カラーコード](images/Color-Codes-ja.png)
+![カラーコード](images/Color-Codes-ja.webp)
 
 「開発者向け機能」設定から有効化すると、コピーしたカラーコードに基づくカラーアイコンを、履歴ウィンドウとメニューに表示させることができます。
 
@@ -125,13 +125,13 @@ Clip Holdは**ユーザーに関する情報は一切収集しません**。\
 以下に、アプリに搭載されているプライバシー機能を紹介します。
 
 #### 履歴に保存されて欲しくない時はいつでも一時停止
-![クリップボード監視の一時停止](images/Pause-Clipboard-Monitoring-ja.png)
+![クリップボード監視の一時停止](images/Pause-Clipboard-Monitoring-ja.webp)
 
 パスワードや機密情報をコピーする時など、コピーした内容が履歴に保存されて欲しくない時はクリップボード監視を一時停止することができます。\
 一時停止中はメニューバーアイコンが半透明になり、現在の状態が一目でわかります。一時停止の状態でアプリを起動すると通知が届くので、クリップボード監視の再開を忘れることもありません。
 
 #### クリップボード監視からアプリを除外できる
-![除外するアプリ](images/Apps-to-Exclude-ja.png)
+![除外するアプリ](images/Apps-to-Exclude-ja.webp)
 
 特定のアプリでのみ履歴が保存されて欲しくない時でも大丈夫、クリップボード監視から除外できるアプリを追加できます。わざわざクリップボード監視を一時停止する必要はありません。
 
@@ -164,7 +164,7 @@ Clip Holdが気に入ったら寄付してくださると嬉しいです。開�
 [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_taikun)で緑茶一杯分の金額からサポートしていただけます。
 
 <a href="https://www.buymeacoffee.com/i_am_taikun" target="_blank">
-  <img alt="Buy Me a Coffee" src="images/blue-button.png">
+  <img alt="Buy Me a Coffee" src="images/blue-button.webp">
 </a>
 
 #### PayPal\.Me

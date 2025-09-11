@@ -16,6 +16,7 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
         )
         window.contentView = NSHostingView(rootView: settingsView)
         window.title = "設定"
+        window.identifier = NSUserInterfaceItemIdentifier("SettingsWindow")
         
         self.init(window: window)
         

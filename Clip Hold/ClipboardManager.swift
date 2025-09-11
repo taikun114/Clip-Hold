@@ -9,6 +9,18 @@ class ClipboardManager: ObservableObject {
     static let shared = ClipboardManager()
 
     @Published var clipboardHistory: [ClipboardItem] = []
+    @Published var filteredHistoryForShortcuts: [ClipboardItem]? = nil
+
+    // History Window States
+    @Published var historySelectedFilter: ItemFilter = .all
+    @Published var historySelectedSort: ItemSort = .newest
+    @Published var historySelectedApp: String? = nil
+
+    func resetHistoryViewFilters() {
+        historySelectedFilter = .all
+        historySelectedSort = .newest
+        historySelectedApp = nil
+    }
 
     // MARK: - Properties that need to remain in the main class
     var saveTask: Task<Void, Never>?

@@ -307,7 +307,7 @@ extension ClipboardManager {
                         if newImageHash == sandboxedImageHash {
                             print("ClipboardManager: Found duplicate image in sandbox based on file hash: \(sandboxedFileURL.lastPathComponent)")
                             // ファイルサイズとハッシュもセット
-                            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: sandboxedImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+                            return ClipboardItem(text: "Image File", date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: sandboxedImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
                         }
                     } else {
                         // データが読み込めなかった場合、従来のファイルサイズによるチェックを行う
@@ -330,9 +330,71 @@ extension ClipboardManager {
             try imageData.write(to: destinationURL)
             print("ClipboardManager: New image saved to sandbox as \(destinationURL.lastPathComponent)")
             // ファイルサイズとハッシュもセット
-            return ClipboardItem(text: String(localized: "Image File"), date: Date(), filePath: destinationURL, fileSize: newImageSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+            return ClipboardItem(text: "Image File", date: Date(), filePath: destinationURL, fileSize: newImageSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
         } catch {
             print("ClipboardManager: Error saving new image to sandbox: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    // MARK: - New Helper function for PDF duplication check and saving
+    func createClipboardItemFromPDFData(_ pdfData: Data, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? {
+        guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
+
+        let newPDFSize = UInt64(pdfData.count)
+        // PDFデータのハッシュを計算
+        let newPDFHash = HashCalculator.calculateImageDataHash(pdfData)
+
+        print("DEBUG: createClipboardItemFromPDFData - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
+
+        // MARK: - PDFサイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
+        if !isPerformingInternalCopy {
+            if !isFromAlertConfirmation {
+                if maxFileSizeToSave > 0 && newPDFSize > maxFileSizeToSave {
+                    print("ClipboardManager: PDF not saved due to size limit. PDF size: \(newPDFSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
+                    return nil
+                } else if largeFileAlertThreshold > 0 && newPDFSize > largeFileAlertThreshold {
+                    await MainActor.run {
+                        // PDFはpendingLargeImageDataを再利用する（タイプを区別する必要があれば新しいプロパティを追加）
+                        self.pendingLargeImageData = (pdfData, nil)
+                        self.pendingLargeFileItemsSourceAppPath = sourceAppPath
+                        self.showingLargeFileAlert = true
+                        print("DEBUG: createClipboardItemFromPDFData - Setting showingLargeFileAlert to true for PDF data (size: \(newPDFSize))")
+                    }
+                    return nil
+                }
+            }
+        }
+
+        do {
+            let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles)
+
+            for sandboxedFileURL in sandboxedFileContents {
+                if sandboxedFileURL.pathExtension.lowercased() == "pdf" {
+                    if let sandboxedData = try? Data(contentsOf: sandboxedFileURL) {
+                        let sandboxedPDFHash = HashCalculator.calculateImageDataHash(sandboxedData)
+                        if newPDFHash == sandboxedPDFHash {
+                            print("ClipboardManager: Found duplicate PDF in sandbox based on file hash: \(sandboxedFileURL.lastPathComponent)")
+                            let attributes = getFileAttributes(sandboxedFileURL)
+                            return ClipboardItem(text: "PDF File", date: Date(), filePath: sandboxedFileURL, fileSize: attributes.fileSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+                        }
+                    }
+                }
+            }
+        } catch {
+            print("ClipboardManager: Error getting contents of sandbox directory for PDF duplicate check: \(error.localizedDescription)")
+        }
+
+        // 重複が見つからなかった場合、新しいPDFを保存
+        let uniqueFileName = "\(UUID().uuidString)-file.pdf"
+        let destinationURL = filesDirectory.appendingPathComponent(uniqueFileName)
+
+        do {
+            try pdfData.write(to: destinationURL)
+            print("ClipboardManager: New PDF saved to sandbox as \(destinationURL.lastPathComponent)")
+            return ClipboardItem(text: "PDF File", date: Date(), filePath: destinationURL, fileSize: newPDFSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+        } catch {
+            print("ClipboardManager: Error saving new PDF to sandbox: \(error.localizedDescription)")
             return nil
         }
     }
@@ -352,9 +414,20 @@ extension ClipboardManager {
                 return newFilePath == existingFilePath && newItem.fileSize == existingItem.fileSize
             }
         }
-        // テキストアイテムの場合、テキスト内容で重複を判定
+        // テキストアイテムの場合、リッチテキストと標準テキストを区別して重複を判定
         else if newItem.filePath == nil && existingItem.filePath == nil {
-            return newItem.text == existingItem.text
+            // 両方ともリッチテキストの場合、リッチテキストの内容で比較
+            if let newRichText = newItem.richText, let existingRichText = existingItem.richText {
+                return newRichText == existingRichText
+            }
+            // 片方だけがリッチテキストの場合、重複ではない
+            else if (newItem.richText != nil) != (existingItem.richText != nil) {
+                return false
+            }
+            // 両方ともリッチテキストでない（標準テキスト）場合、標準テキストの内容で比較
+            else {
+                return newItem.text == existingItem.text
+            }
         }
         // 片方だけがファイルアイテムの場合は重複ではない
         return false
