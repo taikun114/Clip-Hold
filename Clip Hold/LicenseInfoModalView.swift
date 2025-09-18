@@ -31,7 +31,7 @@ struct LicenseInfoModalView: View {
     private let qwenCodeVersionString: String = "0.0.10"
 
     // KeyboardShortcutsの使用バージョン
-    private let keyboardShortcutsVersionString: String = "2.3.0"
+    private let keyboardShortcutsVersionString: String = "2.4.0"
     
     // create-dmgの使用バージョン
     private let createDmgVersionString: String = "1.2.2"
