@@ -620,6 +620,22 @@
         }
       }
     },
+    "Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporarily hide the Clip Hold menu bar icon. It will reappear when you open the app again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。"
+          }
+        }
+      }
+    },
     "Clip Holdの設定" : {
       "localizations" : {
         "en" : {
@@ -964,6 +980,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "KeyboardShortcutsのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Macのログイン時にClip Holdを自動で開くようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make Clip Hold open automatically when you login to Mac."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Macのログイン時にClip Holdを自動で開くようにします。"
           }
         }
       }
@@ -2085,38 +2117,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このオプションをオンにすると、テキストのみがクイックペーストの対象となります。"
-          }
-        }
-      }
-    },
-    "このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When this option is enabled, the menu bar icon will be temporarily hidden. It will reappear when you reopen the app again."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。"
-          }
-        }
-      }
-    },
-    "このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When this option is enabled, Command + V key actions will be sent when you select a standard phrase or a copy history item from the menu, or when you use shortcut keys to copy. Accessibility permission is required."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。"
           }
         }
       }
@@ -3625,34 +3625,34 @@
         }
       }
     },
-    "メニューに表示する定型文の最大数" : {
+    "メニューに表示される定型文の最大数を設定します。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maximum number of standard phrases to show in the menu"
+            "value" : "Set the maximum number of standard phrases to display in the menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メニューに表示する定型文の最大数"
+            "value" : "メニューに表示される定型文の最大数を設定します。"
           }
         }
       }
     },
-    "メニューに表示する定型文の最大数:" : {
+    "メニューに表示される履歴の最大数を設定します。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maximum number of standard phrases to show in the menu:"
+            "value" : "Set the maximum number of history items to display in the menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メニューに表示する定型文の最大数:"
+            "value" : "メニューに表示される履歴の最大数を設定します。"
           }
         }
       }
@@ -3673,38 +3673,6 @@
         }
       }
     },
-    "メニューに表示する履歴の最大数" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum number of history items to show in the menu"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メニューに表示する履歴の最大数"
-          }
-        }
-      }
-    },
-    "メニューに表示する履歴の最大数:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum number of history items to show in the menu:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メニューに表示する履歴の最大数:"
-          }
-        }
-      }
-    },
     "メニューに表示する履歴の最大数を設定" : {
       "localizations" : {
         "en" : {
@@ -3721,18 +3689,18 @@
         }
       }
     },
-    "メニューバーアイコンを一時的に非表示" : {
+    "メニューバーアイコンを隠す" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Temporarily Hide Menu Bar Icon"
+            "value" : "Hide the Menu Bar Icon"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メニューバーアイコンを一時的に非表示"
+            "value" : "メニューバーアイコンを隠す"
           }
         }
       }
@@ -4665,6 +4633,22 @@
         }
       }
     },
+    "定型文の最大表示数" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum Number of Standard Phrases to Display"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文の最大表示数"
+          }
+        }
+      }
+    },
     "定型文の削除" : {
       "localizations" : {
         "en" : {
@@ -4741,6 +4725,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文はありません"
+          }
+        }
+      }
+    },
+    "定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When selecting a standard phrase or copy history item from the menu, or when copying using shortcut keys, the Command + V key action is sent. Accessibility permission is required."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。"
           }
         }
       }
@@ -5045,6 +5045,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の保存数に合わせる"
+          }
+        }
+      }
+    },
+    "履歴の最大表示数" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum Number of History Items to Display"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の最大表示数"
           }
         }
       }

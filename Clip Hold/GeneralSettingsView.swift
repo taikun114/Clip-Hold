@@ -164,7 +164,12 @@ struct GeneralSettingsView: View {
             // MARK: - Clip Holdの設定
             Section(header: Text("Clip Holdの設定").font(.headline)) {
                 HStack {
-                    Text("ログイン時に開く")
+                    VStack(alignment: .leading) {
+                        Text("ログイン時に開く")
+                        Text("Macのログイン時にClip Holdを自動で開くようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                     Toggle(isOn: $loginItemManager.launchAtLogin) {
                         Text("ログイン時に開く")
@@ -178,14 +183,14 @@ struct GeneralSettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("クイックペースト")
-                        Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
+                        Text("定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $quickPaste) {
                         Text("クイックペースト")
-                        Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
+                        Text("定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -213,12 +218,17 @@ struct GeneralSettingsView: View {
 
             // MARK: - メニュー
             Section(header: Text("メニュー").font(.headline)) {
-                // メニューに表示する定型文の最大数
+                // 定型文の最大表示数
                 HStack {
-                    Text("メニューに表示する定型文の最大数:")
+                    VStack(alignment: .leading) {
+                        Text("定型文の最大表示数")
+                        Text("メニューに表示される定型文の最大数を設定します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
 
-                    Picker("メニューに表示する定型文の最大数", selection: $tempSelectedPhraseMenuOption) {
+                    Picker("定型文の最大表示数", selection: $tempSelectedPhraseMenuOption) {
                         ForEach(HistoryOption.presets) { option in
                             Text(option.stringValue)
                                 .tag(option)
@@ -249,12 +259,17 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
-                // メニューに表示する履歴の最大数
+                // 履歴の最大表示数
                 HStack {
-                    Text("メニューに表示する履歴の最大数:")
+                    VStack(alignment: .leading) {
+                        Text("履歴の最大表示数")
+                        Text("メニューに表示される履歴の最大数を設定します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
 
-                    Picker("メニューに表示する履歴の最大数", selection: $tempSelectedMenuOption) {
+                    Picker("履歴の最大表示数", selection: $tempSelectedMenuOption) {
                         ForEach(MenuHistoryOption.presetsAndSameAsSaved.filter { option in
                             if case .sameAsSaved = option {
                                 // UserDefaults.standard.integer(forKey: "maxHistoryToSave") が 0 (無制限) でない場合のみ .sameAsSaved を表示
@@ -298,15 +313,15 @@ struct GeneralSettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("メニューバーアイコンを一時的に非表示")
-                        Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
+                        Text("メニューバーアイコンを隠す")
+                        Text("Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $hideMenuBarExtra) {
-                        Text("メニューバーアイコンを一時的に非表示")
-                        Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
+                        Text("メニューバーアイコンを隠す")
+                        Text("Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
