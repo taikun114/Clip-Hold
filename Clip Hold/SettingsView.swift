@@ -48,7 +48,7 @@ struct SettingsView: View {
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(selectedSection == "info" ? (isWindowFocused ? Color.accentColor.opacity(0.8) : Color.gray.opacity(0.3)) : Color.clear)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(10)
                 } else {
                     Button(action: {
