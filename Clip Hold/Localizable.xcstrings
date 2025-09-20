@@ -1593,6 +1593,22 @@
         }
       }
     },
+    "オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, automatically scrolls the history list to the top when the list is updated."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。"
+          }
+        }
+      }
+    },
     "オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。" : {
       "localizations" : {
         "en" : {
@@ -3785,18 +3801,18 @@
         }
       }
     },
-    "リストが更新されたら最も上にスクロール" : {
+    "リストが更新されたとき、リストを自動的に最も上にスクロールします。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scroll to the Top When the List is Updated"
+            "value" : "When the list is updated, automatically scroll to the top of the list."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "リストが更新されたら最も上にスクロール"
+            "value" : "リストが更新されたとき、リストを自動的に最も上にスクロールします。"
           }
         }
       }
@@ -5209,22 +5225,6 @@
         }
       }
     },
-    "履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to automatically scroll to the top when the history list is updated."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。"
-          }
-        }
-      }
-    },
     "履歴を保存する最大数" : {
       "localizations" : {
         "en" : {
@@ -6053,6 +6053,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自動"
+          }
+        }
+      }
+    },
+    "自動スクロール" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto Scroll"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動スクロール"
           }
         }
       }

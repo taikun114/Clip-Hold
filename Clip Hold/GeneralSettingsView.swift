@@ -80,7 +80,7 @@ struct GeneralSettingsView: View {
     @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
     @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
     @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
-    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
+    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
     @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
 
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbersInStandardPhrasesWindow: Bool = false
@@ -436,11 +436,16 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
-                    Text("リストが更新されたら最も上にスクロール")
+                    VStack(alignment: .leading) {
+                        Text("自動スクロール")
+                        Text("リストが更新されたとき、リストを自動的に最も上にスクロールします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                     Toggle(isOn: $scrollToTopOnUpdate) {
-                        Text("リストが更新されたら最も上にスクロール")
-                        Text("履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。")
+                        Text("自動スクロール")
+                        Text("オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
