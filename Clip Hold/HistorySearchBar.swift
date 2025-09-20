@@ -121,6 +121,7 @@ struct HistorySearchBar: View {
             .menuStyle(.borderlessButton)
             .frame(width: 30)
             .padding(.horizontal, 4)
+            .disabled(isLoading) // 読み込み中に無効化
 
             // 並び替えボタン
             Menu {
@@ -139,6 +140,7 @@ struct HistorySearchBar: View {
             .menuStyle(.borderlessButton)
             .frame(width: 30)
             .padding(.horizontal, 4)
+            .disabled(isLoading) // 読み込み中に無効化
 
         }
         .padding(.horizontal, 10)
