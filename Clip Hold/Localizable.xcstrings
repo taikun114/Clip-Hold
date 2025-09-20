@@ -588,6 +588,22 @@
         }
       }
     },
+    "Clip Holdに保存する履歴の最大数を設定します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the maximum number of items saved in Clip Hold history."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Holdに保存する履歴の最大数を設定します。"
+          }
+        }
+      }
+    },
     "Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。" : {
       "localizations" : {
         "en" : {
@@ -2361,22 +2377,6 @@
         }
       }
     },
-    "この容量より大きいファイルコピー時にアラートを表示" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show alert when copying a file larger than this size"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この容量より大きいファイルコピー時にアラートを表示"
-          }
-        }
-      }
-    },
     "コピー" : {
       "localizations" : {
         "en" : {
@@ -2389,6 +2389,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コピー"
+          }
+        }
+      }
+    },
+    "コピーアラートを表示する容量" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size for Copy Alert"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーアラートを表示する容量"
           }
         }
       }
@@ -3269,38 +3285,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バグを見つけましたか？"
-          }
-        }
-      }
-    },
-    "ファイル1つあたりの最大容量" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum size per file"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル1つあたりの最大容量"
-          }
-        }
-      }
-    },
-    "ファイル1つあたりの最大容量:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum Size per File:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル1つあたりの最大容量:"
           }
         }
       }
@@ -4537,6 +4521,22 @@
         }
       }
     },
+    "各ファイルの最大容量" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum File Size for Each File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各ファイルの最大容量"
+          }
+        }
+      }
+    },
     "各項目に表示される番号を非表示にします。" : {
       "localizations" : {
         "en" : {
@@ -5081,6 +5081,22 @@
         }
       }
     },
+    "履歴の最大保存数" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum Number of History Saves"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の最大保存数"
+          }
+        }
+      }
+    },
     "履歴の最大表示数" : {
       "localizations" : {
         "en" : {
@@ -5237,38 +5253,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴リスト"
-          }
-        }
-      }
-    },
-    "履歴を保存する最大数" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum number of history items to save"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴を保存する最大数"
-          }
-        }
-      }
-    },
-    "履歴を保存する最大数:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum number of history items to save:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴を保存する最大数:"
           }
         }
       }
@@ -5765,22 +5749,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次のプリセットに切り替える"
-          }
-        }
-      }
-    },
-    "次の容量より大きいファイルコピー時にアラートを表示:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show alert when copying a file larger than:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "次の容量より大きいファイルコピー時にアラートを表示:"
           }
         }
       }

@@ -167,11 +167,16 @@ struct CopyHistorySettingsView: View {
         Form {
             // MARK: - 履歴の設定
             Section(header: Text("履歴の設定").font(.headline)) {
-                // 履歴を保存する最大数
+                // 履歴の最大保存数
                 HStack {
-                    Text("履歴を保存する最大数:")
+                    VStack(alignment: .leading) {
+                        Text("履歴の最大保存数")
+                        Text("Clip Holdに保存する履歴の最大数を設定します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Picker("履歴を保存する最大数", selection: $tempSelectedSaveOption) {
+                    Picker("履歴の最大保存数", selection: $tempSelectedSaveOption) {
                         ForEach(HistoryOption.presets) { option in
                             Text(option.stringValue)
                                 .tag(option)
@@ -203,46 +208,13 @@ struct CopyHistorySettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("ファイル1つあたりの最大容量:")
-                        Text("ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Picker("ファイル1つあたりの最大容量", selection: $tempSelectedFileSizeOption) {
-                        ForEach(DataSizeOption.presets) { option in
-                            Text(option.stringValue)
-                                .tag(option)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        Text("無制限")
-                            .tag(DataSizeOption.unlimited)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("カスタム...")
-                            .tag(DataSizeOption.custom(nil, nil))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        // Use the extracted custom option view
-                        fileSizeCustomOptionView
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    // Updated onChange syntax to use a two-parameter closure
-                    .onChange(of: tempSelectedFileSizeOption) { _, newValue in
-                        handleFileSizeOptionChange(newValue: newValue)
-                    }
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("次の容量より大きいファイルコピー時にアラートを表示:")
+                        Text("コピーアラートを表示する容量")
                         Text("ここで設定した容量よりも大きいファイルをコピーしようとした際に、コピーしたファイルを履歴に保存するかどうかを求めるアラートが表示されます。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Picker("この容量より大きいファイルコピー時にアラートを表示", selection: $tempSelectedAlertOption) {
+                    Picker("コピーアラートを表示する容量", selection: $tempSelectedAlertOption) {
                         ForEach(DataSizeAlertOption.presets) { option in
                             Text(option.stringValue)
                                 .tag(option)
@@ -263,6 +235,39 @@ struct CopyHistorySettingsView: View {
                     // Updated onChange syntax to use a two-parameter closure
                     .onChange(of: tempSelectedAlertOption) { _, newValue in
                         handleAlertOptionChange(newValue: newValue)
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("各ファイルの最大容量")
+                        Text("ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Picker("各ファイルの最大容量", selection: $tempSelectedFileSizeOption) {
+                        ForEach(DataSizeOption.presets) { option in
+                            Text(option.stringValue)
+                                .tag(option)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        Text("無制限")
+                            .tag(DataSizeOption.unlimited)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text("カスタム...")
+                            .tag(DataSizeOption.custom(nil, nil))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        // Use the extracted custom option view
+                        fileSizeCustomOptionView
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    // Updated onChange syntax to use a two-parameter closure
+                    .onChange(of: tempSelectedFileSizeOption) { _, newValue in
+                        handleFileSizeOptionChange(newValue: newValue)
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
