@@ -66,14 +66,24 @@ struct HistorySearchBar: View {
             Menu {
                 Picker("フィルター", selection: $selectedFilter) {
                     // 「すべての項目」を最初に表示
-                    Text(ItemFilter.all.displayName).tag(ItemFilter.all)
+                    Label(ItemFilter.all.displayName, systemImage: "list.clipboard").tag(ItemFilter.all)
                     
                     // テキストピッカーを「すべての項目」の下、「リンクのみ」の上に配置
-                    Picker("テキストのみ", selection: $selectedFilter) {
-                        Text(ItemFilter.textAll.displayName).tag(ItemFilter.textAll)
+                    Picker(selection: $selectedFilter) {
+                        Label(ItemFilter.textAll.displayName, systemImage: "textformat").tag(ItemFilter.textAll)
                         Divider()
-                        Text(ItemFilter.textPlain.displayName).tag(ItemFilter.textPlain)
-                        Text(ItemFilter.textRich.displayName).tag(ItemFilter.textRich)
+                        if #available(macOS 15.0, *) {
+                            Label(ItemFilter.textPlain.displayName, systemImage: "text.page").tag(ItemFilter.textPlain)
+                        } else {
+                            Label(ItemFilter.textPlain.displayName, systemImage: "doc.plaintext").tag(ItemFilter.textPlain)
+                        }
+                        if #available(macOS 15.0, *) {
+                            Label(ItemFilter.textRich.displayName, systemImage: "richtext.page").tag(ItemFilter.textRich)
+                        } else {
+                            Label(ItemFilter.textRich.displayName, systemImage: "doc.richtext").tag(ItemFilter.textRich)
+                        }
+                    } label: {
+                        Label("テキストのみ", systemImage: "textformat")
                     }
                     .pickerStyle(.menu)
 
@@ -84,7 +94,22 @@ struct HistorySearchBar: View {
                         // colorCodeOnlyは設定がオンの場合のみ表示
                         ($0 == .colorCodeOnly && enableColorCodeFilter)
                     }) { filter in
-                        Text(filter.displayName).tag(filter)
+                        switch filter {
+                        case .linkOnly:
+                            Label(filter.displayName, systemImage: "paperclip").tag(filter)
+                        case .fileOnly:
+                            if #available(macOS 15.0, *) {
+                                Label(filter.displayName, systemImage: "document").tag(filter)
+                            } else {
+                                Label(filter.displayName, systemImage: "doc").tag(filter)
+                            }
+                        case .imageOnly:
+                            Label(filter.displayName, systemImage: "photo").tag(filter)
+                        case .colorCodeOnly:
+                            Label(filter.displayName, systemImage: "paintpalette").tag(filter)
+                        default:
+                            Text(filter.displayName).tag(filter)
+                        }
                     }
 
                     if !clipboardManager.appUsageHistory.isEmpty {
@@ -106,7 +131,7 @@ struct HistorySearchBar: View {
                                 .tag(path as String?)
                             }
                         } label: {
-                            Text("アプリ")
+                            Label("アプリ", systemImage: "app")
                         }
                         .labelStyle(.titleAndIcon)
                         .pickerStyle(.menu)
