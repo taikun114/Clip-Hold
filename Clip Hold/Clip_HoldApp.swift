@@ -258,7 +258,16 @@ struct ClipHoldApp: App {
                     }()
                      
                     let displayText: String = {
-                        var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
+                        let content: String
+                        if item.text == "Image File" {
+                            content = String(localized: "Image File")
+                        } else if item.text == "PDF File" {
+                            content = String(localized: "PDF File")
+                        } else {
+                            content = item.text
+                        }
+
+                        var displayContent = content.replacingOccurrences(of: "\n", with: " ")
                         let dateString = itemDateFormatter.string(from: item.date)
                         
                         let characterCountText = showCharacterCount ? String(localized:" - \(item.text.count)文字") : ""
