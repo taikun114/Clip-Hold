@@ -366,11 +366,16 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
-                    Text("常に最前面に表示")
+                    VStack(alignment: .leading) {
+                        Text("常に最前面に表示")
+                        Text("ウィンドウを常に最も手前に表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                     Toggle(isOn: $standardPhraseWindowAlwaysOnTop) {
                         Text("定型文ウィンドウを常に最前面に表示")
-                        Text("定型文ウィンドウを常に最前面に表示するかどうかを切り替えます。")
+                        Text("オンにすると、定型文ウィンドウを常に最も手前に表示します。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -430,11 +435,16 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
-                    Text("常に最前面に表示")
+                    VStack(alignment: .leading) {
+                        Text("常に最前面に表示")
+                        Text("ウィンドウを常に最も手前に表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                     Toggle(isOn: $historyWindowAlwaysOnTop) {
                         Text("履歴ウィンドウを常に最前面に表示")
-                        Text("履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。")
+                        Text("オンにすると、履歴ウィンドウを常に最も手前に表示します。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()

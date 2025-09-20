@@ -1513,6 +1513,22 @@
         }
       }
     },
+    "ウィンドウを常に最も手前に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Always keep the window on top."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウィンドウを常に最も手前に表示します。"
+          }
+        }
+      }
+    },
     "ウィンドウ操作" : {
       "localizations" : {
         "en" : {
@@ -1625,6 +1641,22 @@
         }
       }
     },
+    "オンにすると、定型文ウィンドウを常に最も手前に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, always keep the Standard Phrases window on top."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、定型文ウィンドウを常に最も手前に表示します。"
+          }
+        }
+      }
+    },
     "オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。" : {
       "localizations" : {
         "en" : {
@@ -1637,6 +1669,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
+    "オンにすると、履歴ウィンドウを常に最も手前に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, always keep the History window on top."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、履歴ウィンドウを常に最も手前に表示します。"
           }
         }
       }
@@ -4617,22 +4665,6 @@
         }
       }
     },
-    "定型文ウィンドウを常に最前面に表示するかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to show the Standard Phrases window always on top."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "定型文ウィンドウを常に最前面に表示するかどうかを切り替えます。"
-          }
-        }
-      }
-    },
     "定型文ウィンドウを開く" : {
       "localizations" : {
         "en" : {
@@ -4981,22 +5013,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウを常に最前面に表示"
-          }
-        }
-      }
-    },
-    "履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to show the History window always on top."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。"
           }
         }
       }
