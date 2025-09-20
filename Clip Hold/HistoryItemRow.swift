@@ -66,7 +66,7 @@ struct HistoryItemRow: View {
     @Binding var showingDeleteConfirmation: Bool
     @Binding var selectedItemID: UUID?
     var dismissAction: () -> Void
-    @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("closeWindowOnDoubleClick") var closeWindowOnDoubleClick: Bool = false
 
     @Environment(\.colorScheme) var colorScheme
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false

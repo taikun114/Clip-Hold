@@ -78,7 +78,8 @@ struct GeneralSettingsView: View {
     @State private var initialPhraseMenuOption: HistoryOption
 
     @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
-    @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
     @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
 
@@ -341,7 +342,7 @@ struct GeneralSettingsView: View {
                     Spacer()
                     Toggle(isOn: $hideNumbersInStandardPhrasesWindow) {
                         Text("定型文ウィンドウの番号を隠す")
-                        Text("この設定をオンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。")
+                        Text("オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -349,11 +350,16 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 HStack {
-                    Text("ダブルクリック時にウィンドウを閉じない")
+                    VStack(alignment: .leading) {
+                        Text("ダブルクリックでウィンドウを閉じる")
+                        Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Toggle(isOn: $preventStandardPhraseWindowCloseOnDoubleClick) {
-                        Text("ダブルクリック時に定型文ウィンドウを閉じない")
-                        Text("定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。")
+                    Toggle(isOn: $closeWindowOnDoubleClickInStandardPhrasesWindow) {
+                        Text("ダブルクリックで定型文ウィンドウを閉じる")
+                        Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -395,7 +401,7 @@ struct GeneralSettingsView: View {
                     Spacer()
                     Toggle(isOn: $hideNumbersInHistoryWindow) {
                         Text("履歴ウィンドウの番号を隠す")
-                        Text("この設定をオンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。")
+                        Text("オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -403,11 +409,16 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 HStack {
-                    Text("ダブルクリック時にウィンドウを閉じない")
+                    VStack(alignment: .leading) {
+                        Text("ダブルクリックでウィンドウを閉じる")
+                        Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Toggle(isOn: $preventWindowCloseOnDoubleClick) {
-                        Text("ダブルクリック時に履歴ウィンドウを閉じない")
-                        Text("履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。")
+                    Toggle(isOn: $closeWindowOnDoubleClickInHistoryWindow) {
+                        Text("ダブルクリックで履歴ウィンドウを閉じる")
+                        Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()

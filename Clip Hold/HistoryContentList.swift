@@ -46,7 +46,7 @@ struct HistoryContentList: View {
     @State private var rowIconViews: [UUID: NSView] = [:]
 
     let hideNumbersInHistoryWindow: Bool
-    let preventWindowCloseOnDoubleClick: Bool
+    let closeWindowOnDoubleClickInHistoryWindow: Bool
     let scrollToTopOnUpdate: Bool
     let showCharacterCount: Bool
     let lineNumberTextWidth: CGFloat?
@@ -280,7 +280,7 @@ struct HistoryContentList: View {
                                     showCopyConfirmation = false
                                 }
                             }
-                            if !preventWindowCloseOnDoubleClick {
+                            if closeWindowOnDoubleClickInHistoryWindow {
                                 dismiss()
                             }
                         }

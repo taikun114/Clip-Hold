@@ -40,7 +40,7 @@ struct HistoryWindowView: View {
     @FocusState private var isSearchFieldFocused: Bool
 
     @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
-    @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
@@ -178,7 +178,7 @@ struct HistoryWindowView: View {
                             itemForNewPhrase: $itemForNewPhrase,
                             previousClipboardHistoryCount: $previousClipboardHistoryCount,
                             hideNumbersInHistoryWindow: hideNumbersInHistoryWindow,
-                            preventWindowCloseOnDoubleClick: preventWindowCloseOnDoubleClick,
+                            closeWindowOnDoubleClickInHistoryWindow: closeWindowOnDoubleClickInHistoryWindow,
                             scrollToTopOnUpdate: scrollToTopOnUpdate,
                             showCharacterCount: showCharacterCount,
                             lineNumberTextWidth: lineNumberTextWidth,

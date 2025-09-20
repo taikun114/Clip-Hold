@@ -27,7 +27,7 @@ struct StandardPhraseItemRow: View {
     @Binding var phraseToDelete: StandardPhrase?
     @Binding var showingDeleteConfirmation: Bool
     @Binding var selectedPhraseID: UUID?
-    @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -173,7 +173,7 @@ struct StandardPhraseWindowView: View {
     @State private var destinationPresetId: UUID?
 
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
-    @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
 
     @FocusState private var isSearchFieldFocused: Bool
 
@@ -528,7 +528,7 @@ struct StandardPhraseWindowView: View {
                                             showCopyConfirmation = false
                                         }
                                     }
-                                    if !preventWindowCloseOnDoubleClick {
+                                    if closeWindowOnDoubleClickInStandardPhrasesWindow {
                                         dismiss()
                                     }
                                 }

@@ -1593,6 +1593,54 @@
         }
       }
     },
+    "オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, hide numbers displayed in each item of the Standard Phrases window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
+    "オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, hide numbers displayed in each item in the History window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
+    "オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, close window when you double-click an item to copy it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。"
+          }
+        }
+      }
+    },
     "カスタム: %lld" : {
       "localizations" : {
         "en" : {
@@ -2265,38 +2313,6 @@
         }
       }
     },
-    "この設定をオンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When enabled, hide numbers displayed in each item of the Standard Phrases window."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この設定をオンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。"
-          }
-        }
-      }
-    },
-    "この設定をオンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When enabled, hide numbers displayed in each item in the History window."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この設定をオンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。"
-          }
-        }
-      }
-    },
     "コピー" : {
       "localizations" : {
         "en" : {
@@ -2921,50 +2937,50 @@
         }
       }
     },
-    "ダブルクリック時にウィンドウを閉じない" : {
+    "ダブルクリックでウィンドウを閉じる" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close window on double click"
+            "value" : "Close Window by Double-Click"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ダブルクリック時にウィンドウを閉じない"
+            "value" : "ダブルクリックでウィンドウを閉じる"
           }
         }
       }
     },
-    "ダブルクリック時に定型文ウィンドウを閉じない" : {
+    "ダブルクリックで定型文ウィンドウを閉じる" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close the Standard Phrases window on double click"
+            "value" : "Close Standard Phrases Window by Double-Click"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ダブルクリック時に定型文ウィンドウを閉じない"
+            "value" : "ダブルクリックで定型文ウィンドウを閉じる"
           }
         }
       }
     },
-    "ダブルクリック時に履歴ウィンドウを閉じない" : {
+    "ダブルクリックで履歴ウィンドウを閉じる" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close the History window on double click"
+            "value" : "Close History Window by Double-Click"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ダブルクリック時に履歴ウィンドウを閉じない"
+            "value" : "ダブルクリックで履歴ウィンドウを閉じる"
           }
         }
       }
@@ -4537,22 +4553,6 @@
         }
       }
     },
-    "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the Standard Phrases window."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。"
-          }
-        }
-      }
-    },
     "定型文ウィンドウの番号を隠す" : {
       "localizations" : {
         "en" : {
@@ -4901,22 +4901,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。"
-          }
-        }
-      }
-    },
-    "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the History window."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。"
           }
         }
       }
@@ -6597,6 +6581,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "項目から定型文を作成..."
+          }
+        }
+      }
+    },
+    "項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make the window close when you double-click an item to copy it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。"
           }
         }
       }
