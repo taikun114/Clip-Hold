@@ -684,22 +684,6 @@
         }
       }
     },
-    "Clip Holdをログイン時に開くかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle launch at login for Clip Hold."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clip Holdをログイン時に開くかどうかを切り替えます。"
-          }
-        }
-      }
-    },
     "Copyright ©︎ 2025 今浦大雅" : {
       "localizations" : {
         "en" : {
@@ -1625,6 +1609,22 @@
         }
       }
     },
+    "オンにすると、Macのログイン時にClip Holdを自動で開くようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, make Clip Hold open automatically when you login to Mac."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、Macのログイン時にClip Holdを自動で開くようにします。"
+          }
+        }
+      }
+    },
     "オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。" : {
       "localizations" : {
         "en" : {
@@ -1673,6 +1673,22 @@
         }
       }
     },
+    "オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, when selecting a standard phrase or copy history item from the menu, or when copying using shortcut keys, the Command + V key action is sent. Accessibility permission is required."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。"
+          }
+        }
+      }
+    },
     "オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。" : {
       "localizations" : {
         "en" : {
@@ -1701,6 +1717,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オンにすると、履歴ウィンドウを常に最も手前に表示します。"
+          }
+        }
+      }
+    },
+    "オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, make Quick Paste perform only when the history item is text."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。"
           }
         }
       }
@@ -1877,6 +1909,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイックペースト"
+          }
+        }
+      }
+    },
+    "クイックペーストをテキストに限定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Paste Only for Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックペーストをテキストに限定"
           }
         }
       }
@@ -2229,22 +2277,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このアプリは既に別のプリセットに割り当てられています。上書きしてもよろしいですか？"
-          }
-        }
-      }
-    },
-    "このオプションをオンにすると、テキストのみがクイックペーストの対象となります。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When this option is enabled, Quick Paste will only be applied to text."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このオプションをオンにすると、テキストのみがクイックペーストの対象となります。"
           }
         }
       }
@@ -5317,6 +5349,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴を検索"
+          }
+        }
+      }
+    },
+    "履歴項目がテキストである場合のみクイックペーストを行うようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make Quick Paste perform only when the history item is text."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴項目がテキストである場合のみクイックペーストを行うようにします。"
           }
         }
       }

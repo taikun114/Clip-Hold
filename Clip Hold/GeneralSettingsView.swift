@@ -176,7 +176,7 @@ struct GeneralSettingsView: View {
                     Spacer()
                     Toggle(isOn: $loginItemManager.launchAtLogin) {
                         Text("ログイン時に開く")
-                        Text("Clip Holdをログイン時に開くかどうかを切り替えます。")
+                        Text("オンにすると、Macのログイン時にClip Holdを自動で開くようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -193,7 +193,7 @@ struct GeneralSettingsView: View {
                     Spacer()
                     Toggle(isOn: $quickPaste) {
                         Text("クイックペースト")
-                        Text("定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
+                        Text("オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -202,14 +202,15 @@ struct GeneralSettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("テキストのみ")
-                        Text("このオプションをオンにすると、テキストのみがクイックペーストの対象となります。")
+                        Text("クイックペーストをテキストに限定")
+                        Text("履歴項目がテキストである場合のみクイックペーストを行うようにします。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $textOnlyQuickPaste) {
-                        Text("テキストのみ")
+                        Text("クイックペーストをテキストに限定")
+                        Text("オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
