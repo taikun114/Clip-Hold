@@ -61,7 +61,7 @@ struct HistoryItemRow: View {
     
     let item: ClipboardItem
     let index: Int
-    let showLineNumber: Bool
+    let hideNumbers: Bool
     @Binding var itemToDelete: ClipboardItem?
     @Binding var showingDeleteConfirmation: Bool
     @Binding var selectedItemID: UUID?
@@ -92,7 +92,7 @@ struct HistoryItemRow: View {
 
     init(item: ClipboardItem,
          index: Int,
-         showLineNumber: Bool,
+         hideNumbers: Bool,
          itemToDelete: Binding<ClipboardItem?>,
          showingDeleteConfirmation: Binding<Bool>,
          selectedItemID: Binding<UUID?>,
@@ -108,7 +108,7 @@ struct HistoryItemRow: View {
             
         self.item = item
         self.index = index
-        self.showLineNumber = showLineNumber
+        self.hideNumbers = hideNumbers
         _itemToDelete = itemToDelete
         _showingDeleteConfirmation = showingDeleteConfirmation
         _selectedItemID = selectedItemID
@@ -223,7 +223,7 @@ struct HistoryItemRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            if showLineNumber {
+            if !hideNumbers {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)

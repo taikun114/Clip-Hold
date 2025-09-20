@@ -45,7 +45,7 @@ struct HistoryContentList: View {
     // 各行のアイコンのNSView参照を保存するためのState
     @State private var rowIconViews: [UUID: NSView] = [:]
 
-    let showLineNumbersInHistoryWindow: Bool
+    let hideNumbersInHistoryWindow: Bool
     let preventWindowCloseOnDoubleClick: Bool
     let scrollToTopOnUpdate: Bool
     let showCharacterCount: Bool
@@ -88,7 +88,7 @@ struct HistoryContentList: View {
                             HistoryItemRow(
                                 item: item,
                                 index: filteredHistory.firstIndex(where: { $0.id == item.id }) ?? 0,
-                                showLineNumber: showLineNumbersInHistoryWindow,
+                                hideNumbers: hideNumbersInHistoryWindow,
                                 itemToDelete: $itemToDelete,
                                 showingDeleteConfirmation: $showingDeleteConfirmation,
                                 selectedItemID: $selectedItemID,

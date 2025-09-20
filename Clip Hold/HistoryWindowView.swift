@@ -39,13 +39,13 @@ struct HistoryWindowView: View {
 
     @FocusState private var isSearchFieldFocused: Bool
 
-    @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
+    @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
     private var lineNumberTextWidth: CGFloat? {
-        guard showLineNumbersInHistoryWindow, !(clipboardManager.filteredHistoryForShortcuts ?? []).isEmpty else { return nil }
+        guard !hideNumbersInHistoryWindow, !(clipboardManager.filteredHistoryForShortcuts ?? []).isEmpty else { return nil }
         
         let maxIndex = (clipboardManager.filteredHistoryForShortcuts ?? []).count
         let numDigits = String(maxIndex).count
@@ -165,31 +165,31 @@ struct HistoryWindowView: View {
 
                     Spacer(minLength: 0)
 
-                    HistoryContentList(
-                        filteredHistory: $filteredHistory,
-                        isLoading: $isLoading,
-                        showingDeleteConfirmation: $showingDeleteConfirmation,
-                        itemToDelete: $itemToDelete,
-                        selectedItemID: $selectedItemID,
-                        showCopyConfirmation: $showCopyConfirmation,
-                        currentCopyConfirmationTask: $currentCopyConfirmationTask,
-                        showQRCodeSheet: $showQRCodeSheet,
-                        selectedItemForQRCode: $selectedItemForQRCode,
-                        itemForNewPhrase: $itemForNewPhrase,
-                        previousClipboardHistoryCount: $previousClipboardHistoryCount,
-                        showLineNumbersInHistoryWindow: showLineNumbersInHistoryWindow,
-                        preventWindowCloseOnDoubleClick: preventWindowCloseOnDoubleClick,
-                        scrollToTopOnUpdate: scrollToTopOnUpdate,
-                        showCharacterCount: showCharacterCount,
-                        lineNumberTextWidth: lineNumberTextWidth,
-                        trailingPaddingForLineNumber: trailingPaddingForLineNumber,
-                        searchText: searchText,
-                        onCopyAction: { item in
-                            // 内部コピーフラグをtrueに設定
-                            clipboardManager.isPerformingInternalCopy = true
-                            ClipboardManager.shared.copyItemToClipboard(item)
-                        }
-                    )
+                                            HistoryContentList(
+                            filteredHistory: $filteredHistory,
+                            isLoading: $isLoading,
+                            showingDeleteConfirmation: $showingDeleteConfirmation,
+                            itemToDelete: $itemToDelete,
+                            selectedItemID: $selectedItemID,
+                            showCopyConfirmation: $showCopyConfirmation,
+                            currentCopyConfirmationTask: $currentCopyConfirmationTask,
+                            showQRCodeSheet: $showQRCodeSheet,
+                            selectedItemForQRCode: $selectedItemForQRCode,
+                            itemForNewPhrase: $itemForNewPhrase,
+                            previousClipboardHistoryCount: $previousClipboardHistoryCount,
+                            hideNumbersInHistoryWindow: hideNumbersInHistoryWindow,
+                            preventWindowCloseOnDoubleClick: preventWindowCloseOnDoubleClick,
+                            scrollToTopOnUpdate: scrollToTopOnUpdate,
+                            showCharacterCount: showCharacterCount,
+                            lineNumberTextWidth: lineNumberTextWidth,
+                            trailingPaddingForLineNumber: trailingPaddingForLineNumber,
+                            searchText: searchText,
+                            onCopyAction: { item in
+                                // 内部コピーフラグをtrueに設定
+                                clipboardManager.isPerformingInternalCopy = true
+                                ClipboardManager.shared.copyItemToClipboard(item)
+                            }
+                        )
                 }
             }
             

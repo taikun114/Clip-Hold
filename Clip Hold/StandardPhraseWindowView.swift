@@ -22,7 +22,7 @@ struct StandardPhraseItemRow: View {
     
     let phrase: StandardPhrase
     let index: Int
-    @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumber: Bool = false
+    @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     @Binding var phraseToDelete: StandardPhrase?
     @Binding var showingDeleteConfirmation: Bool
@@ -53,7 +53,7 @@ struct StandardPhraseItemRow: View {
         }()
 
         HStack(spacing: 8) {
-            if showLineNumber {
+            if !hideNumbers {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
@@ -172,7 +172,7 @@ struct StandardPhraseWindowView: View {
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
 
-    @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbers: Bool = false
+    @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
 
     @FocusState private var isSearchFieldFocused: Bool
@@ -182,7 +182,7 @@ struct StandardPhraseWindowView: View {
     @State private var newPresetName = ""
 
     private var lineNumberTextWidth: CGFloat? {
-        guard showLineNumbers, !filteredPhrases.isEmpty else { return nil }
+        guard !hideNumbers, !filteredPhrases.isEmpty else { return nil }
         
         let maxIndex = filteredPhrases.count
         let numDigits = String(maxIndex).count
@@ -402,7 +402,7 @@ struct StandardPhraseWindowView: View {
                                         StandardPhraseItemRow(
                                             phrase: phrase,
                                             index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                            showLineNumber: showLineNumbers,
+                                            hideNumbers: hideNumbers,
                                             phraseToDelete: $phraseToDelete,
                                             showingDeleteConfirmation: $showingDeleteConfirmation,
                                             selectedPhraseID: $selectedPhraseID,
@@ -425,7 +425,7 @@ struct StandardPhraseWindowView: View {
                                         StandardPhraseItemRow(
                                             phrase: phrase,
                                             index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                            showLineNumber: showLineNumbers,
+                                            hideNumbers: hideNumbers,
                                             phraseToDelete: $phraseToDelete,
                                             showingDeleteConfirmation: $showingDeleteConfirmation,
                                             selectedPhraseID: $selectedPhraseID,

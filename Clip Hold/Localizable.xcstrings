@@ -2265,6 +2265,38 @@
         }
       }
     },
+    "この設定をオンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, hide numbers displayed in each item of the Standard Phrases window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この設定をオンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
+    "この設定をオンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, hide numbers displayed in each item in the History window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この設定をオンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
     "コピー" : {
       "localizations" : {
         "en" : {
@@ -4409,6 +4441,22 @@
         }
       }
     },
+    "各項目に表示される番号を非表示にします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide numbers displayed in each item."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
     "大容量ファイルのコピー" : {
       "localizations" : {
         "en" : {
@@ -4489,22 +4537,6 @@
         }
       }
     },
-    "定型文ウィンドウに番号を表示" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Numbers in the Standard Phrases Window"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "定型文ウィンドウに番号を表示"
-          }
-        }
-      }
-    },
     "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。" : {
       "localizations" : {
         "en" : {
@@ -4521,18 +4553,18 @@
         }
       }
     },
-    "定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。" : {
+    "定型文ウィンドウの番号を隠す" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show or not show numbers for each item in the Standard Phrases window."
+            "value" : "Hide Numbers in the Standard Phrases Window"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。"
+            "value" : "定型文ウィンドウの番号を隠す"
           }
         }
       }
@@ -4873,22 +4905,6 @@
         }
       }
     },
-    "履歴ウィンドウに番号を表示" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Numbers in the History Window"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴ウィンドウに番号を表示"
-          }
-        }
-      }
-    },
     "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。" : {
       "localizations" : {
         "en" : {
@@ -4937,18 +4953,18 @@
         }
       }
     },
-    "履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。" : {
+    "履歴ウィンドウの番号を隠す" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show or not show numbers for each item in the History window."
+            "value" : "Hide Numbers in the History Window"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。"
+            "value" : "履歴ウィンドウの番号を隠す"
           }
         }
       }
@@ -5897,18 +5913,18 @@
         }
       }
     },
-    "番号を表示" : {
+    "番号を隠す" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Numbers"
+            "value" : "Hide Numbers"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "番号を表示"
+            "value" : "番号を隠す"
           }
         }
       }

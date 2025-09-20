@@ -77,12 +77,12 @@ struct GeneralSettingsView: View {
     @State private var tempSelectedPhraseMenuOption: HistoryOption
     @State private var initialPhraseMenuOption: HistoryOption
 
-    @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
+    @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
     @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
     @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
 
-    @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbersInStandardPhraseWindow: Bool = false
+    @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbersInStandardPhrasesWindow: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
     @AppStorage("historyWindowAlwaysOnTop") var historyWindowAlwaysOnTop: Bool = false
     @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
@@ -332,11 +332,16 @@ struct GeneralSettingsView: View {
             // MARK: - 定型文ウィンドウ
             Section(header: Text("定型文ウィンドウ").font(.headline)) {
                 HStack {
-                    Text("番号を表示")
+                    VStack(alignment: .leading) {
+                        Text("番号を隠す")
+                        Text("各項目に表示される番号を非表示にします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Toggle(isOn: $showLineNumbersInStandardPhraseWindow) {
-                        Text("定型文ウィンドウに番号を表示")
-                        Text("定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
+                    Toggle(isOn: $hideNumbersInStandardPhrasesWindow) {
+                        Text("定型文ウィンドウの番号を隠す")
+                        Text("この設定をオンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -381,11 +386,16 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
-                    Text("番号を表示")
+                    VStack(alignment: .leading) {
+                        Text("番号を隠す")
+                        Text("各項目に表示される番号を非表示にします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Toggle(isOn: $showLineNumbersInHistoryWindow) {
-                        Text("履歴ウィンドウに番号を表示")
-                        Text("履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
+                    Toggle(isOn: $hideNumbersInHistoryWindow) {
+                        Text("履歴ウィンドウの番号を隠す")
+                        Text("この設定をオンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
