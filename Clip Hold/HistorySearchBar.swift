@@ -84,7 +84,11 @@ struct HistorySearchBar: View {
                             Label {
                                 Text(localizedName)
                             } icon: {
-                                Image(nsImage: resizedAppIcon(for: path))
+                                if FileManager.default.fileExists(atPath: path) {
+                                    Image(nsImage: resizedAppIcon(for: path))
+                                } else {
+                                    Image(systemName: "questionmark.app")
+                                }
                             }
                             .tag(path as String?)
                         }
