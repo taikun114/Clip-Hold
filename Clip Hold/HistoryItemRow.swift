@@ -282,16 +282,16 @@ struct HistoryItemRow: View {
                         } else {
                             // テキストアイコン (リッチテキストかどうかで分岐)
                             if item.richText != nil {
-                                // リッチテキストの場合、append.pageアイコンを使用 (macOSバージョンによる分岐)
+                                // リッチテキストの場合、richtext.pageアイコンを使用 (macOSバージョンによる分岐)
                                 if #available(macOS 15.0, *) {
-                                    return AnyView(Image(systemName: "append.page")
+                                    return AnyView(Image(systemName: "richtext.page")
                                                     .resizable()
                                                     .scaledToFit()
                                                     .padding(4)
                                                     .frame(width: 30, height: 30)
                                                     .foregroundStyle(.secondary))
                                 } else {
-                                    return AnyView(Image(systemName: "doc.append")
+                                    return AnyView(Image(systemName: "doc.richtext")
                                                     .resizable()
                                                     .scaledToFit()
                                                     .padding(4)

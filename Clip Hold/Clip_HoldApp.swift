@@ -331,16 +331,16 @@ struct ClipHoldApp: App {
                                 // ファイルパスもキャッシュもなければテキストアイコン
                                 // リッチテキストかどうかでアイコンを分岐
                                 if item.richText != nil {
-                                    // リッチテキストの場合、append.pageアイコンを使用 (macOSバージョンによる分岐)
+                                    // リッチテキストの場合、richtext.pageアイコンを使用 (macOSバージョンによる分岐)
                                     if #available(macOS 15.0, *) {
-                                        Image(systemName: "append.page")
+                                        Image(systemName: "richtext.page")
                                             .resizable()
                                             .scaledToFit()
                                             .padding(4)
                                             .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
                                             .foregroundStyle(.secondary)
                                     } else {
-                                        Image(systemName: "doc.append")
+                                        Image(systemName: "doc.richtext")
                                             .resizable()
                                             .scaledToFit()
                                             .padding(4)
