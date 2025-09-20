@@ -2761,6 +2761,22 @@
         }
       }
     },
+    "すべてのテキスト" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのテキスト"
+          }
+        }
+      }
+    },
     "すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。" : {
       "localizations" : {
         "en" : {
@@ -3909,6 +3925,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リセット完了"
+          }
+        }
+      }
+    },
+    "リッチテキストのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rich Text Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リッチテキストのみ"
           }
         }
       }
@@ -5701,6 +5733,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "標準テキストとしてコピー"
+          }
+        }
+      }
+    },
+    "標準テキストのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plain Text Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準テキストのみ"
           }
         }
       }

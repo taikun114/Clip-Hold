@@ -65,38 +65,54 @@ struct HistorySearchBar: View {
             // フィルターボタン
             Menu {
                 Picker("フィルター", selection: $selectedFilter) {
+                    // 「すべての項目」を最初に表示
+                    Text(ItemFilter.all.displayName).tag(ItemFilter.all)
+                    
+                    // テキストピッカーを「すべての項目」の下、「リンクのみ」の上に配置
+                    Picker("テキストのみ", selection: $selectedFilter) {
+                        Text(ItemFilter.textAll.displayName).tag(ItemFilter.textAll)
+                        Divider()
+                        Text(ItemFilter.textPlain.displayName).tag(ItemFilter.textPlain)
+                        Text(ItemFilter.textRich.displayName).tag(ItemFilter.textRich)
+                    }
+                    .pickerStyle(.menu)
+
+                    // テキスト関連と「すべての項目」を除く他のフィルターオプションを表示
                     ForEach(ItemFilter.allCases.filter {
+                        // テキスト関連と「すべての項目」、colorCodeOnly以外の項目を表示
+                        ($0 != .textAll && $0 != .textPlain && $0 != .textRich && $0 != .all && $0 != .colorCodeOnly) || 
                         // colorCodeOnlyは設定がオンの場合のみ表示
-                        $0 != .colorCodeOnly || enableColorCodeFilter
+                        ($0 == .colorCodeOnly && enableColorCodeFilter)
                     }) { filter in
                         Text(filter.displayName).tag(filter)
                     }
+
+                    if !clipboardManager.appUsageHistory.isEmpty {
+                        Divider()
+                        Picker(selection: $selectedApp) {
+                            Label("すべてのアプリ", systemImage: "app").tag(nil as String?)
+                            Label("自動", systemImage: "app.badge.checkmark").tag("auto_filter_mode" as String?)
+                            Divider()
+                            ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { path, localizedName in
+                                Label {
+                                    Text(localizedName)
+                                } icon: {
+                                    if FileManager.default.fileExists(atPath: path) {
+                                        Image(nsImage: resizedAppIcon(for: path))
+                                    } else {
+                                        Image(systemName: "questionmark.app")
+                                    }
+                                }
+                                .tag(path as String?)
+                            }
+                        } label: {
+                            Text("アプリ")
+                        }
+                        .labelStyle(.titleAndIcon)
+                        .pickerStyle(.menu)
+                    }
                 }
                 .pickerStyle(.inline)
-                
-                if !clipboardManager.appUsageHistory.isEmpty {
-                    Divider()
-                    Picker(selection: $selectedApp) {
-                        Label("すべてのアプリ", systemImage: "app").tag(nil as String?)
-                        Label("自動", systemImage: "app.badge.checkmark").tag("auto_filter_mode" as String?)
-                        Divider()
-                        ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { path, localizedName in
-                            Label {
-                                Text(localizedName)
-                            } icon: {
-                                if FileManager.default.fileExists(atPath: path) {
-                                    Image(nsImage: resizedAppIcon(for: path))
-                                } else {
-                                    Image(systemName: "questionmark.app")
-                                }
-                            }
-                            .tag(path as String?)
-                        }
-                    } label: {
-                        Text("アプリ")
-                    }
-                    .labelStyle(.titleAndIcon)
-                }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
                     .tint(selectedFilter != .all || selectedApp != nil ? .accentColor : .secondary)

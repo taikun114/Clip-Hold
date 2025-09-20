@@ -356,7 +356,9 @@ enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
 // MARK: - Filter and Sort Options
 enum ItemFilter: String, CaseIterable, Identifiable {
     case all
-    case textOnly
+    case textAll
+    case textPlain
+    case textRich
     case linkOnly
     case fileOnly
     case imageOnly
@@ -367,7 +369,9 @@ enum ItemFilter: String, CaseIterable, Identifiable {
     var displayName: LocalizedStringKey {
         switch self {
         case .all: return "すべての項目"
-        case .textOnly: return "テキストのみ"
+        case .textAll: return "すべてのテキスト"
+        case .textPlain: return "標準テキストのみ"
+        case .textRich: return "リッチテキストのみ"
         case .linkOnly: return "リンクのみ"
         case .fileOnly: return "ファイルのみ"
         case .imageOnly: return "画像のみ"

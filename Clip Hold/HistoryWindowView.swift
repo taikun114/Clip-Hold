@@ -113,8 +113,14 @@ struct HistoryWindowView: View {
                 switch clipboardManager.historySelectedFilter {
                 case .all:
                     matchesFilter = true
-                case .textOnly:
+                case .textAll:
                     matchesFilter = item.filePath == nil
+                case .textRich:
+                    // リッチテキストの判定（richTextプロパティがnilでない場合）
+                    matchesFilter = item.filePath == nil && item.richText != nil
+                case .textPlain:
+                    // 標準テキストのみ（richTextプロパティがnilの場合）
+                    matchesFilter = item.filePath == nil && item.richText == nil
                 case .linkOnly:
                     matchesFilter = item.isURL
                 case .fileOnly:
