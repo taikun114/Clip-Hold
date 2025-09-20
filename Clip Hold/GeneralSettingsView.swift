@@ -334,6 +334,22 @@ struct GeneralSettingsView: View {
             Section(header: Text("定型文ウィンドウ").font(.headline)) {
                 HStack {
                     VStack(alignment: .leading) {
+                        Text("常に最前面に表示")
+                        Text("ウィンドウを常に最も手前に表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $standardPhraseWindowAlwaysOnTop) {
+                        Text("定型文ウィンドウを常に最前面に表示")
+                        Text("オンにすると、定型文ウィンドウを常に最も手前に表示します。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
                         Text("番号を隠す")
                         Text("各項目に表示される番号を非表示にします。")
                             .font(.caption)
@@ -365,6 +381,10 @@ struct GeneralSettingsView: View {
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            } // End of Section: 定型文ウィンドウ
+
+            // MARK: - 履歴をウィンドウ
+            Section(header: Text("履歴ウィンドウ").font(.headline)) {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("常に最前面に表示")
@@ -373,18 +393,14 @@ struct GeneralSettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Toggle(isOn: $standardPhraseWindowAlwaysOnTop) {
-                        Text("定型文ウィンドウを常に最前面に表示")
-                        Text("オンにすると、定型文ウィンドウを常に最も手前に表示します。")
+                    Toggle(isOn: $historyWindowAlwaysOnTop) {
+                        Text("履歴ウィンドウを常に最前面に表示")
+                        Text("オンにすると、履歴ウィンドウを常に最も手前に表示します。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            } // End of Section: 定型文ウィンドウ
-
-            // MARK: - 履歴をウィンドウ
-            Section(header: Text("履歴ウィンドウ").font(.headline)) {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("アプリアイコンを表示")
@@ -396,6 +412,22 @@ struct GeneralSettingsView: View {
                     Toggle(isOn: $showAppIconOverlay) {
                         Text("アプリアイコンを表示")
                         Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("自動スクロール")
+                        Text("リストが更新されたとき、リストを自動的に最も上にスクロールします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $scrollToTopOnUpdate) {
+                        Text("自動スクロール")
+                        Text("オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -429,38 +461,6 @@ struct GeneralSettingsView: View {
                     Toggle(isOn: $closeWindowOnDoubleClickInHistoryWindow) {
                         Text("ダブルクリックで履歴ウィンドウを閉じる")
                         Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("常に最前面に表示")
-                        Text("ウィンドウを常に最も手前に表示します。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $historyWindowAlwaysOnTop) {
-                        Text("履歴ウィンドウを常に最前面に表示")
-                        Text("オンにすると、履歴ウィンドウを常に最も手前に表示します。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("自動スクロール")
-                        Text("リストが更新されたとき、リストを自動的に最も上にスクロールします。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $scrollToTopOnUpdate) {
-                        Text("自動スクロール")
-                        Text("オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
