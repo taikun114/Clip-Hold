@@ -96,6 +96,8 @@ struct GeneralSettingsView: View {
 
     @State private var showingCustomMenuHistorySheet = false
     @State private var showingCustomPhraseMenuSheet = false
+    @State private var customPhraseValueWasSaved = false
+    @State private var customHistoryValueWasSaved = false
 
     @State private var tempCustomMenuHistoryValue: Int = 10
     @State private var tempCustomPhrasesInMenuValue: Int = 5
@@ -252,6 +254,7 @@ struct GeneralSettingsView: View {
                     .onChange(of: tempSelectedPhraseMenuOption) { // ここを tempSelectedPhraseMenuOption に修正
                         if case .custom(nil) = tempSelectedPhraseMenuOption {
                             tempCustomPhrasesInMenuValue = maxPhrasesInMenu // 現在の値をカスタムシートの初期値に
+                            customPhraseValueWasSaved = false // シート表示前にリセット
                             showingCustomPhraseMenuSheet = true
                         } else if let intValue = tempSelectedPhraseMenuOption.intValue {
                             maxPhrasesInMenu = intValue
@@ -302,6 +305,7 @@ struct GeneralSettingsView: View {
                     .onChange(of: tempSelectedMenuOption) { // ここを tempSelectedMenuOption に修正
                         if case .custom(nil) = tempSelectedMenuOption {
                             tempCustomMenuHistoryValue = maxHistoryInMenu
+                            customHistoryValueWasSaved = false // シート表示前にリセット
                             showingCustomMenuHistorySheet = true
                         } else if tempSelectedMenuOption == .sameAsSaved {
                             maxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryToSave")
@@ -489,13 +493,25 @@ struct GeneralSettingsView: View {
             // View が表示されるたびにログイン項目の状態を最新にする
             loginItemManager.refreshLoginItemStatus()
         }
-        .sheet(isPresented: $showingCustomMenuHistorySheet) {
+        .sheet(isPresented: $showingCustomMenuHistorySheet, onDismiss: {
+            if !customHistoryValueWasSaved {
+                // ユーザーがキャンセルまたはESCで閉じた場合、選択を元に戻す
+                if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == maxHistoryInMenu }) {
+                    tempSelectedMenuOption = savedPreset
+                } else if maxHistoryInMenu == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
+                    tempSelectedMenuOption = .sameAsSaved
+                } else {
+                    tempSelectedMenuOption = .custom(maxHistoryInMenu)
+                }
+            }
+        }) {
             CustomNumberInputSheet(
                 title: Text("メニューに表示する履歴の最大数を設定"),
                 description: nil,
                 currentValue: $tempCustomMenuHistoryValue,
                 onSave: { newValue in
                     maxHistoryInMenu = newValue
+                    customHistoryValueWasSaved = true // 保存されたことをマーク
 
                     if newValue == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
                         tempSelectedMenuOption = .sameAsSaved
@@ -506,23 +522,27 @@ struct GeneralSettingsView: View {
                     }
                 },
                 onCancel: {
-                    if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == maxHistoryInMenu }) {
-                        tempSelectedMenuOption = savedPreset
-                    } else if maxHistoryInMenu == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
-                        tempSelectedMenuOption = .sameAsSaved
-                    } else {
-                        tempSelectedMenuOption = .custom(maxHistoryInMenu)
-                    }
+                    // onDismissで処理するため、ここは空で良い
                 }
             )
         }
-        .sheet(isPresented: $showingCustomPhraseMenuSheet) {
+        .sheet(isPresented: $showingCustomPhraseMenuSheet, onDismiss: {
+            if !customPhraseValueWasSaved {
+                // ユーザーがキャンセルまたはESCで閉じた場合、選択を元に戻す
+                if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxPhrasesInMenu }) {
+                    tempSelectedPhraseMenuOption = savedPreset
+                } else {
+                    tempSelectedPhraseMenuOption = .custom(maxPhrasesInMenu)
+                }
+            }
+        }) {
             CustomNumberInputSheet(
                 title: Text("メニューに表示する定型文の最大数を設定"),
                 description: nil,
                 currentValue: $tempCustomPhrasesInMenuValue,
                 onSave: { newValue in
                     maxPhrasesInMenu = newValue
+                    customPhraseValueWasSaved = true // 保存されたことをマーク
 
                     if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == newValue }) {
                         tempSelectedPhraseMenuOption = savedPreset
@@ -531,11 +551,7 @@ struct GeneralSettingsView: View {
                     }
                 },
                 onCancel: {
-                    if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxPhrasesInMenu }) {
-                        tempSelectedPhraseMenuOption = savedPreset
-                    } else {
-                        tempSelectedPhraseMenuOption = .custom(maxPhrasesInMenu)
-                    }
+                    // onDismissで処理するため、ここは空で良い
                 }
             )
         }
