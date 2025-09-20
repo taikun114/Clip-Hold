@@ -381,11 +381,16 @@ struct GeneralSettingsView: View {
             // MARK: - 履歴をウィンドウ
             Section(header: Text("履歴ウィンドウ").font(.headline)) {
                 HStack {
-                    Text("アプリアイコンを表示")
+                    VStack(alignment: .leading) {
+                        Text("アプリアイコンを表示")
+                        Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                     Toggle(isOn: $showAppIconOverlay) {
                         Text("アプリアイコンを表示")
-                        Text("履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。")
+                        Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()

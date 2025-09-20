@@ -2345,6 +2345,22 @@
         }
       }
     },
+    "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show app icons that were in the foreground when you copied them for each item."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。"
+          }
+        }
+      }
+    },
     "コピーしました！" : {
       "localizations" : {
         "en" : {
@@ -4933,22 +4949,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウのフィルタリングオプションに「カラーコードのみ」を追加します。"
-          }
-        }
-      }
-    },
-    "履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to show or hide the app icon for each item in the History window."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。"
           }
         }
       }
