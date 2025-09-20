@@ -188,7 +188,7 @@ struct HistoryContentList: View {
                                         }
                                     }
                                 } label: {
-                                    Label("標準テキストとしてコピー", systemImage: "doc.plaintext")
+                                    Text("標準テキストとしてコピー")
                                 }
                             }
                             if let qrContent = currentItem.qrCodeContent {

@@ -150,7 +150,7 @@ struct HistoryItemRow: View {
                     NSPasteboard.general.setString(item.text, forType: .string)
                     showCopyConfirmation = true
                 } label: {
-                    Label("標準テキストとしてコピー", systemImage: "doc.plaintext")
+                    Text("標準テキストとしてコピー")
                 }
             }
             if let qrContent = item.qrCodeContent {
