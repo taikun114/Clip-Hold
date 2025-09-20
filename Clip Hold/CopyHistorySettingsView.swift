@@ -28,6 +28,10 @@ struct CopyHistorySettingsView: View {
     @State private var showingClearHistoryConfirmation = false
     @State private var showingClearFilesConfirmation = false
 
+    @State private var customSaveHistoryWasSaved = false
+    @State private var customFileSizeWasSaved = false
+    @State private var customAlertWasSaved = false
+
     @State private var tempCustomSaveHistoryValue: Int = 20
     @State private var tempCustomFileSizeValue: Int = 1
     @State private var tempCustomFileSizeUnit: DataSizeUnit = .megabytes
@@ -400,33 +404,45 @@ struct CopyHistorySettingsView: View {
         .onChange(of: clipboardManager.clipboardHistory) {
             calculateStatistics()
         }
-        .sheet(isPresented: $showingCustomSaveHistorySheet) {
+        .sheet(isPresented: $showingCustomSaveHistorySheet, onDismiss: {
+            if !customSaveHistoryWasSaved {
+                handleCustomSaveHistorySheetCancel()
+            }
+        }) {
             CustomNumberInputSheet(
                 title: Text("履歴を保存する最大数を設定"),
                 description: Text("保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。"),
                 currentValue: $tempCustomSaveHistoryValue,
                 onSave: handleCustomSaveHistorySheetSave,
-                onCancel: handleCustomSaveHistorySheetCancel
+                onCancel: {}
             )
         }
-        .sheet(isPresented: $showingCustomFileSizeSheet) {
+        .sheet(isPresented: $showingCustomFileSizeSheet, onDismiss: {
+            if !customFileSizeWasSaved {
+                handleCustomFileSizeSheetCancel()
+            }
+        }) {
             CustomNumberInputSheet(
                 title: Text("ファイル1つあたりの最大容量を設定"),
                 description: nil,
                 currentValue: $tempCustomFileSizeValue,
                 selectedUnit: Binding<DataSizeUnit?>(get: { tempCustomFileSizeUnit }, set: { tempCustomFileSizeUnit = $0 ?? .megabytes }),
                 onSave: handleCustomFileSizeSheetSave,
-                onCancel: handleCustomFileSizeSheetCancel
+                onCancel: {}
             )
         }
-        .sheet(isPresented: $showingCustomAlertSheet) {
+        .sheet(isPresented: $showingCustomAlertSheet, onDismiss: {
+            if !customAlertWasSaved {
+                handleCustomAlertSheetCancel()
+            }
+        }) {
             CustomNumberInputSheet(
                 title: Text("アラートを表示する容量を設定"),
                 description: nil,
                 currentValue: $tempCustomAlertValue,
                 selectedUnit: Binding<DataSizeUnit?>(get: { tempCustomAlertUnit }, set: { tempCustomAlertUnit = $0 ?? .megabytes }),
                 onSave: handleCustomAlertSheetSave,
-                onCancel: handleCustomAlertSheetCancel
+                onCancel: {}
             )
         }
         .fileExporter(
@@ -480,6 +496,7 @@ struct CopyHistorySettingsView: View {
     private func handleSaveOptionChange(newValue: HistoryOption) {
         if case .custom(nil) = newValue {
             tempCustomSaveHistoryValue = maxHistoryToSave // 現在の値をカスタムシートの初期値に
+            customSaveHistoryWasSaved = false // シート表示前にリセット
             showingCustomSaveHistorySheet = true
         } else if newValue == .unlimited {
             maxHistoryToSave = 0 // 無制限を0として保存
@@ -503,6 +520,7 @@ struct CopyHistorySettingsView: View {
             let (value, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: maxFileSizeToSave)
             tempCustomFileSizeValue = value
             tempCustomFileSizeUnit = unit
+            customFileSizeWasSaved = false // シート表示前にリセット
             showingCustomFileSizeSheet = true
         } else if newValue == .unlimited {
             maxFileSizeToSave = 0 // 無制限は0として保存
@@ -517,6 +535,7 @@ struct CopyHistorySettingsView: View {
             let (value, unit) = DataSizeOption.extractValueAndUnitFromByteValue(byteValue: largeFileAlertThreshold)
             tempCustomAlertValue = value
             tempCustomAlertUnit = unit
+            customAlertWasSaved = false // シート表示前にリセット
             showingCustomAlertSheet = true
         } else if newValue == .noAlert {
             largeFileAlertThreshold = 0
@@ -527,6 +546,7 @@ struct CopyHistorySettingsView: View {
 
     // MARK: - Custom Sheet Save/Cancel Handlers
     private func handleCustomSaveHistorySheetSave(newValue: Int) {
+        customSaveHistoryWasSaved = true // 保存されたことをマーク
         maxHistoryToSave = newValue
 
         if newValue == 0 {
@@ -553,6 +573,7 @@ struct CopyHistorySettingsView: View {
     }
 
     private func handleCustomFileSizeSheetSave(newValue: Int) {
+        customFileSizeWasSaved = true // 保存されたことをマーク
         let newByteValue = tempCustomFileSizeUnit.byteValue(for: newValue)
         maxFileSizeToSave = newByteValue
 
@@ -580,6 +601,7 @@ struct CopyHistorySettingsView: View {
     }
 
     private func handleCustomAlertSheetSave(newValue: Int) {
+        customAlertWasSaved = true // 保存されたことをマーク
         let newByteValue = tempCustomAlertUnit.byteValue(for: newValue)
         largeFileAlertThreshold = newByteValue
 
