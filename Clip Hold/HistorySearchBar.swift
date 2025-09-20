@@ -152,7 +152,17 @@ struct HistorySearchBar: View {
             Menu {
                 Picker("並び替え", selection: $selectedSort) {
                     ForEach(ItemSort.allCases, id: \.self) { sort in
-                        Text(sort.displayName).tag(sort)
+                        switch sort {
+                        case .newest:
+                            Label(sort.displayName, systemImage: "clock").tag(sort)
+                        case .oldest:
+                            Text(sort.displayName).tag(sort)
+                        case .largestFileSize:
+                            Divider()
+                            Label(sort.displayName, systemImage: "folder").tag(sort)
+                        case .smallestFileSize:
+                            Text(sort.displayName).tag(sort)
+                        }
                     }
                 }
                 .pickerStyle(.inline)
