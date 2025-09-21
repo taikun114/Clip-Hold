@@ -25,7 +25,7 @@ Notes
 ### New Features
 - **Add “Plain Text Only” and “Rich Text Only” options to the filtering options**
   - These options are in “Text Only”.
-- **Add “PDF Only”, “Videos Only” and “Other Files” options to the filtering options**
+- **Add “PDF Only”, “Videos Only”, “Folders Only” and “Other Files” options to the filtering options**
   - These options are in “Files Only”.
 
 ### Bug Fixes and Improvements
