@@ -25,8 +25,8 @@ Notes
 ### New Features
 - **Add “Plain Text Only” and “Rich Text Only” options to the filtering options**
   - These options are in “Text Only”.
-- **Add “PDF Only” option to the filtering options**
-  - This option is in “Files Only”.
+- **Add “PDF Only”, “Videos Only” and “Other Files” options to the filtering options**
+  - These options are in “Files Only”.
 
 ### Bug Fixes and Improvements
 - **Fix issue that previously selected items weren't chosen when closing the custom number input sheet in Settings using the Escape key**
@@ -42,6 +42,7 @@ Notes
   - Changed from `append.page` to `richtext.page`, making rich text items easier to recognize.
 - **Change “Links Only” into “Text Only” in the filtering options**
 - **Add icons to each filtering option and sorting option**
+- **Add `ico`, `icns`, `svg`, `eps`, `ai`, and `psd` to the filtering targets for “Images Only”**
 - **Remove the icon from the “Copy as Plain Text” option in the History window's context menu and action menu**
   - Following Apple's [**Human Interface Guidelines**](https://developer.apple.com/design/human-interface-guidelines/menus#Icons), icons for related features now appear only on one parent item (in this case, “Copy”).
 
