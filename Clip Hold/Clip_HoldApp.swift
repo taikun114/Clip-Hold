@@ -607,5 +607,41 @@ struct ClipHoldApp: App {
                 }
             }
         }
+        
+        // 最新の履歴を編集してコピーするショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .editAndCopyLatestHistory) {
+            let clipboardManager = ClipboardManager.shared
+            let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
+            
+            let historySource: [ClipboardItem]
+            if useFiltered, let filteredList = clipboardManager.filteredHistoryForShortcuts {
+                historySource = filteredList
+            } else {
+                historySource = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+            }
+            
+            // 最新の履歴アイテムを取得
+            if let latestItem = historySource.first {
+                // ウィンドウとして表示する処理をここに実装
+                DispatchQueue.main.async {
+                    if (NSApp.mainWindow ?? NSApp.windows.first) != nil {
+                        let editView = EditHistoryItemView(content: latestItem.text) { editedContent in
+                            // コピー処理を実装
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(editedContent, forType: .string)
+                        }
+                        
+                        let hostingController = NSHostingController(rootView: editView)
+                        let editWindow = NSWindow(contentViewController: hostingController)
+                        editWindow.title = String(localized: "履歴を編集")
+                        editWindow.styleMask = [.titled, .closable]
+                        editWindow.setContentSize(NSSize(width: 400, height: 300))
+                        editWindow.makeKeyAndOrderFront(nil)
+                        editWindow.center()
+                        NSApp.activate(ignoringOtherApps: true)
+                    }
+                }
+            }
+        }
     }
 }

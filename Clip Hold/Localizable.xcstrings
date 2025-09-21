@@ -4473,6 +4473,22 @@
         }
       }
     },
+    "最新の履歴を編集してコピーする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit and Copy the Latest History Item"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新の履歴を編集してコピーする"
+          }
+        }
+      }
+    },
     "別のプリセットに移動" : {
       "localizations" : {
         "en" : {
