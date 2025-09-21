@@ -5433,6 +5433,22 @@
         }
       }
     },
+    "履歴を編集" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit History"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴を編集"
+          }
+        }
+      }
+    },
     "履歴項目がテキストである場合のみクイックペーストを行うようにします。" : {
       "localizations" : {
         "en" : {
@@ -6197,6 +6213,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集…"
+          }
+        }
+      }
+    },
+    "編集してコピー..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit and Copy..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集してコピー..."
           }
         }
       }

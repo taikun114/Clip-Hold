@@ -89,6 +89,7 @@ struct HistoryItemRow: View {
     @State private var iconLoadTask: Task<Void, Never>?
     @State private var showingExcludeAppAlert = false
     @State private var appToExclude: String?
+    @State private var showingEditSheet = false
 
     init(item: ClipboardItem,
          index: Int,
@@ -151,6 +152,19 @@ struct HistoryItemRow: View {
                     showCopyConfirmation = true
                 } label: {
                     Text("標準テキストとしてコピー")
+                }
+                Button {
+                    // 編集してコピーのアクションをここに実装
+                    showingEditSheet = true
+                } label: {
+                    Text("編集してコピー...")
+                }
+            } else {
+                Button {
+                    // 標準テキストアイテムの場合、編集してコピー
+                    showingEditSheet = true
+                } label: {
+                    Text("編集してコピー...")
                 }
             }
             if let qrContent = item.qrCodeContent {
@@ -445,6 +459,16 @@ struct HistoryItemRow: View {
             if let appPath = appToExclude {
                 let appName = getLocalizedName(for: appPath) ?? appPath
                 Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
+            }
+        }
+        .sheet(isPresented: $showingEditSheet) {
+            EditHistoryItemView(content: item.text) { editedContent in
+                // コピー処理を実装
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(editedContent, forType: .string)
+                
+                // コピー確認を表示
+                showCopyConfirmation = true
             }
         }
     }

@@ -44,6 +44,10 @@ struct HistoryContentList: View {
 
     // 各行のアイコンのNSView参照を保存するためのState
     @State private var rowIconViews: [UUID: NSView] = [:]
+    
+    // State variable for the edit sheet
+    @State private var showingEditSheet = false
+    @State private var itemToEdit: ClipboardItem?
 
     let hideNumbersInHistoryWindow: Bool
     let closeWindowOnDoubleClickInHistoryWindow: Bool
@@ -191,6 +195,13 @@ struct HistoryContentList: View {
                                     Text("標準テキストとしてコピー")
                                 }
                             }
+                            
+                            Button {
+                                itemToEdit = currentItem
+                                showingEditSheet = true
+                            } label: {
+                                Text("編集してコピー...")
+                            }
                             if let qrContent = currentItem.qrCodeContent {
                                 Button {
                                     let newItemToCopy = ClipboardItem(text: qrContent) // 新しいClipboardItemを作成
@@ -285,6 +296,26 @@ struct HistoryContentList: View {
                             }
                         }
                     })
+                    .sheet(isPresented: $showingEditSheet) {
+                        if let item = itemToEdit {
+                            EditHistoryItemView(content: item.text) { editedContent in
+                                // コピー処理を実装
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(editedContent, forType: .string)
+                                
+                                // コピー確認を表示
+                                showCopyConfirmation = true
+                                currentCopyConfirmationTask?.cancel()
+                                currentCopyConfirmationTask = Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
+                                    guard !Task.isCancelled else { return }
+                                    withAnimation {
+                                        showCopyConfirmation = false
+                                    }
+                                }
+                            }
+                        }
+                    }
                     .onDrop(of: [.image], isTargeted: nil) { providers in
                         guard let itemProvider = providers.first else { return false }
                         let manager = clipboardManager
