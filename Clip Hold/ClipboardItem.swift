@@ -17,7 +17,7 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         guard let filePath = filePath else { return false }
         if filePath.isFileURL {
             let pathExtension = filePath.pathExtension.lowercased()
-            let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "bmp", "heic", "webp", "tiff", "tif"]
+            let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "bmp", "heic", "webp", "tiff", "tif", "ico", "icns", "svg", "eps", "ai", "psd"]
             if imageExtensions.contains(pathExtension) {
                 return true
             }
