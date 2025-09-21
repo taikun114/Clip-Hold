@@ -27,6 +27,9 @@ Notes
   - These options are in “Text Only”.
 - **Add “PDF Only”, “Videos Only”, “Folders Only” and “Other Files” options to the filtering options**
   - These options are in “Files Only”.
+- **Add a feature to edit and copy**
+  - You can edit and copy the history by clicking “Edit and Copy...” in the context menu or action menu of a text item in the History window.
+  - You can also use a shortcut key to edit and copy the latest history item. The default shortcut key is `⌥ (Option)` + `⌘ (Command)` + `E`.
 
 ### Bug Fixes and Improvements
 - **Fix issue that previously selected items weren't chosen when closing the custom number input sheet in Settings using the Escape key**
