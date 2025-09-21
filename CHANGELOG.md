@@ -1,6 +1,45 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+<!--
+The order of listing is as follows.
+- New Features
+  - Notable Information
+  - Support
+  - Additions
+- Bug Fixes and Improvements
+  - Fixes
+  - Improvements
+  - Changes
+  - Additions
+  - Removals
+Only for versions 1.5.0 and later. Earlier versions may not follow this order.
+
+Notes
+- Make the first level of the list bold
+- Make links bold
+- When linking to Issues, Pull Requests, or Discussions, include the full URL
+-->
+
+## 1.5.0 (under development)
+### New Features
+- **Add “Plain Text Only” and “Rich Text Only” options to the filtering options**
+
+### Bug Fixes and Improvements
+- **Fix issue that previously selected items weren't chosen when closing the custom number input sheet in Settings using the Escape key**
+- **Improve settings item names and descriptions in General and Copy History Settings**
+  - Names have been changed to be more intuitive, and descriptions have been added to each item, making it easier to understand the role of each setting and what functionality it provides.
+- **Improve the layout of settings items in General and Copy History Settings**
+  - Related or similar features are now grouped together.
+- **Improve behavior to disable filtering and sorting buttons while loading history**
+- **Change default behavior to display numbers for each item in the History and Standard Phrases windows**
+- **Change default behavior to not close the window when you double-click an item in the History or Standard Phrases windows**
+- **Change the rich text icon**
+  - Changed from `append.page` to `richtext.page`, making rich text items easier to recognize.
+- **Add icons to each filtering option and sorting option**
+- **Remove the icon from the “Copy as Plain Text” option in the History window's context menu and action menu**
+  - Following Apple's [**Human Interface Guidelines**](https://developer.apple.com/design/human-interface-guidelines/menus#Icons), icons for related features now appear only on one parent item (in this case, “Copy”).
+
 ## 1.4.0
 ### New Features
 - **Support for Rich Text**
