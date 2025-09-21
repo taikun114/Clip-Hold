@@ -360,6 +360,7 @@ enum ItemFilter: String, CaseIterable, Identifiable {
     case textPlain
     case textRich
     case linkOnly
+    case folderOnly
     case fileOnly
     case imageOnly
     case videoOnly
@@ -376,6 +377,7 @@ enum ItemFilter: String, CaseIterable, Identifiable {
         case .textPlain: return "標準テキストのみ"
         case .textRich: return "リッチテキストのみ"
         case .linkOnly: return "リンクのみ"
+        case .folderOnly: return "フォルダのみ"
         case .fileOnly: return "ファイルのみ"
         case .imageOnly: return "画像のみ"
         case .videoOnly: return "動画のみ"

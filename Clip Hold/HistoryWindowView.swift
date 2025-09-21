@@ -125,14 +125,16 @@ struct HistoryWindowView: View {
                     matchesFilter = item.isURL
                 case .fileOnly:
                     matchesFilter = item.filePath != nil
+                case .folderOnly:
+                    matchesFilter = item.filePath != nil && item.isFolder
                 case .imageOnly:
                     matchesFilter = item.isImage
                 case .videoOnly:
                     // 動画ファイルの判定（isVideoプロパティを使用）
                     matchesFilter = item.isVideo
                 case .otherFiles:
-                    // その他のファイルの判定（画像、動画、PDFではないファイル）
-                    matchesFilter = item.filePath != nil && !item.isImage && !item.isVideo && !item.isPDF
+                    // その他のファイルの判定（画像、動画、PDF、フォルダではないファイル）
+                    matchesFilter = item.filePath != nil && !item.isImage && !item.isVideo && !item.isPDF && !item.isFolder
                 case .pdfOnly:
                     // PDFファイルの判定（isPDFプロパティを使用）
                     matchesFilter = item.isPDF

@@ -47,6 +47,14 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         return false
     }
 
+    // ファイルがフォルダかどうかを判断するヘルパープロパティ
+    var isFolder: Bool {
+        guard let filePath = filePath else { return false }
+        var isDirectory: ObjCBool = false
+        let fileExists = FileManager.default.fileExists(atPath: filePath.path, isDirectory: &isDirectory)
+        return fileExists && isDirectory.boolValue
+    }
+
     // テキストが有効なURLであるかどうかを判断するヘルパープロパティ
     var isURL: Bool {
         guard !text.isEmpty,

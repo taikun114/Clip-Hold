@@ -100,6 +100,7 @@ struct HistorySearchBar: View {
                         Label(ItemFilter.imageOnly.displayName, systemImage: "photo").tag(ItemFilter.imageOnly)
                         Label(ItemFilter.videoOnly.displayName, systemImage: "movieclapper").tag(ItemFilter.videoOnly)
                         Label(ItemFilter.pdfOnly.displayName, systemImage: "text.document").tag(ItemFilter.pdfOnly)
+                        Label(ItemFilter.folderOnly.displayName, systemImage: "folder").tag(ItemFilter.folderOnly)
                         Label(ItemFilter.otherFiles.displayName, systemImage: "document.badge.ellipsis").tag(ItemFilter.otherFiles)
                     } label: {
                         if #available(macOS 15.0, *) {
