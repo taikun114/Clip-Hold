@@ -105,6 +105,8 @@ struct HistorySearchBar: View {
                             }
                         case .imageOnly:
                             Label(filter.displayName, systemImage: "photo").tag(filter)
+                        case .pdfOnly:
+                            Label(filter.displayName, systemImage: "text.document").tag(filter)
                         case .colorCodeOnly:
                             Label(filter.displayName, systemImage: "paintpalette").tag(filter)
                         default:

@@ -1107,6 +1107,22 @@
         }
       }
     },
+    "PDFファイルのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF Files Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFファイルのみ"
+          }
+        }
+      }
+    },
     "PID: %@" : {
       "shouldTranslate" : false
     },

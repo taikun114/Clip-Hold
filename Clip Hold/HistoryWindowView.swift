@@ -127,6 +127,13 @@ struct HistoryWindowView: View {
                     matchesFilter = item.filePath != nil
                 case .imageOnly:
                     matchesFilter = item.isImage
+                case .pdfOnly:
+                    // PDFファイルの判定（ファイルパスが存在し、拡張子が.pdfの場合）
+                    if let filePath = item.filePath {
+                        matchesFilter = filePath.pathExtension.lowercased() == "pdf"
+                    } else {
+                        matchesFilter = false
+                    }
                 case .colorCodeOnly:
                     matchesFilter = item.filePath == nil && ColorCodeParser.parseColor(from: item.text) != nil
                 }
