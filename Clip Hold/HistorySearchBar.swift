@@ -97,8 +97,10 @@ struct HistorySearchBar: View {
                             Label("すべてのファイル", systemImage: "doc").tag(ItemFilter.fileOnly)
                         }
                         Divider()
-                        Label(ItemFilter.pdfOnly.displayName, systemImage: "text.document").tag(ItemFilter.pdfOnly)
                         Label(ItemFilter.imageOnly.displayName, systemImage: "photo").tag(ItemFilter.imageOnly)
+                        Label(ItemFilter.videoOnly.displayName, systemImage: "movieclapper").tag(ItemFilter.videoOnly)
+                        Label(ItemFilter.pdfOnly.displayName, systemImage: "text.document").tag(ItemFilter.pdfOnly)
+                        Label(ItemFilter.otherFiles.displayName, systemImage: "document.badge.ellipsis").tag(ItemFilter.otherFiles)
                     } label: {
                         if #available(macOS 15.0, *) {
                             Label("ファイルのみ", systemImage: "document")

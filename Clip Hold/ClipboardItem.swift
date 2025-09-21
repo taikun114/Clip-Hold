@@ -24,6 +24,28 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         }
         return false
     }
+    
+    // ファイルが動画かどうかを判断するヘルパープロパティ
+    var isVideo: Bool {
+        guard let filePath = filePath else { return false }
+        if filePath.isFileURL {
+            let pathExtension = filePath.pathExtension.lowercased()
+            let videoExtensions = ["mov", "mp4", "avi", "mkv", "wmv", "flv", "webm", "m4v", "qt"]
+            if videoExtensions.contains(pathExtension) {
+                return true
+            }
+        }
+        return false
+    }
+    
+    // ファイルがPDFかどうかを判断するヘルパープロパティ
+    var isPDF: Bool {
+        guard let filePath = filePath else { return false }
+        if filePath.isFileURL {
+            return filePath.pathExtension.lowercased() == "pdf"
+        }
+        return false
+    }
 
     // テキストが有効なURLであるかどうかを判断するヘルパープロパティ
     var isURL: Bool {

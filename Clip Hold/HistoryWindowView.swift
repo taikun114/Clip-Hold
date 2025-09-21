@@ -127,13 +127,15 @@ struct HistoryWindowView: View {
                     matchesFilter = item.filePath != nil
                 case .imageOnly:
                     matchesFilter = item.isImage
+                case .videoOnly:
+                    // 動画ファイルの判定（isVideoプロパティを使用）
+                    matchesFilter = item.isVideo
+                case .otherFiles:
+                    // その他のファイルの判定（画像、動画、PDFではないファイル）
+                    matchesFilter = item.filePath != nil && !item.isImage && !item.isVideo && !item.isPDF
                 case .pdfOnly:
-                    // PDFファイルの判定（ファイルパスが存在し、拡張子が.pdfの場合）
-                    if let filePath = item.filePath {
-                        matchesFilter = filePath.pathExtension.lowercased() == "pdf"
-                    } else {
-                        matchesFilter = false
-                    }
+                    // PDFファイルの判定（isPDFプロパティを使用）
+                    matchesFilter = item.isPDF
                 case .colorCodeOnly:
                     matchesFilter = item.filePath == nil && ColorCodeParser.parseColor(from: item.text) != nil
                 }

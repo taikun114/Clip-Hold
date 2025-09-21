@@ -3065,6 +3065,22 @@
         }
       }
     },
+    "その他のファイル" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他のファイル"
+          }
+        }
+      }
+    },
     "タイトル" : {
       "localizations" : {
         "en" : {
@@ -4597,6 +4613,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "動作中"
+          }
+        }
+      }
+    },
+    "動画のみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画のみ"
           }
         }
       }
