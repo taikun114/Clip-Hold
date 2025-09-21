@@ -1107,18 +1107,18 @@
         }
       }
     },
-    "PDFファイルのみ" : {
+    "PDFのみ" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PDF Files Only"
+            "value" : "PDF Only"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PDFファイルのみ"
+            "value" : "PDFのみ"
           }
         }
       }
@@ -2821,6 +2821,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのテキスト"
+          }
+        }
+      }
+    },
+    "すべてのファイル" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのファイル"
           }
         }
       }

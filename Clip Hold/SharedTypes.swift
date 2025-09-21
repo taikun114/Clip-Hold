@@ -376,7 +376,7 @@ enum ItemFilter: String, CaseIterable, Identifiable {
         case .linkOnly: return "リンクのみ"
         case .fileOnly: return "ファイルのみ"
         case .imageOnly: return "画像のみ"
-        case .pdfOnly: return "PDFファイルのみ"
+        case .pdfOnly: return "PDFのみ"
         case .colorCodeOnly: return "カラーコードのみ"
         }
     }

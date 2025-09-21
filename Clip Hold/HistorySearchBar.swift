@@ -68,7 +68,7 @@ struct HistorySearchBar: View {
                     // 「すべての項目」を最初に表示
                     Label(ItemFilter.all.displayName, systemImage: "list.clipboard").tag(ItemFilter.all)
                     
-                    // テキストピッカーを「すべての項目」の下、「リンクのみ」の上に配置
+                    // テキストピッカーを「すべての項目」の下に配置
                     Picker(selection: $selectedFilter) {
                         Label(ItemFilter.textAll.displayName, systemImage: "textformat").tag(ItemFilter.textAll)
                         Divider()
@@ -82,36 +82,35 @@ struct HistorySearchBar: View {
                         } else {
                             Label(ItemFilter.textRich.displayName, systemImage: "doc.richtext").tag(ItemFilter.textRich)
                         }
+                        Label(ItemFilter.linkOnly.displayName, systemImage: "paperclip").tag(ItemFilter.linkOnly)
                     } label: {
                         Label("テキストのみ", systemImage: "textformat")
                     }
                     .pickerStyle(.menu)
-
-                    // テキスト関連と「すべての項目」を除く他のフィルターオプションを表示
-                    ForEach(ItemFilter.allCases.filter {
-                        // テキスト関連と「すべての項目」、colorCodeOnly以外の項目を表示
-                        ($0 != .textAll && $0 != .textPlain && $0 != .textRich && $0 != .all && $0 != .colorCodeOnly) || 
-                        // colorCodeOnlyは設定がオンの場合のみ表示
-                        ($0 == .colorCodeOnly && enableColorCodeFilter)
-                    }) { filter in
-                        switch filter {
-                        case .linkOnly:
-                            Label(filter.displayName, systemImage: "paperclip").tag(filter)
-                        case .fileOnly:
-                            if #available(macOS 15.0, *) {
-                                Label(filter.displayName, systemImage: "document").tag(filter)
-                            } else {
-                                Label(filter.displayName, systemImage: "doc").tag(filter)
-                            }
-                        case .imageOnly:
-                            Label(filter.displayName, systemImage: "photo").tag(filter)
-                        case .pdfOnly:
-                            Label(filter.displayName, systemImage: "text.document").tag(filter)
-                        case .colorCodeOnly:
-                            Label(filter.displayName, systemImage: "paintpalette").tag(filter)
-                        default:
-                            Text(filter.displayName).tag(filter)
+                    
+                    // ファイルピッカーを「リンクのみ」の下に配置
+                    Picker(selection: $selectedFilter) {
+                        // 「すべてのファイル」を最初に表示
+                        if #available(macOS 15.0, *) {
+                            Label("すべてのファイル", systemImage: "document").tag(ItemFilter.fileOnly)
+                        } else {
+                            Label("すべてのファイル", systemImage: "doc").tag(ItemFilter.fileOnly)
                         }
+                        Divider()
+                        Label(ItemFilter.pdfOnly.displayName, systemImage: "text.document").tag(ItemFilter.pdfOnly)
+                        Label(ItemFilter.imageOnly.displayName, systemImage: "photo").tag(ItemFilter.imageOnly)
+                    } label: {
+                        if #available(macOS 15.0, *) {
+                            Label("ファイルのみ", systemImage: "document")
+                        } else {
+                            Label("ファイルのみ", systemImage: "doc")
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    
+                    // カラーコードフィルターをファイルピッカーの下に配置
+                    if enableColorCodeFilter {
+                        Label(ItemFilter.colorCodeOnly.displayName, systemImage: "paintpalette").tag(ItemFilter.colorCodeOnly)
                     }
 
                     if !clipboardManager.appUsageHistory.isEmpty {
