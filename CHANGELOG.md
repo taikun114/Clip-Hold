@@ -24,9 +24,13 @@ Notes
 ## 1.5.0 (under development)
 ### New Features
 - **Add “Plain Text Only” and “Rich Text Only” options to the filtering options**
+  - These options are in “Text Only”.
+- **Add “PDF Only” option to the filtering options**
+  - This option is in “Files Only”.
 
 ### Bug Fixes and Improvements
 - **Fix issue that previously selected items weren't chosen when closing the custom number input sheet in Settings using the Escape key**
+- **Fix issue that copied folders starting with ”.” did not appear in the History window**
 - **Improve settings item names and descriptions in General and Copy History Settings**
   - Names have been changed to be more intuitive, and descriptions have been added to each item, making it easier to understand the role of each setting and what functionality it provides.
 - **Improve the layout of settings items in General and Copy History Settings**
@@ -36,6 +40,7 @@ Notes
 - **Change default behavior to not close the window when you double-click an item in the History or Standard Phrases windows**
 - **Change the rich text icon**
   - Changed from `append.page` to `richtext.page`, making rich text items easier to recognize.
+- **Change “Links Only” into “Text Only” in the filtering options**
 - **Add icons to each filtering option and sorting option**
 - **Remove the icon from the “Copy as Plain Text” option in the History window's context menu and action menu**
   - Following Apple's [**Human Interface Guidelines**](https://developer.apple.com/design/human-interface-guidelines/menus#Icons), icons for related features now appear only on one parent item (in this case, “Copy”).
