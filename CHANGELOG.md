@@ -34,11 +34,13 @@ Notes
 ### Bug Fixes and Improvements
 - **Fix issue that previously selected items weren't chosen when closing the custom number input sheet in Settings using the Escape key**
 - **Fix issue that copied folders starting with ”.” did not appear in the History window**
+- **Fix the background of the window for add a standard phrase and add a preset**
 - **Improve settings item names and descriptions in General and Copy History Settings**
   - Names have been changed to be more intuitive, and descriptions have been added to each item, making it easier to understand the role of each setting and what functionality it provides.
 - **Improve the layout of settings items in General and Copy History Settings**
   - Related or similar features are now grouped together.
 - **Improve behavior to disable filtering and sorting buttons while loading history**
+- **Improve Settings window to be able to close with the Escape key**
 - **Change default behavior to display numbers for each item in the History and Standard Phrases windows**
 - **Change default behavior to not close the window when you double-click an item in the History or Standard Phrases windows**
 - **Change the rich text icon**
