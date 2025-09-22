@@ -115,6 +115,7 @@ struct SettingsView: View {
                             Button(action: goBack) {
                                 Image(systemName: "chevron.left")
                                     .frame(width: 20, height: 20)
+                                    .offset(x: 2.0)
                                     .contentShape(Rectangle())
                             }
                             .disabled(!canGoBack)
@@ -124,6 +125,7 @@ struct SettingsView: View {
                             Button(action: goForward) {
                                 Image(systemName: "chevron.right")
                                     .frame(width: 20, height: 20)
+                                    .offset(x: -2.0)
                                     .contentShape(Rectangle())
                             }
                             .disabled(!canGoForward)
