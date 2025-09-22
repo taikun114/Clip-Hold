@@ -75,9 +75,4 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
         }
         return true
     }
-    
-    // escキーでウィンドウを閉じる
-    override func cancelOperation(_ sender: Any?) {
-        self.window?.close()
-    }
 }

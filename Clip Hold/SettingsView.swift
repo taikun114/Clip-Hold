@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var isProgrammaticSelection: Bool = false
     @Environment(\.colorScheme) var colorScheme
     @State private var isWindowFocused: Bool = true
+    @FocusState private var isListFocused: Bool
 
     var body: some View {
         NavigationSplitView {
@@ -74,6 +75,7 @@ struct SettingsView: View {
             }
             .frame(minWidth: 150, idealWidth: 200, maxWidth: 250)
             .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 250)
+            .focused($isListFocused)
         } detail: {
             Group {
                 switch selectedSection {
@@ -149,6 +151,19 @@ struct SettingsView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.didResignMainNotification)) { notification in
             if let window = notification.object as? NSWindow, window.identifier == NSUserInterfaceItemIdentifier("SettingsWindow") {
                 isWindowFocused = false
+            }
+        }
+        .onKeyPress(.escape) {
+            // エスケープキーが押されたらウィンドウを閉じる
+            if let window = NSApp.windows.first(where: { $0.identifier == NSUserInterfaceItemIdentifier("SettingsWindow") }) {
+                window.close()
+            }
+            return .handled
+        }
+        .onAppear {
+            // ビューが表示されたときにリストにフォーカスを当てる
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                isListFocused = true
             }
         }
     }
