@@ -52,7 +52,6 @@ struct AddEditPresetView: View {
         }
         .padding()
         .frame(width: 300, height: 140)
-        .background(!isSheet ? Color(.windowBackgroundColor) : nil)
         .onAppear {
             // ウィンドウを前面に表示
             if let window = NSApp.mainWindow {

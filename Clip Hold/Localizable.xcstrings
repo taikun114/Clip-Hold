@@ -3753,6 +3753,22 @@
         }
       }
     },
+    "プリセットを追加" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットを追加"
+          }
+        }
+      }
+    },
     "プリセットを選択" : {
       "localizations" : {
         "en" : {
@@ -5045,6 +5061,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文を編集"
+          }
+        }
+      }
+    },
+    "定型文を追加" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a Standard Phrase"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文を追加"
           }
         }
       }

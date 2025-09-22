@@ -191,7 +191,6 @@ struct AddEditPhraseView: View {
         }
         .padding() // ここで全体にパディングが適用される
         .frame(minWidth: 400, minHeight: 310)
-        .background(!isSheet ? Color(.windowBackgroundColor) : nil)
         .onAppear {
             isContentFocused = true
         }
