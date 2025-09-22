@@ -298,7 +298,7 @@ struct HistoryContentList: View {
                     })
                     .sheet(isPresented: $showingEditSheet) {
                         if let item = itemToEdit {
-                            EditHistoryItemView(content: item.text) { editedContent in
+                            EditHistoryItemView(content: item.text, onCopy: { editedContent in
                                 // コピー処理を実装
                                 NSPasteboard.general.clearContents()
                                 NSPasteboard.general.setString(editedContent, forType: .string)
@@ -313,7 +313,7 @@ struct HistoryContentList: View {
                                         showCopyConfirmation = false
                                     }
                                 }
-                            }
+                            }, isSheet: true)
                         }
                     }
                     .onDrop(of: [.image], isTargeted: nil) { providers in

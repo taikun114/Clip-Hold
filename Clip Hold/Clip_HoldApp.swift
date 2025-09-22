@@ -625,19 +625,22 @@ struct ClipHoldApp: App {
                 // ウィンドウとして表示する処理をここに実装
                 DispatchQueue.main.async {
                     if (NSApp.mainWindow ?? NSApp.windows.first) != nil {
-                        let editView = EditHistoryItemView(content: latestItem.text) { editedContent in
+                        let editView = EditHistoryItemView(content: latestItem.text, onCopy: { editedContent in
                             // コピー処理を実装
                             NSPasteboard.general.clearContents()
                             NSPasteboard.general.setString(editedContent, forType: .string)
-                        }
+                        }, isSheet: false)
                         
-                        let hostingController = NSHostingController(rootView: editView)
-                        let editWindow = NSWindow(contentViewController: hostingController)
-                        editWindow.title = String(localized: "履歴を編集")
-                        editWindow.styleMask = [.titled, .closable]
-                        editWindow.setContentSize(NSSize(width: 400, height: 300))
-                        editWindow.makeKeyAndOrderFront(nil)
-                        editWindow.center()
+                        let windowController = ClipHoldStandardWindowController.shared(rootView: editView, title: String(localized: "履歴を編集"))
+                        // ウィンドウの位置とサイズをログに出力
+                        if let window = windowController.window {
+                            print("Clip_HoldApp: Window frame before showWindow: \(window.frame)")
+                        }
+                        windowController.showWindow(nil)
+                        // ウィンドウの位置とサイズをログに出力
+                        if let window = windowController.window {
+                            print("Clip_HoldApp: Window frame after showWindow: \(window.frame)")
+                        }
                         NSApp.activate(ignoringOtherApps: true)
                     }
                 }

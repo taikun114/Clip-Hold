@@ -4,6 +4,7 @@ struct EditHistoryItemView: View {
     @Environment(\.dismiss) var dismiss
     @State var content: String
     var onCopy: (String) -> Void
+    var isSheet: Bool = false
     
     @FocusState private var isContentFocused: Bool
     
@@ -31,7 +32,11 @@ struct EditHistoryItemView: View {
             Spacer()
             HStack {
                 Button("キャンセル") {
-                    dismiss()
+                    if isSheet {
+                        dismiss()
+                    } else {
+                        NSApp.sendAction(#selector(NSWindow.performClose(_:)), to: nil, from: nil)
+                    }
                 }
                 .controlSize(.large)
                 .keyboardShortcut(.cancelAction)
@@ -39,7 +44,11 @@ struct EditHistoryItemView: View {
                 Spacer()
                 Button("コピー") {
                     onCopy(content)
-                    dismiss()
+                    if isSheet {
+                        dismiss()
+                    } else {
+                        NSApp.sendAction(#selector(NSWindow.performClose(_:)), to: nil, from: nil)
+                    }
                 }
                 .buttonStyle(.borderedProminent)
                 .keyboardShortcut(.defaultAction)

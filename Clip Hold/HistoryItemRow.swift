@@ -462,14 +462,14 @@ struct HistoryItemRow: View {
             }
         }
         .sheet(isPresented: $showingEditSheet) {
-            EditHistoryItemView(content: item.text) { editedContent in
+            EditHistoryItemView(content: item.text, onCopy: { editedContent in
                 // コピー処理を実装
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(editedContent, forType: .string)
                 
                 // コピー確認を表示
                 showCopyConfirmation = true
-            }
+            }, isSheet: true)
         }
     }
 }
