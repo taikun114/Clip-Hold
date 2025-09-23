@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 import UserNotifications
 
 struct PrivacySettingsView: View {
+    @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @EnvironmentObject var clipboardManager: ClipboardManager
 
     @ObservedObject private var accessibilityChecker = AccessibilityPermissionChecker.shared
@@ -91,9 +92,17 @@ struct PrivacySettingsView: View {
         Form {
             Section(header: Text("クリップボード").font(.headline)) {
                 HStack {
-                    Circle()
-                        .fill(isClipboardMonitoringPaused ? Color.gray : Color.green)
-                        .frame(width: 10, height: 10)
+                    if differentiateWithoutColor {
+                        Image(systemName: isClipboardMonitoringPaused ? "xmark.circle.fill" : "checkmark.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 10, height: 10)
+                            .foregroundStyle(isClipboardMonitoringPaused ? .red : .green)
+                    } else {
+                        Circle()
+                            .fill(isClipboardMonitoringPaused ? Color.gray : Color.green)
+                            .frame(width: 10, height: 10)
+                    }
                     
                     VStack(alignment: .leading) {
                         Text("クリップボード監視")
@@ -127,9 +136,17 @@ struct PrivacySettingsView: View {
                 }
             ) {
                 HStack {
-                    Circle()
-                        .fill(notificationAuthorizationStatus == .authorized ? Color.green : Color.red)
-                        .frame(width: 10, height: 10)
+                    if differentiateWithoutColor {
+                        Image(systemName: notificationAuthorizationStatus == .authorized ? "checkmark.circle.fill" : "xmark.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 10, height: 10)
+                            .foregroundStyle(notificationAuthorizationStatus == .authorized ? .green : .red)
+                    } else {
+                        Circle()
+                            .fill(notificationAuthorizationStatus == .authorized ? Color.green : Color.red)
+                            .frame(width: 10, height: 10)
+                    }
                     
                     VStack(alignment: .leading) {
                         Text("通知")
@@ -165,9 +182,17 @@ struct PrivacySettingsView: View {
                     print("通知許可状態が変更されました: \(newValue.rawValue)")
                 }
                 HStack {
-                    Circle()
-                        .fill(accessibilityChecker.hasAccessibilityPermission ? Color.green : Color.red)
-                        .frame(width: 10, height: 10)
+                    if differentiateWithoutColor {
+                        Image(systemName: accessibilityChecker.hasAccessibilityPermission ? "checkmark.circle.fill" : "xmark.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 10, height: 10)
+                            .foregroundStyle(accessibilityChecker.hasAccessibilityPermission ? .green : .red)
+                    } else {
+                        Circle()
+                            .fill(accessibilityChecker.hasAccessibilityPermission ? Color.green : Color.red)
+                            .frame(width: 10, height: 10)
+                    }
                     
                     VStack(alignment: .leading) {
                         Text("アクセシビリティ")
