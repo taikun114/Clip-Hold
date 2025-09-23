@@ -155,12 +155,11 @@ struct SettingsView: View {
                 isWindowFocused = false
             }
         }
-        .onKeyPress(.escape) {
+        .onExitCommand {
             // エスケープキーが押されたらウィンドウを閉じる
             if let window = NSApp.windows.first(where: { $0.identifier == NSUserInterfaceItemIdentifier("SettingsWindow") }) {
                 window.close()
             }
-            return .handled
         }
         .onAppear {
             // ビューが表示されたときにリストにフォーカスを当てる
