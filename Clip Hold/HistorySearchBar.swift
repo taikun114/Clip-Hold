@@ -28,6 +28,33 @@ struct HistorySearchBar: View {
         resizedIcon.unlockFocus()
         return resizedIcon
     }
+    
+    @ViewBuilder
+    private var appPickerLabel: some View {
+        if let selectedAppPath = selectedApp {
+            if selectedAppPath == "auto_filter_mode" {
+                Label("アプリ（自動）", systemImage: "app.badge.checkmark")
+            } else if let appName = clipboardManager.appUsageHistory[selectedAppPath] {
+                if FileManager.default.fileExists(atPath: selectedAppPath) {
+                    Label {
+                        Text(appName)
+                    } icon: {
+                        Image(nsImage: resizedAppIcon(for: selectedAppPath))
+                    }
+                } else {
+                    Label {
+                        Text(appName)
+                    } icon: {
+                        Image(systemName: "questionmark.app")
+                    }
+                }
+            } else {
+                Label("アプリ", systemImage: "questionmark.app")
+            }
+        } else {
+            Label("アプリ", systemImage: "app")
+        }
+    }
 
     var body: some View {
         HStack {
@@ -141,7 +168,7 @@ struct HistorySearchBar: View {
                                 .tag(path as String?)
                             }
                         } label: {
-                            Label("アプリ", systemImage: "app")
+                            appPickerLabel
                         }
                         .labelStyle(.titleAndIcon)
                         .pickerStyle(.menu)
