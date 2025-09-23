@@ -258,13 +258,23 @@ struct HistoryItemRow: View {
                         return AnyView(
                             baseIconView
                                 .overlay(
-                                    Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 15, height: 15)
-                                        .alignmentGuide(.leading) { _ in 4 }
-                                        .alignmentGuide(.top) { _ in 22.5 }
-                                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
+                                    Group {
+                                        if FileManager.default.fileExists(atPath: sourceAppPath) {
+                                            Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 15, height: 15)
+                                        } else {
+                                            Image(systemName: "questionmark.app.fill")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 15, height: 15)
+                                                .fontWeight(.bold)
+                                        }
+                                    }
+                                    .alignmentGuide(.leading) { _ in 4 }
+                                    .alignmentGuide(.top) { _ in 22.5 }
+                                    .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
@@ -339,13 +349,23 @@ struct HistoryItemRow: View {
                         return AnyView(
                             baseIconView
                                 .overlay(
-                                    Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 15, height: 15)
-                                        .alignmentGuide(.leading) { _ in 4 }
-                                        .alignmentGuide(.top) { _ in 22.5 }
-                                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
+                                    Group {
+                                        if FileManager.default.fileExists(atPath: sourceAppPath) {
+                                            Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 15, height: 15)
+                                        } else {
+                                            Image(systemName: "questionmark.app.fill")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 15, height: 15)
+                                                .fontWeight(.bold)
+                                        }
+                                    }
+                                    .alignmentGuide(.leading) { _ in 4 }
+                                    .alignmentGuide(.top) { _ in 22.5 }
+                                    .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
