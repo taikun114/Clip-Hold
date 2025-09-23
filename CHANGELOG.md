@@ -41,6 +41,7 @@ Notes
   - Related or similar features are now grouped together.
 - **Improve behavior to disable filtering and sorting buttons while loading history**
 - **Improve Settings window to be able to close with the Escape key**
+- **Improve the style of the add standard phrase screen**
 - **Change default behavior to display numbers for each item in the History and Standard Phrases windows**
 - **Change default behavior to not close the window when you double-click an item in the History or Standard Phrases windows**
 - **Change the rich text icon**
