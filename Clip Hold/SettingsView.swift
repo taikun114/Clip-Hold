@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var historyIndex: Int = 0
     @State private var isProgrammaticSelection: Bool = false
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorSchemeContrast) var colorSchemeContrast
     @State private var isWindowFocused: Bool = true
     @FocusState private var isListFocused: Bool
 
@@ -120,7 +121,7 @@ struct SettingsView: View {
                             }
                             .disabled(!canGoBack)
                             if #available(macOS 26, *) {
-                                Capsule().fill(Color.secondary).opacity(0.1).frame(width: 1, height: 20)
+                                Capsule().fill(Color.secondary).opacity(colorSchemeContrast == .increased ? 1.0 : 0.1).frame(width: 1, height: 20)
                             }
                             Button(action: goForward) {
                                 Image(systemName: "chevron.right")
