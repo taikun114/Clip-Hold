@@ -151,6 +151,7 @@ struct StandardPhraseItemRow: View {
 }
 
 struct StandardPhraseWindowView: View {
+    @Environment(\.colorSchemeContrast) var colorSchemeContrast
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
@@ -275,7 +276,7 @@ struct StandardPhraseWindowView: View {
                         .padding(.vertical, 8)
                         .padding(.leading, 30)
                         .padding(.trailing, 10)
-                        .background(Color.primary.opacity(0.1))
+                        .background(Color.primary.opacity(colorSchemeContrast == .increased ? 0.05 : 0.1))
                         .cornerRadius(10)
                         .controlSize(.large)
                         .focused($isSearchFieldFocused)
@@ -297,6 +298,11 @@ struct StandardPhraseWindowView: View {
                                     .padding(.trailing, 8)
                                 }
                             }
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.primary, lineWidth: 1)
+                                .opacity(colorSchemeContrast == .increased ? 1 : 0)
                         )
                         
                         // プリセット選択メニューを追加
