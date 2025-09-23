@@ -93,11 +93,12 @@ struct PrivacySettingsView: View {
             Section(header: Text("クリップボード").font(.headline)) {
                 HStack {
                     if differentiateWithoutColor {
-                        Image(systemName: isClipboardMonitoringPaused ? "xmark.circle.fill" : "checkmark.circle.fill")
+                        Image(systemName: isClipboardMonitoringPaused ? "xmark" : "checkmark")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 10, height: 10)
                             .foregroundStyle(isClipboardMonitoringPaused ? .red : .green)
+                            .fontWeight(.bold)
                     } else {
                         Circle()
                             .fill(isClipboardMonitoringPaused ? Color.gray : Color.green)
@@ -137,11 +138,12 @@ struct PrivacySettingsView: View {
             ) {
                 HStack {
                     if differentiateWithoutColor {
-                        Image(systemName: notificationAuthorizationStatus == .authorized ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        Image(systemName: notificationAuthorizationStatus == .authorized ? "checkmark" : "xmark")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 10, height: 10)
                             .foregroundStyle(notificationAuthorizationStatus == .authorized ? .green : .red)
+                            .fontWeight(.bold)
                     } else {
                         Circle()
                             .fill(notificationAuthorizationStatus == .authorized ? Color.green : Color.red)
@@ -183,11 +185,12 @@ struct PrivacySettingsView: View {
                 }
                 HStack {
                     if differentiateWithoutColor {
-                        Image(systemName: accessibilityChecker.hasAccessibilityPermission ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        Image(systemName: accessibilityChecker.hasAccessibilityPermission ? "checkmark" : "xmark")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 10, height: 10)
                             .foregroundStyle(accessibilityChecker.hasAccessibilityPermission ? .green : .red)
+                            .fontWeight(.bold)
                     } else {
                         Circle()
                             .fill(accessibilityChecker.hasAccessibilityPermission ? Color.green : Color.red)
