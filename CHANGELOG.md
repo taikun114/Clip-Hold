@@ -30,6 +30,7 @@ Notes
 - **Add a feature to edit and copy**
   - You can edit and copy the history by clicking “Edit and Copy...” in the context menu or action menu of a text item in the History window.
   - You can also use a shortcut key to edit and copy the latest history item. The default shortcut key is `⌥ (Option)` + `⌘ (Command)` + `E`.
+  - This feature allows you to edit and copy text retrieved from your past history, so your past history will not be modified.
 
 ### Bug Fixes and Improvements
 - **Fix issue that previously selected items weren't chosen when closing the custom number input sheet in Settings using the Escape key**
@@ -47,6 +48,9 @@ Notes
 - **Change the rich text icon**
   - Changed from `append.page` to `richtext.page`, making rich text items easier to recognize.
 - **Change “Links Only” into “Text Only” in the filtering options**
+- **Change the clipboard check interval to 0.1 seconds**
+  - Now faster at 0.1 seconds from 0.5 seconds previously, reducing delays in history updates and app retrieval.
+  - Performance impact from this change is minimal.
 - **Add icons to each filtering option and sorting option**
 - **Add `ico`, `icns`, `svg`, `eps`, `ai`, and `psd` to the filtering targets for “Images Only”**
 - **Remove the icon from the “Copy as Plain Text” option in the History window's context menu and action menu**
