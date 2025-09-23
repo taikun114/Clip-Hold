@@ -27,7 +27,7 @@ class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
     convenience init<Content: View>(rootView: Content, title: String = "", windowType: WindowType) {
         // 新しいウィンドウを作成
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 310),
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 350),
             styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -40,7 +40,7 @@ class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
         window.contentViewController = hostingController
         
         // ウィンドウのサイズを明示的に設定
-        window.setContentSize(NSSize(width: 400, height: 310))
+        window.setContentSize(NSSize(width: 400, height: 350))
         window.center() // ウィンドウを画面中央に配置
         
         self.init(window: window)
