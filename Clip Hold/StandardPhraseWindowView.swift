@@ -1,7 +1,8 @@
 import SwiftUI
 import AppKit
 
-private func copyToClipboard(_ text: String) {
+private func copyToClipboard(_ text: String, clipboardManager: ClipboardManager) {
+    clipboardManager.isCopyingStandardPhrase = true
     NSPasteboard.general.clearContents()
     NSPasteboard.general.setString(text, forType: .string)
 }
@@ -18,6 +19,7 @@ private func truncateString(_ text: String?, maxLength: Int) -> String {
 struct StandardPhraseItemRow: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
+    @EnvironmentObject var clipboardManager: ClipboardManager
     @Environment(\.dismiss) var dismiss
     
     let phrase: StandardPhrase
@@ -90,7 +92,7 @@ struct StandardPhraseItemRow: View {
             
             Menu {
                 Button {
-                    copyToClipboard(phrase.content)
+                    copyToClipboard(phrase.content, clipboardManager: clipboardManager)
                     showCopyConfirmation = true
                 } label: {
                     Label("コピー", systemImage: "document.on.document")
@@ -154,6 +156,7 @@ struct StandardPhraseWindowView: View {
     @Environment(\.colorSchemeContrast) var colorSchemeContrast
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
+    @EnvironmentObject var clipboardManager: ClipboardManager
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
 
@@ -468,7 +471,7 @@ struct StandardPhraseWindowView: View {
                                     }()
                                     
                                     Button {
-                                        copyToClipboard(currentPhrase.content)
+                                        copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
                                         showCopyConfirmation = true
                                         currentCopyConfirmationTask?.cancel()
                                         currentCopyConfirmationTask = Task { @MainActor in
@@ -524,7 +527,7 @@ struct StandardPhraseWindowView: View {
                                 }
                             }, primaryAction: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
-                                    copyToClipboard(currentPhrase.content)
+                                    copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
                                     showCopyConfirmation = true
                                     currentCopyConfirmationTask?.cancel()
                                     currentCopyConfirmationTask = Task { @MainActor in
@@ -656,4 +659,5 @@ struct StandardPhraseWindowView: View {
     StandardPhraseWindowView()
         .environmentObject(StandardPhraseManager.shared)
         .environmentObject(StandardPhrasePresetManager.shared)
+        .environmentObject(ClipboardManager.shared)
 }

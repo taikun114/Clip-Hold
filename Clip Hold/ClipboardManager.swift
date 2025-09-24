@@ -28,6 +28,7 @@ class ClipboardManager: ObservableObject {
     @AppStorage("maxHistoryToSave") var maxHistoryToSave: Int = 0
     @AppStorage("maxFileSizeToSave") var maxFileSizeToSave: Int = 1_000_000_000
     @AppStorage("largeFileAlertThreshold") var largeFileAlertThreshold: Int = 1_000_000_000
+    @AppStorage("ignoreStandardPhrases") var ignoreStandardPhrases: Bool = false
     @Published var excludedAppIdentifiers: [String] = []
     var pasteboardMonitorTimer: Timer?
     var lastChangeCount: Int = 0
@@ -35,6 +36,8 @@ class ClipboardManager: ObservableObject {
     let filesDirectoryName = "ClipboardFiles"
     @Published var isMonitoring: Bool = false
     @Published var isPerformingInternalCopy: Bool = false
+    @Published var isCopyingStandardPhrase: Bool = false
+
     var isClipboardMonitoringPausedObserver: NSKeyValueObservation?
     @Published var showingLargeFileAlert: Bool = false {
         didSet {

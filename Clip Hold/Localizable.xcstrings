@@ -1657,6 +1657,22 @@
         }
       }
     },
+    "オンにすると、コピーした定型文を履歴に追加しないようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, prevents copied standard phrases from being added to the history."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、コピーした定型文を履歴に追加しないようにします。"
+          }
+        }
+      }
+    },
     "オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。" : {
       "localizations" : {
         "en" : {
@@ -2485,6 +2501,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。"
+          }
+        }
+      }
+    },
+    "コピーした定型文を履歴に追加しないようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prevents copied standard phrases from being added to the history."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーした定型文を履歴に追加しないようにします。"
           }
         }
       }
@@ -5061,6 +5093,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文を検索"
+          }
+        }
+      }
+    },
+    "定型文を無視する" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignore Standard Phrases"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文を無視する"
           }
         }
       }

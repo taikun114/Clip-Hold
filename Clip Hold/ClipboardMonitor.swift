@@ -61,6 +61,18 @@ extension ClipboardManager {
             lastChangeCount = pasteboard.changeCount
             print("DEBUG: checkPasteboard - Pasteboard change detected. New changeCount: \(lastChangeCount)")
 
+            // Check for standard phrase copy
+            if self.ignoreStandardPhrases && isCopyingStandardPhrase {
+                isCopyingStandardPhrase = false // Reset the flag
+                print("DEBUG: checkPasteboard: Standard phrase copy detected and ignored.")
+                return // Skip adding to history
+            }
+            // It's important to reset the flag even if ignoreStandardPhrases is false
+            if isCopyingStandardPhrase {
+                isCopyingStandardPhrase = false
+                print("DEBUG: checkPasteboard: Standard phrase copy detected, but will be added to history.")
+            }
+
             // 内部コピー操作中の場合は、この変更をスキップし、フラグをリセットする
             // isPerformingInternalCopy の状態をこのチェックの最初にキャプチャする
             let wasInternalCopyInitially = isPerformingInternalCopy

@@ -133,6 +133,7 @@ struct ClipHoldApp: App {
                     }()
                     
                     Button {
+                        clipboardManager.isCopyingStandardPhrase = true
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(phrase.content, forType: .string)
                         
@@ -539,6 +540,8 @@ struct ClipHoldApp: App {
                 let presetManager = StandardPhrasePresetManager.shared
                 if let selectedPreset = presetManager.selectedPreset, selectedPreset.phrases.indices.contains(i) {
                     let phrase = selectedPreset.phrases[i]
+                    let clipboardManager = ClipboardManager.shared
+                    clipboardManager.isCopyingStandardPhrase = true
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(phrase.content, forType: .string)
                     print("定型文「\(phrase.title)」がショートカットでコピーされました。")

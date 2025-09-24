@@ -20,6 +20,8 @@ struct CopyHistorySettingsView: View {
     @State private var initialAlertOption: DataSizeAlertOption
     @State private var showingCustomAlertSheet = false
 
+    @AppStorage("ignoreStandardPhrases") var ignoreStandardPhrases: Bool = false
+
     @State private var tempCustomAlertValue: Int = 1 // カスタム入力シート用の値
     @State private var tempCustomAlertUnit: DataSizeUnit = .gigabytes // カスタム入力シート用の単位
 
@@ -273,6 +275,22 @@ struct CopyHistorySettingsView: View {
                     .onChange(of: tempSelectedFileSizeOption) { _, newValue in
                         handleFileSizeOptionChange(newValue: newValue)
                     }
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("定型文を無視する")
+                        Text("コピーした定型文を履歴に追加しないようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $ignoreStandardPhrases) {
+                        Text("定型文を無視する")
+                        Text("オンにすると、コピーした定型文を履歴に追加しないようにします。")
+                    }
+                    .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: 履歴の設定
