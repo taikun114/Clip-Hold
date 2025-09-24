@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct HistorySearchBar: View {
+    @Environment(\.colorSchemeContrast) var colorSchemeContrast
     @EnvironmentObject var clipboardManager: ClipboardManager
     @Binding var searchText: String
     @Binding var isLoading: Bool
@@ -27,6 +28,33 @@ struct HistorySearchBar: View {
         resizedIcon.unlockFocus()
         return resizedIcon
     }
+    
+    @ViewBuilder
+    private var appPickerLabel: some View {
+        if let selectedAppPath = selectedApp {
+            if selectedAppPath == "auto_filter_mode" {
+                Label("アプリ（自動）", systemImage: "app.badge.checkmark")
+            } else if let appName = clipboardManager.appUsageHistory[selectedAppPath] {
+                if FileManager.default.fileExists(atPath: selectedAppPath) {
+                    Label {
+                        Text(appName)
+                    } icon: {
+                        Image(nsImage: resizedAppIcon(for: selectedAppPath))
+                    }
+                } else {
+                    Label {
+                        Text(appName)
+                    } icon: {
+                        Image(systemName: "questionmark.app")
+                    }
+                }
+            } else {
+                Label("アプリ", systemImage: "questionmark.app")
+            }
+        } else {
+            Label("アプリ", systemImage: "app")
+        }
+    }
 
     var body: some View {
         HStack {
@@ -39,7 +67,7 @@ struct HistorySearchBar: View {
             .padding(.vertical, 8)
             .padding(.leading, 30)
             .padding(.trailing, 10)
-            .background(Color.primary.opacity(0.1))
+            .background(Color.primary.opacity(colorSchemeContrast == .increased ? 0.05 : 0.1))
             .cornerRadius(10)
             .controlSize(.large)
             .focused($isSearchFieldFocused)
@@ -62,37 +90,91 @@ struct HistorySearchBar: View {
                     }
                 }
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.primary, lineWidth: 1)
+                    .opacity(colorSchemeContrast == .increased ? 1 : 0)
+            )
             // フィルターボタン
             Menu {
                 Picker("フィルター", selection: $selectedFilter) {
-                    ForEach(ItemFilter.allCases.filter {
-                        // colorCodeOnlyは設定がオンの場合のみ表示
-                        $0 != .colorCodeOnly || enableColorCodeFilter
-                    }) { filter in
-                        Text(filter.displayName).tag(filter)
+                    // 「すべての項目」を最初に表示
+                    Label(ItemFilter.all.displayName, systemImage: "list.clipboard").tag(ItemFilter.all)
+                    
+                    // テキストピッカーを「すべての項目」の下に配置
+                    Picker(selection: $selectedFilter) {
+                        Label(ItemFilter.textAll.displayName, systemImage: "textformat").tag(ItemFilter.textAll)
+                        Divider()
+                        if #available(macOS 15.0, *) {
+                            Label(ItemFilter.textPlain.displayName, systemImage: "text.page").tag(ItemFilter.textPlain)
+                        } else {
+                            Label(ItemFilter.textPlain.displayName, systemImage: "doc.plaintext").tag(ItemFilter.textPlain)
+                        }
+                        if #available(macOS 15.0, *) {
+                            Label(ItemFilter.textRich.displayName, systemImage: "richtext.page").tag(ItemFilter.textRich)
+                        } else {
+                            Label(ItemFilter.textRich.displayName, systemImage: "doc.richtext").tag(ItemFilter.textRich)
+                        }
+                        Label(ItemFilter.linkOnly.displayName, systemImage: "paperclip").tag(ItemFilter.linkOnly)
+                    } label: {
+                        Label("テキストのみ", systemImage: "textformat")
+                    }
+                    .pickerStyle(.menu)
+                    
+                    // ファイルピッカーを「リンクのみ」の下に配置
+                    Picker(selection: $selectedFilter) {
+                        // 「すべてのファイル」を最初に表示
+                        if #available(macOS 15.0, *) {
+                            Label("すべてのファイル", systemImage: "document").tag(ItemFilter.fileOnly)
+                        } else {
+                            Label("すべてのファイル", systemImage: "doc").tag(ItemFilter.fileOnly)
+                        }
+                        Divider()
+                        Label(ItemFilter.imageOnly.displayName, systemImage: "photo").tag(ItemFilter.imageOnly)
+                        Label(ItemFilter.videoOnly.displayName, systemImage: "movieclapper").tag(ItemFilter.videoOnly)
+                        Label(ItemFilter.pdfOnly.displayName, systemImage: "text.document").tag(ItemFilter.pdfOnly)
+                        Label(ItemFilter.folderOnly.displayName, systemImage: "folder").tag(ItemFilter.folderOnly)
+                        Label(ItemFilter.otherFiles.displayName, systemImage: "document.badge.ellipsis").tag(ItemFilter.otherFiles)
+                    } label: {
+                        if #available(macOS 15.0, *) {
+                            Label("ファイルのみ", systemImage: "document")
+                        } else {
+                            Label("ファイルのみ", systemImage: "doc")
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    
+                    // カラーコードフィルターをファイルピッカーの下に配置
+                    if enableColorCodeFilter {
+                        Label(ItemFilter.colorCodeOnly.displayName, systemImage: "paintpalette").tag(ItemFilter.colorCodeOnly)
+                    }
+
+                    if !clipboardManager.appUsageHistory.isEmpty {
+                        Divider()
+                        Picker(selection: $selectedApp) {
+                            Label("すべてのアプリ", systemImage: "app").tag(nil as String?)
+                            Label("自動", systemImage: "app.badge.checkmark").tag("auto_filter_mode" as String?)
+                            Divider()
+                            ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { path, localizedName in
+                                Label {
+                                    Text(localizedName)
+                                } icon: {
+                                    if FileManager.default.fileExists(atPath: path) {
+                                        Image(nsImage: resizedAppIcon(for: path))
+                                    } else {
+                                        Image(systemName: "questionmark.app")
+                                    }
+                                }
+                                .tag(path as String?)
+                            }
+                        } label: {
+                            appPickerLabel
+                        }
+                        .labelStyle(.titleAndIcon)
+                        .pickerStyle(.menu)
                     }
                 }
                 .pickerStyle(.inline)
-                
-                if !clipboardManager.appUsageHistory.isEmpty {
-                    Divider()
-                    Picker(selection: $selectedApp) {
-                        Label("すべてのアプリ", systemImage: "app").tag(nil as String?)
-                        Label("自動", systemImage: "app.badge.checkmark").tag("auto_filter_mode" as String?)
-                        Divider()
-                        ForEach(clipboardManager.appUsageHistory.sorted(by: { $0.value < $1.value }), id: \.key) { path, localizedName in
-                            Label {
-                                Text(localizedName)
-                            } icon: {
-                                Image(nsImage: resizedAppIcon(for: path))
-                            }
-                            .tag(path as String?)
-                        }
-                    } label: {
-                        Text("アプリ")
-                    }
-                    .labelStyle(.titleAndIcon)
-                }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
                     .tint(selectedFilter != .all || selectedApp != nil ? .accentColor : .secondary)
@@ -101,12 +183,23 @@ struct HistorySearchBar: View {
             .menuStyle(.borderlessButton)
             .frame(width: 30)
             .padding(.horizontal, 4)
+            .disabled(isLoading) // 読み込み中に無効化
 
             // 並び替えボタン
             Menu {
                 Picker("並び替え", selection: $selectedSort) {
                     ForEach(ItemSort.allCases, id: \.self) { sort in
-                        Text(sort.displayName).tag(sort)
+                        switch sort {
+                        case .newest:
+                            Label(sort.displayName, systemImage: "clock").tag(sort)
+                        case .oldest:
+                            Text(sort.displayName).tag(sort)
+                        case .largestFileSize:
+                            Divider()
+                            Label(sort.displayName, systemImage: "folder").tag(sort)
+                        case .smallestFileSize:
+                            Text(sort.displayName).tag(sort)
+                        }
                     }
                 }
                 .pickerStyle(.inline)
@@ -119,6 +212,7 @@ struct HistorySearchBar: View {
             .menuStyle(.borderlessButton)
             .frame(width: 30)
             .padding(.horizontal, 4)
+            .disabled(isLoading) // 読み込み中に無効化
 
         }
         .padding(.horizontal, 10)

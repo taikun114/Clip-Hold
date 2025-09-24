@@ -10,7 +10,9 @@ struct SettingsView: View {
     @State private var historyIndex: Int = 0
     @State private var isProgrammaticSelection: Bool = false
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorSchemeContrast) var colorSchemeContrast
     @State private var isWindowFocused: Bool = true
+    @FocusState private var isListFocused: Bool
 
     var body: some View {
         NavigationSplitView {
@@ -48,7 +50,7 @@ struct SettingsView: View {
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .background(selectedSection == "info" ? (isWindowFocused ? Color.accentColor.opacity(0.8) : Color.gray.opacity(0.3)) : Color.clear)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(10)
                 } else {
                     Button(action: {
@@ -74,6 +76,7 @@ struct SettingsView: View {
             }
             .frame(minWidth: 150, idealWidth: 200, maxWidth: 250)
             .navigationSplitViewColumnWidth(min: 150, ideal: 200, max: 250)
+            .focused($isListFocused)
         } detail: {
             Group {
                 switch selectedSection {
@@ -113,15 +116,17 @@ struct SettingsView: View {
                             Button(action: goBack) {
                                 Image(systemName: "chevron.left")
                                     .frame(width: 20, height: 20)
+                                    .offset(x: 2.0)
                                     .contentShape(Rectangle())
                             }
                             .disabled(!canGoBack)
                             if #available(macOS 26, *) {
-                                Capsule().fill(Color.secondary).opacity(0.1).frame(width: 1, height: 20)
+                                Capsule().fill(Color.secondary).opacity(colorSchemeContrast == .increased ? 1.0 : 0.1).frame(width: 1, height: 20)
                             }
                             Button(action: goForward) {
                                 Image(systemName: "chevron.right")
                                     .frame(width: 20, height: 20)
+                                    .offset(x: -2.0)
                                     .contentShape(Rectangle())
                             }
                             .disabled(!canGoForward)
@@ -149,6 +154,18 @@ struct SettingsView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.didResignMainNotification)) { notification in
             if let window = notification.object as? NSWindow, window.identifier == NSUserInterfaceItemIdentifier("SettingsWindow") {
                 isWindowFocused = false
+            }
+        }
+        .onExitCommand {
+            // エスケープキーが押されたらウィンドウを閉じる
+            if let window = NSApp.windows.first(where: { $0.identifier == NSUserInterfaceItemIdentifier("SettingsWindow") }) {
+                window.close()
+            }
+        }
+        .onAppear {
+            // ビューが表示されたときにリストにフォーカスを当てる
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                isListFocused = true
             }
         }
     }

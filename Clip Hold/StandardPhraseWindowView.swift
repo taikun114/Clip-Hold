@@ -22,12 +22,12 @@ struct StandardPhraseItemRow: View {
     
     let phrase: StandardPhrase
     let index: Int
-    @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumber: Bool = false
+    @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     @Binding var phraseToDelete: StandardPhrase?
     @Binding var showingDeleteConfirmation: Bool
     @Binding var selectedPhraseID: UUID?
-    @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -53,7 +53,7 @@ struct StandardPhraseItemRow: View {
         }()
 
         HStack(spacing: 8) {
-            if showLineNumber {
+            if !hideNumbers {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
@@ -151,6 +151,7 @@ struct StandardPhraseItemRow: View {
 }
 
 struct StandardPhraseWindowView: View {
+    @Environment(\.colorSchemeContrast) var colorSchemeContrast
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
@@ -172,8 +173,8 @@ struct StandardPhraseWindowView: View {
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
 
-    @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbers: Bool = false
-    @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
 
     @FocusState private var isSearchFieldFocused: Bool
 
@@ -182,7 +183,7 @@ struct StandardPhraseWindowView: View {
     @State private var newPresetName = ""
 
     private var lineNumberTextWidth: CGFloat? {
-        guard showLineNumbers, !filteredPhrases.isEmpty else { return nil }
+        guard !hideNumbers, !filteredPhrases.isEmpty else { return nil }
         
         let maxIndex = filteredPhrases.count
         let numDigits = String(maxIndex).count
@@ -275,7 +276,7 @@ struct StandardPhraseWindowView: View {
                         .padding(.vertical, 8)
                         .padding(.leading, 30)
                         .padding(.trailing, 10)
-                        .background(Color.primary.opacity(0.1))
+                        .background(Color.primary.opacity(colorSchemeContrast == .increased ? 0.05 : 0.1))
                         .cornerRadius(10)
                         .controlSize(.large)
                         .focused($isSearchFieldFocused)
@@ -297,6 +298,11 @@ struct StandardPhraseWindowView: View {
                                     .padding(.trailing, 8)
                                 }
                             }
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.primary, lineWidth: 1)
+                                .opacity(colorSchemeContrast == .increased ? 1 : 0)
                         )
                         
                         // プリセット選択メニューを追加
@@ -402,7 +408,7 @@ struct StandardPhraseWindowView: View {
                                         StandardPhraseItemRow(
                                             phrase: phrase,
                                             index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                            showLineNumber: showLineNumbers,
+                                            hideNumbers: hideNumbers,
                                             phraseToDelete: $phraseToDelete,
                                             showingDeleteConfirmation: $showingDeleteConfirmation,
                                             selectedPhraseID: $selectedPhraseID,
@@ -425,7 +431,7 @@ struct StandardPhraseWindowView: View {
                                         StandardPhraseItemRow(
                                             phrase: phrase,
                                             index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                            showLineNumber: showLineNumbers,
+                                            hideNumbers: hideNumbers,
                                             phraseToDelete: $phraseToDelete,
                                             showingDeleteConfirmation: $showingDeleteConfirmation,
                                             selectedPhraseID: $selectedPhraseID,
@@ -528,7 +534,7 @@ struct StandardPhraseWindowView: View {
                                             showCopyConfirmation = false
                                         }
                                     }
-                                    if !preventWindowCloseOnDoubleClick {
+                                    if closeWindowOnDoubleClickInStandardPhrasesWindow {
                                         dismiss()
                                     }
                                 }

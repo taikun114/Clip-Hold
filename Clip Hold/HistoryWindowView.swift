@@ -39,13 +39,13 @@ struct HistoryWindowView: View {
 
     @FocusState private var isSearchFieldFocused: Bool
 
-    @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
-    @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
-    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
+    @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
+    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
 
     private var lineNumberTextWidth: CGFloat? {
-        guard showLineNumbersInHistoryWindow, !(clipboardManager.filteredHistoryForShortcuts ?? []).isEmpty else { return nil }
+        guard !hideNumbersInHistoryWindow, !(clipboardManager.filteredHistoryForShortcuts ?? []).isEmpty else { return nil }
         
         let maxIndex = (clipboardManager.filteredHistoryForShortcuts ?? []).count
         let numDigits = String(maxIndex).count
@@ -113,14 +113,31 @@ struct HistoryWindowView: View {
                 switch clipboardManager.historySelectedFilter {
                 case .all:
                     matchesFilter = true
-                case .textOnly:
+                case .textAll:
                     matchesFilter = item.filePath == nil
+                case .textRich:
+                    // リッチテキストの判定（richTextプロパティがnilでない場合）
+                    matchesFilter = item.filePath == nil && item.richText != nil
+                case .textPlain:
+                    // 標準テキストのみ（richTextプロパティがnilの場合）
+                    matchesFilter = item.filePath == nil && item.richText == nil
                 case .linkOnly:
                     matchesFilter = item.isURL
                 case .fileOnly:
                     matchesFilter = item.filePath != nil
+                case .folderOnly:
+                    matchesFilter = item.filePath != nil && item.isFolder
                 case .imageOnly:
                     matchesFilter = item.isImage
+                case .videoOnly:
+                    // 動画ファイルの判定（isVideoプロパティを使用）
+                    matchesFilter = item.isVideo
+                case .otherFiles:
+                    // その他のファイルの判定（画像、動画、PDF、フォルダではないファイル）
+                    matchesFilter = item.filePath != nil && !item.isImage && !item.isVideo && !item.isPDF && !item.isFolder
+                case .pdfOnly:
+                    // PDFファイルの判定（isPDFプロパティを使用）
+                    matchesFilter = item.isPDF
                 case .colorCodeOnly:
                     matchesFilter = item.filePath == nil && ColorCodeParser.parseColor(from: item.text) != nil
                 }
@@ -165,31 +182,31 @@ struct HistoryWindowView: View {
 
                     Spacer(minLength: 0)
 
-                    HistoryContentList(
-                        filteredHistory: $filteredHistory,
-                        isLoading: $isLoading,
-                        showingDeleteConfirmation: $showingDeleteConfirmation,
-                        itemToDelete: $itemToDelete,
-                        selectedItemID: $selectedItemID,
-                        showCopyConfirmation: $showCopyConfirmation,
-                        currentCopyConfirmationTask: $currentCopyConfirmationTask,
-                        showQRCodeSheet: $showQRCodeSheet,
-                        selectedItemForQRCode: $selectedItemForQRCode,
-                        itemForNewPhrase: $itemForNewPhrase,
-                        previousClipboardHistoryCount: $previousClipboardHistoryCount,
-                        showLineNumbersInHistoryWindow: showLineNumbersInHistoryWindow,
-                        preventWindowCloseOnDoubleClick: preventWindowCloseOnDoubleClick,
-                        scrollToTopOnUpdate: scrollToTopOnUpdate,
-                        showCharacterCount: showCharacterCount,
-                        lineNumberTextWidth: lineNumberTextWidth,
-                        trailingPaddingForLineNumber: trailingPaddingForLineNumber,
-                        searchText: searchText,
-                        onCopyAction: { item in
-                            // 内部コピーフラグをtrueに設定
-                            clipboardManager.isPerformingInternalCopy = true
-                            ClipboardManager.shared.copyItemToClipboard(item)
-                        }
-                    )
+                                            HistoryContentList(
+                            filteredHistory: $filteredHistory,
+                            isLoading: $isLoading,
+                            showingDeleteConfirmation: $showingDeleteConfirmation,
+                            itemToDelete: $itemToDelete,
+                            selectedItemID: $selectedItemID,
+                            showCopyConfirmation: $showCopyConfirmation,
+                            currentCopyConfirmationTask: $currentCopyConfirmationTask,
+                            showQRCodeSheet: $showQRCodeSheet,
+                            selectedItemForQRCode: $selectedItemForQRCode,
+                            itemForNewPhrase: $itemForNewPhrase,
+                            previousClipboardHistoryCount: $previousClipboardHistoryCount,
+                            hideNumbersInHistoryWindow: hideNumbersInHistoryWindow,
+                            closeWindowOnDoubleClickInHistoryWindow: closeWindowOnDoubleClickInHistoryWindow,
+                            scrollToTopOnUpdate: scrollToTopOnUpdate,
+                            showCharacterCount: showCharacterCount,
+                            lineNumberTextWidth: lineNumberTextWidth,
+                            trailingPaddingForLineNumber: trailingPaddingForLineNumber,
+                            searchText: searchText,
+                            onCopyAction: { item in
+                                // 内部コピーフラグをtrueに設定
+                                clipboardManager.isPerformingInternalCopy = true
+                                ClipboardManager.shared.copyItemToClipboard(item)
+                            }
+                        )
                 }
             }
             

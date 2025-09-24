@@ -17,12 +17,42 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         guard let filePath = filePath else { return false }
         if filePath.isFileURL {
             let pathExtension = filePath.pathExtension.lowercased()
-            let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "bmp", "heic", "webp", "tiff", "tif"]
+            let imageExtensions: Set<String> = ["jpg", "jpeg", "png", "gif", "bmp", "heic", "webp", "tiff", "tif", "ico", "icns", "svg", "eps", "ai", "psd"]
             if imageExtensions.contains(pathExtension) {
                 return true
             }
         }
         return false
+    }
+    
+    // ファイルが動画かどうかを判断するヘルパープロパティ
+    var isVideo: Bool {
+        guard let filePath = filePath else { return false }
+        if filePath.isFileURL {
+            let pathExtension = filePath.pathExtension.lowercased()
+            let videoExtensions = ["mov", "mp4", "avi", "mkv", "wmv", "flv", "webm", "m4v", "qt"]
+            if videoExtensions.contains(pathExtension) {
+                return true
+            }
+        }
+        return false
+    }
+    
+    // ファイルがPDFかどうかを判断するヘルパープロパティ
+    var isPDF: Bool {
+        guard let filePath = filePath else { return false }
+        if filePath.isFileURL {
+            return filePath.pathExtension.lowercased() == "pdf"
+        }
+        return false
+    }
+
+    // ファイルがフォルダかどうかを判断するヘルパープロパティ
+    var isFolder: Bool {
+        guard let filePath = filePath else { return false }
+        var isDirectory: ObjCBool = false
+        let fileExists = FileManager.default.fileExists(atPath: filePath.path, isDirectory: &isDirectory)
+        return fileExists && isDirectory.boolValue
     }
 
     // テキストが有効なURLであるかどうかを判断するヘルパープロパティ

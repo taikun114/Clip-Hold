@@ -133,6 +133,8 @@ struct AddEditPhraseView: View {
                 .padding(.top, 10)
             }
 
+            Spacer()
+            
             HStack {
                 Button("キャンセル") {
                     dismiss()
@@ -187,11 +189,9 @@ struct AddEditPhraseView: View {
                 .disabled(content.isEmpty || (useCustomTitle && title.isEmpty) || selectedPresetId == noPresetsUUID)
                 .controlSize(.large)
             }
-            .padding(.vertical, 10)
         }
         .padding() // ここで全体にパディングが適用される
-        .frame(minWidth: 400, minHeight: 310)
-        .background(!isSheet ? Color(.windowBackgroundColor) : nil)
+        .frame(minWidth: 400, minHeight: 350)
         .onAppear {
             isContentFocused = true
         }

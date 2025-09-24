@@ -1,6 +1,66 @@
 # Clip Hold Changelog
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
+<!--
+The order of listing is as follows.
+- New Features
+  - Notable Information
+  - Support
+  - Additions
+- Bug Fixes and Improvements
+  - Fixes
+  - Improvements
+  - Changes
+  - Additions
+  - Removals
+Only for versions 1.5.0 and later. Earlier versions may not follow this order.
+
+Notes
+- Make the first level of the list bold
+- Make links bold
+- When linking to Issues, Pull Requests, or Discussions, include the full URL
+-->
+
+## 1.5.0
+### New Features
+- **Add “Plain Text Only” and “Rich Text Only” options to the filtering options**
+  - These options are in “Text Only”.
+- **Add “PDF Only”, “Videos Only”, “Folders Only” and “Other Files” options to the filtering options**
+  - These options are in “Files Only”.
+- **Add a feature to edit and copy**
+  - You can edit and copy the history by clicking “Edit and Copy...” in the context menu or action menu of a text item in the History window.
+  - You can also use a shortcut key to edit and copy the latest history item. The default shortcut key is `⌥ (Option)` + `⌘ (Command)` + `E`.
+  - This feature allows you to edit and copy text retrieved from your past history, so your past history will not be modified.
+
+### Bug Fixes and Improvements
+- **Fix issue that previously selected items weren't chosen when closing the custom number input sheet in Settings using the Escape key**
+- **Fix issue that copied folders starting with ”.” did not appear in the History window**
+- **Fix the background of the window for add a standard phrase and add a preset**
+- **Improve settings item names and descriptions in General and Copy History Settings**
+  - Names have been changed to be more intuitive, and descriptions have been added to each item, making it easier to understand the role of each setting and what functionality it provides.
+- **Improve the layout of settings items in General and Copy History Settings**
+  - Related or similar features are now grouped together.
+- **Improve behavior to disable filtering and sorting buttons while loading history**
+- **Improve Settings window to be able to close with the Escape key**
+- **Improve the style of the add standard phrase screen**
+- **Improve the Privacy Settings indicator to be differentiated by shape when “Differentiate Without Color” is enabled in System Settings**
+- **Improve the search boxes in the History and Standard Phrases windows to display borders when “Increase Contrast” is enabled in System Settings**
+- **Improve the separator line between navigation buttons in the Settings window to increase contrast when “Increase Contrast” is enabled in System Settings**
+- **Improve the history list to display dedicated icons for non existing apps**
+- **Improve the “Apps” picker in the filtering options to display the selected app icon and name**
+- **Change default behavior to display numbers for each item in the History and Standard Phrases windows**
+- **Change default behavior to not close the window when you double-click an item in the History or Standard Phrases windows**
+- **Change the rich text icon**
+  - Changed from `append.page` to `richtext.page`, making rich text items easier to recognize.
+- **Change “Links Only” into “Text Only” in the filtering options**
+- **Change the clipboard check interval to 0.1 seconds**
+  - Now faster at 0.1 seconds from 0.5 seconds previously, reducing delays in history updates and app retrieval.
+  - Performance impact from this change is minimal.
+- **Add icons to each filtering option and sorting option**
+- **Add `ico`, `icns`, `svg`, `eps`, `ai`, and `psd` to the filtering targets for “Images Only”**
+- **Remove the icon from the “Copy as Plain Text” option in the History window's context menu and action menu**
+  - Following Apple's [**Human Interface Guidelines**](https://developer.apple.com/design/human-interface-guidelines/menus#Icons), icons for related features now appear only on one parent item (in this case, “Copy”).
+
 ## 1.4.0
 ### New Features
 - **Support for Rich Text**

@@ -43,6 +43,7 @@ extension KeyboardShortcuts.Name {
     static let copyClipboardHistory8 = Self("copyClipboardHistory8", default: .init(.eight, modifiers: [.option, .command]))
     static let copyClipboardHistory9 = Self("copyClipboardHistory9", default: .init(.nine, modifiers: [.option, .command]))
     static let copyClipboardHistory10 = Self("copyClipboardHistory10", default: .init(.zero, modifiers: [.option, .command]))
+    static let editAndCopyLatestHistory = Self("editAndCopyLatestHistory", default: .init(.e, modifiers: [.option, .command]))
 
     static var allClipboardHistoryCopyShortcuts: [KeyboardShortcuts.Name] {
         return [

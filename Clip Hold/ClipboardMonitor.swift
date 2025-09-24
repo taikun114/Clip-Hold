@@ -18,7 +18,7 @@ extension ClipboardManager {
         lastChangeCount = NSPasteboard.general.changeCount
         print("ClipboardManager: Monitoring started. Initial pasteboard change count: \(lastChangeCount)")
 
-        let newTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+        let newTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self else { 
                 print("DEBUG: Timer fired, but self is nil. Timer will invalidate itself.")
                 // selfがnilの場合、タイマーのターゲットがなくなったため、念のためタイマーを無効化

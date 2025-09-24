@@ -11,7 +11,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     var standardPhraseWindowController: ClipHoldWindowController?
     var settingsWindowController: SettingsWindowController?
 
-    private var addPhraseWindowController: ClipHoldWindowController?
+    // ウィンドウの種類ごとにウィンドウコントローラーを管理する
+    private var windowControllers: [WindowType: ClipHoldStandardWindowController] = [:]
 
     let resumeMonitoringActionID = "RESUME_MONITORING_ACTION"
     let clipboardPausedNotificationCategory = "CLIPBOARD_PAUSED_CATEGORY"
@@ -192,152 +193,107 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
     @MainActor
     func showAddPhraseWindow(withContent content: String) {
-        if addPhraseWindowController == nil || addPhraseWindowController?.window == nil {
-            let contentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared, isSheet: false)
-                .environmentObject(StandardPhraseManager.shared)
-                .environmentObject(StandardPhrasePresetManager.shared)
-
-            let hostingController = NSHostingController(rootView: AnyView(contentView))
-
-            var windowRect = NSRect(x: 0, y: 0, width: 400, height: 350) // ウィンドウの固定サイズを設定
-            
-            if let screenFrame = NSScreen.main?.visibleFrame {
-                // スクリーンの中央に配置するためのX座標とY座標を計算
-                let x = screenFrame.minX + (screenFrame.width - windowRect.width) / 2
-                let y = screenFrame.minY + (screenFrame.height - windowRect.height) / 2
-                windowRect.origin = NSPoint(x: x, y: y) // 計算した座標をウィンドウの原点に設定
-                print("AppDelegate: Calculated window origin: (\(x), \(y)) for screen frame: \(screenFrame)")
-            } else {
-                print("AppDelegate: Could not get main screen frame, falling back to default window position.")
-                // スクリーン情報が取得できない場合のフォールバック（このままでもデフォルトで左上から表示される）
-            }
-
-            let window = NSWindow(
-                contentRect: windowRect,
-                styleMask: [.titled, .closable, .miniaturizable],
-                backing: .buffered, defer: false)
-
-            window.contentViewController = hostingController
-            window.identifier = NSUserInterfaceItemIdentifier("AddPhraseWindow")
-
-            // ClipHoldWindowController でウィンドウをラップ
-            addPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: false)
-
-            // ウィンドウのデリゲートを設定 (AppDelegateが最終的なデリゲートになる)
-            addPhraseWindowController?.window?.delegate = self
-
-            print("AppDelegate: Add Phrase window created.")
-
-        } else {
-            // 既存のウィンドウがある場合は、コンテンツを更新して前面に表示
-            print("AppDelegate: Add Phrase window already exists. Updating content and bringing to front.")
-            if let window = addPhraseWindowController?.window { // Controller 経由でウィンドウにアクセス
-                // newContentView を、if/else ブロックの外側に移動し、両方からアクセス可能にする
-                let newContentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared, isSheet: false)
-                    .environmentObject(StandardPhraseManager.shared)
-                    .environmentObject(StandardPhrasePresetManager.shared)
-
-                // 既存の NSHostingController の rootView を AnyView としてキャストし、新しい AnyView で更新
-                if let existingHostingController = window.contentViewController as? NSHostingController<AnyView> {
-                    existingHostingController.rootView = AnyView(newContentView)
-                } else {
-                    // もし contentViewController が期待する型でない場合は、新しいものに置き換える
-                    window.contentViewController = NSHostingController(rootView: AnyView(newContentView))
-                }
-            }
+        let windowType: WindowType = .addPhrase
+        let title = String(localized: "定型文を追加")
+        
+        // 既存のウィンドウコントローラーがあればそれを最前面に表示
+        if let existingController = windowControllers[windowType] {
+            existingController.showWindowAndCenter(false)
+            NSApp.activate(ignoringOtherApps: true)
+            print("AppDelegate: Reusing existing \(windowType) window.")
+            return
         }
+
+        let contentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared, isSheet: false)
+            .environmentObject(StandardPhraseManager.shared)
+            .environmentObject(StandardPhrasePresetManager.shared)
+
+        // 新しいウィンドウコントローラーを作成
+        let windowController = ClipHoldStandardWindowController(rootView: contentView, title: title, windowType: windowType)
+        windowControllers[windowType] = windowController
+
         // ウィンドウを表示し、アプリをアクティブにする
-        addPhraseWindowController?.showWindow(nil) // Controller 経由で表示
-        addPhraseWindowController?.window?.makeKeyAndOrderFront(nil) // 最前面に表示
+        windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
+        
+        print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
     }
     
     @MainActor
     func showAddPresetWindow() {
-        // 既存のウィンドウがあればそれを再利用
-        if addPhraseWindowController != nil && addPhraseWindowController?.window != nil {
-            // 既存のウィンドウがある場合は、コンテンツを更新して前面に表示
-            print("AppDelegate: Add Preset window already exists. Updating content and bringing to front.")
-            if let window = addPhraseWindowController?.window { // Controller 経由でウィンドウにアクセス
-                let newContentView = AddEditPresetView(isSheet: false) { [weak self] in
-                    // ウィンドウを閉じたときの後処理
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        self.addPhraseWindowController = nil
-                        print("AppDelegate: addPhraseWindowController set to nil asynchronously.")
-                    }
-                }
-                .environmentObject(StandardPhrasePresetManager.shared)
-
-                // 既存の NSHostingController の rootView を AnyView としてキャストし、新しい AnyView で更新
-                if let existingHostingController = window.contentViewController as? NSHostingController<AnyView> {
-                    existingHostingController.rootView = AnyView(newContentView)
-                } else {
-                    // もし contentViewController が期待する型でない場合は、新しいものに置き換える
-                    window.contentViewController = NSHostingController(rootView: AnyView(newContentView))
-                }
-            }
-        } else {
-            // 新しいウィンドウを作成
-            let contentView = AddEditPresetView(isSheet: false) { [weak self] in
-                // ウィンドウを閉じたときの後処理
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    self.addPhraseWindowController = nil
-                    print("AppDelegate: addPhraseWindowController set to nil asynchronously.")
-                }
-            }
-            .environmentObject(StandardPhrasePresetManager.shared)
-
-            let hostingController = NSHostingController(rootView: AnyView(contentView))
-
-            var windowRect = NSRect(x: 0, y: 0, width: 300, height: 140) // ウィンドウの固定サイズを設定
-            
-            if let screenFrame = NSScreen.main?.visibleFrame {
-                // スクリーンの中央に配置するためのX座標とY座標を計算
-                let x = screenFrame.minX + (screenFrame.width - windowRect.width) / 2
-                let y = screenFrame.minY + (screenFrame.height - windowRect.height) / 2
-                windowRect.origin = NSPoint(x: x, y: y) // 計算した座標をウィンドウの原点に設定
-                print("AppDelegate: Calculated window origin: (\(x), \(y)) for screen frame: \(screenFrame)")
-            } else {
-                print("AppDelegate: Could not get main screen frame, falling back to default window position.")
-                // スクリーン情報が取得できない場合のフォールバック（このままでもデフォルトで左上から表示される）
-            }
-
-            let window = NSWindow(
-                contentRect: windowRect,
-                styleMask: [.titled, .closable, .miniaturizable],
-                backing: .buffered, defer: false)
-
-            window.contentViewController = hostingController
-            window.identifier = NSUserInterfaceItemIdentifier("AddPresetWindow")
-
-            // ClipHoldWindowController でウィンドウをラップ
-            addPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, applyTransparentBackground: false)
-
-            // ウィンドウのデリゲートを設定 (AppDelegateが最終的なデリゲートになる)
-            addPhraseWindowController?.window?.delegate = self
-
-            print("AppDelegate: Add Preset window created.")
+        let windowType: WindowType = .addPreset
+        let title = String(localized: "プリセットを追加")
+        
+        // 既存のウィンドウコントローラーがあればそれを最前面に表示
+        if let existingController = windowControllers[windowType] {
+            existingController.showWindowAndCenter(false)
+            NSApp.activate(ignoringOtherApps: true)
+            print("AppDelegate: Reusing existing \(windowType) window.")
+            return
         }
         
+        let contentView = AddEditPresetView(isSheet: false) { [weak self] in
+            // ウィンドウを閉じたときの後処理
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.windowControllers.removeValue(forKey: windowType)
+                print("AppDelegate: \(windowType) window removed from windowControllers asynchronously.")
+            }
+        }
+        .environmentObject(StandardPhrasePresetManager.shared)
+
+        // 新しいウィンドウコントローラーを作成
+        let windowController = ClipHoldStandardWindowController(rootView: contentView, title: title, windowType: windowType)
+        windowControllers[windowType] = windowController
+
         // ウィンドウを表示し、アプリをアクティブにする
-        addPhraseWindowController?.showWindow(nil) // Controller 経由で表示
-        addPhraseWindowController?.window?.makeKeyAndOrderFront(nil) // 最前面に表示
+        windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
+        
+        print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+    }
+    
+    @MainActor
+    func showEditHistoryWindow(withContent content: String) {
+        let windowType: WindowType = .editHistory
+        let title = String(localized: "履歴を編集")
+        
+        // 既存のウィンドウコントローラーがあればそれを最前面に表示
+        if let existingController = windowControllers[windowType] {
+            existingController.showWindowAndCenter(false)
+            NSApp.activate(ignoringOtherApps: true)
+            print("AppDelegate: Reusing existing \(windowType) window.")
+            return
+        }
+
+        let editView = EditHistoryItemView(content: content, onCopy: { editedContent in
+            // コピー処理を実装
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(editedContent, forType: .string)
+        }, isSheet: false)
+
+        // 新しいウィンドウコントローラーを作成
+        let windowController = ClipHoldStandardWindowController(rootView: editView, title: title, windowType: windowType)
+        windowControllers[windowType] = windowController
+
+        // ウィンドウを表示し、アプリをアクティブにする
+        windowController.showWindowAndCenter(true)
+        NSApp.activate(ignoringOtherApps: true)
+        
+        print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
     }
 
     // MARK: - NSWindowDelegate
     func windowWillClose(_ notification: Notification) {
         guard let closedWindow = notification.object as? NSWindow else { return }
 
-        if closedWindow == addPhraseWindowController?.window {
-            print("AppDelegate: Add Phrase window will close. Setting addPhraseWindowController to nil (async).")
-            // ここで参照をnilにするのを遅延させ、システムがウィンドウのクローズ処理を完了する時間を確保する
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                self.addPhraseWindowController = nil
-                print("AppDelegate: addPhraseWindowController set to nil asynchronously.")
+        // ウィンドウの種類ごとにウィンドウコントローラーを管理する
+        for (type, controller) in windowControllers {
+            if closedWindow == controller.window {
+                print("AppDelegate: \(type) window will close. Removing from windowControllers.")
+                windowControllers.removeValue(forKey: type)
+                print("AppDelegate: \(type) window removed from windowControllers.")
+                break
             }
         }
     }

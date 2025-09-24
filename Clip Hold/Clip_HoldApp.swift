@@ -258,7 +258,16 @@ struct ClipHoldApp: App {
                     }()
                      
                     let displayText: String = {
-                        var displayContent = item.text.replacingOccurrences(of: "\n", with: " ")
+                        let content: String
+                        if item.text == "Image File" {
+                            content = String(localized: "Image File")
+                        } else if item.text == "PDF File" {
+                            content = String(localized: "PDF File")
+                        } else {
+                            content = item.text
+                        }
+
+                        var displayContent = content.replacingOccurrences(of: "\n", with: " ")
                         let dateString = itemDateFormatter.string(from: item.date)
                         
                         let characterCountText = showCharacterCount ? String(localized:" - \(item.text.count)文字") : ""
@@ -322,16 +331,16 @@ struct ClipHoldApp: App {
                                 // ファイルパスもキャッシュもなければテキストアイコン
                                 // リッチテキストかどうかでアイコンを分岐
                                 if item.richText != nil {
-                                    // リッチテキストの場合、append.pageアイコンを使用 (macOSバージョンによる分岐)
+                                    // リッチテキストの場合、richtext.pageアイコンを使用 (macOSバージョンによる分岐)
                                     if #available(macOS 15.0, *) {
-                                        Image(systemName: "append.page")
+                                        Image(systemName: "richtext.page")
                                             .resizable()
                                             .scaledToFit()
                                             .padding(4)
                                             .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
                                             .foregroundStyle(.secondary)
                                     } else {
-                                        Image(systemName: "doc.append")
+                                        Image(systemName: "doc.richtext")
                                             .resizable()
                                             .scaledToFit()
                                             .padding(4)
@@ -595,6 +604,29 @@ struct ClipHoldApp: App {
                     }
                 } else {
                     print("履歴ショートカット \(i+1) が押されましたが、対応する履歴（UI上\(i+1)番目）は存在しません。")
+                }
+            }
+        }
+        
+        // 最新の履歴を編集してコピーするショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .editAndCopyLatestHistory) {
+            let clipboardManager = ClipboardManager.shared
+            let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
+            
+            let historySource: [ClipboardItem]
+            if useFiltered, let filteredList = clipboardManager.filteredHistoryForShortcuts {
+                historySource = filteredList
+            } else {
+                historySource = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+            }
+            
+            // 最新の履歴アイテムを取得
+            if let latestItem = historySource.first {
+                // ウィンドウとして表示する処理をここに実装
+                DispatchQueue.main.async {
+                    if let delegate = NSApp.delegate as? AppDelegate {
+                        delegate.showEditHistoryWindow(withContent: latestItem.text)
+                    }
                 }
             }
         }

@@ -588,6 +588,22 @@
         }
       }
     },
+    "Clip Holdに保存する履歴の最大数を設定します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set the maximum number of items saved in Clip Hold history."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Holdに保存する履歴の最大数を設定します。"
+          }
+        }
+      }
+    },
     "Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。" : {
       "localizations" : {
         "en" : {
@@ -620,6 +636,22 @@
         }
       }
     },
+    "Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporarily hide the Clip Hold menu bar icon. It will reappear when you open the app again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。"
+          }
+        }
+      }
+    },
     "Clip Holdの設定" : {
       "localizations" : {
         "en" : {
@@ -648,22 +680,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clip Holdはオープンソースアプリケーションです。"
-          }
-        }
-      }
-    },
-    "Clip Holdをログイン時に開くかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle launch at login for Clip Hold."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clip Holdをログイン時に開くかどうかを切り替えます。"
           }
         }
       }
@@ -968,6 +984,22 @@
         }
       }
     },
+    "Macのログイン時にClip Holdを自動で開くようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make Clip Hold open automatically when you login to Mac."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Macのログイン時にClip Holdを自動で開くようにします。"
+          }
+        }
+      }
+    },
     "nd_suffix" : {
       "localizations" : {
         "en" : {
@@ -1071,6 +1103,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PDFファイル"
+          }
+        }
+      }
+    },
+    "PDFのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDFのみ"
           }
         }
       }
@@ -1321,6 +1369,22 @@
         }
       }
     },
+    "アプリ（自動）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps (Automatic)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリ（自動）"
+          }
+        }
+      }
+    },
     "アプリアイコンを表示" : {
       "localizations" : {
         "en" : {
@@ -1481,6 +1545,22 @@
         }
       }
     },
+    "ウィンドウを常に最も手前に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Always keep the window on top."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウィンドウを常に最も手前に表示します。"
+          }
+        }
+      }
+    },
     "ウィンドウ操作" : {
       "localizations" : {
         "en" : {
@@ -1557,6 +1637,150 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オープンソースライセンス"
+          }
+        }
+      }
+    },
+    "オンにすると、Macのログイン時にClip Holdを自動で開くようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, make Clip Hold open automatically when you login to Mac."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、Macのログイン時にClip Holdを自動で開くようにします。"
+          }
+        }
+      }
+    },
+    "オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, automatically scrolls the history list to the top when the list is updated."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。"
+          }
+        }
+      }
+    },
+    "オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, hide numbers displayed in each item of the Standard Phrases window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
+    "オンにすると、定型文ウィンドウを常に最も手前に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, always keep the Standard Phrases window on top."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、定型文ウィンドウを常に最も手前に表示します。"
+          }
+        }
+      }
+    },
+    "オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, when selecting a standard phrase or copy history item from the menu, or when copying using shortcut keys, the Command + V key action is sent. Accessibility permission is required."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。"
+          }
+        }
+      }
+    },
+    "オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, hide numbers displayed in each item in the History window."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
+    "オンにすると、履歴ウィンドウを常に最も手前に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, always keep the History window on top."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、履歴ウィンドウを常に最も手前に表示します。"
+          }
+        }
+      }
+    },
+    "オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, make Quick Paste perform only when the history item is text."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。"
+          }
+        }
+      }
+    },
+    "オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, close window when you double-click an item to copy it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。"
           }
         }
       }
@@ -1717,6 +1941,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイックペースト"
+          }
+        }
+      }
+    },
+    "クイックペーストをテキストに限定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Paste Only for Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックペーストをテキストに限定"
           }
         }
       }
@@ -2073,54 +2313,6 @@
         }
       }
     },
-    "このオプションをオンにすると、テキストのみがクイックペーストの対象となります。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When this option is enabled, Quick Paste will only be applied to text."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このオプションをオンにすると、テキストのみがクイックペーストの対象となります。"
-          }
-        }
-      }
-    },
-    "このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When this option is enabled, the menu bar icon will be temporarily hidden. It will reappear when you reopen the app again."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。"
-          }
-        }
-      }
-    },
-    "このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "When this option is enabled, Command + V key actions will be sent when you select a standard phrase or a copy history item from the menu, or when you use shortcut keys to copy. Accessibility permission is required."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。"
-          }
-        }
-      }
-    },
     "このプリセットに割り当てられているすべてのアプリをリストから削除しますか？" : {
       "localizations" : {
         "en" : {
@@ -2249,22 +2441,6 @@
         }
       }
     },
-    "この容量より大きいファイルコピー時にアラートを表示" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show alert when copying a file larger than this size"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この容量より大きいファイルコピー時にアラートを表示"
-          }
-        }
-      }
-    },
     "コピー" : {
       "localizations" : {
         "en" : {
@@ -2277,6 +2453,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コピー"
+          }
+        }
+      }
+    },
+    "コピーアラートを表示する容量" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size for Copy Alert"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーアラートを表示する容量"
+          }
+        }
+      }
+    },
+    "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show app icons that were in the foreground when you copied them for each item."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。"
           }
         }
       }
@@ -2617,6 +2825,38 @@
         }
       }
     },
+    "すべてのテキスト" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Text"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのテキスト"
+          }
+        }
+      }
+    },
+    "すべてのファイル" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのファイル"
+          }
+        }
+      }
+    },
     "すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。" : {
       "localizations" : {
         "en" : {
@@ -2841,6 +3081,22 @@
         }
       }
     },
+    "その他のファイル" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他のファイル"
+          }
+        }
+      }
+    },
     "タイトル" : {
       "localizations" : {
         "en" : {
@@ -2889,50 +3145,50 @@
         }
       }
     },
-    "ダブルクリック時にウィンドウを閉じない" : {
+    "ダブルクリックでウィンドウを閉じる" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close window on double click"
+            "value" : "Close Window by Double-Click"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ダブルクリック時にウィンドウを閉じない"
+            "value" : "ダブルクリックでウィンドウを閉じる"
           }
         }
       }
     },
-    "ダブルクリック時に定型文ウィンドウを閉じない" : {
+    "ダブルクリックで定型文ウィンドウを閉じる" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close the Standard Phrases window on double click"
+            "value" : "Close Standard Phrases Window by Double-Click"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ダブルクリック時に定型文ウィンドウを閉じない"
+            "value" : "ダブルクリックで定型文ウィンドウを閉じる"
           }
         }
       }
     },
-    "ダブルクリック時に履歴ウィンドウを閉じない" : {
+    "ダブルクリックで履歴ウィンドウを閉じる" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Do not close the History window on double click"
+            "value" : "Close History Window by Double-Click"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ダブルクリック時に履歴ウィンドウを閉じない"
+            "value" : "ダブルクリックで履歴ウィンドウを閉じる"
           }
         }
       }
@@ -3145,38 +3401,6 @@
         }
       }
     },
-    "ファイル1つあたりの最大容量" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum size per file"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル1つあたりの最大容量"
-          }
-        }
-      }
-    },
-    "ファイル1つあたりの最大容量:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum Size per File:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ファイル1つあたりの最大容量:"
-          }
-        }
-      }
-    },
     "ファイル1つあたりの最大容量を設定" : {
       "localizations" : {
         "en" : {
@@ -3369,6 +3593,22 @@
         }
       }
     },
+    "フォルダのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folders Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダのみ"
+          }
+        }
+      }
+    },
     "プライバシー" : {
       "localizations" : {
         "en" : {
@@ -3529,6 +3769,22 @@
         }
       }
     },
+    "プリセットを追加" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a Preset"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットを追加"
+          }
+        }
+      }
+    },
     "プリセットを選択" : {
       "localizations" : {
         "en" : {
@@ -3625,34 +3881,34 @@
         }
       }
     },
-    "メニューに表示する定型文の最大数" : {
+    "メニューに表示される定型文の最大数を設定します。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maximum number of standard phrases to show in the menu"
+            "value" : "Set the maximum number of standard phrases to display in the menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メニューに表示する定型文の最大数"
+            "value" : "メニューに表示される定型文の最大数を設定します。"
           }
         }
       }
     },
-    "メニューに表示する定型文の最大数:" : {
+    "メニューに表示される履歴の最大数を設定します。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maximum number of standard phrases to show in the menu:"
+            "value" : "Set the maximum number of history items to display in the menu."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メニューに表示する定型文の最大数:"
+            "value" : "メニューに表示される履歴の最大数を設定します。"
           }
         }
       }
@@ -3673,38 +3929,6 @@
         }
       }
     },
-    "メニューに表示する履歴の最大数" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum number of history items to show in the menu"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メニューに表示する履歴の最大数"
-          }
-        }
-      }
-    },
-    "メニューに表示する履歴の最大数:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum number of history items to show in the menu:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メニューに表示する履歴の最大数:"
-          }
-        }
-      }
-    },
     "メニューに表示する履歴の最大数を設定" : {
       "localizations" : {
         "en" : {
@@ -3721,18 +3945,18 @@
         }
       }
     },
-    "メニューバーアイコンを一時的に非表示" : {
+    "メニューバーアイコンを隠す" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Temporarily Hide Menu Bar Icon"
+            "value" : "Hide the Menu Bar Icon"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メニューバーアイコンを一時的に非表示"
+            "value" : "メニューバーアイコンを隠す"
           }
         }
       }
@@ -3769,18 +3993,18 @@
         }
       }
     },
-    "リストが更新されたら最も上にスクロール" : {
+    "リストが更新されたとき、リストを自動的に最も上にスクロールします。" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scroll to the Top When the List is Updated"
+            "value" : "When the list is updated, automatically scroll to the top of the list."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "リストが更新されたら最も上にスクロール"
+            "value" : "リストが更新されたとき、リストを自動的に最も上にスクロールします。"
           }
         }
       }
@@ -3829,6 +4053,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リセット完了"
+          }
+        }
+      }
+    },
+    "リッチテキストのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rich Text Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リッチテキストのみ"
           }
         }
       }
@@ -4265,6 +4505,22 @@
         }
       }
     },
+    "最新の履歴を編集してコピーする" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit and Copy the Latest History Item"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最新の履歴を編集してコピーする"
+          }
+        }
+      }
+    },
     "別のプリセットに移動" : {
       "localizations" : {
         "en" : {
@@ -4425,6 +4681,22 @@
         }
       }
     },
+    "動画のみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Videos Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "動画のみ"
+          }
+        }
+      }
+    },
     "古い順" : {
       "localizations" : {
         "en" : {
@@ -4437,6 +4709,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "古い順"
+          }
+        }
+      }
+    },
+    "各ファイルの最大容量" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum File Size for Each File"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各ファイルの最大容量"
+          }
+        }
+      }
+    },
+    "各項目に表示される番号を非表示にします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide numbers displayed in each item."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各項目に表示される番号を非表示にします。"
           }
         }
       }
@@ -4521,50 +4825,18 @@
         }
       }
     },
-    "定型文ウィンドウに番号を表示" : {
+    "定型文ウィンドウの番号を隠す" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Numbers in the Standard Phrases Window"
+            "value" : "Hide Numbers in the Standard Phrases Window"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "定型文ウィンドウに番号を表示"
-          }
-        }
-      }
-    },
-    "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the Standard Phrases window."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。"
-          }
-        }
-      }
-    },
-    "定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to show or not show numbers for each item in the Standard Phrases window."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。"
+            "value" : "定型文ウィンドウの番号を隠す"
           }
         }
       }
@@ -4581,22 +4853,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文ウィンドウを常に最前面に表示"
-          }
-        }
-      }
-    },
-    "定型文ウィンドウを常に最前面に表示するかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to show the Standard Phrases window always on top."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "定型文ウィンドウを常に最前面に表示するかどうかを切り替えます。"
           }
         }
       }
@@ -4661,6 +4917,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文のエクスポート"
+          }
+        }
+      }
+    },
+    "定型文の最大表示数" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum Number of Standard Phrases to Display"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文の最大表示数"
           }
         }
       }
@@ -4745,6 +5017,22 @@
         }
       }
     },
+    "定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When selecting a standard phrase or copy history item from the menu, or when copying using shortcut keys, the Command + V key action is sent. Accessibility permission is required."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。"
+          }
+        }
+      }
+    },
     "定型文リスト" : {
       "localizations" : {
         "en" : {
@@ -4789,6 +5077,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文を編集"
+          }
+        }
+      }
+    },
+    "定型文を追加" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a Standard Phrase"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文を追加"
           }
         }
       }
@@ -4873,38 +5177,6 @@
         }
       }
     },
-    "履歴ウィンドウに番号を表示" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Numbers in the History Window"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴ウィンドウに番号を表示"
-          }
-        }
-      }
-    },
-    "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to keep the window from closing when copying by double-clicking each item shown in the History window."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。"
-          }
-        }
-      }
-    },
     "履歴ウィンドウのフィルタリングオプションに「カラーコードのみ」を追加します。" : {
       "localizations" : {
         "en" : {
@@ -4921,34 +5193,18 @@
         }
       }
     },
-    "履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。" : {
+    "履歴ウィンドウの番号を隠す" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toggle to show or hide the app icon for each item in the History window."
+            "value" : "Hide Numbers in the History Window"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。"
-          }
-        }
-      }
-    },
-    "履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to show or not show numbers for each item in the History window."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。"
+            "value" : "履歴ウィンドウの番号を隠す"
           }
         }
       }
@@ -4965,22 +5221,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウを常に最前面に表示"
-          }
-        }
-      }
-    },
-    "履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to show the History window always on top."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。"
           }
         }
       }
@@ -5045,6 +5285,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の保存数に合わせる"
+          }
+        }
+      }
+    },
+    "履歴の最大保存数" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum Number of History Saves"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の最大保存数"
+          }
+        }
+      }
+    },
+    "履歴の最大表示数" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum Number of History Items to Display"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の最大表示数"
           }
         }
       }
@@ -5193,54 +5465,6 @@
         }
       }
     },
-    "履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle to automatically scroll to the top when the history list is updated."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。"
-          }
-        }
-      }
-    },
-    "履歴を保存する最大数" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum number of history items to save"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴を保存する最大数"
-          }
-        }
-      }
-    },
-    "履歴を保存する最大数:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maximum number of history items to save:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴を保存する最大数:"
-          }
-        }
-      }
-    },
     "履歴を保存する最大数を設定" : {
       "localizations" : {
         "en" : {
@@ -5269,6 +5493,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴を検索"
+          }
+        }
+      }
+    },
+    "履歴を編集" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit History"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴を編集"
+          }
+        }
+      }
+    },
+    "履歴項目がテキストである場合のみクイックペーストを行うようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make Quick Paste perform only when the history item is text."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴項目がテキストである場合のみクイックペーストを行うようにします。"
           }
         }
       }
@@ -5689,6 +5945,22 @@
         }
       }
     },
+    "標準テキストのみ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plain Text Only"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "標準テキストのみ"
+          }
+        }
+      }
+    },
     "権限" : {
       "localizations" : {
         "en" : {
@@ -5733,22 +6005,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次のプリセットに切り替える"
-          }
-        }
-      }
-    },
-    "次の容量より大きいファイルコピー時にアラートを表示:" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show alert when copying a file larger than:"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "次の容量より大きいファイルコピー時にアラートを表示:"
           }
         }
       }
@@ -5881,18 +6137,18 @@
         }
       }
     },
-    "番号を表示" : {
+    "番号を隠す" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Numbers"
+            "value" : "Hide Numbers"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "番号を表示"
+            "value" : "番号を隠す"
           }
         }
       }
@@ -6025,6 +6281,22 @@
         }
       }
     },
+    "編集してコピー..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit and Copy..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集してコピー..."
+          }
+        }
+      }
+    },
     "自動" : {
       "localizations" : {
         "en" : {
@@ -6037,6 +6309,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自動"
+          }
+        }
+      }
+    },
+    "自動スクロール" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto Scroll"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動スクロール"
           }
         }
       }
@@ -6565,6 +6853,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "項目から定型文を作成..."
+          }
+        }
+      }
+    },
+    "項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make the window close when you double-click an item to copy it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。"
           }
         }
       }

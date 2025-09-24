@@ -77,12 +77,13 @@ struct GeneralSettingsView: View {
     @State private var tempSelectedPhraseMenuOption: HistoryOption
     @State private var initialPhraseMenuOption: HistoryOption
 
-    @AppStorage("showLineNumbersInHistoryWindow") var showLineNumbersInHistoryWindow: Bool = false
-    @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
-    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = false
+    @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
+    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
     @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
 
-    @AppStorage("showLineNumbersInStandardPhraseWindow") var showLineNumbersInStandardPhraseWindow: Bool = false
+    @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbersInStandardPhrasesWindow: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
     @AppStorage("historyWindowAlwaysOnTop") var historyWindowAlwaysOnTop: Bool = false
     @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
@@ -95,6 +96,8 @@ struct GeneralSettingsView: View {
 
     @State private var showingCustomMenuHistorySheet = false
     @State private var showingCustomPhraseMenuSheet = false
+    @State private var customPhraseValueWasSaved = false
+    @State private var customHistoryValueWasSaved = false
 
     @State private var tempCustomMenuHistoryValue: Int = 10
     @State private var tempCustomPhrasesInMenuValue: Int = 5
@@ -164,11 +167,16 @@ struct GeneralSettingsView: View {
             // MARK: - Clip Holdの設定
             Section(header: Text("Clip Holdの設定").font(.headline)) {
                 HStack {
-                    Text("ログイン時に開く")
+                    VStack(alignment: .leading) {
+                        Text("ログイン時に開く")
+                        Text("Macのログイン時にClip Holdを自動で開くようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
                     Toggle(isOn: $loginItemManager.launchAtLogin) {
                         Text("ログイン時に開く")
-                        Text("Clip Holdをログイン時に開くかどうかを切り替えます。")
+                        Text("オンにすると、Macのログイン時にClip Holdを自動で開くようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -178,14 +186,14 @@ struct GeneralSettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("クイックペースト")
-                        Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
+                        Text("定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $quickPaste) {
                         Text("クイックペースト")
-                        Text("このオプションをオンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作が送信されます。アクセシビリティの許可が必要です。")
+                        Text("オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -194,14 +202,15 @@ struct GeneralSettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("テキストのみ")
-                        Text("このオプションをオンにすると、テキストのみがクイックペーストの対象となります。")
+                        Text("クイックペーストをテキストに限定")
+                        Text("履歴項目がテキストである場合のみクイックペーストを行うようにします。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $textOnlyQuickPaste) {
-                        Text("テキストのみ")
+                        Text("クイックペーストをテキストに限定")
+                        Text("オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -213,12 +222,17 @@ struct GeneralSettingsView: View {
 
             // MARK: - メニュー
             Section(header: Text("メニュー").font(.headline)) {
-                // メニューに表示する定型文の最大数
+                // 定型文の最大表示数
                 HStack {
-                    Text("メニューに表示する定型文の最大数:")
+                    VStack(alignment: .leading) {
+                        Text("定型文の最大表示数")
+                        Text("メニューに表示される定型文の最大数を設定します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
 
-                    Picker("メニューに表示する定型文の最大数", selection: $tempSelectedPhraseMenuOption) {
+                    Picker("定型文の最大表示数", selection: $tempSelectedPhraseMenuOption) {
                         ForEach(HistoryOption.presets) { option in
                             Text(option.stringValue)
                                 .tag(option)
@@ -241,6 +255,7 @@ struct GeneralSettingsView: View {
                     .onChange(of: tempSelectedPhraseMenuOption) { // ここを tempSelectedPhraseMenuOption に修正
                         if case .custom(nil) = tempSelectedPhraseMenuOption {
                             tempCustomPhrasesInMenuValue = maxPhrasesInMenu // 現在の値をカスタムシートの初期値に
+                            customPhraseValueWasSaved = false // シート表示前にリセット
                             showingCustomPhraseMenuSheet = true
                         } else if let intValue = tempSelectedPhraseMenuOption.intValue {
                             maxPhrasesInMenu = intValue
@@ -249,12 +264,17 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
-                // メニューに表示する履歴の最大数
+                // 履歴の最大表示数
                 HStack {
-                    Text("メニューに表示する履歴の最大数:")
+                    VStack(alignment: .leading) {
+                        Text("履歴の最大表示数")
+                        Text("メニューに表示される履歴の最大数を設定します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
 
-                    Picker("メニューに表示する履歴の最大数", selection: $tempSelectedMenuOption) {
+                    Picker("履歴の最大表示数", selection: $tempSelectedMenuOption) {
                         ForEach(MenuHistoryOption.presetsAndSameAsSaved.filter { option in
                             if case .sameAsSaved = option {
                                 // UserDefaults.standard.integer(forKey: "maxHistoryToSave") が 0 (無制限) でない場合のみ .sameAsSaved を表示
@@ -286,6 +306,7 @@ struct GeneralSettingsView: View {
                     .onChange(of: tempSelectedMenuOption) { // ここを tempSelectedMenuOption に修正
                         if case .custom(nil) = tempSelectedMenuOption {
                             tempCustomMenuHistoryValue = maxHistoryInMenu
+                            customHistoryValueWasSaved = false // シート表示前にリセット
                             showingCustomMenuHistorySheet = true
                         } else if tempSelectedMenuOption == .sameAsSaved {
                             maxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryToSave")
@@ -298,15 +319,15 @@ struct GeneralSettingsView: View {
 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("メニューバーアイコンを一時的に非表示")
-                        Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
+                        Text("メニューバーアイコンを隠す")
+                        Text("Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Toggle(isOn: $hideMenuBarExtra) {
-                        Text("メニューバーアイコンを一時的に非表示")
-                        Text("このオプションをオンにすると、メニューバーアイコンが一時的に非表示になります。もう一度アプリを開くと再び表示されるようになります。")
+                        Text("メニューバーアイコンを隠す")
+                        Text("Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -317,11 +338,32 @@ struct GeneralSettingsView: View {
             // MARK: - 定型文ウィンドウ
             Section(header: Text("定型文ウィンドウ").font(.headline)) {
                 HStack {
-                    Text("番号を表示")
+                    VStack(alignment: .leading) {
+                        Text("常に最前面に表示")
+                        Text("ウィンドウを常に最も手前に表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Toggle(isOn: $showLineNumbersInStandardPhraseWindow) {
-                        Text("定型文ウィンドウに番号を表示")
-                        Text("定型文ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
+                    Toggle(isOn: $standardPhraseWindowAlwaysOnTop) {
+                        Text("定型文ウィンドウを常に最前面に表示")
+                        Text("オンにすると、定型文ウィンドウを常に最も手前に表示します。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("番号を隠す")
+                        Text("各項目に表示される番号を非表示にします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $hideNumbersInStandardPhrasesWindow) {
+                        Text("定型文ウィンドウの番号を隠す")
+                        Text("オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -329,22 +371,16 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 HStack {
-                    Text("ダブルクリック時にウィンドウを閉じない")
-                    Spacer()
-                    Toggle(isOn: $preventStandardPhraseWindowCloseOnDoubleClick) {
-                        Text("ダブルクリック時に定型文ウィンドウを閉じない")
-                        Text("定型文ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。")
+                    VStack(alignment: .leading) {
+                        Text("ダブルクリックでウィンドウを閉じる")
+                        Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    Text("常に最前面に表示")
                     Spacer()
-                    Toggle(isOn: $standardPhraseWindowAlwaysOnTop) {
-                        Text("定型文ウィンドウを常に最前面に表示")
-                        Text("定型文ウィンドウを常に最前面に表示するかどうかを切り替えます。")
+                    Toggle(isOn: $closeWindowOnDoubleClickInStandardPhrasesWindow) {
+                        Text("ダブルクリックで定型文ウィンドウを閉じる")
+                        Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -355,22 +391,64 @@ struct GeneralSettingsView: View {
             // MARK: - 履歴をウィンドウ
             Section(header: Text("履歴ウィンドウ").font(.headline)) {
                 HStack {
-                    Text("アプリアイコンを表示")
+                    VStack(alignment: .leading) {
+                        Text("常に最前面に表示")
+                        Text("ウィンドウを常に最も手前に表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Toggle(isOn: $showAppIconOverlay) {
-                        Text("アプリアイコンを表示")
-                        Text("履歴ウィンドウの各項目にアプリアイコンを表示するかどうかを切り替えます。")
+                    Toggle(isOn: $historyWindowAlwaysOnTop) {
+                        Text("履歴ウィンドウを常に最前面に表示")
+                        Text("オンにすると、履歴ウィンドウを常に最も手前に表示します。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
-                    Text("番号を表示")
+                    VStack(alignment: .leading) {
+                        Text("アプリアイコンを表示")
+                        Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     Spacer()
-                    Toggle(isOn: $showLineNumbersInHistoryWindow) {
-                        Text("履歴ウィンドウに番号を表示")
-                        Text("履歴ウィンドウの各項目に番号を表示するかどうかを切り替えます。")
+                    Toggle(isOn: $showAppIconOverlay) {
+                        Text("アプリアイコンを表示")
+                        Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("自動スクロール")
+                        Text("リストが更新されたとき、リストを自動的に最も上にスクロールします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $scrollToTopOnUpdate) {
+                        Text("自動スクロール")
+                        Text("オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("番号を隠す")
+                        Text("各項目に表示される番号を非表示にします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $hideNumbersInHistoryWindow) {
+                        Text("履歴ウィンドウの番号を隠す")
+                        Text("オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -378,33 +456,16 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 HStack {
-                    Text("ダブルクリック時にウィンドウを閉じない")
-                    Spacer()
-                    Toggle(isOn: $preventWindowCloseOnDoubleClick) {
-                        Text("ダブルクリック時に履歴ウィンドウを閉じない")
-                        Text("履歴ウィンドウに表示される各項目をダブルクリックしてコピーしたときにウィンドウを閉じないようにするかどうかを切り替えます。")
+                    VStack(alignment: .leading) {
+                        Text("ダブルクリックでウィンドウを閉じる")
+                        Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    Text("常に最前面に表示")
                     Spacer()
-                    Toggle(isOn: $historyWindowAlwaysOnTop) {
-                        Text("履歴ウィンドウを常に最前面に表示")
-                        Text("履歴ウィンドウを常に最前面に表示するかどうかを切り替えます。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    Text("リストが更新されたら最も上にスクロール")
-                    Spacer()
-                    Toggle(isOn: $scrollToTopOnUpdate) {
-                        Text("リストが更新されたら最も上にスクロール")
-                        Text("履歴リストが更新されたときに自動的に一番上にスクロールするかどうかを切り替えます。")
+                    Toggle(isOn: $closeWindowOnDoubleClickInHistoryWindow) {
+                        Text("ダブルクリックで履歴ウィンドウを閉じる")
+                        Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -433,13 +494,25 @@ struct GeneralSettingsView: View {
             // View が表示されるたびにログイン項目の状態を最新にする
             loginItemManager.refreshLoginItemStatus()
         }
-        .sheet(isPresented: $showingCustomMenuHistorySheet) {
+        .sheet(isPresented: $showingCustomMenuHistorySheet, onDismiss: {
+            if !customHistoryValueWasSaved {
+                // ユーザーがキャンセルまたはESCで閉じた場合、選択を元に戻す
+                if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == maxHistoryInMenu }) {
+                    tempSelectedMenuOption = savedPreset
+                } else if maxHistoryInMenu == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
+                    tempSelectedMenuOption = .sameAsSaved
+                } else {
+                    tempSelectedMenuOption = .custom(maxHistoryInMenu)
+                }
+            }
+        }) {
             CustomNumberInputSheet(
                 title: Text("メニューに表示する履歴の最大数を設定"),
                 description: nil,
                 currentValue: $tempCustomMenuHistoryValue,
                 onSave: { newValue in
                     maxHistoryInMenu = newValue
+                    customHistoryValueWasSaved = true // 保存されたことをマーク
 
                     if newValue == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
                         tempSelectedMenuOption = .sameAsSaved
@@ -450,23 +523,27 @@ struct GeneralSettingsView: View {
                     }
                 },
                 onCancel: {
-                    if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == maxHistoryInMenu }) {
-                        tempSelectedMenuOption = savedPreset
-                    } else if maxHistoryInMenu == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
-                        tempSelectedMenuOption = .sameAsSaved
-                    } else {
-                        tempSelectedMenuOption = .custom(maxHistoryInMenu)
-                    }
+                    // onDismissで処理するため、ここは空で良い
                 }
             )
         }
-        .sheet(isPresented: $showingCustomPhraseMenuSheet) {
+        .sheet(isPresented: $showingCustomPhraseMenuSheet, onDismiss: {
+            if !customPhraseValueWasSaved {
+                // ユーザーがキャンセルまたはESCで閉じた場合、選択を元に戻す
+                if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxPhrasesInMenu }) {
+                    tempSelectedPhraseMenuOption = savedPreset
+                } else {
+                    tempSelectedPhraseMenuOption = .custom(maxPhrasesInMenu)
+                }
+            }
+        }) {
             CustomNumberInputSheet(
                 title: Text("メニューに表示する定型文の最大数を設定"),
                 description: nil,
                 currentValue: $tempCustomPhrasesInMenuValue,
                 onSave: { newValue in
                     maxPhrasesInMenu = newValue
+                    customPhraseValueWasSaved = true // 保存されたことをマーク
 
                     if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == newValue }) {
                         tempSelectedPhraseMenuOption = savedPreset
@@ -475,11 +552,7 @@ struct GeneralSettingsView: View {
                     }
                 },
                 onCancel: {
-                    if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxPhrasesInMenu }) {
-                        tempSelectedPhraseMenuOption = savedPreset
-                    } else {
-                        tempSelectedPhraseMenuOption = .custom(maxPhrasesInMenu)
-                    }
+                    // onDismissで処理するため、ここは空で良い
                 }
             )
         }

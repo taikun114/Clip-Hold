@@ -61,12 +61,12 @@ struct HistoryItemRow: View {
     
     let item: ClipboardItem
     let index: Int
-    let showLineNumber: Bool
+    let hideNumbers: Bool
     @Binding var itemToDelete: ClipboardItem?
     @Binding var showingDeleteConfirmation: Bool
     @Binding var selectedItemID: UUID?
     var dismissAction: () -> Void
-    @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("closeWindowOnDoubleClick") var closeWindowOnDoubleClick: Bool = false
 
     @Environment(\.colorScheme) var colorScheme
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
@@ -89,10 +89,11 @@ struct HistoryItemRow: View {
     @State private var iconLoadTask: Task<Void, Never>?
     @State private var showingExcludeAppAlert = false
     @State private var appToExclude: String?
+    @State private var showingEditSheet = false
 
     init(item: ClipboardItem,
          index: Int,
-         showLineNumber: Bool,
+         hideNumbers: Bool,
          itemToDelete: Binding<ClipboardItem?>,
          showingDeleteConfirmation: Binding<Bool>,
          selectedItemID: Binding<UUID?>,
@@ -108,7 +109,7 @@ struct HistoryItemRow: View {
             
         self.item = item
         self.index = index
-        self.showLineNumber = showLineNumber
+        self.hideNumbers = hideNumbers
         _itemToDelete = itemToDelete
         _showingDeleteConfirmation = showingDeleteConfirmation
         _selectedItemID = selectedItemID
@@ -150,7 +151,20 @@ struct HistoryItemRow: View {
                     NSPasteboard.general.setString(item.text, forType: .string)
                     showCopyConfirmation = true
                 } label: {
-                    Label("標準テキストとしてコピー", systemImage: "doc.plaintext")
+                    Text("標準テキストとしてコピー")
+                }
+                Button {
+                    // 編集してコピーのアクションをここに実装
+                    showingEditSheet = true
+                } label: {
+                    Text("編集してコピー...")
+                }
+            } else {
+                Button {
+                    // 標準テキストアイテムの場合、編集してコピー
+                    showingEditSheet = true
+                } label: {
+                    Text("編集してコピー...")
                 }
             }
             if let qrContent = item.qrCodeContent {
@@ -223,7 +237,7 @@ struct HistoryItemRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            if showLineNumber {
+            if !hideNumbers {
                 Text("\(index + 1).")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
@@ -244,13 +258,23 @@ struct HistoryItemRow: View {
                         return AnyView(
                             baseIconView
                                 .overlay(
-                                    Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 15, height: 15)
-                                        .alignmentGuide(.leading) { _ in 4 }
-                                        .alignmentGuide(.top) { _ in 22.5 }
-                                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
+                                    Group {
+                                        if FileManager.default.fileExists(atPath: sourceAppPath) {
+                                            Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 15, height: 15)
+                                        } else {
+                                            Image(systemName: "questionmark.app.fill")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 15, height: 15)
+                                                .fontWeight(.bold)
+                                        }
+                                    }
+                                    .alignmentGuide(.leading) { _ in 4 }
+                                    .alignmentGuide(.top) { _ in 22.5 }
+                                    .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
@@ -282,16 +306,16 @@ struct HistoryItemRow: View {
                         } else {
                             // テキストアイコン (リッチテキストかどうかで分岐)
                             if item.richText != nil {
-                                // リッチテキストの場合、append.pageアイコンを使用 (macOSバージョンによる分岐)
+                                // リッチテキストの場合、richtext.pageアイコンを使用 (macOSバージョンによる分岐)
                                 if #available(macOS 15.0, *) {
-                                    return AnyView(Image(systemName: "append.page")
+                                    return AnyView(Image(systemName: "richtext.page")
                                                     .resizable()
                                                     .scaledToFit()
                                                     .padding(4)
                                                     .frame(width: 30, height: 30)
                                                     .foregroundStyle(.secondary))
                                 } else {
-                                    return AnyView(Image(systemName: "doc.append")
+                                    return AnyView(Image(systemName: "doc.richtext")
                                                     .resizable()
                                                     .scaledToFit()
                                                     .padding(4)
@@ -325,13 +349,23 @@ struct HistoryItemRow: View {
                         return AnyView(
                             baseIconView
                                 .overlay(
-                                    Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 15, height: 15)
-                                        .alignmentGuide(.leading) { _ in 4 }
-                                        .alignmentGuide(.top) { _ in 22.5 }
-                                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
+                                    Group {
+                                        if FileManager.default.fileExists(atPath: sourceAppPath) {
+                                            Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 15, height: 15)
+                                        } else {
+                                            Image(systemName: "questionmark.app.fill")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 15, height: 15)
+                                                .fontWeight(.bold)
+                                        }
+                                    }
+                                    .alignmentGuide(.leading) { _ in 4 }
+                                    .alignmentGuide(.top) { _ in 22.5 }
+                                    .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
@@ -446,6 +480,16 @@ struct HistoryItemRow: View {
                 let appName = getLocalizedName(for: appPath) ?? appPath
                 Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
             }
+        }
+        .sheet(isPresented: $showingEditSheet) {
+            EditHistoryItemView(content: item.text, onCopy: { editedContent in
+                // コピー処理を実装
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(editedContent, forType: .string)
+                
+                // コピー確認を表示
+                showCopyConfirmation = true
+            }, isSheet: true)
         }
     }
 }

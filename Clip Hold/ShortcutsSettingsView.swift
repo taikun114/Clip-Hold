@@ -245,6 +245,19 @@ struct ShortcutsSettingsView: View {
                         .help("デフォルトのショートカットに戻します。")
                     }
                 }
+                HStack {
+                    Text("最新の履歴を編集してコピーする")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .editAndCopyLatestHistory)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.editAndCopyLatestHistory)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
             }
         }
         .formStyle(.grouped)

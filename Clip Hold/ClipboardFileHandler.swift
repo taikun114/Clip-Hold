@@ -79,9 +79,15 @@ extension ClipboardManager {
 
     // ヘルパー関数: 元のファイル名を抽出
     func extractOriginalFileName(from fileName: String) -> String { // private から internal に変更
-        if let range = fileName.range(of: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-", options: .regularExpression) {
+        // UUIDプレフィックスを削除する正規表現パターン
+        let uuidPattern = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-"
+        
+        // ファイル名がUUIDプレフィックスで始まるかチェック
+        if let range = fileName.range(of: uuidPattern, options: .regularExpression) {
+            // UUIDプレフィックスを削除して元のファイル名を返す
             return String(fileName[range.upperBound...])
         } else {
+            // UUIDプレフィックスがない場合は、ファイル名をそのまま返す
             return fileName
         }
     }

@@ -9,7 +9,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
     private let minContentHeight: CGFloat = 300
     private let maxContentHeight: CGFloat = NSScreen.main?.visibleFrame.height ?? .infinity
 
-    @AppStorage("preventWindowCloseOnDoubleClick") var preventWindowCloseOnDoubleClick: Bool = false
+    @AppStorage("closeWindowOnDoubleClick") var closeWindowOnDoubleClick: Bool = false
 
     var applyTransparentBackground: Bool = true
 
@@ -86,7 +86,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
     // MARK: - ウィンドウのダブルクリック挙動を制御するデリゲートメソッド (タイトルバーなど)
     func windowShouldCloseOnDoubleClick(_ sender: NSWindow) -> Bool {
         // AppStorage の値に基づいて、ウィンドウを閉じるかどうかを決定
-        return !preventWindowCloseOnDoubleClick
+        return closeWindowOnDoubleClick
     }
     
     // MARK: - QLPreviewPanelController (from NSResponder)
