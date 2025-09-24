@@ -21,7 +21,7 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
-## 1.5.0 (under development)
+## 1.5.0
 ### New Features
 - **Add “Plain Text Only” and “Rich Text Only” options to the filtering options**
   - These options are in “Text Only”.
