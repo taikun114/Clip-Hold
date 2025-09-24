@@ -21,6 +21,11 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.6.0 (under development)
+### New Features
+- **Add an “Ignore Standard Phrases” option to the “History Settings” section in the Copy History Settings**
+  - Prevents copied standard phrases from being added to the history.
+
 ## 1.5.0
 ### New Features
 - **Add “Plain Text Only” and “Rich Text Only” options to the filtering options**
