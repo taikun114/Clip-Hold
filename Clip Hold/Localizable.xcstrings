@@ -2745,6 +2745,22 @@
         }
       }
     },
+    "シンボルを検索" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Symbols"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "シンボルを検索"
+          }
+        }
+      }
+    },
     "スキップ" : {
       "localizations" : {
         "en" : {

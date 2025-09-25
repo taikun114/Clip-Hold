@@ -1,7 +1,8 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
-import SymbolPicker
+import SFSymbolsPicker
+
 
 // MARK: - StandardPhraseSettingsView
 struct StandardPhraseSettingsView: View {
@@ -1136,9 +1137,7 @@ private struct PresetNameSheet: View {
                             VStack(alignment: .leading, spacing: 10) {
                                 // アイコン選択ボタンと入力フィールド
                                 HStack {
-                                    Button(action: {
-                                        showingIconPicker = true
-                                    }) {
+                                    SFSymbolsPicker(selection: $icon, prompt: String(localized: "シンボルを検索")) {
                                         ZStack {
                                             Circle()
                                                 .fill(getColor(from: color))
@@ -1149,10 +1148,6 @@ private struct PresetNameSheet: View {
                                         }
                                     }
                                     .buttonStyle(.plain)
-                                    .popover(isPresented: $showingIconPicker) {
-                                        SymbolPicker(symbol: $icon)
-                                            .frame(width: 400)
-                                    }
                                     
                                     TextField("プリセット名", text: $name).onSubmit(onSave)
                                 }

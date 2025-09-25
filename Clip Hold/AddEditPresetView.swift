@@ -1,5 +1,6 @@
 import SwiftUI
-import SymbolPicker
+import SFSymbolsPicker
+
 
 struct AddEditPresetView: View {
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
@@ -28,10 +29,7 @@ struct AddEditPresetView: View {
             }
 
             HStack {
-                // アイコン選択ボタン
-                Button(action: {
-                    showingIconPicker = true
-                }) {
+                SFSymbolsPicker(selection: $presetIcon, prompt: String(localized: "シンボルを検索")) {
                     ZStack {
                         Circle()
                             .fill(getColor(from: presetColor))
@@ -42,10 +40,6 @@ struct AddEditPresetView: View {
                     }
                 }
                 .buttonStyle(.plain)
-                .popover(isPresented: $showingIconPicker) {
-                    SymbolPicker(symbol: $presetIcon)
-                        .frame(width: 400, height: 400)
-                }
                 
                 TextField("プリセット名", text: $presetName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())

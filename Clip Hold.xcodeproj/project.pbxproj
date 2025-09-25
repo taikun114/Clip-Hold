@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6D18390E2E1165B0008540BC /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 6D18390D2E1165B0008540BC /* KeyboardShortcuts */; };
-		6D5937BE2E852485006B7724 /* SymbolPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6D5937BD2E852485006B7724 /* SymbolPicker */; };
+		6D594B082E8543D8006B7724 /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6D594B072E8543D8006B7724 /* SFSymbolsPicker */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,8 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6D5937BE2E852485006B7724 /* SymbolPicker in Frameworks */,
 				6D18390E2E1165B0008540BC /* KeyboardShortcuts in Frameworks */,
+				6D594B082E8543D8006B7724 /* SFSymbolsPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,20 +79,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6D18390C2E1165B0008540BC /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		6D244A082E03FA9F008A66F6 = {
 			isa = PBXGroup;
 			children = (
 				6D244A132E03FA9F008A66F6 /* Clip Hold */,
 				6D244A222E03FAA0008A66F6 /* Clip HoldTests */,
 				6D244A2C2E03FAA0008A66F6 /* Clip HoldUITests */,
-				6D18390C2E1165B0008540BC /* Frameworks */,
 				6D244A122E03FA9F008A66F6 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -128,7 +120,7 @@
 			name = "Clip Hold";
 			packageProductDependencies = (
 				6D18390D2E1165B0008540BC /* KeyboardShortcuts */,
-				6D5937BD2E852485006B7724 /* SymbolPicker */,
+				6D594B072E8543D8006B7724 /* SFSymbolsPicker */,
 			);
 			productName = "Clip Hold";
 			productReference = 6D244A112E03FA9F008A66F6 /* Clip Hold.app */;
@@ -215,7 +207,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6D18390B2E1165A2008540BC /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
-				6D5937BC2E852485006B7724 /* XCRemoteSwiftPackageReference "SymbolPicker" */,
+				6D594B062E8543D8006B7724 /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6D244A122E03FA9F008A66F6 /* Products */;
@@ -433,7 +425,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 202509251810;
+				CURRENT_PROJECT_VERSION = 202509251852;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -492,7 +484,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 202509251810;
+				CURRENT_PROJECT_VERSION = 202509251852;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -544,7 +536,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202509251810;
+				CURRENT_PROJECT_VERSION = 202509251852;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -563,7 +555,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202509251810;
+				CURRENT_PROJECT_VERSION = 202509251852;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -581,7 +573,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202509251810;
+				CURRENT_PROJECT_VERSION = 202509251852;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -598,7 +590,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202509251810;
+				CURRENT_PROJECT_VERSION = 202509251852;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -661,12 +653,12 @@
 				version = 2.4.0;
 			};
 		};
-		6D5937BC2E852485006B7724 /* XCRemoteSwiftPackageReference "SymbolPicker" */ = {
+		6D594B062E8543D8006B7724 /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/xnth97/SymbolPicker";
+			repositoryURL = "https://github.com/jaywcjlove/SFSymbolsPicker";
 			requirement = {
 				kind = exactVersion;
-				version = 1.6.2;
+				version = 1.0.4;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -677,10 +669,10 @@
 			package = 6D18390B2E1165A2008540BC /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
 		};
-		6D5937BD2E852485006B7724 /* SymbolPicker */ = {
+		6D594B072E8543D8006B7724 /* SFSymbolsPicker */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 6D5937BC2E852485006B7724 /* XCRemoteSwiftPackageReference "SymbolPicker" */;
-			productName = SymbolPicker;
+			package = 6D594B062E8543D8006B7724 /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */;
+			productName = SFSymbolsPicker;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,5 +1,5 @@
 {
-  "originHash" : "084dcea98ee3d5c20b4c7dc29bdb408316e719966e247c4a2ed718feea1987ac",
+  "originHash" : "0aa51088f03d554487f6eedbba68d7ef83320a8d1f39060dd0594aa5d5f1759d",
   "pins" : [
     {
       "identity" : "keyboardshortcuts",
@@ -11,12 +11,12 @@
       }
     },
     {
-      "identity" : "symbolpicker",
+      "identity" : "sfsymbolspicker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/xnth97/SymbolPicker",
+      "location" : "https://github.com/jaywcjlove/SFSymbolsPicker",
       "state" : {
-        "revision" : "8bb08c982235b8e601bc500a41e770d7e198759b",
-        "version" : "1.6.2"
+        "revision" : "603a9c1b8bad4daef411ca569b386bdbb9342329",
+        "version" : "1.0.4"
       }
     }
   ],
