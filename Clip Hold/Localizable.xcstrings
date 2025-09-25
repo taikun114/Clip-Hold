@@ -1369,6 +1369,22 @@
         }
       }
     },
+    "アクセントカラー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accent Color"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセントカラー"
+          }
+        }
+      }
+    },
     "アプリ" : {
       "localizations" : {
         "en" : {
@@ -1529,6 +1545,22 @@
         }
       }
     },
+    "イエロー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yellow"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イエロー"
+          }
+        }
+      }
+    },
     "インポート" : {
       "localizations" : {
         "en" : {
@@ -1653,6 +1685,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オープンソースライセンス"
+          }
+        }
+      }
+    },
+    "オレンジ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orange"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オレンジ"
           }
         }
       }
@@ -2021,6 +2069,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイックルック"
+          }
+        }
+      }
+    },
+    "グリーン" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Green"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グリーン"
           }
         }
       }
@@ -3401,6 +3465,22 @@
         }
       }
     },
+    "パープル" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Purple"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パープル"
+          }
+        }
+      }
+    },
     "はい" : {
       "localizations" : {
         "en" : {
@@ -3445,6 +3525,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バグを見つけましたか？"
+          }
+        }
+      }
+    },
+    "ピンク" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pink"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピンク"
           }
         }
       }
@@ -3897,6 +3993,22 @@
         }
       }
     },
+    "ブルー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ブルー"
+          }
+        }
+      }
+    },
     "メール送信画面を開きますか？" : {
       "localizations" : {
         "en" : {
@@ -4181,6 +4293,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リンクを開く"
+          }
+        }
+      }
+    },
+    "レッド" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Red"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レッド"
           }
         }
       }

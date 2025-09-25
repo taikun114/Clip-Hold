@@ -1101,6 +1101,20 @@ private struct PhraseManagementSection: View {
     }
 }
 
+    private func localizedColorName(for colorName: String) -> String {
+        switch colorName {
+        case "accent": return String(localized: "アクセントカラー")
+        case "red": return String(localized: "レッド")
+        case "orange": return String(localized: "オレンジ")
+        case "yellow": return String(localized: "イエロー")
+        case "green": return String(localized: "グリーン")
+        case "blue": return String(localized: "ブルー")
+        case "purple": return String(localized: "パープル")
+        case "pink": return String(localized: "ピンク")
+        default: return ""
+        }
+    }
+
 // MARK: - Reusable Components
 private struct PresetNameSheet: View {
     @Binding var name: String
@@ -1161,6 +1175,7 @@ private struct PresetNameSheet: View {
                                                     )
                                             }
                                             .buttonStyle(.plain)
+                                            .help(Text(localizedColorName(for: colorName)))
                                         }
                                     }
                                 }
