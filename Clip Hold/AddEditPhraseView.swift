@@ -115,7 +115,7 @@ struct AddEditPhraseView: View {
                         Label {
                             Text(displayName(for: preset))
                         } icon: {
-                                                if let iconImage = iconGenerator.iconCache[preset.id] {
+                                                if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
                                                     Image(nsImage: iconImage)
                                                 } else {
                                                     Image(systemName: "star.fill") // Fallback
