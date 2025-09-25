@@ -989,7 +989,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to open the KeyboardShortcuts GitHub repository page?"
+            "value" : "Are you sure you want to open the KeyboardShortcuts GitHub page?"
           }
         },
         "ja" : {
@@ -1285,6 +1285,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番目の"
+          }
+        }
+      }
+    },
+    "SFSymbolsPicker by Kenny Wang" : {
+      "shouldTranslate" : false
+    },
+    "SFSymbolsPickerのGitHubページへのリンクを開きます。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the SFSymbolsPicker GitHub page."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SFSymbolsPickerのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "SFSymbolsPickerのGitHubページを開いてもよろしいですか？" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the SFSymbolsPicker GitHub page?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SFSymbolsPickerのGitHubページを開いてもよろしいですか？"
           }
         }
       }

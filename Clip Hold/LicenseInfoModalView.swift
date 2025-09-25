@@ -16,6 +16,9 @@ struct LicenseInfoModalView: View {
     @State private var showingQwenCodeLinkAlert = false
     @State private var isQwenCodeLinkHovered: Bool = false
 
+    @State private var showingSFSymbolsPickerLinkAlert = false
+    @State private var isSFSymbolsPickerLinkHovered: Bool = false
+
     private var appVersionString: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
     }
@@ -29,6 +32,9 @@ struct LicenseInfoModalView: View {
 
     // Qwen Codeの使用バージョン
     private let qwenCodeVersionString: String = "0.0.13"
+
+    // SFSymbolsPickerの使用バージョン
+    private let sfSymbolsPickerVersionString: String = "1.0.4"
 
     // KeyboardShortcutsの使用バージョン
     private let keyboardShortcutsVersionString: String = "2.4.0"
@@ -128,6 +134,54 @@ struct LicenseInfoModalView: View {
                         .padding(.horizontal)
                         .padding(.vertical, 1)
 
+                    // MARK: - SFSymbolsPicker by Kenny Wang
+                    VStack(alignment: .leading) {
+                        Button(action: {
+                            showingSFSymbolsPickerLinkAlert = true
+                        }) {
+                            Text("SFSymbolsPicker by Kenny Wang")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundStyle(Color.accentColor)
+                                .underline(isSFSymbolsPickerLinkHovered)
+                        }
+                        .buttonStyle(.plain)
+                        .help("SFSymbolsPickerのGitHubページへのリンクを開きます。")
+                        .padding(.bottom, 1)
+                        .onHover { hovered in
+                            isSFSymbolsPickerLinkHovered = hovered
+                        }
+                        
+                        Text("バージョン: \(sfSymbolsPickerVersionString)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.bottom, 1)
+
+                        Text(verbatim: "MIT License")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.top, 10)
+                    .padding(.horizontal)
+                    
+                    .alert("リンクを開きますか？", isPresented: $showingSFSymbolsPickerLinkAlert) {
+                        Button("開く") {
+                            if let url = URL(string: "https://github.com/jaywcjlove/SFSymbolsPicker") {
+                                openURL(url)
+                            }
+                        }
+                        Button("キャンセル", role: .cancel) {
+                            // 何もしない
+                        }
+                    } message: {
+                        Text("SFSymbolsPickerのGitHubページを開いてもよろしいですか？")
+                    }
+
+                    Text(verbatim: "MIT License\n\nCopyright (c) 2025 Kenny Wang(小弟调调™) <kennyiseeyou@gmail.com> (https://github.com/jaywcjlove)\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
+                        .font(.callout.monospaced())
+                        .padding(.horizontal)
+                        .padding(.vertical, 1)
+                    
                     // MARK: - create-dmg by Andrey Tarantsov and Andrew Janke
                     VStack(alignment: .leading) {
                         Button(action: {
