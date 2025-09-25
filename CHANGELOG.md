@@ -23,6 +23,10 @@ Notes
 
 ## 1.6.0 (under development)
 ### New Features
+- **Add the feature to set icons and colors for standard phrase presets**
+  - You can now assign colors and set your favorite icons for each preset.
+  - Icons can be selected from SF Symbols. While you can choose icons from the in-app symbol picker, using the [**SF Symbols app**](https://developer.apple.com/sf-symbols/) is convenient for viewing symbols in more detail or searching for them.
+  - You can change icons and colors from the edit screen in the “Preset Settings” section of the Standard Phrases settings.
 - **Add an “Ignore Standard Phrases” option to the “History Settings” section in the Copy History Settings**
   - Prevents copied standard phrases from being added to the history.
 
