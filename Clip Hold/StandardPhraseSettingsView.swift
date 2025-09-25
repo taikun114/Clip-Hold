@@ -1120,10 +1120,11 @@ private struct PresetNameSheet: View {
                                 .foregroundColor(.white)
                                 .font(.system(size: 14))
                         }
-                        .popover(isPresented: $showingIconPicker) {
-                            SymbolPicker(symbol: icon)
-                                .frame(width: 400, height: 400)
-                        }
+                    }
+                    .buttonStyle(.plain)
+                    .popover(isPresented: $showingIconPicker) {
+                        SymbolPicker(symbol: icon)
+                            .frame(width: 400)
                     }
                     
                     TextField("プリセット名", text: $name).onSubmit(onSave)
@@ -1143,9 +1144,10 @@ private struct PresetNameSheet: View {
                                     .frame(width: 20, height: 20)
                                     .overlay(
                                         Circle()
-                                            .stroke(color.wrappedValue == colorName ? Color.black : Color.clear, lineWidth: 2)
+                                            .stroke(color.wrappedValue == colorName ? Color.primary : Color.clear, lineWidth: 2)
                                     )
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -1163,7 +1165,7 @@ private struct PresetNameSheet: View {
             }
         }
         .padding()
-        .frame(width: 300, height: icon != nil ? 200 : 140)
+        .frame(width: 300, height: icon != nil ? 170 : 140)
     }
     
     private func getColor(from colorName: String) -> Color {

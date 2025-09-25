@@ -685,7 +685,20 @@
       }
     },
     "Color:" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color:"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カラー:"
+          }
+        }
+      }
     },
     "Copyright ©︎ 2025 今浦大雅" : {
       "localizations" : {

@@ -40,10 +40,11 @@ struct AddEditPresetView: View {
                             .foregroundColor(.white)
                             .font(.system(size: 14))
                     }
-                    .popover(isPresented: $showingIconPicker) {
-                        SymbolPicker(symbol: $presetIcon)
-                            .frame(width: 400, height: 400)
-                    }
+                }
+                .buttonStyle(.plain)
+                .popover(isPresented: $showingIconPicker) {
+                    SymbolPicker(symbol: $presetIcon)
+                        .frame(width: 400, height: 400)
                 }
                 
                 TextField("プリセット名", text: $presetName)
@@ -70,7 +71,7 @@ struct AddEditPresetView: View {
                                 .frame(width: 20, height: 20)
                                 .overlay(
                                     Circle()
-                                        .stroke(presetColor == colorName ? Color.black : Color.clear, lineWidth: 2)
+                                        .stroke(presetColor == colorName ? Color.primary : Color.clear, lineWidth: 2)
                                 )
                         }
                     }
