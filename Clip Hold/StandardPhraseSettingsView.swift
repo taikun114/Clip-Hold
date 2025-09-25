@@ -180,6 +180,8 @@ private struct PresetSettingsSection: View {
                     if let selectedId = selectedPresetId, let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
                         newPresetName = preset.name
+                        newPresetIcon = preset.icon
+                        newPresetColor = preset.color
                         showingEditPresetSheet = true
                     }
                 }) {
@@ -667,6 +669,8 @@ private struct PhraseSettingsSection: View {
     @State private var showingClearAllPhrasesConfirmation = false
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
+    @State private var newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
+    @State private var newPresetColorForPhraseSection = "accent"
     @State private var showingMoveSheet = false
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
@@ -806,13 +810,22 @@ private struct PhraseSettingsSection: View {
     }
 
     private var addPresetSheet: some View {
-        PresetNameSheet(name: $newPresetName, title: String(localized: "プリセット名を入力")) {
-            addPreset(name: newPresetName)
+        PresetNameSheet(
+            name: $newPresetName,
+            icon: $newPresetIconForPhraseSection,
+            color: $newPresetColorForPhraseSection,
+            title: String(localized: "プリセット名を入力")
+        ) {
+            addPreset(name: newPresetName, icon: newPresetIconForPhraseSection, color: newPresetColorForPhraseSection)
             newPresetName = ""
+            newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
+            newPresetColorForPhraseSection = "accent"
             showingAddPresetSheet = false
         } onCancel: {
             showingAddPresetSheet = false
             newPresetName = ""
+            newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
+            newPresetColorForPhraseSection = "accent"
         }
     }
 
@@ -993,8 +1006,8 @@ private struct PhraseSettingsSection: View {
         presetManager.updatePreset(p)
     }
     
-    private func addPreset(name: String) {
-        presetManager.addPreset(name: name)
+    private func addPreset(name: String, icon: String, color: String) {
+        presetManager.addPreset(name: name, icon: icon, color: color)
     }
 }
 
@@ -1091,8 +1104,8 @@ private struct PhraseManagementSection: View {
 // MARK: - Reusable Components
 private struct PresetNameSheet: View {
     @Binding var name: String
-    var icon: Binding<String>?
-    var color: Binding<String>?
+    @Binding var icon: String
+    @Binding var color: String
     @State private var showingIconPicker = false
     var title: String
     var onSave: () -> Void
@@ -1105,56 +1118,53 @@ private struct PresetNameSheet: View {
                 Spacer()
             }
             
-            // アイコン選択機能が有効な場合のみ表示
-            if let icon = icon, let color = color {
-                // アイコン選択ボタンと入力フィールド
-                HStack {
-                    Button(action: {
-                        showingIconPicker = true
-                    }) {
-                        ZStack {
-                            Circle()
-                                .fill(getColor(from: color.wrappedValue))
-                                .frame(width: 30, height: 30)
-                            Image(systemName: icon.wrappedValue)
-                                .foregroundColor(.white)
-                                .font(.system(size: 14))
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .popover(isPresented: $showingIconPicker) {
-                        SymbolPicker(symbol: icon)
-                            .frame(width: 400)
-                    }
-                    
-                    TextField("プリセット名", text: $name).onSubmit(onSave)
-                }
-                
-                // カラーピッカー
-                HStack {
-                    Text("Color:")
-                    Spacer()
-                    HStack(spacing: 5) {
-                        ForEach(getColorOptions(), id: \.self) { colorName in
-                            Button(action: {
-                                color.wrappedValue = colorName
-                            }) {
-                                Circle()
-                                    .fill(getColor(from: colorName))
-                                    .frame(width: 20, height: 20)
-                                    .overlay(
-                                        Circle()
-                                            .stroke(color.wrappedValue == colorName ? Color.primary : Color.clear, lineWidth: 2)
-                                    )
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-            } else {
-                // アイコン選択機能が無効な場合（アイコンとカラーの選択がない場合）
-                TextField("プリセット名", text: $name).onSubmit(onSave)
-            }
+            HStack {
+                            VStack(alignment: .leading, spacing: 10) {
+                                // アイコン選択ボタンと入力フィールド
+                                HStack {
+                                    Button(action: {
+                                        showingIconPicker = true
+                                    }) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(getColor(from: color))
+                                                .frame(width: 30, height: 30)
+                                            Image(systemName: icon)
+                                                .foregroundColor(.white)
+                                                .font(.system(size: 14))
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                    .popover(isPresented: $showingIconPicker) {
+                                        SymbolPicker(symbol: $icon)
+                                            .frame(width: 400)
+                                    }
+                                    
+                                    TextField("プリセット名", text: $name).onSubmit(onSave)
+                                }
+                                
+                                // カラーピッカー
+                                HStack {
+                                    Text("Color:")
+                                    Spacer()
+                                    HStack(spacing: 5) {
+                                        ForEach(getColorOptions(), id: \.self) { colorName in
+                                            Button(action: {
+                                                color = colorName
+                                            }) {
+                                                Circle()
+                                                    .fill(getColor(from: colorName))
+                                                    .frame(width: 20, height: 20)
+                                                    .overlay(
+                                                        Circle()
+                                                            .stroke(color == colorName ? Color.primary : Color.clear, lineWidth: 2)
+                                                    )
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
+                                    }
+                                }
+                            }            }
             
             Spacer()
             
@@ -1165,7 +1175,7 @@ private struct PresetNameSheet: View {
             }
         }
         .padding()
-        .frame(width: 300, height: icon != nil ? 170 : 140)
+        .frame(width: 300, height: 180)
     }
     
     private func getColor(from colorName: String) -> Color {
