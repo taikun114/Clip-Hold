@@ -232,7 +232,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             return
         }
         
-        let contentView = AddEditPresetView(isSheet: false) { [weak self] in
+        let contentView = AddPresetView(isSheet: false) { [weak self] in
             // ウィンドウを閉じたときの後処理
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }

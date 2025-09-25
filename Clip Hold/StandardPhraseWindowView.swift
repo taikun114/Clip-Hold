@@ -638,8 +638,7 @@ struct StandardPhraseWindowView: View {
                 .environmentObject(presetManager)
         }
         .sheet(isPresented: $showingAddPresetSheet) {
-            AddEditPresetView(isSheet: true)
-                .environmentObject(presetManager)
+            AddPresetView(isSheet: true)
         }
         .sheet(isPresented: $showingMoveSheet) {
             if let phrase = phraseToMove, let sourceId = presetManager.selectedPresetId {

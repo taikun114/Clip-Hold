@@ -207,8 +207,7 @@ struct AddEditPhraseView: View {
         }
         .sheet(isPresented: $showingAddPresetSheet) {
             // プリセット追加画面（シート）を表示
-            AddEditPresetView { 
-                // シートが閉じられたときの処理
+            AddPresetView {
                 showingAddPresetSheet = false
             }
         }
