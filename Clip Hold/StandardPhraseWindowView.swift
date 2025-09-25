@@ -160,6 +160,8 @@ struct StandardPhraseWindowView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
 
+    @StateObject var iconGenerator = PresetIconGenerator.shared
+
     @State private var searchText: String = ""
     @State private var filteredPhrases: [StandardPhrase] = []
     @State private var selectedPhraseID: UUID?
@@ -312,7 +314,16 @@ struct StandardPhraseWindowView: View {
                         Menu {
                             Picker("プリセット", selection: $presetManager.selectedPresetId) {
                                 ForEach(presetManager.presets) { preset in
-                                    Text(displayName(for: preset)).tag(preset.id as UUID?)
+                                    Label {
+                                        Text(displayName(for: preset))
+                                    } icon: {
+                                        if let iconImage = iconGenerator.iconCache[preset.id] {
+                                            Image(nsImage: iconImage)
+                                        } else {
+                                            Image(systemName: "star.fill") // Fallback
+                                        }
+                                    }
+                                    .tag(preset.id as UUID?)
                                 }
                                 
                                 // プリセットがない場合の項目
@@ -321,6 +332,7 @@ struct StandardPhraseWindowView: View {
                                 }
                             }
                             .pickerStyle(.inline)
+                            .labelStyle(.titleAndIcon)
 
                             Divider()
                             
@@ -328,13 +340,18 @@ struct StandardPhraseWindowView: View {
                                 showingAddPresetSheet = true
                             }
                         } label: {
-                            Image(systemName: "star.square")
-                                .imageScale(.large)
-                                .foregroundStyle(.secondary)
-                        }
+                                if let selectedPreset = presetManager.selectedPreset,
+                                   let icon = iconGenerator.iconCache[selectedPreset.id] {
+                                    Image(nsImage: icon)
+                                } else {
+                                    Image(systemName: "star.square")
+                                        .imageScale(.large)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
                         .menuStyle(.borderlessButton)
-                        .frame(width: 30)
-                        .padding(.horizontal, 4)
+                        .frame(width: 48)
+                        .padding(.trailing, 4)
                     }
                     .padding(.horizontal, 10)
                     .padding(.bottom, 5)

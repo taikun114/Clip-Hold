@@ -3,6 +3,7 @@ import SwiftUI
 struct MovePhrasePresetSelectionSheet: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var presetManager: StandardPhrasePresetManager
+    @StateObject var iconGenerator = PresetIconGenerator.shared
     
     let sourcePresetId: UUID
     @Binding var selectedPresetId: UUID?
@@ -26,12 +27,20 @@ struct MovePhrasePresetSelectionSheet: View {
             
             Picker("プリセットを選択", selection: $selectedPresetId) {
                 ForEach(presetManager.presets) { preset in
-                    Text(displayName(for: preset))
-                        .tag(preset.id as UUID?)
+                    Label {
+                        Text(displayName(for: preset))
+                    } icon: {
+                                            if let iconImage = iconGenerator.iconCache[preset.id] {
+                                                Image(nsImage: iconImage)
+                                            } else {
+                                                Image(systemName: "star.fill") // Fallback
+                                            }                    }
+                    .tag(preset.id as UUID?)
                 }
             }
             .pickerStyle(.menu)
             .labelsHidden()
+            .labelStyle(.titleAndIcon)
             
             Spacer()
             

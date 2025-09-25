@@ -43,6 +43,7 @@ struct ClipHoldApp: App {
     @StateObject var clipboardManager = ClipboardManager.shared
     @StateObject var presetManager = StandardPhrasePresetManager.shared
     @StateObject var frontmostAppMonitor = FrontmostAppMonitor.shared
+    @StateObject var iconGenerator = PresetIconGenerator.shared
 
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
@@ -203,9 +204,17 @@ struct ClipHoldApp: App {
                         }
                     }
                 )) {
-                    ForEach(presetManager.presets) {
-                        preset in
-                        Text(displayName(for: preset)).tag(preset.id as UUID?)
+                    ForEach(presetManager.presets) { preset in
+                        Label {
+                            Text(displayName(for: preset))
+                        } icon: {
+                            if let iconImage = iconGenerator.iconCache[preset.id] {
+                                Image(nsImage: iconImage)
+                            } else {
+                                Image(systemName: "star.fill") // Fallback
+                            }
+                        }
+                        .tag(preset.id as UUID?)
                     }
                     
                     // プリセットがない場合の項目
@@ -224,11 +233,17 @@ struct ClipHoldApp: App {
                     }
                 }
             } label: {
-                HStack {
+                Label {
                     Text("プリセット: \(displayName(for: presetManager.selectedPreset))")
-                    Image(systemName: "star.square")
-                        .foregroundStyle(.secondary)
+                } icon: {
+                    if let selectedPreset = presetManager.selectedPreset,
+                       let icon = iconGenerator.iconCache[selectedPreset.id] {
+                        Image(nsImage: icon)
+                    } else {
+                        Image(systemName: "star.square")
+                    }
                 }
+                .labelStyle(.titleAndIcon)
             }
             Button {
                 if let delegate = NSApp.delegate as? AppDelegate {

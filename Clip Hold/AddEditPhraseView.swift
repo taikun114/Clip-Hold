@@ -4,6 +4,7 @@ struct AddEditPhraseView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
+    @StateObject var iconGenerator = PresetIconGenerator.shared
 
     enum Mode: Equatable {
         case add
@@ -111,12 +112,21 @@ struct AddEditPhraseView: View {
                         Text("プリセットがありません").tag(noPresetsUUID as UUID?)
                     }
                     ForEach(presetManager.presets) { preset in
-                        Text(displayName(for: preset)).tag(preset.id as UUID?)
+                        Label {
+                            Text(displayName(for: preset))
+                        } icon: {
+                                                if let iconImage = iconGenerator.iconCache[preset.id] {
+                                                    Image(nsImage: iconImage)
+                                                } else {
+                                                    Image(systemName: "star.fill") // Fallback
+                                                }                        }
+                        .tag(preset.id as UUID?)
                     }
                     Divider()
                     Text("新規プリセット...").tag(newPresetUUID as UUID?)
                 }
                 .pickerStyle(.menu)
+                .labelStyle(.titleAndIcon)
                 .onChange(of: selectedPresetId) { _, newValue in
                     // 新規プリセット...が選択された場合、シートを表示
                     if newValue == newPresetUUID {

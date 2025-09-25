@@ -65,6 +65,9 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     private func loadPresetsFromFileSystem() {
+        // アイコンキャッシュをクリア
+        PresetIconGenerator.shared.clearCache()
+
         guard let presetDirectory = getPresetDirectory() else {
             presets = []
             return
@@ -90,6 +93,11 @@ class StandardPhrasePresetManager: ObservableObject {
         // 各プリセットのフレーズを読み込む
         for preset in presets {
             loadPresetPhrases(for: preset.id)
+        }
+
+        // すべて読み込んだプリセットのアイコンを生成
+        for preset in presets {
+            let _ = PresetIconGenerator.shared.generateIcon(for: preset)
         }
         
         // 読み込み/再構築後にプリセットが存在しない場合、デフォルトを作成
@@ -288,6 +296,7 @@ class StandardPhrasePresetManager: ObservableObject {
         savePresetToFile(newPreset)
         savePresetIndex()
         saveSelectedPresetId()
+        let _ = PresetIconGenerator.shared.generateIcon(for: newPreset)
         presetAddedSubject.send()
     }
     
@@ -300,6 +309,7 @@ class StandardPhrasePresetManager: ObservableObject {
         savePresetToFile(preset)
         savePresetIndex()
         saveSelectedPresetId()
+        let _ = PresetIconGenerator.shared.generateIcon(for: preset)
         presetAddedSubject.send()
     }
     
@@ -317,6 +327,7 @@ class StandardPhrasePresetManager: ObservableObject {
         savePresetToFile(newPreset)
         savePresetIndex()
         saveSelectedPresetId()
+        let _ = PresetIconGenerator.shared.generateIcon(for: newPreset)
         presetAddedSubject.send()
     }
     
@@ -343,6 +354,7 @@ class StandardPhrasePresetManager: ObservableObject {
         
         // ビューに通知してselectedPresetIdを更新
         presetAddedSubject.send()
+        PresetIconGenerator.shared.removeIcon(for: id)
     }
     
     func updatePreset(_ preset: StandardPhrasePreset) {
@@ -351,6 +363,7 @@ class StandardPhrasePresetManager: ObservableObject {
             savePresetToFile(preset)
             savePresetIndex()
             presetAddedSubject.send()
+            PresetIconGenerator.shared.updateIcon(for: preset)
         }
     }
     
@@ -374,6 +387,7 @@ class StandardPhrasePresetManager: ObservableObject {
         savePresetIndex()
         
         // ビューに通知
+        let _ = PresetIconGenerator.shared.generateIcon(for: newPreset)
         presetAddedSubject.send()
     }
     
@@ -438,6 +452,7 @@ class StandardPhrasePresetManager: ObservableObject {
             PresetAppAssignmentManager.shared.clearAssignments(for: preset.id)
             
             deletePresetFile(id: preset.id)
+            PresetIconGenerator.shared.removeIcon(for: preset.id)
         }
         
         if userDeletedDefault {

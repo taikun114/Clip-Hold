@@ -27,6 +27,7 @@ struct StandardPhraseSettingsView: View {
 // MARK: - PresetSettingsSection
 private struct PresetSettingsSection: View {
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
+    @StateObject private var iconGenerator = PresetIconGenerator.shared
     
     @State private var selectedPresetId: UUID? = nil
     @State private var showingAddPresetSheet = false
@@ -57,13 +58,18 @@ private struct PresetSettingsSection: View {
                 ForEach(presetManager.presets) { preset in
                     HStack {
                         // アイコン表示
-                        ZStack {
-                            Circle()
-                                .fill(getColor(from: preset.color))
-                                .frame(width: 20, height: 20)
-                            Image(systemName: preset.icon)
-                                .foregroundColor(.white)
-                                .font(.system(size: 10))
+                        if let icon = iconGenerator.iconCache[preset.id] {
+                            Image(nsImage: icon)
+                        } else {
+                            // Fallback to manual drawing if icon not found (should not happen)
+                            ZStack {
+                                Circle()
+                                    .fill(getColor(from: preset.color))
+                                    .frame(width: 20, height: 20)
+                                Image(systemName: preset.icon)
+                                    .foregroundColor(getSymbolColor(forPresetColor: preset.color))
+                                    .font(.system(size: 10))
+                            }
                         }
                         
                         VStack(alignment: .leading) {
@@ -144,6 +150,14 @@ private struct PresetSettingsSection: View {
             } else {
                 Text("このプリセットを本当に削除しますか？")
             }
+        }
+    }
+    
+    private func getSymbolColor(forPresetColor colorName: String) -> Color {
+        if colorName == "yellow" || colorName == "green" {
+            return .black
+        } else {
+            return .white
         }
     }
     
@@ -312,6 +326,7 @@ private struct PresetSettingsSection: View {
 private struct PresetAssignmentSection: View {
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @EnvironmentObject var assignmentManager: PresetAppAssignmentManager
+    @StateObject var iconGenerator = PresetIconGenerator.shared
     
     @State private var selectedPresetForAssignmentId: UUID? = StandardPhrasePresetManager.shared.presets.first?.id
     @State private var isShowingAddAppPopover: Bool = false
@@ -388,7 +403,16 @@ private struct PresetAssignmentSection: View {
                 }
             )) {
                 ForEach(presetManager.presets) { preset in
-                    Text(displayName(for: preset)).tag(preset.id as UUID?)
+                    Label {
+                        Text(displayName(for: preset))
+                    } icon: {
+                        if let iconImage = iconGenerator.iconCache[preset.id] {
+                            Image(nsImage: iconImage)
+                        } else {
+                            Image(systemName: "star.fill") // Fallback
+                        }
+                    }
+                    .tag(preset.id as UUID?)
                 }
                 
                 // プリセットがない場合の項目
@@ -398,6 +422,7 @@ private struct PresetAssignmentSection: View {
                 }
             }
             .pickerStyle(.menu)
+            .labelStyle(.titleAndIcon)
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             .onChange(of: selectedPresetForAssignmentId) { _, _ in
                 selectedAssignedAppId = nil
@@ -661,6 +686,7 @@ private struct PresetAssignmentSection: View {
 private struct PhraseSettingsSection: View {
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @StateObject var iconGenerator = PresetIconGenerator.shared
     
     @State private var selectedPhraseId: UUID? = nil
     @State private var showingAddPhraseSheet = false
@@ -795,7 +821,16 @@ private struct PhraseSettingsSection: View {
             }
         )) {
             ForEach(presetManager.presets) { preset in
-                Text(displayName(for: preset)).tag(preset.id)
+                Label {
+                    Text(displayName(for: preset))
+                } icon: {
+                    if let iconImage = iconGenerator.iconCache[preset.id] {
+                        Image(nsImage: iconImage)
+                    } else {
+                        Image(systemName: "star.fill") // Fallback
+                    }
+                }
+                .tag(preset.id)
             }
             
             // プリセットがない場合の項目
@@ -808,6 +843,7 @@ private struct PhraseSettingsSection: View {
             Text("新規プリセット...").tag(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!)
         }
         .pickerStyle(.menu)
+        .labelStyle(.titleAndIcon)
     }
     
     private var addPresetSheet: some View {
@@ -1144,7 +1180,7 @@ private struct PresetNameSheet: View {
                                     .fill(getColor(from: color))
                                     .frame(width: 30, height: 30)
                                 Image(systemName: icon.isEmpty ? previousIcon : icon)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(getSymbolColor(forPresetColor: color))
                                     .font(.system(size: 14))
                             }
                         }
@@ -1190,6 +1226,14 @@ private struct PresetNameSheet: View {
         .frame(width: 300, height: 180)
         .onAppear {
             previousIcon = icon // ここを追加
+        }
+    }
+    
+    private func getSymbolColor(forPresetColor colorName: String) -> Color {
+        if colorName == "yellow" || colorName == "green" {
+            return .black
+        } else {
+            return .white
         }
     }
     
