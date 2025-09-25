@@ -1185,6 +1185,15 @@ private struct PresetNameSheet: View {
                             }
                         }
                         .buttonStyle(.plain)
+                        .onChange(of: icon) { oldValue, newValue in
+                            // アイコンが空文字列になった場合、previousIconに戻す
+                            if newValue.isEmpty {
+                                icon = previousIcon
+                            } else {
+                                // 新しいアイコンが選択されたら、previousIconを更新
+                                previousIcon = newValue
+                            }
+                        }
                         
                         TextField("プリセット名", text: $name).onSubmit(onSave)
                     }

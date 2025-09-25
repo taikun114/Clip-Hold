@@ -42,6 +42,15 @@ struct AddPresetView: View {
                             }
                         }
                         .buttonStyle(.plain)
+                        .onChange(of: presetIcon) { oldValue, newValue in
+                            // アイコンが空文字列になった場合、previousPresetIconに戻す
+                            if newValue.isEmpty {
+                                presetIcon = previousPresetIcon
+                            } else {
+                                // 新しいアイコンが選択されたら、previousPresetIconを更新
+                                previousPresetIcon = newValue
+                            }
+                        }
                         
                         TextField("プリセット名", text: $presetName).onSubmit(addPreset)
                     }
@@ -94,7 +103,8 @@ struct AddPresetView: View {
     }
     
     private func addPreset() {
-        let newPreset = StandardPhrasePreset(name: presetName, icon: presetIcon, color: presetColor)
+        let iconToSave = presetIcon.isEmpty ? previousPresetIcon : presetIcon
+        let newPreset = StandardPhrasePreset(name: presetName, icon: iconToSave, color: presetColor)
         presetManager.addPreset(preset: newPreset)
         dismiss()
         onDismiss?()

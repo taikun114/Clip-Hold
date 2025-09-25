@@ -287,7 +287,8 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     func addPreset(name: String, icon: String? = nil, color: String? = nil) {
-        let newPreset = StandardPhrasePreset(name: name, icon: icon, color: color)
+        let iconToUse = icon?.isEmpty ?? true ? "list.bullet.rectangle.portrait" : icon!
+        let newPreset = StandardPhrasePreset(name: name, icon: iconToUse, color: color)
         presets.append(newPreset)
         // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
         if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
@@ -301,15 +302,19 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     func addPreset(preset: StandardPhrasePreset) {
-        presets.append(preset)
+        // アイコンが空文字列の場合、デフォルトアイコンに設定
+        let iconToUse = preset.icon.isEmpty ? (preset.id.uuidString == "00000000-0000-0000-0000-000000000000" ? "star.fill" : "list.bullet.rectangle.portrait") : preset.icon
+        let presetWithValidIcon = StandardPhrasePreset(id: preset.id, name: preset.name, phrases: preset.phrases, icon: iconToUse, color: preset.color)
+        
+        presets.append(presetWithValidIcon)
         // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
         if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
-            selectedPresetId = preset.id
+            selectedPresetId = presetWithValidIcon.id
         }
-        savePresetToFile(preset)
+        savePresetToFile(presetWithValidIcon)
         savePresetIndex()
         saveSelectedPresetId()
-        let _ = PresetIconGenerator.shared.generateIcon(for: preset)
+        let _ = PresetIconGenerator.shared.generateIcon(for: presetWithValidIcon)
         presetAddedSubject.send()
     }
     
@@ -318,7 +323,8 @@ class StandardPhrasePresetManager: ObservableObject {
         if presets.contains(where: { $0.id == id }) {
             return
         }
-        let newPreset = StandardPhrasePreset(id: id, name: name, icon: icon, color: color)
+        let iconToUse = icon?.isEmpty ?? true ? (id.uuidString == "00000000-0000-0000-0000-000000000000" ? "star.fill" : "list.bullet.rectangle.portrait") : icon!
+        let newPreset = StandardPhrasePreset(id: id, name: name, icon: iconToUse, color: color)
         presets.append(newPreset)
         // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
         if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
@@ -359,11 +365,15 @@ class StandardPhrasePresetManager: ObservableObject {
     
     func updatePreset(_ preset: StandardPhrasePreset) {
         if let index = presets.firstIndex(where: { $0.id == preset.id }) {
-            presets[index] = preset
-            savePresetToFile(preset)
+            // アイコンが空文字列の場合、元のアイコンに設定
+            let iconToUse = preset.icon.isEmpty ? presets[index].icon : preset.icon
+            let presetWithValidIcon = StandardPhrasePreset(id: preset.id, name: preset.name, phrases: preset.phrases, icon: iconToUse, color: preset.color)
+            
+            presets[index] = presetWithValidIcon
+            savePresetToFile(presetWithValidIcon)
             savePresetIndex()
             presetAddedSubject.send()
-            PresetIconGenerator.shared.updateIcon(for: preset)
+            PresetIconGenerator.shared.updateIcon(for: presetWithValidIcon)
         }
     }
     
