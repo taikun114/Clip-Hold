@@ -28,6 +28,30 @@ extension PrimitiveButtonStyle where Self == PreActionButtonStyle {
     }
 }
 
+extension NSImage {
+    func createNotificationAttachment(identifier: String) -> UNNotificationAttachment? {
+        guard let tiffRepresentation = self.tiffRepresentation,
+              let bitmapImageRep = NSBitmapImageRep(data: tiffRepresentation),
+              let pngData = bitmapImageRep.representation(using: .png, properties: [:]) else {
+            return nil
+        }
+
+        let fileManager = FileManager.default
+        let tempDirectory = fileManager.temporaryDirectory
+        let fileName = UUID().uuidString + ".png"
+        let fileURL = tempDirectory.appendingPathComponent(fileName)
+
+        do {
+            try pngData.write(to: fileURL)
+            let attachment = try UNNotificationAttachment(identifier: identifier, url: fileURL, options: nil)
+            return attachment
+        } catch {
+            print("Error creating notification attachment: \(error)")
+            return nil
+        }
+    }
+}
+
 @main
 struct ClipHoldApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -500,6 +524,12 @@ struct ClipHoldApp: App {
                     content.body = String(localized: "「\(nextPreset.displayName)」に切り替わりました。")
                     content.sound = nil // 音なし
                     
+                    // Add attachment
+                    if let bigIcon = PresetIconGenerator.shared.bigIconCache[nextPreset.id],
+                       let attachment = bigIcon.createNotificationAttachment(identifier: "presetIcon") {
+                        content.attachments = [attachment]
+                    }
+
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
                     notificationCenter.add(request) { error in
                         if let error = error {
@@ -529,6 +559,12 @@ struct ClipHoldApp: App {
                     content.body = String(localized: "「\(previousPreset.displayName)」に切り替わりました。")
                     content.sound = nil // 音なし
                     
+                    // Add attachment
+                    if let bigIcon = PresetIconGenerator.shared.bigIconCache[previousPreset.id],
+                       let attachment = bigIcon.createNotificationAttachment(identifier: "presetIcon") {
+                        content.attachments = [attachment]
+                    }
+
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
                     notificationCenter.add(request) { error in
                         if let error = error {
