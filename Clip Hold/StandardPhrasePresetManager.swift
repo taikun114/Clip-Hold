@@ -141,12 +141,12 @@ class StandardPhrasePresetManager: ObservableObject {
                 
                 if fileName == defaultPresetFileName {
                     if !didUserDeleteDefaultPreset() {
-                        let preset = StandardPhrasePreset(id: defaultPresetId, name: "Default", phrases: [])
+                        let preset = StandardPhrasePreset(id: defaultPresetId, name: "Default", phrases: [], icon: "star.fill", color: "accent")
                         newPresets.insert(preset, at: 0) // デフォルトが最初に来るようにする
                     }
                 } else if let uuid = UUID(uuidString: fileName) {
                     let presetName = "Preset \(presetCounter)"
-                    let preset = StandardPhrasePreset(id: uuid, name: presetName, phrases: [])
+                    let preset = StandardPhrasePreset(id: uuid, name: presetName, phrases: [], icon: "list.bullet.rectangle.portrait", color: "accent")
                     newPresets.append(preset)
                     presetCounter += 1
                 }
@@ -169,7 +169,10 @@ class StandardPhrasePresetManager: ObservableObject {
         
         do {
             let data = try Data(contentsOf: indexFileURL)
-            let presetInfos = try JSONDecoder().decode([PresetInfo].self, from: data)
+            
+            // カスタムデコーダーを使用してPresetInfoをデコード
+            let decoder = JSONDecoder()
+            let presetInfos = try decoder.decode([PresetInfo].self, from: data)
             
             var loadedPresets: [StandardPhrasePreset] = []
             for presetInfo in presetInfos {
@@ -177,7 +180,7 @@ class StandardPhrasePresetManager: ObservableObject {
                 let fileName = presetInfo.id == defaultPresetId ? defaultPresetFileName : presetInfo.id.uuidString
                 let presetFileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
                 if FileManager.default.fileExists(atPath: presetFileURL.path) {
-                    loadedPresets.append(StandardPhrasePreset(id: presetInfo.id, name: presetInfo.name, phrases: []))
+                    loadedPresets.append(StandardPhrasePreset(id: presetInfo.id, name: presetInfo.name, phrases: [], icon: presetInfo.icon, color: presetInfo.color))
                 } else if presetInfo.id == defaultPresetId && didUserDeleteDefaultPreset() {
                     // デフォルトのプリセットファイルがなく、ユーザーが削除した場合は何もしない
                     continue
@@ -221,6 +224,7 @@ class StandardPhrasePresetManager: ObservableObject {
             encoder.outputFormatting = .prettyPrinted
             let data = try encoder.encode(preset.phrases)
             try data.write(to: fileURL)
+            print("Saved preset with \(preset.phrases.count) phrases for preset \(preset.id)")
         } catch {
             print("Error saving preset to file: \(error.localizedDescription)")
         }
@@ -230,7 +234,7 @@ class StandardPhrasePresetManager: ObservableObject {
         guard let presetDirectory = getPresetDirectory() else { return }
         let indexFileURL = presetDirectory.appendingPathComponent(presetIndexFileName)
         
-        let presetInfos = presets.map { PresetInfo(id: $0.id, name: $0.name) }
+        let presetInfos = presets.map { PresetInfo(id: $0.id, name: $0.name, icon: $0.icon, color: $0.color) }
         
         do {
             let data = try JSONEncoder().encode(presetInfos)
@@ -457,4 +461,6 @@ class StandardPhrasePresetManager: ObservableObject {
 struct PresetInfo: Codable {
     let id: UUID
     let name: String
+    let icon: String?
+    let color: String?
 }
