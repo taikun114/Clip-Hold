@@ -1356,6 +1356,22 @@
         }
       }
     },
+    "アイコン色" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Icon Color"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アイコン色"
+          }
+        }
+      }
+    },
     "アイデアがありますか？" : {
       "localizations" : {
         "en" : {
@@ -1896,6 +1912,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。"
+          }
+        }
+      }
+    },
+    "カスタム" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタム"
           }
         }
       }
@@ -6540,6 +6572,22 @@
         }
       }
     },
+    "背景色" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Background Color"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "背景色"
+          }
+        }
+      }
+    },
     "自動" : {
       "localizations" : {
         "en" : {
@@ -6760,6 +6808,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "通知機能を使用する場合は許可を与える必要があります。"
+          }
+        }
+      }
+    },
+    "適用" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "適用"
           }
         }
       }

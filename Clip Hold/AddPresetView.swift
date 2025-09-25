@@ -11,6 +11,9 @@ struct AddPresetView: View {
     @State private var showingIconPicker = false
     @State private var previousPresetIcon: String = ""
     @Environment(\.dismiss) var dismiss
+    @State private var showingColorPicker = false
+    @State private var customBackgroundColor = Color.blue
+    @State private var customIconColor = Color.white
     
     var onDismiss: (() -> Void)? = nil
     private var isSheet: Bool = false
@@ -34,7 +37,7 @@ struct AddPresetView: View {
                         SFSymbolsPicker(selection: $presetIcon, prompt: String(localized: "シンボルを検索")) {
                             ZStack {
                                 Circle()
-                                    .fill(getColor(from: presetColor))
+                                    .fill(presetColor == "custom" ? customBackgroundColor : getColor(from: presetColor))
                                     .frame(width: 30, height: 30)
                                 Image(systemName: presetIcon.isEmpty ? previousPresetIcon : presetIcon)
                                     .foregroundColor(getSymbolColor(forPresetColor: presetColor))
@@ -61,19 +64,72 @@ struct AddPresetView: View {
                         Spacer()
                         HStack(spacing: 5) {
                             ForEach(getColorOptions(), id: \.self) { colorName in
-                                Button(action: {
-                                    presetColor = colorName
-                                }) {
-                                    Circle()
-                                        .fill(getColor(from: colorName))
-                                        .frame(width: 20, height: 20)
+                                if colorName == "custom" {
+                                    Button(action: {
+                                        showingColorPicker = true
+                                    }) {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.gray)
+                                                .frame(width: 20, height: 20)
+                                            Image(systemName: "paintpalette")
+                                                .font(.system(size: 10))
+                                                .foregroundColor(.white)
+                                        }
                                         .overlay(
                                             Circle()
                                                 .stroke(presetColor == colorName ? Color.primary : Color.clear, lineWidth: 2)
                                         )
+                                    }
+                                    .buttonStyle(.plain)
+                                    .help(Text(localizedColorName(for: colorName)))
+                                    .popover(isPresented: $showingColorPicker) {
+                                        VStack {
+                                            HStack {
+                                                Text("背景色").font(.headline)
+                                                Spacer()
+                                                ColorPicker("", selection: $customBackgroundColor)
+                                                    .labelsHidden()
+                                            }
+                                            
+                                            HStack {
+                                                Text("アイコン色").font(.headline)
+                                                Spacer()
+                                                ColorPicker("", selection: $customIconColor)
+                                                    .labelsHidden()
+                                            }
+                                            
+                                            Spacer()
+                                            
+                                            Button(action: {
+                                                // カスタムカラーを適用
+                                                showingColorPicker = false
+                                                presetColor = "custom"
+                                            }) {
+                                                HStack {
+                                                    Image(systemName: "checkmark")
+                                                    Text("適用")
+                                                }
+                                            }
+                                        }
+                                        .padding()
+                                        .frame(width: 250, height: 130)
+                                    }
+                                } else {
+                                    Button(action: {
+                                        presetColor = colorName
+                                    }) {
+                                        Circle()
+                                            .fill(getColor(from: colorName))
+                                            .frame(width: 20, height: 20)
+                                            .overlay(
+                                                Circle()
+                                                    .stroke(presetColor == colorName ? Color.primary : Color.clear, lineWidth: 2)
+                                            )
+                                    }
+                                    .buttonStyle(.plain)
+                                    .help(Text(localizedColorName(for: colorName)))
                                 }
-                                .buttonStyle(.plain)
-                                .help(Text(localizedColorName(for: colorName)))
                             }
                         }
                     }
@@ -111,7 +167,9 @@ struct AddPresetView: View {
     }
     
     private func getSymbolColor(forPresetColor colorName: String) -> Color {
-        if colorName == "yellow" || colorName == "green" {
+        if colorName == "custom" {
+            return customIconColor
+        } else if colorName == "yellow" || colorName == "green" {
             return .black
         } else {
             return .white
@@ -127,12 +185,13 @@ struct AddPresetView: View {
         case "blue": return .blue
         case "purple": return .purple
         case "pink": return .pink
+        case "custom": return .gray // 独自色のプレースホルダー
         default: return .accentColor // アクセントカラー
         }
     }
     
     private func getColorOptions() -> [String] {
-        return ["accent", "red", "orange", "yellow", "green", "blue", "purple", "pink"]
+        return ["accent", "red", "orange", "yellow", "green", "blue", "purple", "pink", "custom"]
     }
     
     private func localizedColorName(for colorName: String) -> String {
@@ -144,6 +203,7 @@ struct AddPresetView: View {
         case "blue": return "青"
         case "purple": return "紫"
         case "pink": return "ピンク"
+        case "custom": return "カスタム"
         default: return "アクセント"
         }
     }
