@@ -1,5 +1,5 @@
 {
-  "originHash" : "69c39523ac0471922b625cc56b8722155cfd2afd660bdd4f5ff67335b5b87714",
+  "originHash" : "084dcea98ee3d5c20b4c7dc29bdb408316e719966e247c4a2ed718feea1987ac",
   "pins" : [
     {
       "identity" : "keyboardshortcuts",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "1aef85578fdd4f9eaeeb8d53b7b4fc31bf08fe27",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "symbolpicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/xnth97/SymbolPicker",
+      "state" : {
+        "revision" : "8bb08c982235b8e601bc500a41e770d7e198759b",
+        "version" : "1.6.2"
       }
     }
   ],

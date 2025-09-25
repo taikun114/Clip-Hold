@@ -53,7 +53,9 @@ class StandardPhrasePresetManager: ObservableObject {
         let defaultPreset = StandardPhrasePreset(
             id: defaultPresetId,
             name: "Default", // ローカライズされない名前
-            phrases: standardPhraseManager.standardPhrases
+            phrases: standardPhraseManager.standardPhrases,
+            icon: "star.fill",
+            color: "accent"
         )
         presets.append(defaultPreset)
         selectedPresetId = defaultPreset.id
@@ -272,8 +274,8 @@ class StandardPhrasePresetManager: ObservableObject {
         }
     }
     
-    func addPreset(name: String) {
-        let newPreset = StandardPhrasePreset(name: name)
+    func addPreset(name: String, icon: String? = nil, color: String? = nil) {
+        let newPreset = StandardPhrasePreset(name: name, icon: icon, color: color)
         presets.append(newPreset)
         // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
         if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
@@ -285,13 +287,24 @@ class StandardPhrasePresetManager: ObservableObject {
         presetAddedSubject.send()
     }
     
-    func addPresetWithId(_ id: UUID, name: String) {
+    func addPreset(preset: StandardPhrasePreset) {
+        presets.append(preset)
+        // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
+        if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
+            selectedPresetId = preset.id
+        }
+        savePresetToFile(preset)
+        savePresetIndex()
+        saveSelectedPresetId()
+        presetAddedSubject.send()
+    }
+    
+    func addPresetWithId(_ id: UUID, name: String, icon: String? = nil, color: String? = nil) {
         // 既に同じIDのプリセットが存在する場合は追加しない
         if presets.contains(where: { $0.id == id }) {
             return
         }
-        
-        let newPreset = StandardPhrasePreset(id: id, name: name)
+        let newPreset = StandardPhrasePreset(id: id, name: name, icon: icon, color: color)
         presets.append(newPreset)
         // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
         if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {

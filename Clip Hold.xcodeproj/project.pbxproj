@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6D18390E2E1165B0008540BC /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 6D18390D2E1165B0008540BC /* KeyboardShortcuts */; };
+		6D5937BE2E852485006B7724 /* SymbolPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6D5937BD2E852485006B7724 /* SymbolPicker */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D5937BE2E852485006B7724 /* SymbolPicker in Frameworks */,
 				6D18390E2E1165B0008540BC /* KeyboardShortcuts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -126,6 +128,7 @@
 			name = "Clip Hold";
 			packageProductDependencies = (
 				6D18390D2E1165B0008540BC /* KeyboardShortcuts */,
+				6D5937BD2E852485006B7724 /* SymbolPicker */,
 			);
 			productName = "Clip Hold";
 			productReference = 6D244A112E03FA9F008A66F6 /* Clip Hold.app */;
@@ -212,6 +215,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6D18390B2E1165A2008540BC /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				6D5937BC2E852485006B7724 /* XCRemoteSwiftPackageReference "SymbolPicker" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6D244A122E03FA9F008A66F6 /* Products */;
@@ -429,7 +433,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 202509242334;
+				CURRENT_PROJECT_VERSION = 202509251632;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -488,7 +492,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 202509242334;
+				CURRENT_PROJECT_VERSION = 202509251632;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -540,7 +544,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202509242334;
+				CURRENT_PROJECT_VERSION = 202509251632;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -559,7 +563,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202509242334;
+				CURRENT_PROJECT_VERSION = 202509251632;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -577,7 +581,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202509242334;
+				CURRENT_PROJECT_VERSION = 202509251632;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -594,7 +598,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202509242334;
+				CURRENT_PROJECT_VERSION = 202509251632;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -657,6 +661,14 @@
 				version = 2.4.0;
 			};
 		};
+		6D5937BC2E852485006B7724 /* XCRemoteSwiftPackageReference "SymbolPicker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/xnth97/SymbolPicker";
+			requirement = {
+				kind = exactVersion;
+				version = 1.6.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -664,6 +676,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6D18390B2E1165A2008540BC /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
+		};
+		6D5937BD2E852485006B7724 /* SymbolPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D5937BC2E852485006B7724 /* XCRemoteSwiftPackageReference "SymbolPicker" */;
+			productName = SymbolPicker;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

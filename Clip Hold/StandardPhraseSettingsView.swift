@@ -1,6 +1,7 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import SymbolPicker
 
 // MARK: - StandardPhraseSettingsView
 struct StandardPhraseSettingsView: View {
@@ -30,6 +31,8 @@ private struct PresetSettingsSection: View {
     @State private var showingAddPresetSheet = false
     @State private var showingEditPresetSheet = false
     @State private var newPresetName = ""
+    @State private var newPresetIcon = "list.bullet.rectangle.portrait"
+    @State private var newPresetColor = "accent"
     @State private var editingPreset: StandardPhrasePreset?
     @State private var presetToDelete: StandardPhrasePreset?
     @State private var showingDeletePresetConfirmation = false
@@ -52,6 +55,16 @@ private struct PresetSettingsSection: View {
             List(selection: $selectedPresetId) {
                 ForEach(presetManager.presets) { preset in
                     HStack {
+                        // アイコン表示
+                        ZStack {
+                            Circle()
+                                .fill(getColor(from: preset.color))
+                                .frame(width: 20, height: 20)
+                            Image(systemName: preset.icon)
+                                .foregroundColor(.white)
+                                .font(.system(size: 10))
+                        }
+                        
                         VStack(alignment: .leading) {
                             Text(displayName(for: preset))
                                 .font(.headline)
@@ -79,6 +92,8 @@ private struct PresetSettingsSection: View {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             editingPreset = preset
                             newPresetName = preset.name
+                            newPresetIcon = preset.icon
+                            newPresetColor = preset.color
                             showingEditPresetSheet = true
                         }
                     } label: { Label("編集...", systemImage: "pencil") }
@@ -101,6 +116,8 @@ private struct PresetSettingsSection: View {
                     if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
                         newPresetName = preset.name
+                        newPresetIcon = preset.icon
+                        newPresetColor = preset.color
                         showingEditPresetSheet = true
                     }
                 }
@@ -188,13 +205,22 @@ private struct PresetSettingsSection: View {
     }
 
     private var addPresetSheet: some View {
-        PresetNameSheet(name: $newPresetName, title: String(localized: "プリセット名を入力")) {
-            addPreset(name: newPresetName)
+        PresetNameSheet(
+            name: $newPresetName,
+            icon: $newPresetIcon,
+            color: $newPresetColor,
+            title: String(localized: "プリセット名を入力")
+        ) {
+            addPreset(name: newPresetName, icon: newPresetIcon, color: newPresetColor)
             newPresetName = ""
+            newPresetIcon = "list.bullet.rectangle.portrait"  // デフォルトアイコンに戻す
+            newPresetColor = "accent"  // デフォルトカラーに戻す
             showingAddPresetSheet = false
         } onCancel: {
             showingAddPresetSheet = false
             newPresetName = ""
+            newPresetIcon = "list.bullet.rectangle.portrait"  // デフォルトアイコンに戻す
+            newPresetColor = "accent"  // デフォルトカラーに戻す
         }
         .onDisappear {
             if let lastAddedPresetId = presetManager.presets.last?.id,
@@ -204,15 +230,24 @@ private struct PresetSettingsSection: View {
     }
 
     private var editPresetSheet: some View {
-        PresetNameSheet(name: $newPresetName, title: String(localized: "プリセット名を編集")) {
+        PresetNameSheet(
+            name: $newPresetName,
+            icon: $newPresetIcon,
+            color: $newPresetColor,
+            title: String(localized: "プリセット名を編集")
+        ) {
             if let preset = editingPreset {
-                updatePreset(preset, newName: newPresetName)
+                updatePreset(preset, newName: newPresetName, newIcon: newPresetIcon, newColor: newPresetColor)
                 newPresetName = ""
+                newPresetIcon = "list.bullet.rectangle.portrait"  // デフォルトアイコンに戻す
+                newPresetColor = "accent"  // デフォルトカラーに戻す
                 showingEditPresetSheet = false
             }
         } onCancel: {
             showingEditPresetSheet = false
             newPresetName = ""
+            newPresetIcon = "list.bullet.rectangle.portrait"  // デフォルトアイコンに戻す
+            newPresetColor = "accent"  // デフォルトカラーに戻す
         }
     }
     
@@ -224,13 +259,15 @@ private struct PresetSettingsSection: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
 
-    private func addPreset(name: String) {
-        presetManager.addPreset(name: name)
+    private func addPreset(name: String, icon: String, color: String) {
+        presetManager.addPreset(name: name, icon: icon, color: color)
     }
 
-    private func updatePreset(_ preset: StandardPhrasePreset, newName: String) {
+    private func updatePreset(_ preset: StandardPhrasePreset, newName: String, newIcon: String, newColor: String) {
         guard let index = presetManager.presets.firstIndex(where: { $0.id == preset.id }) else { return }
         presetManager.presets[index].name = newName
+        presetManager.presets[index].icon = newIcon
+        presetManager.presets[index].color = newColor
         presetManager.updatePreset(presetManager.presets[index])
     }
 
@@ -248,6 +285,23 @@ private struct PresetSettingsSection: View {
     private func movePreset(from source: IndexSet, to destination: Int) {
         presetManager.presets.move(fromOffsets: source, toOffset: destination)
         presetManager.savePresetIndex()
+    }
+    
+    private func getColor(from colorName: String) -> Color {
+        switch colorName {
+        case "red": return .red
+        case "orange": return .orange
+        case "yellow": return .yellow
+        case "green": return .green
+        case "blue": return .blue
+        case "purple": return .purple
+        case "pink": return .pink
+        default: return .accentColor // アクセントカラー
+        }
+    }
+    
+    private func getColorOptions() -> [String] {
+        return ["accent", "red", "orange", "yellow", "green", "blue", "purple", "pink"]
     }
 }
 
@@ -1037,6 +1091,9 @@ private struct PhraseManagementSection: View {
 // MARK: - Reusable Components
 private struct PresetNameSheet: View {
     @Binding var name: String
+    var icon: Binding<String>?
+    var color: Binding<String>?
+    @State private var showingIconPicker = false
     var title: String
     var onSave: () -> Void
     var onCancel: () -> Void
@@ -1047,8 +1104,58 @@ private struct PresetNameSheet: View {
                 Text(title).font(.headline)
                 Spacer()
             }
-            TextField("プリセット名", text: $name).onSubmit(onSave)
+            
+            // アイコン選択機能が有効な場合のみ表示
+            if let icon = icon, let color = color {
+                // アイコン選択ボタンと入力フィールド
+                HStack {
+                    Button(action: {
+                        showingIconPicker = true
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(getColor(from: color.wrappedValue))
+                                .frame(width: 30, height: 30)
+                            Image(systemName: icon.wrappedValue)
+                                .foregroundColor(.white)
+                                .font(.system(size: 14))
+                        }
+                        .popover(isPresented: $showingIconPicker) {
+                            SymbolPicker(symbol: icon)
+                                .frame(width: 400, height: 400)
+                        }
+                    }
+                    
+                    TextField("プリセット名", text: $name).onSubmit(onSave)
+                }
+                
+                // カラーピッカー
+                HStack {
+                    Text("Color:")
+                    Spacer()
+                    HStack(spacing: 5) {
+                        ForEach(getColorOptions(), id: \.self) { colorName in
+                            Button(action: {
+                                color.wrappedValue = colorName
+                            }) {
+                                Circle()
+                                    .fill(getColor(from: colorName))
+                                    .frame(width: 20, height: 20)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(color.wrappedValue == colorName ? Color.black : Color.clear, lineWidth: 2)
+                                    )
+                            }
+                        }
+                    }
+                }
+            } else {
+                // アイコン選択機能が無効な場合（アイコンとカラーの選択がない場合）
+                TextField("プリセット名", text: $name).onSubmit(onSave)
+            }
+            
             Spacer()
+            
             HStack {
                 Button("キャンセル", role: .cancel, action: onCancel).controlSize(.large)
                 Spacer()
@@ -1056,7 +1163,24 @@ private struct PresetNameSheet: View {
             }
         }
         .padding()
-        .frame(width: 300, height: 140)
+        .frame(width: 300, height: icon != nil ? 200 : 140)
+    }
+    
+    private func getColor(from colorName: String) -> Color {
+        switch colorName {
+        case "red": return .red
+        case "orange": return .orange
+        case "yellow": return .yellow
+        case "green": return .green
+        case "blue": return .blue
+        case "purple": return .purple
+        case "pink": return .pink
+        default: return .accentColor // アクセントカラー
+        }
+    }
+    
+    private func getColorOptions() -> [String] {
+        return ["accent", "red", "orange", "yellow", "green", "blue", "purple", "pink"]
     }
 }
 
