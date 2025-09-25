@@ -9,7 +9,7 @@ struct StandardPhraseSettingsView: View {
     @StateObject private var presetManager = StandardPhrasePresetManager.shared
     @StateObject private var assignmentManager = PresetAppAssignmentManager.shared
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
-
+    
     var body: some View {
         Form {
             PresetSettingsSection()
@@ -38,17 +38,17 @@ private struct PresetSettingsSection: View {
     @State private var presetToDelete: StandardPhrasePreset?
     @State private var showingDeletePresetConfirmation = false
     @AppStorage("sendNotificationOnPresetChange") private var sendNotificationOnPresetChange: Bool = true
-
+    
     var body: some View {
         Section(header:
-            VStack(alignment: .leading, spacing: 4) {
-                Text("プリセットの設定")
-                    .font(.headline)
-                Text("プリセットの順番はドラッグアンドドロップで並び替えることができます。")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+                    VStack(alignment: .leading, spacing: 4) {
+            Text("プリセットの設定")
+                .font(.headline)
+            Text("プリセットの順番はドラッグアンドドロップで並び替えることができます。")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
         ) {
             Toggle("ショートカットキーで切り替えたときに通知を送信する", isOn: $sendNotificationOnPresetChange)
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
@@ -98,7 +98,7 @@ private struct PresetSettingsSection: View {
                             showingEditPresetSheet = true
                         }
                     } label: { Label("編集...", systemImage: "pencil") }
-                    .disabled(isDefaultPreset(id: selectedId))
+                        .disabled(isDefaultPreset(id: selectedId))
                     Button {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             presetManager.duplicatePreset(preset)
@@ -146,7 +146,7 @@ private struct PresetSettingsSection: View {
             }
         }
     }
-
+    
     private var bottomToolbar: some View {
         VStack(alignment: .leading, spacing: 0) {
             Divider()
@@ -206,7 +206,7 @@ private struct PresetSettingsSection: View {
             .background(Color.gray.opacity(0.1))
             .padding(.horizontal, 4)
     }
-
+    
     private var addPresetSheet: some View {
         PresetNameSheet(
             name: $newPresetName,
@@ -231,7 +231,7 @@ private struct PresetSettingsSection: View {
             }
         }
     }
-
+    
     private var editPresetSheet: some View {
         PresetNameSheet(
             name: $newPresetName,
@@ -257,15 +257,15 @@ private struct PresetSettingsSection: View {
     private func displayName(for preset: StandardPhrasePreset) -> String {
         isDefaultPreset(id: preset.id) ? String(localized: "Default") : preset.name
     }
-
+    
     private func isDefaultPreset(id: UUID?) -> Bool {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
-
+    
     private func addPreset(name: String, icon: String, color: String) {
         presetManager.addPreset(name: name, icon: icon, color: color)
     }
-
+    
     private func updatePreset(_ preset: StandardPhrasePreset, newName: String, newIcon: String, newColor: String) {
         guard let index = presetManager.presets.firstIndex(where: { $0.id == preset.id }) else { return }
         presetManager.presets[index].name = newName
@@ -273,18 +273,18 @@ private struct PresetSettingsSection: View {
         presetManager.presets[index].color = newColor
         presetManager.updatePreset(presetManager.presets[index])
     }
-
+    
     private func deletePreset(id: UUID) {
         presetManager.deletePreset(id: id)
         selectedPresetId = nil
     }
-
+    
     private func deletePreset(offsets: IndexSet) {
         let idsToDelete = offsets.map { presetManager.presets[$0].id }
         idsToDelete.forEach { presetManager.deletePreset(id: $0) }
         selectedPresetId = nil
     }
-
+    
     private func movePreset(from source: IndexSet, to destination: Int) {
         presetManager.presets.move(fromOffsets: source, toOffset: destination)
         presetManager.savePresetIndex()
@@ -312,7 +312,7 @@ private struct PresetSettingsSection: View {
 private struct PresetAssignmentSection: View {
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @EnvironmentObject var assignmentManager: PresetAppAssignmentManager
-
+    
     @State private var selectedPresetForAssignmentId: UUID? = StandardPhrasePresetManager.shared.presets.first?.id
     @State private var isShowingAddAppPopover: Bool = false
     @State private var showingFinderPanel = false
@@ -327,24 +327,24 @@ private struct PresetAssignmentSection: View {
     @State private var conflictingBundleIdentifier: String = ""
     @State private var conflictingPresetId: UUID?
     @State private var targetPresetId: UUID?
-
+    
     private var assignedApps: [String] {
         guard let presetId = selectedPresetForAssignmentId else { return [] }
         return assignmentManager.getAssignments(for: presetId).sorted { id1, id2 in
             appName(for: id1).localizedCaseInsensitiveCompare(appName(for: id2)) == .orderedAscending
         }
     }
-
+    
     var body: some View {
         Section(header:
-            VStack(alignment: .leading, spacing: 4) {
-                Text("プリセットの割り当て")
-                    .font(.headline)
-                Text("プリセットをアプリに割り当てると、そのアプリが最前面の時は、自動で選択されたプリセットに切り替わるようになります。")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+                    VStack(alignment: .leading, spacing: 4) {
+            Text("プリセットの割り当て")
+                .font(.headline)
+            Text("プリセットをアプリに割り当てると、そのアプリが最前面の時は、自動で選択されたプリセットに切り替わるようになります。")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
         ) {
             HStack {
                 VStack(alignment: .leading) {
@@ -362,7 +362,7 @@ private struct PresetAssignmentSection: View {
                 .labelsHidden()
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
+            
             Picker("割り当てるプリセット", selection: Binding(
                 get: {
                     // プリセットが空の場合、特別なUUIDを返す
@@ -402,7 +402,7 @@ private struct PresetAssignmentSection: View {
             .onChange(of: selectedPresetForAssignmentId) { _, _ in
                 selectedAssignedAppId = nil
             }
-
+            
             List(selection: $selectedAssignedAppId) {
                 ForEach(assignedApps, id: \.self) { bundleIdentifier in
                     AppRowView(bundleIdentifier: bundleIdentifier)
@@ -484,7 +484,7 @@ private struct PresetAssignmentSection: View {
         }
         .onReceive(presetManager.$presets) { presets in
             let selectionExists = presets.contains(where: { $0.id == selectedPresetForAssignmentId })
-
+            
             if presets.isEmpty {
                 // プリセットが空になったら、選択を「なし」状態にする
                 selectedPresetForAssignmentId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
@@ -499,7 +499,7 @@ private struct PresetAssignmentSection: View {
                     handleAppAssignment(for: presetId, bundleIdentifier: bundleIdentifier)
                 }
             } onSelectionCancelled: { }
-            .frame(width: 0, height: 0).clipped()
+                .frame(width: 0, height: 0).clipped()
         )
         .alert("すべての割り当てを削除", isPresented: $showingClearAssignmentsConfirmation) {
             Button("削除", role: .destructive) { clearAllAssignments() }
@@ -535,7 +535,7 @@ private struct PresetAssignmentSection: View {
             }
         }
     }
-
+    
     private var bottomToolbar: some View {
         VStack(alignment: .leading, spacing: 0) {
             Divider()
@@ -565,9 +565,9 @@ private struct PresetAssignmentSection: View {
                         }
                     )
                 }
-
+                
                 Divider().frame(width: 1, height: 16).background(Color.gray.opacity(0.1)).padding(.horizontal, 4)
-
+                
                 Button(action: {
                     if let selectedId = selectedAssignedAppId {
                         deleteAssignedApp(bundleIdentifier: selectedId)
@@ -580,7 +580,7 @@ private struct PresetAssignmentSection: View {
                 .help(Text("選択したアプリをリストから削除します。"))
                 
                 Spacer()
-
+                
                 Button(action: {
                     showingClearAssignmentsConfirmation = true
                 }) {
@@ -604,7 +604,7 @@ private struct PresetAssignmentSection: View {
     private func displayName(for preset: StandardPhrasePreset) -> String {
         preset.id.uuidString == "00000000-0000-0000-0000-000000000000" ? String(localized: "Default") : preset.name
     }
-
+    
     private func appName(for bundleIdentifier: String) -> String {
         if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier),
            let bundle = Bundle(url: url),
@@ -613,7 +613,7 @@ private struct PresetAssignmentSection: View {
         }
         return bundleIdentifier
     }
-
+    
     private func handleAppAssignment(for presetId: UUID, bundleIdentifier: String) {
         // 既に他のプリセットに割り当てられているか確認
         if let existingPresetId = assignmentManager.getPresetId(for: bundleIdentifier),
@@ -628,7 +628,7 @@ private struct PresetAssignmentSection: View {
             assignmentManager.addAssignment(for: presetId, bundleIdentifier: bundleIdentifier)
         }
     }
-
+    
     private func deleteAssignedApp(at offsets: IndexSet) {
         guard let presetId = selectedPresetForAssignmentId else { return }
         offsets.map { assignedApps[$0] }.forEach {
@@ -636,13 +636,13 @@ private struct PresetAssignmentSection: View {
         }
         selectedAssignedAppId = nil
     }
-
+    
     private func deleteAssignedApp(bundleIdentifier: String) {
         guard let presetId = selectedPresetForAssignmentId else { return }
         assignmentManager.removeAssignment(for: presetId, bundleIdentifier: bundleIdentifier)
         selectedAssignedAppId = nil
     }
-
+    
     private func contextMenuItems(for bundleIdentifier: String) -> some View {
         Button(role: .destructive) {
             deleteAssignedApp(bundleIdentifier: bundleIdentifier)
@@ -650,7 +650,7 @@ private struct PresetAssignmentSection: View {
             Label("削除", systemImage: "trash")
         }
     }
-
+    
     private func clearAllAssignments() {
         guard let presetId = selectedPresetForAssignmentId else { return }
         assignmentManager.clearAssignments(for: presetId)
@@ -661,7 +661,7 @@ private struct PresetAssignmentSection: View {
 private struct PhraseSettingsSection: View {
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
-
+    
     @State private var selectedPhraseId: UUID? = nil
     @State private var showingAddPhraseSheet = false
     @State private var selectedPhrase: StandardPhrase?
@@ -675,21 +675,21 @@ private struct PhraseSettingsSection: View {
     @State private var showingMoveSheet = false
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
-
+    
     private var currentPhrases: [StandardPhrase] {
         presetManager.selectedPreset?.phrases ?? []
     }
-
+    
     var body: some View {
         Section(header:
-            VStack(alignment: .leading, spacing: 4) {
-                Text("定型文の設定")
-                    .font(.headline)
-                Text("定型文の順番はドラッグアンドドロップで並び替えることができます。")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+                    VStack(alignment: .leading, spacing: 4) {
+            Text("定型文の設定")
+                .font(.headline)
+            Text("定型文の順番はドラッグアンドドロップで並び替えることができます。")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
         ) {
             HStack {
                 Text("プリセット")
@@ -809,7 +809,7 @@ private struct PhraseSettingsSection: View {
         }
         .pickerStyle(.menu)
     }
-
+    
     private var addPresetSheet: some View {
         PresetNameSheet(
             name: $newPresetName,
@@ -829,7 +829,7 @@ private struct PhraseSettingsSection: View {
             newPresetColorForPhraseSection = "accent"
         }
     }
-
+    
     private var bottomToolbar: some View {
         VStack(alignment: .leading, spacing: 0) {
             Divider()
@@ -939,7 +939,7 @@ private struct PhraseSettingsSection: View {
             }
         }
     }
-
+    
     private var addSheet: some View {
         AddEditPhraseView(mode: .add, presetManager: presetManager, isSheet: true) { newPhrase in
             addPhrase(newPhrase)
@@ -947,7 +947,7 @@ private struct PhraseSettingsSection: View {
         .environmentObject(standardPhraseManager)
         .environmentObject(presetManager)
     }
-
+    
     private func editSheet(for phrase: StandardPhrase) -> some View {
         AddEditPhraseView(mode: .edit(phrase), phraseToEdit: phrase, presetManager: presetManager, isSheet: true) { editedPhrase in
             updatePhrase(editedPhrase)
@@ -970,31 +970,31 @@ private struct PhraseSettingsSection: View {
     private func displayName(for preset: StandardPhrasePreset) -> String {
         preset.id.uuidString == "00000000-0000-0000-0000-000000000000" ? String(localized: "Default") : preset.name
     }
-
+    
     private func addPhrase(_ phrase: StandardPhrase) {
         guard var p = presetManager.selectedPreset else { return }
         p.phrases.append(phrase)
         presetManager.updatePreset(p)
     }
-
+    
     private func updatePhrase(_ phrase: StandardPhrase) {
         guard var p = presetManager.selectedPreset, let i = p.phrases.firstIndex(where: { $0.id == phrase.id }) else { return }
         p.phrases[i] = phrase
         presetManager.updatePreset(p)
     }
-
+    
     private func deletePhrase(id: UUID) {
         guard var p = presetManager.selectedPreset else { return }
         p.phrases.removeAll { $0.id == id }
         presetManager.updatePreset(p)
     }
-
+    
     private func deletePhrase(atOffsets indexSet: IndexSet) {
         guard var p = presetManager.selectedPreset else { return }
         p.phrases.remove(atOffsets: indexSet)
         presetManager.updatePreset(p)
     }
-
+    
     private func movePhrase(from source: IndexSet, to destination: Int) {
         guard var p = presetManager.selectedPreset else { return }
         p.phrases.move(fromOffsets: source, toOffset: destination)
@@ -1019,13 +1019,13 @@ private struct PhraseManagementSection: View {
     
     @State private var showingClearAllPhrasesConfirmation = false
     @State private var showingClearAllPresetsConfirmation = false
-
+    
     private var allPhrasesCount: Int {
         presetManager.presets.reduce(0) { count, preset in
             count + preset.phrases.count
         }
     }
-
+    
     var body: some View {
         Section(header: Text("定型文の管理").font(.headline)) {
             StandardPhraseImportExportView()
@@ -1087,7 +1087,7 @@ private struct PhraseManagementSection: View {
         }
         return preset.id.uuidString == "00000000-0000-0000-0000-000000000000" ? String(localized: "Default") : preset.name
     }
-
+    
     private func deleteAllPhrases() {
         guard var p = presetManager.selectedPreset else { return }
         p.phrases = []
@@ -1102,19 +1102,19 @@ private struct PhraseManagementSection: View {
     }
 }
 
-    private func localizedColorName(for colorName: String) -> String {
-        switch colorName {
-        case "accent": return String(localized: "アクセントカラー")
-        case "red": return String(localized: "レッド")
-        case "orange": return String(localized: "オレンジ")
-        case "yellow": return String(localized: "イエロー")
-        case "green": return String(localized: "グリーン")
-        case "blue": return String(localized: "ブルー")
-        case "purple": return String(localized: "パープル")
-        case "pink": return String(localized: "ピンク")
-        default: return ""
-        }
+private func localizedColorName(for colorName: String) -> String {
+    switch colorName {
+    case "accent": return String(localized: "アクセントカラー")
+    case "red": return String(localized: "レッド")
+    case "orange": return String(localized: "オレンジ")
+    case "yellow": return String(localized: "イエロー")
+    case "green": return String(localized: "グリーン")
+    case "blue": return String(localized: "ブルー")
+    case "purple": return String(localized: "パープル")
+    case "pink": return String(localized: "ピンク")
+    default: return ""
     }
+}
 
 // MARK: - Reusable Components
 private struct PresetNameSheet: View {
@@ -1122,10 +1122,11 @@ private struct PresetNameSheet: View {
     @Binding var icon: String
     @Binding var color: String
     @State private var showingIconPicker = false
+    @State private var previousIcon: String = ""
     var title: String
     var onSave: () -> Void
     var onCancel: () -> Void
-
+    
     var body: some View {
         VStack(spacing: 10) {
             HStack {
@@ -1134,47 +1135,48 @@ private struct PresetNameSheet: View {
             }
             
             HStack {
-                            VStack(alignment: .leading, spacing: 10) {
-                                // アイコン選択ボタンと入力フィールド
-                                HStack {
-                                    SFSymbolsPicker(selection: $icon, prompt: String(localized: "シンボルを検索")) {
-                                        ZStack {
+                VStack(alignment: .leading, spacing: 10) {
+                    // アイコン選択ボタンと入力フィールド
+                    HStack {
+                        SFSymbolsPicker(selection: $icon, prompt: String(localized: "シンボルを検索")) {
+                            ZStack {
+                                Circle()
+                                    .fill(getColor(from: color))
+                                    .frame(width: 30, height: 30)
+                                Image(systemName: icon.isEmpty ? previousIcon : icon)
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 14))
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        
+                        TextField("プリセット名", text: $name).onSubmit(onSave)
+                    }
+                    
+                    // カラーピッカー
+                    HStack {
+                        Text("Color:")
+                        Spacer()
+                        HStack(spacing: 5) {
+                            ForEach(getColorOptions(), id: \.self) { colorName in
+                                Button(action: {
+                                    color = colorName
+                                }) {
+                                    Circle()
+                                        .fill(getColor(from: colorName))
+                                        .frame(width: 20, height: 20)
+                                        .overlay(
                                             Circle()
-                                                .fill(getColor(from: color))
-                                                .frame(width: 30, height: 30)
-                                            Image(systemName: icon)
-                                                .foregroundColor(.white)
-                                                .font(.system(size: 14))
-                                        }
-                                    }
-                                    .buttonStyle(.plain)
-                                    
-                                    TextField("プリセット名", text: $name).onSubmit(onSave)
+                                                .stroke(color == colorName ? Color.primary : Color.clear, lineWidth: 2)
+                                        )
                                 }
-                                
-                                // カラーピッカー
-                                HStack {
-                                    Text("Color:")
-                                    Spacer()
-                                    HStack(spacing: 5) {
-                                        ForEach(getColorOptions(), id: \.self) { colorName in
-                                            Button(action: {
-                                                color = colorName
-                                            }) {
-                                                Circle()
-                                                    .fill(getColor(from: colorName))
-                                                    .frame(width: 20, height: 20)
-                                                    .overlay(
-                                                        Circle()
-                                                            .stroke(color == colorName ? Color.primary : Color.clear, lineWidth: 2)
-                                                    )
-                                            }
-                                            .buttonStyle(.plain)
-                                            .help(Text(localizedColorName(for: colorName)))
-                                        }
-                                    }
-                                }
-                            }            }
+                                .buttonStyle(.plain)
+                                .help(Text(localizedColorName(for: colorName)))
+                            }
+                        }
+                    }
+                }
+            }
             
             Spacer()
             
@@ -1186,6 +1188,9 @@ private struct PresetNameSheet: View {
         }
         .padding()
         .frame(width: 300, height: 180)
+        .onAppear {
+            previousIcon = icon // ここを追加
+        }
     }
     
     private func getColor(from colorName: String) -> Color {
@@ -1208,7 +1213,7 @@ private struct PresetNameSheet: View {
 
 private struct AppRowView: View {
     let bundleIdentifier: String
-
+    
     var body: some View {
         HStack {
             // bundleIdentifier から NSRunningApplication を取得するロジックを追加
@@ -1234,7 +1239,7 @@ private struct AppRowView: View {
             }
         }
     }
-
+    
     private func appName(for bundleIdentifier: String) -> String {
         if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier),
            let bundle = Bundle(url: url),
@@ -1252,12 +1257,12 @@ private struct AppSelectionPopoverView: View {
     let onSelectFromFinder: () -> Void
     
     @State private var showAllRunningApps: Bool = false
-
+    
     private var filteredApps: [NSRunningApplication] {
         let unassigned = runningApplications.filter { !assignedApps.contains($0.bundleIdentifier ?? "") }
         return showAllRunningApps ? unassigned : unassigned.filter { $0.activationPolicy == .regular }
     }
-
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -1266,7 +1271,7 @@ private struct AppSelectionPopoverView: View {
                 Toggle(isOn: $showAllRunningApps) { Text("すべてのプロセスを表示") }.toggleStyle(.checkbox).font(.subheadline)
             }
             .padding(.bottom, 4)
-
+            
             ScrollView {
                 VStack(alignment: .leading) {
                     ForEach(filteredApps.sorted(by: { ($0.localizedName ?? "") < ($1.localizedName ?? "") }), id: \.self) { app in
@@ -1290,7 +1295,7 @@ private struct AppSelectionPopoverView: View {
             .frame(maxHeight: 200)
             
             Divider().padding(.vertical, 4)
-
+            
             Button(action: onSelectFromFinder) {
                 HStack {
                     Image(systemName: "folder.fill")

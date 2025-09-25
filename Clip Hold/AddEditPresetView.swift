@@ -9,6 +9,7 @@ struct AddEditPresetView: View {
     @State private var presetIcon: String = "list.bullet.rectangle.portrait"
     @State private var presetColor: String = "accent"
     @State private var showingIconPicker = false
+    @State private var previousPresetIcon: String = "" // ここを復活
     @Environment(\.dismiss) var dismiss
     @FocusState private var isPresetNameFieldFocused: Bool
     
@@ -34,7 +35,7 @@ struct AddEditPresetView: View {
                         Circle()
                             .fill(getColor(from: presetColor))
                             .frame(width: 30, height: 30)
-                        Image(systemName: presetIcon)
+                        Image(systemName: presetIcon.isEmpty ? previousPresetIcon : presetIcon)
                             .foregroundColor(.white)
                             .font(.system(size: 14))
                     }
@@ -98,6 +99,8 @@ struct AddEditPresetView: View {
                 window.makeKeyAndOrderFront(nil)
                 NSApp.activate(ignoringOtherApps: true)
             }
+            
+            previousPresetIcon = presetIcon // ここを追加
             
             // テキストフィールドにフォーカスを当てる
             DispatchQueue.main.async {
