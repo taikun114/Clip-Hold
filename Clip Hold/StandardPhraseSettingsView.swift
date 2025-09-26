@@ -8,6 +8,7 @@ struct StandardPhraseSettingsView: View {
     @StateObject private var presetManager = StandardPhrasePresetManager.shared
     @StateObject private var assignmentManager = PresetAppAssignmentManager.shared
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @StateObject var iconGenerator = PresetIconGenerator.shared
     
     var body: some View {
         Form {
@@ -20,6 +21,7 @@ struct StandardPhraseSettingsView: View {
         .environmentObject(presetManager)
         .environmentObject(assignmentManager)
         .environmentObject(standardPhraseManager)
+        .environmentObject(iconGenerator)
     }
 }
 

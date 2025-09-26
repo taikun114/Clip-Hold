@@ -3,6 +3,7 @@ import SwiftUI
 struct ImportPresetSelectionSheet: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var presetManager: StandardPhrasePresetManager
+    @StateObject var iconGenerator = PresetIconGenerator.shared
     
     @Binding var selectedPresetId: UUID?
     var onConfirm: (_ shouldCreateNewPreset: Bool) -> Void
@@ -68,8 +69,16 @@ struct ImportPresetSelectionSheet: View {
                     
                     Picker("プリセットを選択", selection: $selectedPresetId) {
                         ForEach(presetManager.presets) { preset in
-                            Text(preset.truncatedDisplayName(maxLength: 50))
-                                .tag(preset.id as UUID?)
+                            Label {
+                                Text(preset.truncatedDisplayName(maxLength: 50))
+                            } icon: {
+                                if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
+                                    Image(nsImage: iconImage)
+                                } else {
+                                    Image(systemName: "star.fill") // Fallback
+                                }
+                            }
+                            .tag(preset.id as UUID?)
                         }
                         
                         Divider()
@@ -79,6 +88,7 @@ struct ImportPresetSelectionSheet: View {
                     }
                     .pickerStyle(.menu)
                     .labelsHidden()
+                    .labelStyle(.titleAndIcon)
                     
                     Spacer()
                     

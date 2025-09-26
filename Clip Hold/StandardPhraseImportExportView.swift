@@ -87,6 +87,7 @@ extension StandardPhraseManager {
 // MARK: - インポート/エクスポート機能を提供するView
 struct StandardPhraseImportExportView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
+    @EnvironmentObject var iconGenerator: PresetIconGenerator
     @StateObject private var presetManager = StandardPhrasePresetManager.shared
 
     @State private var showingFileExporter = false
@@ -170,18 +171,31 @@ struct StandardPhraseImportExportView: View {
                     .foregroundStyle(.secondary)
                 
                 Picker("プリセットを選択", selection: $selectedExportPresetId) {
-                    Text("すべて")
-                        .tag(nil as UUID?)
+                    Label {
+                        Text("すべて")
+                    } icon: {
+                        Image(systemName: "list.bullet.rectangle.portrait")
+                    }
+                    .tag(nil as UUID?)
                     
                     Divider()
                     
                     ForEach(exportablePresets) { preset in
-                        Text(preset.truncatedDisplayName(maxLength: 50))
-                            .tag(preset.id as UUID?)
+                        Label {
+                            Text(preset.truncatedDisplayName(maxLength: 50))
+                        } icon: {
+                            if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
+                                Image(nsImage: iconImage)
+                            } else {
+                                Image(systemName: "star.fill") // Fallback
+                            }
+                        }
+                        .tag(preset.id as UUID?)
                     }
                 }
                 .pickerStyle(.menu)
                 .labelsHidden()
+                .labelStyle(.titleAndIcon)
                 
                 Toggle("旧バージョンで使用できるようにする", isOn: $useLegacyFormat)
                     .help("有効にすると、プリセット情報なしで定型文のみをエクスポートします。")
