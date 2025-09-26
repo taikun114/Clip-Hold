@@ -55,7 +55,8 @@ class StandardPhrasePresetManager: ObservableObject {
             name: "Default", // ローカライズされない名前
             phrases: standardPhraseManager.standardPhrases,
             icon: "star.fill",
-            color: "accent"
+            color: "accent",
+            customColor: nil
         )
         presets.append(defaultPreset)
         selectedPresetId = defaultPreset.id
@@ -149,12 +150,13 @@ class StandardPhrasePresetManager: ObservableObject {
                 
                 if fileName == defaultPresetFileName {
                     if !didUserDeleteDefaultPreset() {
-                        let preset = StandardPhrasePreset(id: defaultPresetId, name: "Default", phrases: [], icon: "star.fill", color: "accent")
+                        let preset = StandardPhrasePreset(id: defaultPresetId, name: "Default", phrases: [], icon: "star.fill", color: "accent", customColor: nil)
                         newPresets.insert(preset, at: 0) // デフォルトが最初に来るようにする
                     }
                 } else if let uuid = UUID(uuidString: fileName) {
+                    // ここではカスタムカラーを読み込めないため、nilを設定
                     let presetName = "Preset \(presetCounter)"
-                    let preset = StandardPhrasePreset(id: uuid, name: presetName, phrases: [], icon: "list.bullet.rectangle.portrait", color: "accent")
+                    let preset = StandardPhrasePreset(id: uuid, name: presetName, phrases: [], icon: "list.bullet.rectangle.portrait", color: "accent", customColor: nil)
                     newPresets.append(preset)
                     presetCounter += 1
                 }
@@ -188,7 +190,7 @@ class StandardPhrasePresetManager: ObservableObject {
                 let fileName = presetInfo.id == defaultPresetId ? defaultPresetFileName : presetInfo.id.uuidString
                 let presetFileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
                 if FileManager.default.fileExists(atPath: presetFileURL.path) {
-                    loadedPresets.append(StandardPhrasePreset(id: presetInfo.id, name: presetInfo.name, phrases: [], icon: presetInfo.icon, color: presetInfo.color))
+                    loadedPresets.append(StandardPhrasePreset(id: presetInfo.id, name: presetInfo.name, phrases: [], icon: presetInfo.icon, color: presetInfo.color, customColor: presetInfo.customColor))
                 } else if presetInfo.id == defaultPresetId && didUserDeleteDefaultPreset() {
                     // デフォルトのプリセットファイルがなく、ユーザーが削除した場合は何もしない
                     continue
@@ -205,12 +207,16 @@ class StandardPhrasePresetManager: ObservableObject {
     
     private func loadPresetPhrases(for presetId: UUID) {
         guard let presetDirectory = getPresetDirectory(),
-              let presetIndex = presets.firstIndex(where: { $0.id == presetId }) else { return }
+              let presetIndex = presets.firstIndex(where: { $0.id == presetId }) else {
+            return
+        }
         
         let fileName = presetId == defaultPresetId ? defaultPresetFileName : presetId.uuidString
         let fileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
         
-        guard FileManager.default.fileExists(atPath: fileURL.path) else { return }
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            return
+        }
         
         do {
             let data = try Data(contentsOf: fileURL)
@@ -222,7 +228,9 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     private func savePresetToFile(_ preset: StandardPhrasePreset) {
-        guard let presetDirectory = getPresetDirectory() else { return }
+        guard let presetDirectory = getPresetDirectory() else {
+            return
+        }
         
         let fileName = preset.id == defaultPresetId ? defaultPresetFileName : preset.id.uuidString
         let fileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
@@ -239,10 +247,12 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     func savePresetIndex() {
-        guard let presetDirectory = getPresetDirectory() else { return }
+        guard let presetDirectory = getPresetDirectory() else {
+            return
+        }
         let indexFileURL = presetDirectory.appendingPathComponent(presetIndexFileName)
         
-        let presetInfos = presets.map { PresetInfo(id: $0.id, name: $0.name, icon: $0.icon, color: $0.color) }
+        let presetInfos = presets.map { PresetInfo(id: $0.id, name: $0.name, icon: $0.icon, color: $0.color, customColor: $0.customColor) }
         
         do {
             let data = try JSONEncoder().encode(presetInfos)
@@ -253,7 +263,9 @@ class StandardPhrasePresetManager: ObservableObject {
     }
     
     private func deletePresetFile(id: UUID) {
-        guard let presetDirectory = getPresetDirectory() else { return }
+        guard let presetDirectory = getPresetDirectory() else {
+            return
+        }
         let fileName = id == defaultPresetId ? defaultPresetFileName : id.uuidString
         let fileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
         
@@ -286,9 +298,9 @@ class StandardPhrasePresetManager: ObservableObject {
         }
     }
     
-    func addPreset(name: String, icon: String? = nil, color: String? = nil) {
+    func addPreset(name: String, icon: String? = nil, color: String? = nil, customColor: PresetCustomColor? = nil) {
         let iconToUse = icon?.isEmpty ?? true ? "list.bullet.rectangle.portrait" : icon!
-        let newPreset = StandardPhrasePreset(name: name, icon: iconToUse, color: color)
+        let newPreset = StandardPhrasePreset(name: name, icon: iconToUse, color: color, customColor: customColor)
         presets.append(newPreset)
         // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
         if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
@@ -304,7 +316,7 @@ class StandardPhrasePresetManager: ObservableObject {
     func addPreset(preset: StandardPhrasePreset) {
         // アイコンが空文字列の場合、デフォルトアイコンに設定
         let iconToUse = preset.icon.isEmpty ? (preset.id.uuidString == "00000000-0000-0000-0000-000000000000" ? "star.fill" : "list.bullet.rectangle.portrait") : preset.icon
-        let presetWithValidIcon = StandardPhrasePreset(id: preset.id, name: preset.name, phrases: preset.phrases, icon: iconToUse, color: preset.color)
+        let presetWithValidIcon = StandardPhrasePreset(id: preset.id, name: preset.name, phrases: preset.phrases, icon: iconToUse, color: preset.color, customColor: preset.customColor)
         
         presets.append(presetWithValidIcon)
         // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
@@ -318,13 +330,13 @@ class StandardPhrasePresetManager: ObservableObject {
         presetAddedSubject.send()
     }
     
-    func addPresetWithId(_ id: UUID, name: String, icon: String? = nil, color: String? = nil) {
+    func addPresetWithId(_ id: UUID, name: String, icon: String? = nil, color: String? = nil, customColor: PresetCustomColor? = nil) {
         // 既に同じIDのプリセットが存在する場合は追加しない
         if presets.contains(where: { $0.id == id }) {
             return
         }
         let iconToUse = icon?.isEmpty ?? true ? (id.uuidString == "00000000-0000-0000-0000-000000000000" ? "star.fill" : "list.bullet.rectangle.portrait") : icon!
-        let newPreset = StandardPhrasePreset(id: id, name: name, icon: iconToUse, color: color)
+        let newPreset = StandardPhrasePreset(id: id, name: name, icon: iconToUse, color: color, customColor: customColor)
         presets.append(newPreset)
         // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
         if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
@@ -367,7 +379,8 @@ class StandardPhrasePresetManager: ObservableObject {
         if let index = presets.firstIndex(where: { $0.id == preset.id }) {
             // アイコンが空文字列の場合、元のアイコンに設定
             let iconToUse = preset.icon.isEmpty ? presets[index].icon : preset.icon
-            let presetWithValidIcon = StandardPhrasePreset(id: preset.id, name: preset.name, phrases: preset.phrases, icon: iconToUse, color: preset.color)
+            var presetWithValidIcon = preset
+            presetWithValidIcon.icon = iconToUse
             
             presets[index] = presetWithValidIcon
             savePresetToFile(presetWithValidIcon)
@@ -382,7 +395,10 @@ class StandardPhrasePresetManager: ObservableObject {
         let newPreset = StandardPhrasePreset(
             id: UUID(), // 新しいID
             name: preset.name, // 同じ名前を維持
-            phrases: preset.phrases // フレーズをコピー
+            phrases: preset.phrases, // フレーズをコピー
+            icon: preset.icon,
+            color: preset.color,
+            customColor: preset.customColor
         )
         
         // 新しいプリセットを配列に追加
@@ -488,4 +504,5 @@ struct PresetInfo: Codable {
     let name: String
     let icon: String?
     let color: String?
+    let customColor: PresetCustomColor?
 }

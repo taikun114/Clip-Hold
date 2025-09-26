@@ -72,7 +72,7 @@ class PresetIconGenerator: ObservableObject {
         image.lockFocus()
         
         let rect = NSRect(origin: .zero, size: size)
-        let nsColor = getColor(from: preset.color)
+        let nsColor = getColor(from: preset.color, with: preset.customColor)
         
         // 1. Draw the background circle
         let path = NSBezierPath(ovalIn: rect)
@@ -85,12 +85,7 @@ class PresetIconGenerator: ObservableObject {
             if let configuredSymbol = symbolImage.withSymbolConfiguration(symbolConfig) {
                 
                 // Determine symbol color based on preset color
-                let symbolForegroundColor: NSColor
-                if preset.color == "yellow" || preset.color == "green" {
-                    symbolForegroundColor = .black
-                } else {
-                    symbolForegroundColor = .white
-                }
+                let symbolForegroundColor = getSymbolColor(for: preset.color, with: preset.customColor, on: nsColor)
 
                 // 3. Create a tinted version of the symbol
                 let tintedSymbol = NSImage(size: configuredSymbol.size, flipped: false) { (dstRect) -> Bool in
@@ -122,7 +117,7 @@ class PresetIconGenerator: ObservableObject {
         image.lockFocus()
         
         let rect = NSRect(origin: .zero, size: size)
-        let nsColor = getColor(from: preset.color)
+        let nsColor = getColor(from: preset.color, with: preset.customColor)
         
         // 1. Draw the background circle
         let path = NSBezierPath(ovalIn: rect)
@@ -135,12 +130,7 @@ class PresetIconGenerator: ObservableObject {
             if let configuredSymbol = symbolImage.withSymbolConfiguration(symbolConfig) {
                 
                 // Determine symbol color based on preset color
-                let symbolForegroundColor: NSColor
-                if preset.color == "yellow" || preset.color == "green" {
-                    symbolForegroundColor = .black
-                } else {
-                    symbolForegroundColor = .white
-                }
+                let symbolForegroundColor = getSymbolColor(for: preset.color, with: preset.customColor, on: nsColor)
 
                 // 3. Create a tinted version of the symbol
                 let tintedSymbol = NSImage(size: configuredSymbol.size, flipped: false) { (dstRect) -> Bool in
@@ -172,7 +162,7 @@ class PresetIconGenerator: ObservableObject {
         image.lockFocus()
         
         let rect = NSRect(origin: .zero, size: size)
-        let nsColor = getColor(from: preset.color)
+        let nsColor = getColor(from: preset.color, with: preset.customColor)
         
         // 1. Draw the background circle
         let path = NSBezierPath(ovalIn: rect)
@@ -185,12 +175,7 @@ class PresetIconGenerator: ObservableObject {
             if let configuredSymbol = symbolImage.withSymbolConfiguration(symbolConfig) {
                 
                 // Determine symbol color based on preset color
-                let symbolForegroundColor: NSColor
-                if preset.color == "yellow" || preset.color == "green" {
-                    symbolForegroundColor = .black
-                } else {
-                    symbolForegroundColor = .white
-                }
+                let symbolForegroundColor = getSymbolColor(for: preset.color, with: preset.customColor, on: nsColor)
 
                 // 3. Create a tinted version of the symbol
                 let tintedSymbol = NSImage(size: configuredSymbol.size, flipped: false) { (dstRect) -> Bool in
@@ -215,7 +200,11 @@ class PresetIconGenerator: ObservableObject {
         return image
     }
 
-    private func getColor(from colorName: String) -> NSColor {
+    private func getColor(from colorName: String, with customColor: PresetCustomColor?) -> NSColor {
+        if colorName == "custom", let custom = customColor {
+            return NSColor(hex: custom.background)
+        }
+        
         let swiftUIColor: Color
         switch colorName {
         case "red": swiftUIColor = .red
@@ -228,5 +217,18 @@ class PresetIconGenerator: ObservableObject {
         default: swiftUIColor = .accentColor
         }
         return NSColor(swiftUIColor)
+    }
+    
+    private func getSymbolColor(for colorName: String, with customColor: PresetCustomColor?, on backgroundColor: NSColor) -> NSColor {
+        if colorName == "custom", let custom = customColor {
+            return NSColor(hex: custom.icon)
+        }
+        
+        // For predefined colors, use the old logic
+        if colorName == "yellow" || colorName == "green" {
+            return .black
+        } else {
+            return .white
+        }
     }
 }

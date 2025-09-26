@@ -1,4 +1,3 @@
-
 import SwiftUI
 import UniformTypeIdentifiers
 import SFSymbolsPicker
@@ -64,10 +63,10 @@ private struct PresetSettingsSection: View {
                             // Fallback to manual drawing if icon not found (should not happen)
                             ZStack {
                                 Circle()
-                                    .fill(getColor(from: preset.color))
+                                    .fill(getColor(from: preset.color, customColor: preset.customColor))
                                     .frame(width: 20, height: 20)
                                 Image(systemName: preset.icon)
-                                    .foregroundColor(getSymbolColor(forPresetColor: preset.color))
+                                    .foregroundColor(getSymbolColor(forPresetColor: preset.color, customColor: preset.customColor))
                                     .font(.system(size: 10))
                             }
                         }
@@ -132,7 +131,7 @@ private struct PresetSettingsSection: View {
             .overlay(alignment: .bottom) { bottomToolbar }
         }
         .sheet(isPresented: $showingAddPresetSheet) { addPresetSheet }
-        .sheet(isPresented: $showingEditPresetSheet) { editPresetSheet }
+        .sheet(isPresented: $showingEditPresetSheet, onDismiss: { editingPreset = nil }) { editPresetSheet }
         .alert("プリセットの削除", isPresented: $showingDeletePresetConfirmation) {
             Button("削除", role: .destructive) {
                 if let preset = presetToDelete {
@@ -153,8 +152,10 @@ private struct PresetSettingsSection: View {
         }
     }
     
-    private func getSymbolColor(forPresetColor colorName: String) -> Color {
-        if colorName == "yellow" || colorName == "green" {
+    private func getSymbolColor(forPresetColor colorName: String, customColor: PresetCustomColor?) -> Color {
+        if colorName == "custom", let custom = customColor {
+            return Color(hex: custom.icon)
+        } else if colorName == "yellow" || colorName == "green" {
             return .black
         } else {
             return .white
@@ -227,22 +228,17 @@ private struct PresetSettingsSection: View {
             icon: $newPresetIcon,
             color: $newPresetColor,
             title: String(localized: "プリセット名を入力")
-        ) {
-            addPreset(name: newPresetName, icon: newPresetIcon, color: newPresetColor)
+        ) { customColor in
+            addPreset(name: newPresetName, icon: newPresetIcon, color: newPresetColor, customColor: customColor)
             newPresetName = ""
-            newPresetIcon = "list.bullet.rectangle.portrait"  // デフォルトアイコンに戻す
-            newPresetColor = "accent"  // デフォルトカラーに戻す
+            newPresetIcon = "list.bullet.rectangle.portrait"
+            newPresetColor = "accent"
             showingAddPresetSheet = false
         } onCancel: {
             showingAddPresetSheet = false
             newPresetName = ""
-            newPresetIcon = "list.bullet.rectangle.portrait"  // デフォルトアイコンに戻す
-            newPresetColor = "accent"  // デフォルトカラーに戻す
-        }
-        .onDisappear {
-            if let lastAddedPresetId = presetManager.presets.last?.id,
-               presetManager.selectedPresetId != lastAddedPresetId {
-            }
+            newPresetIcon = "list.bullet.rectangle.portrait"
+            newPresetColor = "accent"
         }
     }
     
@@ -251,20 +247,21 @@ private struct PresetSettingsSection: View {
             name: $newPresetName,
             icon: $newPresetIcon,
             color: $newPresetColor,
+            editingPreset: editingPreset,
             title: String(localized: "プリセット名を編集")
-        ) {
+        ) { customColor in
             if let preset = editingPreset {
-                updatePreset(preset, newName: newPresetName, newIcon: newPresetIcon, newColor: newPresetColor)
+                updatePreset(preset, newName: newPresetName, newIcon: newPresetIcon, newColor: newPresetColor, customColor: customColor)
                 newPresetName = ""
-                newPresetIcon = "list.bullet.rectangle.portrait"  // デフォルトアイコンに戻す
-                newPresetColor = "accent"  // デフォルトカラーに戻す
+                newPresetIcon = "list.bullet.rectangle.portrait"
+                newPresetColor = "accent"
                 showingEditPresetSheet = false
             }
         } onCancel: {
             showingEditPresetSheet = false
             newPresetName = ""
-            newPresetIcon = "list.bullet.rectangle.portrait"  // デフォルトアイコンに戻す
-            newPresetColor = "accent"  // デフォルトカラーに戻す
+            newPresetIcon = "list.bullet.rectangle.portrait"
+            newPresetColor = "accent"
         }
     }
     
@@ -276,16 +273,17 @@ private struct PresetSettingsSection: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
     
-    private func addPreset(name: String, icon: String, color: String) {
-        presetManager.addPreset(name: name, icon: icon, color: color)
+    private func addPreset(name: String, icon: String, color: String, customColor: PresetCustomColor?) {
+        presetManager.addPreset(name: name, icon: icon, color: color, customColor: customColor)
     }
     
-    private func updatePreset(_ preset: StandardPhrasePreset, newName: String, newIcon: String, newColor: String) {
-        guard let index = presetManager.presets.firstIndex(where: { $0.id == preset.id }) else { return }
-        presetManager.presets[index].name = newName
-        presetManager.presets[index].icon = newIcon
-        presetManager.presets[index].color = newColor
-        presetManager.updatePreset(presetManager.presets[index])
+    private func updatePreset(_ preset: StandardPhrasePreset, newName: String, newIcon: String, newColor: String, customColor: PresetCustomColor?) {
+        var updatedPreset = preset
+        updatedPreset.name = newName
+        updatedPreset.icon = newIcon
+        updatedPreset.color = newColor
+        updatedPreset.customColor = customColor
+        presetManager.updatePreset(updatedPreset)
     }
     
     private func deletePreset(id: UUID) {
@@ -304,7 +302,10 @@ private struct PresetSettingsSection: View {
         presetManager.savePresetIndex()
     }
     
-    private func getColor(from colorName: String) -> Color {
+    private func getColor(from colorName: String, customColor: PresetCustomColor?) -> Color {
+        if colorName == "custom", let custom = customColor {
+            return Color(hex: custom.background)
+        }
         switch colorName {
         case "red": return .red
         case "orange": return .orange
@@ -313,12 +314,8 @@ private struct PresetSettingsSection: View {
         case "blue": return .blue
         case "purple": return .purple
         case "pink": return .pink
-        default: return .accentColor // アクセントカラー
+        default: return .accentColor
         }
-    }
-    
-    private func getColorOptions() -> [String] {
-        return ["accent", "red", "orange", "yellow", "green", "blue", "purple", "pink"]
     }
 }
 
@@ -852,8 +849,8 @@ private struct PhraseSettingsSection: View {
             icon: $newPresetIconForPhraseSection,
             color: $newPresetColorForPhraseSection,
             title: String(localized: "プリセット名を入力")
-        ) {
-            addPreset(name: newPresetName, icon: newPresetIconForPhraseSection, color: newPresetColorForPhraseSection)
+        ) { customColor in
+            addPreset(name: newPresetName, icon: newPresetIconForPhraseSection, color: newPresetColorForPhraseSection, customColor: customColor)
             newPresetName = ""
             newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
             newPresetColorForPhraseSection = "accent"
@@ -1043,8 +1040,8 @@ private struct PhraseSettingsSection: View {
         presetManager.updatePreset(p)
     }
     
-    private func addPreset(name: String, icon: String, color: String) {
-        presetManager.addPreset(name: name, icon: icon, color: color)
+    private func addPreset(name: String, icon: String, color: String, customColor: PresetCustomColor?) {
+        presetManager.addPreset(name: name, icon: icon, color: color, customColor: customColor)
     }
 }
 
@@ -1158,13 +1155,15 @@ private struct PresetNameSheet: View {
     @Binding var name: String
     @Binding var icon: String
     @Binding var color: String
+    var editingPreset: StandardPhrasePreset? = nil
+    
     @State private var showingIconPicker = false
     @State private var previousIcon: String = ""
     @State private var showingColorPicker = false
     @State private var customBackgroundColor = Color.blue
     @State private var customIconColor = Color.white
     var title: String
-    var onSave: () -> Void
+    var onSave: (PresetCustomColor?) -> Void
     var onCancel: () -> Void
     
     var body: some View {
@@ -1190,16 +1189,17 @@ private struct PresetNameSheet: View {
                         }
                         .buttonStyle(.plain)
                         .onChange(of: icon) { oldValue, newValue in
-                            // アイコンが空文字列になった場合、previousIconに戻す
                             if newValue.isEmpty {
                                 icon = previousIcon
                             } else {
-                                // 新しいアイコンが選択されたら、previousIconを更新
                                 previousIcon = newValue
                             }
                         }
                         
-                        TextField("プリセット名", text: $name).onSubmit(onSave)
+                        TextField("プリセット名", text: $name).onSubmit {
+                            let customColorData = self.color == "custom" ? PresetCustomColor(background: customBackgroundColor.toHex() ?? "#0000FF", icon: customIconColor.toHex() ?? "#FFFFFF") : nil
+                            onSave(customColorData)
+                        }
                     }
                     
                     // カラーピッカー
@@ -1214,7 +1214,7 @@ private struct PresetNameSheet: View {
                                     }) {
                                         ZStack {
                                             Circle()
-                                                .fill(Color.gray)
+                                                .fill(color == "custom" ? customBackgroundColor : .gray)
                                                 .frame(width: 20, height: 20)
                                             Image(systemName: "paintpalette")
                                                 .font(.system(size: 10))
@@ -1246,7 +1246,6 @@ private struct PresetNameSheet: View {
                                             Spacer()
                                             
                                             Button(action: {
-                                                // カスタムカラーを適用
                                                 showingColorPicker = false
                                                 color = "custom"
                                             }) {
@@ -1285,13 +1284,20 @@ private struct PresetNameSheet: View {
             HStack {
                 Button("キャンセル", role: .cancel, action: onCancel).controlSize(.large)
                 Spacer()
-                Button("保存", action: onSave).controlSize(.large).buttonStyle(.borderedProminent).disabled(name.isEmpty)
+                Button("保存", action: {
+                    let customColorData = self.color == "custom" ? PresetCustomColor(background: customBackgroundColor.toHex() ?? "#0000FF", icon: customIconColor.toHex() ?? "#FFFFFF") : nil
+                    onSave(customColorData)
+                }).controlSize(.large).buttonStyle(.borderedProminent).disabled(name.isEmpty)
             }
         }
         .padding()
         .frame(width: 300, height: 180)
         .onAppear {
-            previousIcon = icon // ここを追加
+            previousIcon = icon
+            if let preset = editingPreset, preset.color == "custom", let custom = preset.customColor {
+                customBackgroundColor = Color(hex: custom.background)
+                customIconColor = Color(hex: custom.icon)
+            }
         }
     }
     
@@ -1314,8 +1320,8 @@ private struct PresetNameSheet: View {
         case "blue": return .blue
         case "purple": return .purple
         case "pink": return .pink
-        case "custom": return .gray // 独自色のプレースホルダー
-        default: return .accentColor // アクセントカラー
+        case "custom": return .gray // Placeholder, should be replaced by customBackgroundColor
+        default: return .accentColor
         }
     }
     

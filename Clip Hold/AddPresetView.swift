@@ -160,7 +160,8 @@ struct AddPresetView: View {
     
     private func addPreset() {
         let iconToSave = presetIcon.isEmpty ? previousPresetIcon : presetIcon
-        let newPreset = StandardPhrasePreset(name: presetName, icon: iconToSave, color: presetColor)
+        let customColorData = presetColor == "custom" ? PresetCustomColor(background: customBackgroundColor.toHex() ?? "#0000FF", icon: customIconColor.toHex() ?? "#FFFFFF") : nil
+        let newPreset = StandardPhrasePreset(name: presetName, icon: iconToSave, color: presetColor, customColor: customColorData)
         presetManager.addPreset(preset: newPreset)
         dismiss()
         onDismiss?()
