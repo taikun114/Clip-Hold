@@ -83,6 +83,7 @@ private struct PresetSettingsSection: View {
                     }
                     .tag(preset.id)
                     .contentShape(Rectangle())
+                    .help(Text(displayName(for: preset)))
                 }
                 .onDelete(perform: deletePreset)
                 .onMove(perform: movePreset)
