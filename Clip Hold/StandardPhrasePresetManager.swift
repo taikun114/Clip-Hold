@@ -190,7 +190,11 @@ class StandardPhrasePresetManager: ObservableObject {
                 let fileName = presetInfo.id == defaultPresetId ? defaultPresetFileName : presetInfo.id.uuidString
                 let presetFileURL = presetDirectory.appendingPathComponent(fileName).appendingPathExtension("json")
                 if FileManager.default.fileExists(atPath: presetFileURL.path) {
-                    loadedPresets.append(StandardPhrasePreset(id: presetInfo.id, name: presetInfo.name, phrases: [], icon: presetInfo.icon, color: presetInfo.color, customColor: presetInfo.customColor))
+                    var presetColor = presetInfo.color
+                    if presetInfo.customColor != nil {
+                        presetColor = "custom"
+                    }
+                    loadedPresets.append(StandardPhrasePreset(id: presetInfo.id, name: presetInfo.name, phrases: [], icon: presetInfo.icon, color: presetColor, customColor: presetInfo.customColor))
                 } else if presetInfo.id == defaultPresetId && didUserDeleteDefaultPreset() {
                     // デフォルトのプリセットファイルがなく、ユーザーが削除した場合は何もしない
                     continue

@@ -30,7 +30,6 @@ private struct PresetSettingsSection: View {
     
     @State private var selectedPresetId: UUID? = nil
     @State private var showingAddPresetSheet = false
-    @State private var showingEditPresetSheet = false
     @State private var newPresetName = ""
     @State private var newPresetIcon = "list.bullet.rectangle.portrait"
     @State private var newPresetColor = "accent"
@@ -100,7 +99,6 @@ private struct PresetSettingsSection: View {
                             newPresetName = preset.name
                             newPresetIcon = preset.icon
                             newPresetColor = preset.color
-                            showingEditPresetSheet = true
                         }
                     } label: { Label("編集...", systemImage: "pencil") }
                         .disabled(isDefaultPreset(id: selectedId))
@@ -124,14 +122,32 @@ private struct PresetSettingsSection: View {
                         newPresetName = preset.name
                         newPresetIcon = preset.icon
                         newPresetColor = preset.color
-                        showingEditPresetSheet = true
                     }
                 }
             }
             .overlay(alignment: .bottom) { bottomToolbar }
         }
         .sheet(isPresented: $showingAddPresetSheet) { addPresetSheet }
-        .sheet(isPresented: $showingEditPresetSheet, onDismiss: { editingPreset = nil }) { editPresetSheet }
+        .sheet(item: $editingPreset) { preset in
+            PresetNameSheet(
+                name: $newPresetName,
+                icon: $newPresetIcon,
+                color: $newPresetColor,
+                editingPreset: preset,
+                title: String(localized: "プリセット名を編集")
+            ) { customColor in
+                updatePreset(preset, newName: newPresetName, newIcon: newPresetIcon, newColor: newPresetColor, customColor: customColor)
+                newPresetName = ""
+                newPresetIcon = "list.bullet.rectangle.portrait"
+                newPresetColor = "accent"
+                editingPreset = nil // シートを閉じる
+            } onCancel: {
+                newPresetName = ""
+                newPresetIcon = "list.bullet.rectangle.portrait"
+                newPresetColor = "accent"
+                editingPreset = nil // シートを閉じる
+            }
+        }
         .alert("プリセットの削除", isPresented: $showingDeletePresetConfirmation) {
             Button("削除", role: .destructive) {
                 if let preset = presetToDelete {
@@ -198,7 +214,6 @@ private struct PresetSettingsSection: View {
                         newPresetName = preset.name
                         newPresetIcon = preset.icon
                         newPresetColor = preset.color
-                        showingEditPresetSheet = true
                     }
                 }) {
                     Image(systemName: "pencil")
@@ -242,28 +257,7 @@ private struct PresetSettingsSection: View {
         }
     }
     
-    private var editPresetSheet: some View {
-        PresetNameSheet(
-            name: $newPresetName,
-            icon: $newPresetIcon,
-            color: $newPresetColor,
-            editingPreset: editingPreset,
-            title: String(localized: "プリセット名を編集")
-        ) { customColor in
-            if let preset = editingPreset {
-                updatePreset(preset, newName: newPresetName, newIcon: newPresetIcon, newColor: newPresetColor, customColor: customColor)
-                newPresetName = ""
-                newPresetIcon = "list.bullet.rectangle.portrait"
-                newPresetColor = "accent"
-                showingEditPresetSheet = false
-            }
-        } onCancel: {
-            showingEditPresetSheet = false
-            newPresetName = ""
-            newPresetIcon = "list.bullet.rectangle.portrait"
-            newPresetColor = "accent"
-        }
-    }
+
     
     private func displayName(for preset: StandardPhrasePreset) -> String {
         isDefaultPreset(id: preset.id) ? String(localized: "Default") : preset.name
@@ -1160,11 +1154,37 @@ private struct PresetNameSheet: View {
     @State private var showingIconPicker = false
     @State private var previousIcon: String = ""
     @State private var showingColorPicker = false
-    @State private var customBackgroundColor = Color.blue
-    @State private var customIconColor = Color.white
+    @State private var customBackgroundColor: Color
+    @State private var customIconColor: Color
     var title: String
     var onSave: (PresetCustomColor?) -> Void
     var onCancel: () -> Void
+    
+    init(
+        name: Binding<String>,
+        icon: Binding<String>,
+        color: Binding<String>,
+        editingPreset: StandardPhrasePreset? = nil,
+        title: String,
+        onSave: @escaping (PresetCustomColor?) -> Void,
+        onCancel: @escaping () -> Void
+    ) {
+        self._name = name
+        self._icon = icon
+        self._color = color
+        self.editingPreset = editingPreset
+        self.title = title
+        self.onSave = onSave
+        self.onCancel = onCancel
+        
+        if let preset = editingPreset, preset.color == "custom", let custom = preset.customColor {
+            _customBackgroundColor = State(initialValue: Color(hex: custom.background))
+            _customIconColor = State(initialValue: Color(hex: custom.icon))
+        } else {
+            _customBackgroundColor = State(initialValue: .blue)
+            _customIconColor = State(initialValue: .white)
+        }
+    }
     
     var body: some View {
         VStack(spacing: 10) {
@@ -1294,10 +1314,6 @@ private struct PresetNameSheet: View {
         .frame(width: 300, height: 180)
         .onAppear {
             previousIcon = icon
-            if let preset = editingPreset, preset.color == "custom", let custom = preset.customColor {
-                customBackgroundColor = Color(hex: custom.background)
-                customIconColor = Color(hex: custom.icon)
-            }
         }
     }
     
