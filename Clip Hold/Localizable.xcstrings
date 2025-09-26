@@ -3516,6 +3516,22 @@
         }
       }
     },
+    "なし" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "None"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "なし"
+          }
+        }
+      }
+    },
     "バージョン: %@" : {
       "localizations" : {
         "en" : {

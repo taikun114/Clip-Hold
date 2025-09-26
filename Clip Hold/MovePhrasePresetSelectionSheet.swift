@@ -9,12 +9,7 @@ struct MovePhrasePresetSelectionSheet: View {
     @Binding var selectedPresetId: UUID?
     var onConfirm: () -> Void
     
-    private func displayName(for preset: StandardPhrasePreset) -> String {
-        if preset.name == "Default" {
-            return String(localized: "Default")
-        }
-        return preset.name
-    }
+
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -28,7 +23,7 @@ struct MovePhrasePresetSelectionSheet: View {
             Picker("プリセットを選択", selection: $selectedPresetId) {
                 ForEach(presetManager.presets) { preset in
                     Label {
-                        Text(displayName(for: preset))
+                        Text(preset.truncatedDisplayName(maxLength: 50))
                     } icon: {
                                             if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
                                                 Image(nsImage: iconImage)

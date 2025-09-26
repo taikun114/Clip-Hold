@@ -48,4 +48,12 @@ struct StandardPhrasePreset: Identifiable, Codable {
             return name
         }
     }
+
+    func truncatedDisplayName(maxLength: Int) -> String {
+        if id.uuidString == "00000000-0000-0000-0000-000000000000" {
+            return String(localized: "Default")
+        } else {
+            return name.truncate(maxLength: maxLength)
+        }
+    }
 }

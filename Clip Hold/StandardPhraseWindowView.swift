@@ -242,20 +242,7 @@ struct StandardPhraseWindowView: View {
         }
     }
     
-    private func displayName(for preset: StandardPhrasePreset) -> String {
-        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
-            return String(localized: "Default")
-        }
-        return preset.name
-    }
-    
-    private func displayName(for preset: StandardPhrasePreset?) -> String {
-        guard let preset = preset else {
-            // 選択されているプリセットがない場合
-            return String(localized: "プリセットがありません")
-        }
-        return displayName(for: preset)
-    }
+
     
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
@@ -315,7 +302,7 @@ struct StandardPhraseWindowView: View {
                             Picker("プリセット", selection: $presetManager.selectedPresetId) {
                                 ForEach(presetManager.presets) { preset in
                                     Label {
-                                        Text(displayName(for: preset))
+                                        Text(preset.truncatedDisplayName(maxLength: 50))
                                     } icon: {
                                         if let iconImage = iconGenerator.iconCache[preset.id] {
                                             Image(nsImage: iconImage)
@@ -328,7 +315,7 @@ struct StandardPhraseWindowView: View {
                                 
                                 // プリセットがない場合の項目
                                 if presetManager.presets.isEmpty {
-                                    Text(displayName(for: nil)).tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
+                                    Text(String(localized: "プリセットがありません")).tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
                                 }
                             }
                             .pickerStyle(.inline)

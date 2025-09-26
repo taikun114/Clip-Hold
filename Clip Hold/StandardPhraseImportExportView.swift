@@ -131,9 +131,7 @@ struct StandardPhraseImportExportView: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
     
-    private func displayName(for preset: StandardPhrasePreset) -> String {
-        isDefaultPreset(id: preset.id) ? String(localized: "Default") : preset.name
-    }
+
     
     var body: some View {
         HStack {
@@ -178,7 +176,7 @@ struct StandardPhraseImportExportView: View {
                     Divider()
                     
                     ForEach(exportablePresets) { preset in
-                        Text(displayName(for: preset))
+                        Text(preset.truncatedDisplayName(maxLength: 50))
                             .tag(preset.id as UUID?)
                     }
                 }

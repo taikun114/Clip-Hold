@@ -114,20 +114,7 @@ struct ClipHoldApp: App {
         )
     }
     
-    private func displayName(for preset: StandardPhrasePreset?) -> String {
-        guard let preset = preset else {
-            // 選択されているプリセットがない場合
-            return String(localized: "プリセットがありません")
-        }
-        return displayName(for: preset)
-    }
 
-    private func displayName(for preset: StandardPhrasePreset) -> String {
-        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
-            return String(localized: "Default")
-        }
-        return preset.name
-    }
         
     var body: some Scene {
         MenuBarExtra(
@@ -230,7 +217,7 @@ struct ClipHoldApp: App {
                 )) {
                     ForEach(presetManager.presets) { preset in
                         Label {
-                            Text(displayName(for: preset))
+                            Text(preset.truncatedDisplayName(maxLength: 50))
                         } icon: {
                             if let iconImage = iconGenerator.iconCache[preset.id] {
                                 Image(nsImage: iconImage)
@@ -258,7 +245,7 @@ struct ClipHoldApp: App {
                 }
             } label: {
                 Label {
-                    Text("プリセット: \(displayName(for: presetManager.selectedPreset))")
+                    Text("プリセット: \(presetManager.selectedPreset?.truncatedDisplayName(maxLength: 43) ?? String(localized: "なし"))")
                 } icon: {
                     if let selectedPreset = presetManager.selectedPreset,
                        let icon = iconGenerator.iconCache[selectedPreset.id] {

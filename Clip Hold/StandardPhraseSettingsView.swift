@@ -71,7 +71,7 @@ private struct PresetSettingsSection: View {
                         }
                         
                         VStack(alignment: .leading) {
-                            Text(displayName(for: preset))
+                            Text(preset.truncatedDisplayName(maxLength: 50))
                                 .font(.headline)
                                 .lineLimit(1)
                             Text("\(preset.phrases.count)個の定型文")
@@ -83,7 +83,7 @@ private struct PresetSettingsSection: View {
                     }
                     .tag(preset.id)
                     .contentShape(Rectangle())
-                    .help(Text(displayName(for: preset)))
+                    .help(Text(preset.displayName))
                 }
                 .onDelete(perform: deletePreset)
                 .onMove(perform: movePreset)
@@ -162,7 +162,7 @@ private struct PresetSettingsSection: View {
         } message: {
             if let preset = presetToDelete {
                 let phraseCount = preset.phrases.count
-                Text("「\(displayName(for: preset))」を本当に削除しますか？このプリセットに含まれる\(phraseCount)個の定型文も削除されます。この操作は元に戻せません。")
+                Text("「\(preset.truncatedDisplayName(maxLength: 30))」を本当に削除しますか？このプリセットに含まれる\(phraseCount)個の定型文も削除されます。この操作は元に戻せません。")
             } else {
                 Text("このプリセットを本当に削除しますか？")
             }
@@ -260,9 +260,7 @@ private struct PresetSettingsSection: View {
     
 
     
-    private func displayName(for preset: StandardPhrasePreset) -> String {
-        isDefaultPreset(id: preset.id) ? String(localized: "Default") : preset.name
-    }
+
     
     private func isDefaultPreset(id: UUID?) -> Bool {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
@@ -396,7 +394,7 @@ private struct PresetAssignmentSection: View {
             )) {
                 ForEach(presetManager.presets) { preset in
                     Label {
-                        Text(displayName(for: preset))
+                        Text(preset.truncatedDisplayName(maxLength: 50))
                     } icon: {
                         if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
                             Image(nsImage: iconImage)
@@ -546,7 +544,7 @@ private struct PresetAssignmentSection: View {
                let preset = presetManager.presets.first(where: { $0.id == presetId }) {
                 // ローカライズされたアプリ名を取得
                 let appName = NSWorkspace.shared.runningApplications.first { $0.bundleIdentifier == bundleId }?.localizedName ?? self.appName(for: bundleId)
-                Text("「\(appName)」は別のプリセット「\(displayName(for: preset))」にすでに割り当てられています。このアプリを割り当てると、「\(displayName(for: preset))」から割り当てが解除されます。アプリを割り当ててもよろしいですか？")
+                Text("「\(appName)」は別のプリセット「\(preset.truncatedDisplayName(maxLength: 30))」にすでに割り当てられています。このアプリを割り当てると、「\(preset.truncatedDisplayName(maxLength: 30))」から割り当てが解除されます。アプリを割り当ててもよろしいですか？")
             } else {
                 Text("このアプリは既に別のプリセットに割り当てられています。上書きしてもよろしいですか？")
             }
@@ -766,7 +764,7 @@ private struct PhraseSettingsSection: View {
             Button("削除", role: .destructive) { deleteAllPhrases() }
         } message: {
             if let preset = presetManager.selectedPreset {
-                Text("プリセット「\(displayName(for: preset))」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
+                Text("プリセット「\(preset.truncatedDisplayName(maxLength: 30))」からすべての定型文を本当に削除しますか？この操作は元に戻せません。")
             } else {
                 Text("選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。")
             }
@@ -814,7 +812,7 @@ private struct PhraseSettingsSection: View {
         )) {
             ForEach(presetManager.presets) { preset in
                 Label {
-                    Text(displayName(for: preset))
+                    Text(preset.truncatedDisplayName(maxLength: 50))
                 } icon: {
                     if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
                         Image(nsImage: iconImage)

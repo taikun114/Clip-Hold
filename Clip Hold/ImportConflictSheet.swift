@@ -22,9 +22,7 @@ struct ImportConflictSheet: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
     
-    private func displayName(for preset: StandardPhrasePreset) -> String {
-        isDefaultPreset(id: preset.id) ? String(localized: "Default") : preset.name
-    }
+
     private var currentPresetConflict: PresetConflictInfo? {
         guard currentPresetIndex < presetConflicts.count else { return nil }
         return presetConflicts[currentPresetIndex]
@@ -68,7 +66,7 @@ struct ImportConflictSheet: View {
             // タイトル: プリセットが複数ある場合は追加のカウンターを表示
             if let currentPreset = currentPresetConflict {
                 let presetCountText = presetConflicts.count > 1 ? " (\(currentPresetIndex + 1)/\(presetConflicts.count))" : ""
-                Text("「\(displayName(for: currentPreset.preset))」のインポートの競合 (\(currentConflictIndex + 1)/\(currentConflicts.count))\(presetCountText)")
+                Text("「\(currentPreset.preset.truncatedDisplayName(maxLength: 50))」のインポートの競合 (\(currentConflictIndex + 1)/\(currentConflicts.count))\(presetCountText)")
                     .font(.headline)
                     .fontWeight(.bold)
             }

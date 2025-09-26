@@ -23,9 +23,7 @@ struct AddEditPhraseView: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
     
-    private func displayName(for preset: StandardPhrasePreset) -> String {
-        isDefaultPreset(id: preset.id) ? String(localized: "Default") : preset.name
-    }
+
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
     private var isSheet: Bool = false
@@ -113,7 +111,7 @@ struct AddEditPhraseView: View {
                     }
                     ForEach(presetManager.presets) { preset in
                         Label {
-                            Text(displayName(for: preset))
+                            Text(preset.truncatedDisplayName(maxLength: 50))
                         } icon: {
                                                 if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
                                                     Image(nsImage: iconImage)

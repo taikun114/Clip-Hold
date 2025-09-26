@@ -30,12 +30,7 @@ struct PresetConflictSheet: View {
         }
     }
     
-    private func displayName(for preset: StandardPhrasePreset) -> String {
-        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
-            return String(localized: "Default")
-        }
-        return preset.name
-    }
+
     
     var body: some View {
         Group {
@@ -64,7 +59,7 @@ struct PresetConflictSheet: View {
                     HStack(alignment: .top) {
                         Text("-")
                             .font(.body)
-                        Text(displayName(for: preset))
+                        Text(preset.truncatedDisplayName(maxLength: 50))
                             .font(.body)
                     }
                 }
@@ -113,7 +108,7 @@ struct PresetConflictSheet: View {
     private var individualResolutionView: some View {
         VStack(alignment: .leading, spacing: 15) {
             // タイトル: プリセットが2つ以上ある場合はカウンターを表示
-            Text("\"\(displayName(for: conflictingPresets[currentPresetIndex]))\"の操作を選択してください。\(conflictingPresets.count > 1 ? "(\(currentPresetIndex + 1)/\(conflictingPresets.count))" : "")")
+            Text("\"\(conflictingPresets[currentPresetIndex].truncatedDisplayName(maxLength: 50))\"の操作を選択してください。\(conflictingPresets.count > 1 ? "(\(currentPresetIndex + 1)/\(conflictingPresets.count))" : "")")
                 .font(.headline)
                 .fontWeight(.bold)
             
