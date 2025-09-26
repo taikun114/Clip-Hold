@@ -25,6 +25,7 @@ struct HistoryContentList: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
 
     @Binding var filteredHistory: [ClipboardItem]
     @Binding var isLoading: Bool
@@ -114,7 +115,7 @@ struct HistoryContentList: View {
                     .tableColumnHeaders(.hidden)
                     .tableStyle(.inset)
                     .alternatingRowBackgrounds(.disabled)
-                    .animation(.default, value: filteredHistory)
+                    .animation(reduceMotion ? nil : .default, value: filteredHistory)
                     .onKeyPress(.space) {
                         guard let selectedID = selectedItemID,
                               let selectedItem = filteredHistory.first(where: { $0.id == selectedID }),
@@ -157,8 +158,10 @@ struct HistoryContentList: View {
                     }
                     .accessibilityLabel("履歴リスト")
                     .scrollContentBackground(.hidden)
-                    .blur(radius: isLoading ? 5 : 0)
-                    .animation(.easeOut(duration: 0.1), value: isLoading)
+                    .if(!reduceMotion) { view in
+                        view.blur(radius: isLoading ? 5 : 0)
+                    }
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: isLoading)
                     .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
                             Button {
@@ -187,8 +190,12 @@ struct HistoryContentList: View {
                                     currentCopyConfirmationTask = Task { @MainActor in
                                         try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
                                         guard !Task.isCancelled else { return }
-                                        withAnimation {
+                                        if reduceMotion {
                                             showCopyConfirmation = false
+                                        } else {
+                                            withAnimation {
+                                                showCopyConfirmation = false
+                                            }
                                         }
                                     }
                                 } label: {
@@ -213,8 +220,12 @@ struct HistoryContentList: View {
                                     currentCopyConfirmationTask = Task { @MainActor in
                                         try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
                                         guard !Task.isCancelled else { return }
-                                        withAnimation {
+                                        if reduceMotion {
                                             showCopyConfirmation = false
+                                        } else {
+                                            withAnimation {
+                                                showCopyConfirmation = false
+                                            }
                                         }
                                     }
                                 } label: {
@@ -287,8 +298,12 @@ struct HistoryContentList: View {
                             currentCopyConfirmationTask = Task { @MainActor in
                                 try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
                                 guard !Task.isCancelled else { return }
-                                withAnimation {
+                                if reduceMotion {
                                     showCopyConfirmation = false
+                                } else {
+                                    withAnimation {
+                                        showCopyConfirmation = false
+                                    }
                                 }
                             }
                             if closeWindowOnDoubleClickInHistoryWindow {
@@ -309,8 +324,12 @@ struct HistoryContentList: View {
                                 currentCopyConfirmationTask = Task { @MainActor in
                                     try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
                                     guard !Task.isCancelled else { return }
-                                    withAnimation {
+                                    if reduceMotion {
                                         showCopyConfirmation = false
+                                    } else {
+                                        withAnimation {
+                                            showCopyConfirmation = false
+                                        }
                                     }
                                 }
                             }, isSheet: true)
@@ -334,8 +353,12 @@ struct HistoryContentList: View {
                                         currentCopyConfirmationTask = Task { @MainActor in
                                             try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒後に非表示
                                             guard !Task.isCancelled else { return }
-                                            withAnimation {
+                                            if reduceMotion {
                                                 showCopyConfirmation = false
+                                            } else {
+                                                withAnimation {
+                                                    showCopyConfirmation = false
+                                                }
                                             }
                                         }
                                     } else {
@@ -353,8 +376,12 @@ struct HistoryContentList: View {
                         // さらに、元の履歴の数が変わった場合のみに限定する
                         if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && newValue.count > previousClipboardHistoryCount {
                             if let firstId = newValue.first?.id {
-                                withAnimation {
+                                if reduceMotion {
                                     scrollViewProxy.scrollTo(firstId, anchor: .top)
+                                } else {
+                                    withAnimation {
+                                        scrollViewProxy.scrollTo(firstId, anchor: .top)
+                                    }
                                 }
                             }
                         }

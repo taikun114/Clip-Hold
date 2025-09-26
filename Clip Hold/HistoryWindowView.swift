@@ -10,6 +10,7 @@ struct HistoryWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @EnvironmentObject var frontmostAppMonitor: FrontmostAppMonitor
     @Environment(\.dismiss) var dismiss
 
@@ -240,8 +241,12 @@ struct HistoryWindowView: View {
         }
         .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
         .onChange(of: clipboardManager.filteredHistoryForShortcuts) { _, newValue in
-            withAnimation {
+            if reduceMotion {
                 filteredHistory = newValue ?? []
+            } else {
+                withAnimation {
+                    filteredHistory = newValue ?? []
+                }
             }
         }
         .onAppear {
