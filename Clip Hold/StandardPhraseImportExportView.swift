@@ -425,7 +425,7 @@ struct StandardPhraseImportExportView: View {
         
         // 競合しないプリセットを先に追加
         for preset in nonConflictingPresets {
-            presetManager.addPresetWithId(preset.id, name: preset.name)
+            presetManager.addPresetWithId(preset.id, name: preset.name, icon: preset.icon, color: preset.color, customColor: preset.customColor)
             if let addedPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
                 standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
             }
@@ -493,7 +493,7 @@ struct StandardPhraseImportExportView: View {
                     presetManager.updatePreset(updatedPreset)
                 } else {
                     // 新しいプリセットとして追加 (元のIDを保持)
-                    presetManager.addPresetWithId(preset.id, name: preset.name)
+                    presetManager.addPresetWithId(preset.id, name: preset.name, icon: preset.icon, color: preset.color, customColor: preset.customColor)
                     // 追加されたプリセットのIDを取得して、定型文を追加
                     if let addedPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
                         standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
@@ -515,7 +515,7 @@ struct StandardPhraseImportExportView: View {
                 }
                 
                 // 新しいIDと名前でプリセットを追加
-                presetManager.addPresetWithId(newId, name: newPresetName)
+                presetManager.addPresetWithId(newId, name: newPresetName, icon: preset.icon, color: preset.color, customColor: preset.customColor)
                 // 追加されたプリセットのIDを取得して、定型文を追加
                 if let addedPreset = presetManager.presets.first(where: { $0.id == newId }) {
                     standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
@@ -534,7 +534,7 @@ struct StandardPhraseImportExportView: View {
                     continue
                 }
                 
-                presetManager.addPresetWithId(preset.id, name: preset.name)
+                presetManager.addPresetWithId(preset.id, name: preset.name, icon: preset.icon, color: preset.color, customColor: preset.customColor)
                 // 追加されたプリセットのIDを取得して、定型文を追加
                 if let addedPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
                     standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
@@ -594,7 +594,7 @@ struct StandardPhraseImportExportView: View {
                             presetManager.updatePreset(updatedPreset)
                         } else {
                             // 新しいプリセットとして追加 (元のIDを保持)
-                            presetManager.addPresetWithId(preset.id, name: preset.name)
+                            presetManager.addPresetWithId(preset.id, name: preset.name, icon: preset.icon, color: preset.color, customColor: preset.customColor)
                             // 追加されたプリセットのIDを取得して、定型文を追加
                             if let addedPreset = presetManager.presets.first(where: { $0.id == preset.id }) {
                                 standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
@@ -614,7 +614,7 @@ struct StandardPhraseImportExportView: View {
                         }
                         
                         // 新しいIDと名前でプリセットを追加
-                        presetManager.addPresetWithId(newId, name: newPresetName)
+                        presetManager.addPresetWithId(newId, name: newPresetName, icon: preset.icon, color: preset.color, customColor: preset.customColor)
                         // 追加されたプリセットのIDを取得して、定型文を追加
                         if let addedPreset = presetManager.presets.first(where: { $0.id == newId }) {
                             standardPhraseManager.addImportedPhrases(preset.phrases, toPresetId: addedPreset.id)
@@ -626,7 +626,7 @@ struct StandardPhraseImportExportView: View {
                         // このプリセットは個別に競合解決する必要がある
                         presetsNeedingConflictResolution.append(preset)
                         // プリセットを追加 (元のIDを保持)
-                        presetManager.addPresetWithId(preset.id, name: preset.name)
+                        presetManager.addPresetWithId(preset.id, name: preset.name, icon: preset.icon, color: preset.color, customColor: preset.customColor)
                     }
                 }
             }
