@@ -1252,14 +1252,14 @@ private struct PresetNameSheet: View {
                                             HStack {
                                                 Text("背景色").font(.headline)
                                                 Spacer()
-                                                ColorPicker("", selection: $customBackgroundColor)
+                                                ColorPicker("", selection: $customBackgroundColor, supportsOpacity: false)
                                                     .labelsHidden()
                                             }
                                             
                                             HStack {
                                                 Text("アイコン色").font(.headline)
                                                 Spacer()
-                                                ColorPicker("", selection: $customIconColor)
+                                                ColorPicker("", selection: $customIconColor, supportsOpacity: false)
                                                     .labelsHidden()
                                             }
                                             
