@@ -232,14 +232,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             return
         }
         
-        let contentView = AddPresetView(isSheet: false) { [weak self] in
+        let contentView = AddEditPresetView(isSheet: false, onDismiss: { [weak self] in
             // ウィンドウを閉じたときの後処理
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
+                if let controller = self.windowControllers[windowType] {
+                    controller.close()
+                }
                 self.windowControllers.removeValue(forKey: windowType)
                 print("AppDelegate: \(windowType) window removed from windowControllers asynchronously.")
             }
-        }
+        }, editingPreset: nil)
         .environmentObject(StandardPhrasePresetManager.shared)
 
         // 新しいウィンドウコントローラーを作成

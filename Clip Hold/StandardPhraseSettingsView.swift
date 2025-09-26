@@ -861,7 +861,7 @@ private struct PhraseSettingsSection: View {
         VStack(alignment: .leading, spacing: 0) {
             Divider()
             HStack(spacing: 0) {
-                Button(action: { showingAddPhraseSheet = true }) {
+                Button(action: { showingAddPresetSheet = true }) {
                     Image(systemName: "plus")
                         .font(.body)
                         .fontWeight(.medium)
@@ -1129,7 +1129,7 @@ private struct PhraseManagementSection: View {
     }
 }
 
-private func localizedColorName(for colorName: String) -> String {
+func localizedColorName(for colorName: String) -> String {
     switch colorName {
     case "accent": return String(localized: "アクセントカラー")
     case "red": return String(localized: "レッド")
@@ -1144,8 +1144,113 @@ private func localizedColorName(for colorName: String) -> String {
     }
 }
 
+private struct AppRowView: View {
+    let bundleIdentifier: String
+    
+    var body: some View {
+        HStack {
+            // bundleIdentifier から NSRunningApplication を取得するロジックを追加
+            let runningApp = NSWorkspace.shared.runningApplications.first { $0.bundleIdentifier == bundleIdentifier }
+            
+            if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier) {
+                let icon = NSWorkspace.shared.icon(forFile: url.path)
+                Image(nsImage: icon).resizable().frame(width: 16, height: 16)
+                // localizedName が利用できる場合はそれを使い、そうでない場合は従来の appName 関数を使う
+                if let localizedName = runningApp?.localizedName {
+                    Text(localizedName)
+                } else {
+                    Text(appName(for: bundleIdentifier))
+                }
+            } else {
+                Image(systemName: "questionmark.app").resizable().frame(width: 16, height: 16)
+                // localizedName が利用できる場合はそれを使い、そうでない場合は従来の appName 関数を使う
+                if let localizedName = runningApp?.localizedName {
+                    Text(localizedName)
+                } else {
+                    Text(appName(for: bundleIdentifier))
+                }
+            }
+        }
+    }
+    
+    private func appName(for bundleIdentifier: String) -> String {
+        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier),
+           let bundle = Bundle(url: url),
+           let name = bundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? bundle.infoDictionary?["CFBundleName"] as? String {
+            return name
+        }
+        return bundleIdentifier
+    }
+}
+
+private struct AppSelectionPopoverView: View {
+    @Binding var runningApplications: [NSRunningApplication]
+    let assignedApps: [String]
+    let onAppSelected: (String) -> Void
+    let onSelectFromFinder: () -> Void
+    
+    @State private var showAllRunningApps: Bool = false
+    
+    private var filteredApps: [NSRunningApplication] {
+        let unassigned = runningApplications.filter { !assignedApps.contains($0.bundleIdentifier ?? "") }
+        return showAllRunningApps ? unassigned : unassigned.filter { $0.activationPolicy == .regular }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("実行中のアプリから追加").font(.headline)
+                Spacer()
+                Toggle(isOn: $showAllRunningApps) { Text("すべてのプロセスを表示") }.toggleStyle(.checkbox).font(.subheadline)
+            }
+            .padding(.bottom, 4)
+            
+            ScrollView {
+                VStack(alignment: .leading) {
+                    ForEach(filteredApps.sorted(by: { ($0.localizedName ?? "") < ($1.localizedName ?? "") }), id: \.self) { app in
+                        Button(action: { onAppSelected(app.bundleIdentifier ?? "") }) {
+                            HStack {
+                                Image(nsImage: app.icon ?? NSImage()).resizable().frame(width: 16, height: 16)
+                                Text(app.localizedName ?? "不明なアプリ")
+                                Spacer()
+                                Text(String(describing: app.processIdentifier))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain).padding(.vertical, 4)
+                        .help("PID: \(String(describing: app.processIdentifier))")
+                    }
+                }
+                .padding(4)
+            }
+            .frame(maxHeight: 200)
+            
+            Divider().padding(.vertical, 4)
+            
+            Button(action: onSelectFromFinder) {
+                HStack {
+                    Image(systemName: "folder.fill")
+                    Text("Finderで選択...")
+                    Spacer()
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain).padding(.vertical, 4)
+        }
+        .padding()
+        .frame(minWidth: 280, maxWidth: 400)
+    }
+}
+
+#Preview {
+    StandardPhraseSettingsView()
+        .environmentObject(StandardPhraseManager.shared)
+}
+
 // MARK: - Reusable Components
-private struct PresetNameSheet: View {
+struct PresetNameSheet: View {
     @Binding var name: String
     @Binding var icon: String
     @Binding var color: String
@@ -1301,10 +1406,11 @@ private struct PresetNameSheet: View {
             }
         }
         .padding()
-        .frame(width: 300, height: 180)
+        .frame(width: 350, height: 180)
         .onAppear {
             previousIcon = icon
         }
+        .onExitCommand(perform: onCancel)
     }
     
     private func getSymbolColor(forPresetColor colorName: String) -> Color {
@@ -1334,109 +1440,4 @@ private struct PresetNameSheet: View {
     private func getColorOptions() -> [String] {
         return ["accent", "red", "orange", "yellow", "green", "blue", "purple", "pink", "custom"]
     }
-}
-
-private struct AppRowView: View {
-    let bundleIdentifier: String
-    
-    var body: some View {
-        HStack {
-            // bundleIdentifier から NSRunningApplication を取得するロジックを追加
-            let runningApp = NSWorkspace.shared.runningApplications.first { $0.bundleIdentifier == bundleIdentifier }
-            
-            if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier) {
-                let icon = NSWorkspace.shared.icon(forFile: url.path)
-                Image(nsImage: icon).resizable().frame(width: 16, height: 16)
-                // localizedName が利用できる場合はそれを使い、そうでない場合は従来の appName 関数を使う
-                if let localizedName = runningApp?.localizedName {
-                    Text(localizedName)
-                } else {
-                    Text(appName(for: bundleIdentifier))
-                }
-            } else {
-                Image(systemName: "questionmark.app").resizable().frame(width: 16, height: 16)
-                // localizedName が利用できる場合はそれを使い、そうでない場合は従来の appName 関数を使う
-                if let localizedName = runningApp?.localizedName {
-                    Text(localizedName)
-                } else {
-                    Text(appName(for: bundleIdentifier))
-                }
-            }
-        }
-    }
-    
-    private func appName(for bundleIdentifier: String) -> String {
-        if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier),
-           let bundle = Bundle(url: url),
-           let name = bundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? bundle.infoDictionary?["CFBundleName"] as? String {
-            return name
-        }
-        return bundleIdentifier
-    }
-}
-
-private struct AppSelectionPopoverView: View {
-    @Binding var runningApplications: [NSRunningApplication]
-    let assignedApps: [String]
-    let onAppSelected: (String) -> Void
-    let onSelectFromFinder: () -> Void
-    
-    @State private var showAllRunningApps: Bool = false
-    
-    private var filteredApps: [NSRunningApplication] {
-        let unassigned = runningApplications.filter { !assignedApps.contains($0.bundleIdentifier ?? "") }
-        return showAllRunningApps ? unassigned : unassigned.filter { $0.activationPolicy == .regular }
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("実行中のアプリから追加").font(.headline)
-                Spacer()
-                Toggle(isOn: $showAllRunningApps) { Text("すべてのプロセスを表示") }.toggleStyle(.checkbox).font(.subheadline)
-            }
-            .padding(.bottom, 4)
-            
-            ScrollView {
-                VStack(alignment: .leading) {
-                    ForEach(filteredApps.sorted(by: { ($0.localizedName ?? "") < ($1.localizedName ?? "") }), id: \.self) { app in
-                        Button(action: { onAppSelected(app.bundleIdentifier ?? "") }) {
-                            HStack {
-                                Image(nsImage: app.icon ?? NSImage()).resizable().frame(width: 16, height: 16)
-                                Text(app.localizedName ?? "不明なアプリ")
-                                Spacer()
-                                Text(String(describing: app.processIdentifier))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain).padding(.vertical, 4)
-                        .help("PID: \(String(describing: app.processIdentifier))")
-                    }
-                }
-                .padding(4)
-            }
-            .frame(maxHeight: 200)
-            
-            Divider().padding(.vertical, 4)
-            
-            Button(action: onSelectFromFinder) {
-                HStack {
-                    Image(systemName: "folder.fill")
-                    Text("Finderで選択...")
-                    Spacer()
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain).padding(.vertical, 4)
-        }
-        .padding()
-        .frame(minWidth: 280, maxWidth: 400)
-    }
-}
-
-#Preview {
-    StandardPhraseSettingsView()
-        .environmentObject(StandardPhraseManager.shared)
 }

@@ -6812,22 +6812,6 @@
         }
       }
     },
-    "適用" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apply"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "適用"
-          }
-        }
-      }
-    },
     "選択されたファイルがありません。" : {
       "localizations" : {
         "en" : {

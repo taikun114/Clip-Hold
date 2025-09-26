@@ -207,9 +207,9 @@ struct AddEditPhraseView: View {
         }
         .sheet(isPresented: $showingAddPresetSheet) {
             // プリセット追加画面（シート）を表示
-            AddPresetView {
+            AddEditPresetView(onDismiss: {
                 showingAddPresetSheet = false
-            }
+            }, editingPreset: nil)
         }
         .onChange(of: showingAddPresetSheet) { _, isShowing in
             if !isShowing {
