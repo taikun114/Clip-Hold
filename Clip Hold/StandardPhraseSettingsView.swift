@@ -860,7 +860,7 @@ private struct PhraseSettingsSection: View {
         VStack(alignment: .leading, spacing: 0) {
             Divider()
             HStack(spacing: 0) {
-                Button(action: { showingAddPresetSheet = true }) {
+                Button(action: { showingAddPhraseSheet = true }) {
                     Image(systemName: "plus")
                         .font(.body)
                         .fontWeight(.medium)
