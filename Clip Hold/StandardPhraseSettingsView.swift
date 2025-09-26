@@ -1262,21 +1262,11 @@ private struct PresetNameSheet: View {
                                                 ColorPicker("", selection: $customIconColor, supportsOpacity: false)
                                                     .labelsHidden()
                                             }
-                                            
-                                            Spacer()
-                                            
-                                            Button(action: {
-                                                showingColorPicker = false
-                                                color = "custom"
-                                            }) {
-                                                HStack {
-                                                    Image(systemName: "checkmark")
-                                                    Text("適用")
-                                                }
-                                            }
                                         }
                                         .padding()
-                                        .frame(width: 250, height: 130)
+                                        .frame(width: 250)
+                                        .onChange(of: customBackgroundColor) { _, _ in color = "custom" }
+                                        .onChange(of: customIconColor) { _, _ in color = "custom" }
                                     }
                                 } else {
                                     Button(action: {
