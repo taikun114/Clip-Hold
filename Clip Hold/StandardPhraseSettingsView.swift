@@ -1336,6 +1336,7 @@ struct PresetNameSheet: View {
                                 if colorName == "custom" {
                                     Button(action: {
                                         showingColorPicker = true
+                                        color = "custom"
                                     }) {
                                         ZStack {
                                             Circle()
