@@ -30,6 +30,12 @@ Notes
 - **Add an “Ignore Standard Phrases” option to the “History Settings” section in the Copy History Settings**
   - Prevents copied standard phrases from being added to the history.
 
+### Bug Fixes and Improvements
+- **Add help text to the preset list in the “Preset Settings” section of Standard Phrases Settings**
+  - Hovering the mouse cursor over each list item now displays the full preset name in a tooltip.
+- **Add a character limit to the preset names in each preset picker**
+  - Even if excessively long preset names are set, they no longer cover the screen or slow down processing.
+
 ## 1.5.0
 ### New Features
 - **Add “Plain Text Only” and “Rich Text Only” options to the filtering options**
