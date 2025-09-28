@@ -9,7 +9,32 @@ class PresetIconGenerator: ObservableObject {
     @Published private(set) var miniIconCache: [UUID: NSImage] = [:]
     @Published private(set) var bigIconCache: [UUID: NSImage] = [:] // New cache for big icons
     
-    private init() {}
+    private var appearanceObserver: NSKeyValueObservation?
+    
+    private init() {
+        // Monitor appearance changes to regenerate icons when system accent color changes
+        appearanceObserver = NSApp.observe(\.effectiveAppearance) { [weak self] app, _ in
+            DispatchQueue.main.async {
+                self?.regenerateAllIcons()
+            }
+        }
+    }
+    
+    private func regenerateAllIcons() {
+        // Regenerate all icons using the updated system accent color
+        for preset in StandardPhrasePresetManager.shared.presets {
+            let image = createImage(for: preset)
+            iconCache[preset.id] = image
+
+            let miniImage = createMiniImage(for: preset)
+            miniIconCache[preset.id] = miniImage
+
+            let bigImage = createBigImage(for: preset)
+            bigIconCache[preset.id] = bigImage
+        }
+        
+        objectWillChange.send()
+    }
     
     func generateIcon(for preset: StandardPhrasePreset) -> NSImage {
         if let cachedIcon = iconCache[preset.id] {
@@ -214,7 +239,7 @@ class PresetIconGenerator: ObservableObject {
         case "blue": swiftUIColor = .blue
         case "purple": swiftUIColor = .purple
         case "pink": swiftUIColor = .pink
-        default: swiftUIColor = .accentColor
+        default: return .controlAccentColor
         }
         return NSColor(swiftUIColor)
     }
