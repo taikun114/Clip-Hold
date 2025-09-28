@@ -104,7 +104,6 @@ private struct PresetSettingsSection: View {
                             newPresetColor = preset.color
                         }
                     } label: { Label("編集...", systemImage: "pencil") }
-                        .disabled(isDefaultPreset(id: selectedId))
                     Button {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             presetManager.duplicatePreset(preset)
@@ -119,7 +118,7 @@ private struct PresetSettingsSection: View {
                     } label: { Label("削除...", systemImage: "trash") }
                 }
             } primaryAction: { selection in
-                if let selectedId = selection.first, !isDefaultPreset(id: selectedId) {
+                if let selectedId = selection.first {
                     if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
                         newPresetName = preset.name
@@ -226,7 +225,7 @@ private struct PresetSettingsSection: View {
                         .offset(y: -0.5)
                 }
                 .buttonStyle(.borderless)
-                .disabled(selectedPresetId == nil || isDefaultPreset(id: selectedPresetId))
+                .disabled(selectedPresetId == nil)
                 .help(Text("選択したプリセットを編集します。"))
             }
             .background(Rectangle().opacity(0.04))
@@ -1322,10 +1321,12 @@ struct PresetNameSheet: View {
                             }
                         }
                         
-                        TextField("プリセット名", text: $name).onSubmit {
-                            let customColorData = self.color == "custom" ? PresetCustomColor(background: customBackgroundColor.toHex() ?? "#0000FF", icon: customIconColor.toHex() ?? "#FFFFFF") : nil
-                            onSave(customColorData)
-                        }
+                        TextField("プリセット名", text: $name)
+                            .disabled(editingPreset?.id.uuidString == "00000000-0000-0000-0000-000000000000")
+                            .onSubmit {
+                                let customColorData = self.color == "custom" ? PresetCustomColor(background: customBackgroundColor.toHex() ?? "#0000FF", icon: customIconColor.toHex() ?? "#FFFFFF") : nil
+                                onSave(customColorData)
+                            }
                     }
                     
                     // カラーピッカー
