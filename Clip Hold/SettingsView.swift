@@ -113,23 +113,43 @@ struct SettingsView: View {
                 ToolbarItem(placement: .navigation) {
                     HStack(spacing: 0) {
                         Group {
-                            Button(action: goBack) {
-                                Image(systemName: "chevron.left")
-                                    .frame(width: 20, height: 20)
-                                    .offset(x: 2.0)
-                                    .contentShape(Rectangle())
+                            if #available(macOS 26, *) {
+                                Button(action: goBack) {
+                                    Image(systemName: "chevron.left")
+                                        .frame(width: 20, height: 20)
+                                        .offset(x: 2.0)
+                                        .contentShape(Rectangle())
+                                }
+                                .disabled(!canGoBack)
+                            } else {
+                                Button(action: goBack) {
+                                    Image(systemName: "chevron.left")
+                                        .frame(width: 20, height: 20)
+                                        .contentShape(Rectangle())
+                                }
+                                .disabled(!canGoBack)
                             }
-                            .disabled(!canGoBack)
                             if #available(macOS 26, *) {
                                 Capsule().fill(Color.secondary).opacity(colorSchemeContrast == .increased ? 1.0 : 0.1).frame(width: 1, height: 20)
+                            } else {
+                                Spacer(minLength: 4)
                             }
-                            Button(action: goForward) {
-                                Image(systemName: "chevron.right")
-                                    .frame(width: 20, height: 20)
-                                    .offset(x: -2.0)
-                                    .contentShape(Rectangle())
+                            if #available(macOS 26, *) {
+                                Button(action: goForward) {
+                                    Image(systemName: "chevron.right")
+                                        .frame(width: 20, height: 20)
+                                        .offset(x: -2.0)
+                                        .contentShape(Rectangle())
+                                }
+                                .disabled(!canGoForward)
+                            } else {
+                                Button(action: goForward) {
+                                    Image(systemName: "chevron.right")
+                                        .frame(width: 20, height: 20)
+                                        .contentShape(Rectangle())
+                                }
+                                .disabled(!canGoForward)
                             }
-                            .disabled(!canGoForward)
                         }
                     }
                 }
