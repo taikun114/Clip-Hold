@@ -31,6 +31,9 @@ Notes
   - Prevents copied standard phrases from being added to the history.
 
 ### Bug Fixes and Improvements
+- **Improve to remove animated effects when “Reduce Motion” is enabled**
+- **Improve the style of navigation buttons in the Settings window for macOS Sequoia or earlier versions**
+  - Icon positioning and spacing have been improved, bringing them closer to the navigation buttons in System Settings.
 - **Add help text to the preset list in the “Preset Settings” section of Standard Phrases Settings**
   - Hovering the mouse cursor over each list item now displays the full preset name in a tooltip.
 - **Add a character limit to the preset names in each preset picker**
