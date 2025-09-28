@@ -235,6 +235,7 @@ struct ClipHoldApp: App {
                     }
                 }
                 .pickerStyle(.inline)
+                .labelStyle(.titleAndIcon)
                 
                 Divider()
                 
