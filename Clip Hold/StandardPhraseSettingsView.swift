@@ -1308,7 +1308,11 @@ struct PresetNameSheet: View {
                                     .fill(color == "custom" ? customBackgroundColor : getColor(from: color))
                                     .frame(width: 30, height: 30)
                                 Image(systemName: icon.isEmpty ? previousIcon : icon)
-                                    .foregroundColor(getSymbolColor(forPresetColor: color))
+                                    .foregroundColor(
+                                        color == "accent"
+                                            ? (NSColor.controlAccentColor.isAccentColorYellowOrGreen ? Color.black : Color.white)
+                                            : getSymbolColor(forPresetColor: color)
+                                    )
                                     .font(.system(size: 14))
                             }
                         }

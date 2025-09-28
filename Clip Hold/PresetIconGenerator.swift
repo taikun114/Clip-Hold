@@ -249,11 +249,16 @@ class PresetIconGenerator: ObservableObject {
             return NSColor(hex: custom.icon)
         }
         
-        // For predefined colors, use the old logic
+        // 黄色と緑色（および黄色または緑色である可能性のあるアクセントカラー）には黒を使用
         if colorName == "yellow" || colorName == "green" {
             return .black
         } else {
-            return .white
+            // 背景色を比較して、アクセントカラーが黄色または緑色かどうかを確認
+            if backgroundColor.isAccentColorYellowOrGreen {
+                return .black
+            } else {
+                return .white
+            }
         }
     }
 }

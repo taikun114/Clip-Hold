@@ -69,4 +69,31 @@ extension NSColor {
         let luminance = (0.299 * rgbColor.redComponent) + (0.587 * rgbColor.greenComponent) + (0.114 * rgbColor.blueComponent)
         return luminance > 0.5
     }
+    
+    var isAccentColorYellowOrGreen: Bool {
+        // 標準の黄色と緑色のアクセントカラーと比較
+        let yellowComparison = isEqual(to: NSColor.yellow) || isEqual(to: NSColor(red: 1.0, green: 0.8, blue: 0.0, alpha: 1.0))
+        let greenComparison = isEqual(to: NSColor.green) || isEqual(to: NSColor(red: 0.25, green: 0.8, blue: 0.4, alpha: 1.0))
+        
+        // 黄色または緑色に近い場合は true を返す
+        if yellowComparison || greenComparison {
+            return true
+        }
+        
+        // getHueメソッドを使用して色相が黄色または緑色の範囲内にあるか確認
+        // カタログカラー（例：controlAccentColor）をRGB色空間に変換
+        guard let rgbColor = usingColorSpace(.sRGB) else {
+            return false
+        }
+        
+        var hue: CGFloat = 0.0
+        var saturation: CGFloat = 0.0
+        var brightness: CGFloat = 0.0
+        var alpha: CGFloat = 0.0
+        
+        rgbColor.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        // 黄色は約60度（0-1スケールでは0.167）、緑色は約120度（0.333）
+        // 黄色と緑色の両方をカバーする範囲を使用：約0.1から0.4（60°から144°）
+        return (0.1 <= hue && hue <= 0.4) && (saturation > 0.2) // 薄すぎる色を避けるために彩度チェックを追加
+    }
 }
