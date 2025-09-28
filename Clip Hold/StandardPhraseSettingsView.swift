@@ -1356,7 +1356,8 @@ struct PresetNameSheet: View {
                                     }
                                     .overlay(
                                         Circle()
-                                            .stroke(color == colorName ? Color.primary : Color.clear, lineWidth: 2)
+                                            .stroke(color == colorName ? Color.accentColor : Color.clear, lineWidth: 2)
+                                            .padding(-4)
                                     )
                                 }
                                 .buttonStyle(.plain)
@@ -1391,7 +1392,8 @@ struct PresetNameSheet: View {
                                         .frame(width: 24, height: 24)
                                         .overlay(
                                             Circle()
-                                                .stroke(color == colorName ? Color.primary : Color.clear, lineWidth: 2)
+                                                .stroke(color == colorName ? Color.accentColor : Color.clear, lineWidth: 2)
+                                                .padding(-4)
                                         )
                                 }
                                 .buttonStyle(.plain)
