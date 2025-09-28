@@ -1313,7 +1313,7 @@ struct PresetNameSheet: View {
                                             ? (NSColor.controlAccentColor.isAccentColorYellowOrGreen ? Color.black : Color.white)
                                             : getSymbolColor(forPresetColor: color)
                                     )
-                                    .font(.system(size: 14))
+                                    .font(.system(size: 14, weight: .bold))
                             }
                         }
                         .buttonStyle(.plain)
@@ -1333,71 +1333,83 @@ struct PresetNameSheet: View {
                             }
                     }
                     
+                    // 色選択表示テキスト
+                    Text("カラー: \(localizedColorName(for: color))")
+                        .font(.headline)
+                        .padding(.top, 4)
+                    
                     // カラーピッカー
                     HStack {
-                        Text("Color:")
-                        Spacer()
-                        HStack(spacing: 5) {
-                            ForEach(getColorOptions(), id: \.self) { colorName in
-                                if colorName == "custom" {
-                                    Button(action: {
-                                        showingColorPicker = true
-                                        color = "custom"
-                                    }) {
-                                        ZStack {
-                                            Circle()
-                                                .fill(color == "custom" ? customBackgroundColor : .gray)
-                                                .frame(width: 20, height: 20)
-                                            Image(systemName: "paintpalette")
-                                                .font(.system(size: 10))
-                                                .foregroundColor(.white)
+                        ForEach(getColorOptions(), id: \.self) { colorName in
+                            if colorName == "custom" {
+                                Button(action: {
+                                    showingColorPicker = true
+                                    color = "custom"
+                                }) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(color == "custom" ? customBackgroundColor : .gray)
+                                            .frame(width: 24, height: 24)
+                                        Image(systemName: "paintpalette")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(customIconColor)
+                                    }
+                                    .overlay(
+                                        Circle()
+                                            .stroke(color == colorName ? Color.primary : Color.clear, lineWidth: 2)
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                .help(Text(localizedColorName(for: colorName)))
+                                .popover(isPresented: $showingColorPicker) {
+                                    VStack {
+                                        HStack {
+                                            Text("背景色").font(.headline)
+                                            Spacer()
+                                            ColorPicker("", selection: $customBackgroundColor, supportsOpacity: false)
+                                                .labelsHidden()
                                         }
+                                        
+                                        HStack {
+                                            Text("アイコン色").font(.headline)
+                                            Spacer()
+                                            ColorPicker("", selection: $customIconColor, supportsOpacity: false)
+                                                .labelsHidden()
+                                        }
+                                    }
+                                    .padding()
+                                    .frame(width: 250)
+                                    .onChange(of: customBackgroundColor) { _, _ in color = "custom" }
+                                    .onChange(of: customIconColor) { _, _ in color = "custom" }
+                                }
+                            } else {
+                                Button(action: {
+                                    color = colorName
+                                }) {
+                                    Circle()
+                                        .fill(getColor(from: colorName))
+                                        .frame(width: 24, height: 24)
                                         .overlay(
                                             Circle()
                                                 .stroke(color == colorName ? Color.primary : Color.clear, lineWidth: 2)
                                         )
-                                    }
-                                    .buttonStyle(.plain)
-                                    .help(Text(localizedColorName(for: colorName)))
-                                    .popover(isPresented: $showingColorPicker) {
-                                        VStack {
-                                            HStack {
-                                                Text("背景色").font(.headline)
-                                                Spacer()
-                                                ColorPicker("", selection: $customBackgroundColor, supportsOpacity: false)
-                                                    .labelsHidden()
-                                            }
-                                            
-                                            HStack {
-                                                Text("アイコン色").font(.headline)
-                                                Spacer()
-                                                ColorPicker("", selection: $customIconColor, supportsOpacity: false)
-                                                    .labelsHidden()
-                                            }
-                                        }
-                                        .padding()
-                                        .frame(width: 250)
-                                        .onChange(of: customBackgroundColor) { _, _ in color = "custom" }
-                                        .onChange(of: customIconColor) { _, _ in color = "custom" }
-                                    }
-                                } else {
-                                    Button(action: {
-                                        color = colorName
-                                    }) {
-                                        Circle()
-                                            .fill(getColor(from: colorName))
-                                            .frame(width: 20, height: 20)
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(color == colorName ? Color.primary : Color.clear, lineWidth: 2)
-                                            )
-                                    }
-                                    .buttonStyle(.plain)
-                                    .help(Text(localizedColorName(for: colorName)))
                                 }
+                                .buttonStyle(.plain)
+                                .help(Text(localizedColorName(for: colorName)))
+                            }
+                            
+                            if colorName == "accent" || colorName == "pink" {
+                                Spacer()
+                                Divider()
+                                    .frame(height: 16)
+                            }
+                            
+                            if colorName != getColorOptions().last {
+                                Spacer()
                             }
                         }
                     }
+                    .frame(maxWidth: .infinity)
                 }
             }
             
@@ -1413,7 +1425,7 @@ struct PresetNameSheet: View {
             }
         }
         .padding()
-        .frame(width: 350, height: 180)
+        .frame(width: 400, height: 210)
         .onAppear {
             previousIcon = icon
         }
@@ -1447,4 +1459,19 @@ struct PresetNameSheet: View {
     private func getColorOptions() -> [String] {
         return ["accent", "red", "orange", "yellow", "green", "blue", "purple", "pink", "custom"]
     }
+}
+
+#Preview {
+    PresetNameSheet(
+        name: .constant("Preview Preset"),
+        icon: .constant("star.fill"),
+        color: .constant("accent"),
+        title: "プレビュータイトル",
+        onSave: { _ in },
+        onCancel: { }
+    )
+    .environmentObject(StandardPhraseManager.shared)
+    .environmentObject(StandardPhrasePresetManager.shared)
+    .environmentObject(PresetAppAssignmentManager.shared)
+    .environmentObject(PresetIconGenerator.shared)
 }
