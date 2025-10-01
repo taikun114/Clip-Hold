@@ -42,6 +42,10 @@ struct HistoryContentList: View {
     // State variables for the exclude app alert
     @State private var showingExcludeAppAlert = false
     @State private var appToExclude: String?
+    
+    // State variables for the delete all history from app alert
+    @State private var showingDeleteAllFromAppAlert = false
+    @State private var appToDeleteFrom: String?
 
     // 各行のアイコンのNSView参照を保存するためのState
     @State private var rowIconViews: [UUID: NSView] = [:]
@@ -287,6 +291,16 @@ struct HistoryContentList: View {
                             } label: {
                                 Label("削除...", systemImage: "trash")
                             }
+                            
+                            if let sourceAppPath = currentItem.sourceAppPath {
+                                Button(role: .destructive) {
+                                    // 選択された項目と同じアプリからの履歴をすべて削除するアラートを表示
+                                    showingDeleteAllFromAppAlert = true
+                                    appToDeleteFrom = sourceAppPath
+                                } label: {
+                                    Text("このアプリからのすべての履歴を削除...")
+                                }
+                            }
                         }
                     }, primaryAction: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
@@ -413,6 +427,20 @@ struct HistoryContentList: View {
                         if let appPath = appToExclude {
                             let appName = getLocalizedName(for: appPath) ?? appPath
                             Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
+                        }
+                    }
+                    .alert("このアプリの履歴を削除", isPresented: $showingDeleteAllFromAppAlert) {
+                        Button("削除", role: .destructive) {
+                            if let appPath = appToDeleteFrom {
+                                clipboardManager.deleteAllHistoryFromApp(sourceAppPath: appPath)
+                            }
+                        }
+                        Button("キャンセル", role: .cancel) { }
+                    } message: {
+                        if let appPath = appToDeleteFrom {
+                            let appName = getLocalizedName(for: appPath) ?? appPath
+                            let count = clipboardManager.countHistoryFromApp(sourceAppPath: appPath)
+                            Text("「\(appName)」からのすべての履歴を削除してもよろしいですか？\(count)個の履歴が削除されます。この操作は元に戻せません。")
                         }
                     }
                 } // ScrollViewReaderの終わり

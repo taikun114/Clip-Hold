@@ -195,5 +195,40 @@ class ClipboardManager: ObservableObject {
         image.unlockFocus()
         return image
     }
+    
+    // 特定のアプリからの履歴をすべて削除する関数
+    func deleteAllHistoryFromApp(sourceAppPath: String) {
+        Task { @MainActor in
+            // 対象となるアイテムを一括で取得
+            let itemsToDelete = clipboardHistory.filter { $0.sourceAppPath == sourceAppPath }
+            
+            // 非同期でファイルシステムの操作を並列処理
+            await withTaskGroup(of: Void.self) { group in
+                for item in itemsToDelete {
+                    if let filePath = item.filePath {
+                        group.addTask {
+                            self.deleteFileFromSandbox(at: filePath)
+                        }
+                    }
+                }
+            }
+            
+            // ChunkedHistoryManagerからも一括削除（チャンク単位で効率的に削除）
+            ChunkedHistoryManager.shared.deleteAllHistoryFromApp(sourceAppPath: sourceAppPath)
+            
+            // メモリ上の履歴から対象アイテムを一括削除
+            clipboardHistory.removeAll { $0.sourceAppPath == sourceAppPath }
+            
+            // UI更新のための通知
+            objectWillChange.send()
+            
+            print("ClipboardManager: All history from app \(sourceAppPath) deleted. Removed \(itemsToDelete.count) items.")
+        }
+    }
+    
+    // 特定のアプリからの履歴の数をカウントする関数
+    func countHistoryFromApp(sourceAppPath: String) -> Int {
+        return clipboardHistory.count { $0.sourceAppPath == sourceAppPath }
+    }
 }
 

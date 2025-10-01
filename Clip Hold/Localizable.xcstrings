@@ -73,6 +73,40 @@
         }
       }
     },
+    "「%@」からのすべての履歴を削除してもよろしいですか？%lld個の履歴が削除されます。この操作は元に戻せません。" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete all history from “%1$@”? %2$lld item will be deleted. This cannot be undone."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Are you sure you want to delete all history from “%1$@”? %2$lld items will be deleted. This cannot be undone."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "「%1$@」からのすべての履歴を削除してもよろしいですか？%2$lld個の履歴が削除されます。この操作は元に戻せません。"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "「%@」に切り替わりました。" : {
       "localizations" : {
         "en" : {
@@ -2444,6 +2478,22 @@
         }
       }
     },
+    "このアプリからのすべての履歴を削除..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All History from This App..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリからのすべての履歴を削除..."
+          }
+        }
+      }
+    },
     "このアプリケーションと使用されているライブラリのライセンス情報を表示します。" : {
       "localizations" : {
         "en" : {
@@ -2456,6 +2506,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このアプリケーションと使用されているライブラリのライセンス情報を表示します。"
+          }
+        }
+      }
+    },
+    "このアプリの履歴を削除" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete History of this App"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリの履歴を削除"
           }
         }
       }

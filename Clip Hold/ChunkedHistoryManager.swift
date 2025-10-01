@@ -312,6 +312,30 @@ class ChunkedHistoryManager: ObservableObject {
         }
     }
     
+    // 特定のアプリからの履歴を一括削除するメソッド
+    func deleteAllHistoryFromApp(sourceAppPath: String) {
+        do {
+            let chunkCount = try getChunkCount()
+            
+            for index in 0..<chunkCount {
+                var items = try loadHistoryChunk(at: index)
+                let initialCount = items.count
+                
+                // 特定のアプリからの履歴を削除
+                items.removeAll { $0.sourceAppPath == sourceAppPath }
+                
+                // アイテムが削除された場合のみファイルを更新
+                if items.count != initialCount {
+                    try saveHistoryItems(items, to: index)
+                    print("ChunkedHistoryManager: Deleted \(initialCount - items.count) items from app \(sourceAppPath) in chunk \(index).")
+                }
+            }
+            
+        } catch {
+            print("ChunkedHistoryManager: Error deleting all history from app: \(error.localizedDescription)")
+        }
+    }
+    
     func clearAllHistory() {
         do {
             // 履歴データディレクトリを削除

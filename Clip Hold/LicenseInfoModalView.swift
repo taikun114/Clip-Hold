@@ -31,7 +31,7 @@ struct LicenseInfoModalView: View {
     private let geminiCLIVersionString: String = "0.6.1"
 
     // Qwen Codeの使用バージョン
-    private let qwenCodeVersionString: String = "0.0.13"
+    private let qwenCodeVersionString: String = "0.0.14"
 
     // SFSymbolsPickerの使用バージョン
     private let sfSymbolsPickerVersionString: String = "1.0.4"

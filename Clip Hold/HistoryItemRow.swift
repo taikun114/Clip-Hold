@@ -90,6 +90,8 @@ struct HistoryItemRow: View {
     @State private var showingExcludeAppAlert = false
     @State private var appToExclude: String?
     @State private var showingEditSheet = false
+    @State private var showingDeleteAllFromAppAlert = false
+    @State private var appToDeleteFrom: String?
 
     init(item: ClipboardItem,
          index: Int,
@@ -231,6 +233,16 @@ struct HistoryItemRow: View {
                 showingDeleteConfirmation = true
             } label: {
                 Label("削除...", systemImage: "trash")
+            }
+            
+            if let sourceAppPath = item.sourceAppPath {
+                Button(role: .destructive) {
+                    // 選択された項目と同じアプリからの履歴をすべて削除するアラートを表示
+                    showingDeleteAllFromAppAlert = true
+                    appToDeleteFrom = sourceAppPath
+                } label: {
+                    Text("このアプリからのすべての履歴を削除...")
+                }
             }
         }
     }
@@ -490,6 +502,20 @@ struct HistoryItemRow: View {
                 // コピー確認を表示
                 showCopyConfirmation = true
             }, isSheet: true)
+        }
+        .alert("このアプリの履歴を削除", isPresented: $showingDeleteAllFromAppAlert) {
+            Button("削除", role: .destructive) {
+                if let appPath = appToDeleteFrom {
+                    clipboardManager.deleteAllHistoryFromApp(sourceAppPath: appPath)
+                }
+            }
+            Button("キャンセル", role: .cancel) { }
+        } message: {
+            if let appPath = appToDeleteFrom {
+                let appName = getLocalizedName(for: appPath) ?? appPath
+                let count = clipboardManager.countHistoryFromApp(sourceAppPath: appPath)
+                Text("「\(appName)」からのすべての履歴を削除してもよろしいですか？\(count)個の履歴が削除されます。この操作は元に戻せません。")
+            }
         }
     }
 }
