@@ -45,7 +45,9 @@ struct PrivacySettingsView: View {
 
     @State private var showingClearAllExcludedAppsConfirmation = false
 
-    // MARK: - Helper Functions
+    @State private var timer: Timer? = nil
+
+    // MARK: - ヘルパー関数
     private func addAppToExclusionList(bundleIdentifier: String) {
         if !excludedAppIdentifiers.contains(bundleIdentifier) {
             excludedAppIdentifiers.append(bundleIdentifier)
@@ -179,7 +181,6 @@ struct PrivacySettingsView: View {
                     .buttonStyle(.bordered)
                     .help(notificationAuthorizationStatus == .authorized ? "テスト通知を送信します。" : "システム設定の通知設定を開きます。")
                 }
-                .onAppear(perform: updateNotificationAuthorizationStatus)
                 .onChange(of: notificationAuthorizationStatus) { oldValue, newValue in
                     print("通知許可状態が変更されました: \(newValue.rawValue)")
                 }
@@ -498,6 +499,7 @@ struct PrivacySettingsView: View {
         .formStyle(.grouped)
         .onAppear {
             accessibilityChecker.checkPermission()
+            updateNotificationAuthorizationStatus()
             if let decoded = try? JSONDecoder().decode([String].self, from: excludedAppIdentifiersData) {
                 self.excludedAppIdentifiers = decoded
             }
@@ -511,6 +513,17 @@ struct PrivacySettingsView: View {
             } else {
                 clipboardManager.startMonitoringPasteboard()
             }
+            
+            // 定期的に権限の状態を更新するためのタイマーを開始
+            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+                accessibilityChecker.checkPermission()
+                updateNotificationAuthorizationStatus()
+            }
+        }
+        .onDisappear {
+            // ビューが非表示になったときにタイマーを無効化
+            timer?.invalidate()
+            timer = nil
         }
         .background(
             AppSelectionImporterView(
