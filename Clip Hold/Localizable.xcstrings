@@ -369,6 +369,9 @@
     "%lld." : {
       "shouldTranslate" : false
     },
+    "%lld%%" : {
+      "shouldTranslate" : false
+    },
     "%lld個" : {
       "localizations" : {
         "en" : {
@@ -1738,6 +1741,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エラー"
+          }
+        }
+      }
+    },
+    "オーバーレイ時の透明度" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlay Opacity"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オーバーレイ時の透明度"
+          }
+        }
+      }
+    },
+    "オーバーレイ表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlay Display"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オーバーレイ表示"
           }
         }
       }
@@ -3898,6 +3933,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フィルター"
+          }
+        }
+      }
+    },
+    "フォーカスが当たっていない時は、ウィンドウを半透明にします。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When unfocused, make the window semi-transparent."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォーカスが当たっていない時は、ウィンドウを半透明にします。"
           }
         }
       }

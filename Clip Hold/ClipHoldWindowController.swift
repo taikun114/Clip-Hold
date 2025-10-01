@@ -2,6 +2,11 @@ import AppKit
 import SwiftUI
 import Quartz
 
+enum ClipHoldWindowType {
+    case history
+    case standardPhrase
+}
+
 class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate {
 
     private let maxContentWidth: CGFloat = 900
@@ -9,7 +14,31 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
     private let minContentHeight: CGFloat = 300
     private let maxContentHeight: CGFloat = NSScreen.main?.visibleFrame.height ?? .infinity
 
+    private var windowType: ClipHoldWindowType
+
     @AppStorage("closeWindowOnDoubleClick") var closeWindowOnDoubleClick: Bool = false
+    @AppStorage("historyWindowIsOverlay") var historyWindowIsOverlay: Bool = false
+    @AppStorage("standardPhraseWindowIsOverlay") var standardPhraseWindowIsOverlay: Bool = false
+    @AppStorage("historyWindowOverlayOpacity") var historyWindowOverlayOpacity: Double = 0.5
+    @AppStorage("standardPhraseWindowOverlayOpacity") var standardPhraseWindowOverlayOpacity: Double = 0.5
+
+    private var isOverlayEnabled: Bool {
+        switch windowType {
+        case .history:
+            return historyWindowIsOverlay
+        case .standardPhrase:
+            return standardPhraseWindowIsOverlay
+        }
+    }
+
+    private var overlayOpacity: Double {
+        switch windowType {
+        case .history:
+            return historyWindowOverlayOpacity
+        case .standardPhrase:
+            return standardPhraseWindowOverlayOpacity
+        }
+    }
 
     var applyTransparentBackground: Bool = true
 
@@ -22,15 +51,18 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
 
     // MARK: - Initializers
     override init(window: NSWindow?) {
+        self.windowType = .history // Default value
         super.init(window: window)
     }
 
     required init?(coder: NSCoder) {
+        self.windowType = .history // Default value
         super.init(coder: coder)
     }
 
-    convenience init(wrappingWindow: NSWindow, applyTransparentBackground: Bool = true, windowFrameAutosaveKey: String? = nil) {
+    convenience init(wrappingWindow: NSWindow, windowType: ClipHoldWindowType, applyTransparentBackground: Bool = true, windowFrameAutosaveKey: String? = nil) {
         self.init(window: wrappingWindow)
+        self.windowType = windowType
         self.window?.delegate = self
         self.applyTransparentBackground = applyTransparentBackground
         self.windowFrameAutosaveKey = windowFrameAutosaveKey
@@ -42,6 +74,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
         if let key = self.windowFrameAutosaveKey {
             loadSavedFrame(for: key, to: wrappingWindow)
         }
+        updateOverlay()
     }
 
     // MARK: - Public Quick Look Methods
@@ -65,6 +98,44 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
 
     // MARK: - NSWindowDelegate
     func windowDidUpdate(_ notification: Notification) {
+    }
+
+    func windowDidBecomeKey(_ notification: Notification) {
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.5
+            self.window?.animator().alphaValue = 1.0
+        }
+    }
+
+    func windowDidResignKey(_ notification: Notification) {
+        if isOverlayEnabled {
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 1.0
+                self.window?.animator().alphaValue = CGFloat(self.overlayOpacity)
+            }
+        }
+    }
+    
+    func updateOverlay() {
+        let targetAlpha: CGFloat
+        if isOverlayEnabled {
+            if !(self.window?.isKeyWindow ?? true) {
+                targetAlpha = CGFloat(overlayOpacity)
+            } else {
+                targetAlpha = 1.0
+            }
+        } else {
+            targetAlpha = 1.0
+        }
+        
+        NSAnimationContext.runAnimationGroup { context in
+            if targetAlpha == 1.0 {
+                context.duration = 0.5
+            } else {
+                context.duration = 1.0
+            }
+            self.window?.animator().alphaValue = targetAlpha
+        }
     }
     
     func windowWillClose(_ notification: Notification) {

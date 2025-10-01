@@ -86,7 +86,11 @@ struct GeneralSettingsView: View {
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbersInStandardPhrasesWindow: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
     @AppStorage("historyWindowAlwaysOnTop") var historyWindowAlwaysOnTop: Bool = false
+    @AppStorage("historyWindowIsOverlay") var historyWindowIsOverlay: Bool = false
     @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
+    @AppStorage("standardPhraseWindowIsOverlay") var standardPhraseWindowIsOverlay: Bool = false
+    @AppStorage("historyWindowOverlayOpacity") var historyWindowOverlayOpacity: Double = 0.5
+    @AppStorage("standardPhraseWindowOverlayOpacity") var standardPhraseWindowOverlayOpacity: Double = 0.5
     @AppStorage("excludeClipHoldWindowsFromAutoFilter") var excludeClipHoldWindowsFromAutoFilter: Bool = false
 
     @AppStorage("quickPaste") var quickPaste: Bool = false
@@ -355,6 +359,35 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
                     VStack(alignment: .leading) {
+                        Text("オーバーレイ表示")
+                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $standardPhraseWindowIsOverlay) {
+                        Text("オーバーレイ表示")
+                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    Text("オーバーレイ時の透明度")
+                        .foregroundStyle(standardPhraseWindowIsOverlay ? .primary : .secondary)
+                    Spacer()
+                    HStack {
+                        Slider(value: .init(get: { standardPhraseWindowOverlayOpacity * 100 }, set: { standardPhraseWindowOverlayOpacity = $0 / 100 }), in: 20...80, step: 10)
+                            Text("\(Int(standardPhraseWindowOverlayOpacity * 100))%")
+                                .frame(width: 40, alignment: .trailing)
+                                .foregroundStyle(standardPhraseWindowIsOverlay ? .primary : .secondary)
+                    }
+                }
+                .disabled(!standardPhraseWindowIsOverlay)
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
                         Text("番号を隠す")
                         Text("各項目に表示される番号を非表示にします。")
                             .font(.caption)
@@ -405,6 +438,35 @@ struct GeneralSettingsView: View {
                     .toggleStyle(.switch)
                     .labelsHidden()
                 }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("オーバーレイ表示")
+                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $historyWindowIsOverlay) {
+                        Text("オーバーレイ表示")
+                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    Text("オーバーレイ時の透明度")
+                        .foregroundStyle(historyWindowIsOverlay ? .primary : .secondary)
+                    Spacer()
+                    HStack {
+                        Slider(value: .init(get: { historyWindowOverlayOpacity * 100 }, set: { historyWindowOverlayOpacity = $0 / 100 }), in: 20...80, step: 10)
+                        Text("\(Int(historyWindowOverlayOpacity * 100))%")
+                            .frame(width: 40, alignment: .trailing)
+                            .foregroundStyle(historyWindowIsOverlay ? .primary : .secondary)
+                    }
+                }
+                .disabled(!historyWindowIsOverlay)
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
                     VStack(alignment: .leading) {
