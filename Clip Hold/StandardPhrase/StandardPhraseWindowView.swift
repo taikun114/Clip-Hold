@@ -641,19 +641,6 @@ struct StandardPhraseWindowView: View {
             DispatchQueue.main.async {
                 isSearchFieldFocused = true
             }
-            DispatchQueue.main.async {
-                if let window = NSApp.windows.first(where: { $0.identifier?.rawValue == "StandardPhraseWindow" }) {
-                    print("StandardPhraseWindowView onAppear: Found standardPhraseWindow: \(window.identifier?.rawValue ?? "unknown")")
-                    if let controller = window.windowController as? ClipHoldWindowController {
-                        print("StandardPhraseWindowView onAppear: Found managed controller. Re-applying customizations.")
-                        controller.applyWindowCustomizations(window: window)
-                    } else {
-                        print("StandardPhraseWindowView onAppear: No ClipHoldWindowController found for this window.")
-                    }
-                } else {
-                    print("StandardPhraseWindowView onAppear: Static phrase window not found among NSApp.windows.")
-                }
-            }
         }
     }
 }

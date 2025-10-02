@@ -255,19 +255,6 @@ struct HistoryWindowView: View {
             DispatchQueue.main.async {
                 isSearchFieldFocused = true
             }
-            DispatchQueue.main.async {
-                if let window = NSApp.windows.first(where: { $0.contentViewController is NSHostingController<HistoryWindowView> }) {
-                    print("HistoryWindowView onAppear: Found historyWindow via NSHostingController: \(window.identifier?.rawValue == "unknown")")
-                    print("HistoryWindowView onAppear: Window delegate: \(window.delegate.debugDescription)")
-                    
-                    if let controller = window.windowController as? ClipHoldWindowController {
-                        print("HistoryWindowView onAppear: Found managed controller. Re-applying customizations.")
-                        controller.applyWindowCustomizations(window: window)
-                    }
-                } else {
-                    print("HistoryWindowView onAppear: History window not found among NSApp.windows via NSHostingController.")
-                }
-            }
         }
         .onDisappear {
             clipboardManager.filteredHistoryForShortcuts = nil
