@@ -207,9 +207,10 @@ struct GeneralSettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("クイックペーストをテキストに限定")
+                            .foregroundStyle(quickPaste ? .primary : .secondary)
                         Text("履歴項目がテキストである場合のみクイックペーストを行うようにします。")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(quickPaste ? .secondary : .tertiary)
                     }
                     Spacer()
                     Toggle(isOn: $textOnlyQuickPaste) {
