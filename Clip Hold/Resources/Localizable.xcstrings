@@ -2494,6 +2494,9 @@
         }
       }
     },
+    "ここに統計情報が表示されます。" : {
+
+    },
     "ここに追加したアプリが最前面にあるときはコピー履歴に追加されません。" : {
       "localizations" : {
         "en" : {
@@ -6602,6 +6605,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "統合する"
+          }
+        }
+      }
+    },
+    "統計" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistics"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "統計"
           }
         }
       }

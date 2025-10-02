@@ -29,6 +29,8 @@ struct SettingsView: View {
                     .tag("privacy")
                 Label("開発者向け機能", systemImage: "hammer")
                     .tag("developer")
+                Label("統計", systemImage: "chart.bar")
+                    .tag("statistics")
             }
             .safeAreaInset(edge: .bottom) {
                 if #available(macOS 26, *) {
@@ -100,6 +102,9 @@ struct SettingsView: View {
                 case "developer":
                     DeveloperSettingsView()
                         .navigationTitle("開発者向け機能")
+                case "statistics":
+                    StatisticsSettingsView()
+                        .navigationTitle("統計")
                 case "info":
                     InfoSettingsView()
                         .navigationTitle("情報")
