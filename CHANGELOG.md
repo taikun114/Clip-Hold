@@ -21,7 +21,7 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
-## 1.6.0
+## 1.6.0 (under development)
 ### New Features
 - **Add the feature to set icons and colors for standard phrase presets**
   - You can now assign colors and set your favorite icons for each preset.
