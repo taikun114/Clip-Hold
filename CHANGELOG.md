@@ -32,7 +32,7 @@ Notes
     - When unfocused, make the window semi-transparent.
   - **Overlay Transparency**
     - When “Overlay Display” is enabled, you can set the transparency level of the semi-transparent window between 20% and 80%.
-- **Add an “Ignore Standard Phrases” option to the “History Settings” section in the Copy History Settings**
+- **Add the “Ignore Standard Phrases” option to the “History Settings” section in the Copy History Settings**
   - Prevents copied standard phrases from being added to the history.
 - **Add the “Delete All History from This App...” feature to the History Window’s context menu and action menu**
 
