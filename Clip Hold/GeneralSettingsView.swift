@@ -379,10 +379,20 @@ struct GeneralSettingsView: View {
                         .foregroundStyle(standardPhraseWindowIsOverlay ? .primary : .secondary)
                     Spacer()
                     HStack {
-                        Slider(value: .init(get: { standardPhraseWindowOverlayOpacity * 100 }, set: { standardPhraseWindowOverlayOpacity = $0 / 100 }), in: 20...80, step: 10)
-                            Text("\(Int(standardPhraseWindowOverlayOpacity * 100))%")
-                                .frame(width: 40, alignment: .trailing)
-                                .foregroundStyle(standardPhraseWindowIsOverlay ? .primary : .secondary)
+                        Slider(
+                            value: .init(
+                                get: {
+                                    return 100 - (standardPhraseWindowOverlayOpacity * 100)
+                                },
+                                set: { sliderValue in
+                                    standardPhraseWindowOverlayOpacity = (100 - sliderValue) / 100
+                                }
+                            ),
+                            in: 20...80,
+                            step: 10
+                        )
+                        Text("\(Int(round((1 - standardPhraseWindowOverlayOpacity) * 100)))%")
+                            .foregroundStyle(standardPhraseWindowIsOverlay ? .secondary : .tertiary)
                     }
                 }
                 .disabled(!standardPhraseWindowIsOverlay)
@@ -461,10 +471,20 @@ struct GeneralSettingsView: View {
                         .foregroundStyle(historyWindowIsOverlay ? .primary : .secondary)
                     Spacer()
                     HStack {
-                        Slider(value: .init(get: { historyWindowOverlayOpacity * 100 }, set: { historyWindowOverlayOpacity = $0 / 100 }), in: 20...80, step: 10)
-                        Text("\(Int(historyWindowOverlayOpacity * 100))%")
-                            .frame(width: 40, alignment: .trailing)
-                            .foregroundStyle(historyWindowIsOverlay ? .primary : .secondary)
+                        Slider(
+                            value: .init(
+                                get: {
+                                    return 100 - (historyWindowOverlayOpacity * 100)
+                                },
+                                set: { sliderValue in
+                                    historyWindowOverlayOpacity = (100 - sliderValue) / 100
+                                }
+                            ),
+                            in: 20...80,
+                            step: 10
+                        )
+                        Text("\(Int(round((1 - historyWindowOverlayOpacity) * 100)))%")
+                            .foregroundStyle(historyWindowIsOverlay ? .secondary : .tertiary)
                     }
                 }
                 .disabled(!historyWindowIsOverlay)

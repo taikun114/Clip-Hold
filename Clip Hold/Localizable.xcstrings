@@ -1750,7 +1750,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Overlay Opacity"
+            "value" : "Overlay Transparency"
           }
         },
         "ja" : {
