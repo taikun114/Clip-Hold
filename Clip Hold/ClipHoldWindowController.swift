@@ -19,8 +19,8 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
     @AppStorage("closeWindowOnDoubleClick") var closeWindowOnDoubleClick: Bool = false
     @AppStorage("historyWindowIsOverlay") var historyWindowIsOverlay: Bool = false
     @AppStorage("standardPhraseWindowIsOverlay") var standardPhraseWindowIsOverlay: Bool = false
-    @AppStorage("historyWindowOverlayOpacity") var historyWindowOverlayOpacity: Double = 0.5
-    @AppStorage("standardPhraseWindowOverlayOpacity") var standardPhraseWindowOverlayOpacity: Double = 0.5
+    @AppStorage("historyWindowOverlayTransparency") var historyWindowOverlayTransparency: Double = 0.5
+    @AppStorage("standardPhraseWindowOverlayTransparency") var standardPhraseWindowOverlayTransparency: Double = 0.5
 
     private var isOverlayEnabled: Bool {
         switch windowType {
@@ -34,9 +34,9 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
     private var overlayOpacity: Double {
         switch windowType {
         case .history:
-            return historyWindowOverlayOpacity
+            return historyWindowOverlayTransparency
         case .standardPhrase:
-            return standardPhraseWindowOverlayOpacity
+            return standardPhraseWindowOverlayTransparency
         }
     }
 

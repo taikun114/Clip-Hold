@@ -19,8 +19,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
     private var historyWindowAlwaysOnTopObserver: NSKeyValueObservation?
     private var standardPhraseWindowAlwaysOnTopObserver: NSKeyValueObservation?
-    private var historyWindowOverlayOpacityObserver: NSKeyValueObservation?
-    private var standardPhraseWindowOverlayOpacityObserver: NSKeyValueObservation?
+    private var historyWindowOverlayTransparencyObserver: NSKeyValueObservation?
+    private var standardPhraseWindowOverlayTransparencyObserver: NSKeyValueObservation?
     private var historyWindowIsOverlayObserver: NSKeyValueObservation?
     private var standardPhraseWindowIsOverlayObserver: NSKeyValueObservation?
     private let frontmostAppMonitor = FrontmostAppMonitor.shared
@@ -86,13 +86,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-        historyWindowOverlayOpacityObserver = UserDefaults.standard.observe(\.historyWindowOverlayOpacity, options: [.new]) { [weak self] _, _ in
+        historyWindowOverlayTransparencyObserver = UserDefaults.standard.observe(\.historyWindowOverlayTransparency, options: [.new]) { [weak self] _, _ in
             DispatchQueue.main.async {
                 self?.historyWindowController?.updateOverlay()
             }
         }
 
-        standardPhraseWindowOverlayOpacityObserver = UserDefaults.standard.observe(\.standardPhraseWindowOverlayOpacity, options: [.new]) { [weak self] _, _ in
+        standardPhraseWindowOverlayTransparencyObserver = UserDefaults.standard.observe(\.standardPhraseWindowOverlayTransparency, options: [.new]) { [weak self] _, _ in
             DispatchQueue.main.async {
                 self?.standardPhraseWindowController?.updateOverlay()
             }
@@ -115,8 +115,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         print("AppDelegate: will terminate.")
         historyWindowAlwaysOnTopObserver?.invalidate()
         standardPhraseWindowAlwaysOnTopObserver?.invalidate()
-        historyWindowOverlayOpacityObserver?.invalidate()
-        standardPhraseWindowOverlayOpacityObserver?.invalidate()
+        historyWindowOverlayTransparencyObserver?.invalidate()
+        standardPhraseWindowOverlayTransparencyObserver?.invalidate()
         historyWindowIsOverlayObserver?.invalidate()
         standardPhraseWindowIsOverlayObserver?.invalidate()
     }
@@ -408,12 +408,12 @@ extension UserDefaults {
         get { bool(forKey: "standardPhraseWindowIsOverlay") }
         set { set(newValue, forKey: "standardPhraseWindowIsOverlay") }
     }
-    @objc dynamic var historyWindowOverlayOpacity: Double {
-        get { double(forKey: "historyWindowOverlayOpacity") }
-        set { set(newValue, forKey: "historyWindowOverlayOpacity") }
+    @objc dynamic var historyWindowOverlayTransparency: Double {
+        get { double(forKey: "historyWindowOverlayTransparency") }
+        set { set(newValue, forKey: "historyWindowOverlayTransparency") }
     }
-    @objc dynamic var standardPhraseWindowOverlayOpacity: Double {
-        get { double(forKey: "standardPhraseWindowOverlayOpacity") }
-        set { set(newValue, forKey: "standardPhraseWindowOverlayOpacity") }
+    @objc dynamic var standardPhraseWindowOverlayTransparency: Double {
+        get { double(forKey: "standardPhraseWindowOverlayTransparency") }
+        set { set(newValue, forKey: "standardPhraseWindowOverlayTransparency") }
     }
 }

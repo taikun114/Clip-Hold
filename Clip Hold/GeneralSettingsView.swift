@@ -89,8 +89,8 @@ struct GeneralSettingsView: View {
     @AppStorage("historyWindowIsOverlay") var historyWindowIsOverlay: Bool = false
     @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
     @AppStorage("standardPhraseWindowIsOverlay") var standardPhraseWindowIsOverlay: Bool = false
-    @AppStorage("historyWindowOverlayOpacity") var historyWindowOverlayOpacity: Double = 0.5
-    @AppStorage("standardPhraseWindowOverlayOpacity") var standardPhraseWindowOverlayOpacity: Double = 0.5
+    @AppStorage("historyWindowOverlayTransparency") var historyWindowOverlayTransparency: Double = 0.5
+    @AppStorage("standardPhraseWindowOverlayTransparency") var standardPhraseWindowOverlayTransparency: Double = 0.5
     @AppStorage("excludeClipHoldWindowsFromAutoFilter") var excludeClipHoldWindowsFromAutoFilter: Bool = false
 
     @AppStorage("quickPaste") var quickPaste: Bool = false
@@ -382,16 +382,16 @@ struct GeneralSettingsView: View {
                         Slider(
                             value: .init(
                                 get: {
-                                    return 100 - (standardPhraseWindowOverlayOpacity * 100)
+                                    return 100 - (standardPhraseWindowOverlayTransparency * 100)
                                 },
                                 set: { sliderValue in
-                                    standardPhraseWindowOverlayOpacity = (100 - sliderValue) / 100
+                                    standardPhraseWindowOverlayTransparency = (100 - sliderValue) / 100
                                 }
                             ),
                             in: 20...80,
                             step: 10
                         )
-                        Text("\(Int(round((1 - standardPhraseWindowOverlayOpacity) * 100)))%")
+                        Text("\(Int(round((1 - standardPhraseWindowOverlayTransparency) * 100)))%")
                             .foregroundStyle(standardPhraseWindowIsOverlay ? .secondary : .tertiary)
                     }
                 }
@@ -474,16 +474,16 @@ struct GeneralSettingsView: View {
                         Slider(
                             value: .init(
                                 get: {
-                                    return 100 - (historyWindowOverlayOpacity * 100)
+                                    return 100 - (historyWindowOverlayTransparency * 100)
                                 },
                                 set: { sliderValue in
-                                    historyWindowOverlayOpacity = (100 - sliderValue) / 100
+                                    historyWindowOverlayTransparency = (100 - sliderValue) / 100
                                 }
                             ),
                             in: 20...80,
                             step: 10
                         )
-                        Text("\(Int(round((1 - historyWindowOverlayOpacity) * 100)))%")
+                        Text("\(Int(round((1 - historyWindowOverlayTransparency) * 100)))%")
                             .foregroundStyle(historyWindowIsOverlay ? .secondary : .tertiary)
                     }
                 }
