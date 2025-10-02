@@ -951,9 +951,6 @@
         }
       }
     },
-    "Hello, world!" : {
-      "shouldTranslate" : false
-    },
     "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。" : {
       "localizations" : {
         "en" : {
