@@ -53,6 +53,7 @@
   - [Gemini CLI by Google](#gemini-cli-by-google)
   - [Qwen Code by Qwen](#qwen-code-by-qwen)
   - [KeyboardShortcuts by Sindre Sorhus](#keyboardshortcuts-by-sindre-sorhus)
+  - [SFSymbolsPicker by Kenny Wang](#sfsymbolspicker-by-kenny-wang)
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
 ## What is Clip Hold?
@@ -183,6 +184,9 @@ In addition to Google Gemini, Clip Hold 1.3.0 and later were developed using Qwe
 
 ### [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) by Sindre Sorhus
 The KeyboardShortcuts package was used to implement the global shortcut keys for Clip Hold. Thanks to this package, I was able to implement the shortcut functionality very smoothly.
+
+### [SFSymbolsPicker](https://github.com/jaywcjlove/SFSymbolsPicker) by Kenny Wang
+The SFSymbolsPicker package was used to implement the symbol picker for presets added in Clip Hold 1.6.0. Thanks to this package, I was able to easily implement a symbol picker that allows users to select icons.
 
 ### [create-dmg](https://github.com/create-dmg/create-dmg) by Andrey Tarantsov and Andrew Janke
 The create-dmg shell script was used to create a disk image to distribute the free version. Thanks to this shell script, I was able to easily create a customized disk image.
