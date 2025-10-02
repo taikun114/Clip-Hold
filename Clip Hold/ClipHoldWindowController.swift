@@ -101,9 +101,12 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.5
-            self.window?.animator().alphaValue = 1.0
+        let currentAlpha = self.window?.alphaValue ?? 1.0
+        if currentAlpha < 1.0 {
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.3
+                self.window?.animator().alphaValue = 1.0
+            }
         }
     }
 
@@ -130,7 +133,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
         
         NSAnimationContext.runAnimationGroup { context in
             if targetAlpha == 1.0 {
-                context.duration = 0.5
+                context.duration = 0.3
             } else {
                 context.duration = 1.0
             }

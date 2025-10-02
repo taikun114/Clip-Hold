@@ -178,6 +178,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         if let window = historyWindowController?.window {
             window.level = UserDefaults.standard.bool(forKey: "historyWindowAlwaysOnTop") ? .floating : .normal
+            // ウィンドウがキー状態になった後にupdateOverlayを呼び出す
+            DispatchQueue.main.async {
+                self.historyWindowController?.updateOverlay()
+            }
         }
     }
 
@@ -220,6 +224,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         if let window = standardPhraseWindowController?.window {
             window.level = UserDefaults.standard.bool(forKey: "standardPhraseWindowAlwaysOnTop") ? .floating : .normal
+            // ウィンドウがキー状態になった後にupdateOverlayを呼び出す
+            DispatchQueue.main.async {
+                self.standardPhraseWindowController?.updateOverlay()
+            }
         }
     }
 
