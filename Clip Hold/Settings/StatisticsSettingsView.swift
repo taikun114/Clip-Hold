@@ -131,10 +131,12 @@ struct StatisticsSettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         HStack(alignment: .bottom) {
-                            Text("\(todayStats.totalCount)")
+                            Text("\(todayStats.totalCount, specifier: "%d")")
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
-                            Text("コピー")
+                            
+                            let copyLabelKey: LocalizedStringKey = (todayStats.totalCount == 1) ? "copy_unit_singular" : "copy_unit_plural"
+                            Text(copyLabelKey)
                                 .font(.headline)
                                 .foregroundColor(.secondary)
                                 .offset(x: -6, y: -4)
@@ -258,25 +260,33 @@ struct StatisticsSettingsView: View {
                                 .fontWeight(.bold)
                         }
                         Spacer()
-                        Text("\(todayAppStats.count)種類")
+                        Text("\(todayAppStats.count, specifier: "%d")アプリ")
                             .foregroundColor(todayAppStats.isEmpty ? Color(.tertiaryLabelColor) : .secondary)
                             .fontWeight(.bold)
                     }
                     
-                    ForEach(todayAppStats, id: \.path) { appInfo in
-                        HStack {
-                            // アプリのアイコンを表示
-                            if let appIcon = getAppIcon(for: appInfo.path) {
-                                Image(nsImage: appIcon)
-                                    .resizable()
-                                    .frame(width: 16, height: 16)
-                            }
-                            Text(appInfo.name)
-                            Spacer()
-                            Text("\(appInfo.count)個")
-                                .foregroundColor(.secondary)
-                        }
-                    }
+                    if todayAppStats.isEmpty { 
+                        HStack { 
+                            Text("どのアプリからもコピーされていません。") 
+                                .foregroundColor(.secondary) 
+                            Spacer() 
+                        } 
+                    } else { 
+                        ForEach(todayAppStats, id: \.path) { appInfo in 
+                            HStack { 
+                                // アプリのアイコンを表示 
+                                if let appIcon = getAppIcon(for: appInfo.path) { 
+                                    Image(nsImage: appIcon) 
+                                        .resizable() 
+                                        .frame(width: 16, height: 16) 
+                                } 
+                                Text(appInfo.name) 
+                                Spacer() 
+                                Text("\(appInfo.count)個") 
+                                    .foregroundColor(.secondary) 
+                            } 
+                        } 
+                    } 
                 }
             }
         }

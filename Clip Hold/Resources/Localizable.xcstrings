@@ -355,8 +355,42 @@
         }
       }
     },
-    "%lld" : {
-
+    "%d" : {
+      "shouldTranslate" : false
+    },
+    "%dアプリ" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d App"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d Apps"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%dアプリ"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "%lld %@" : {
       "localizations" : {
@@ -545,11 +579,8 @@
         }
       }
     },
-    "%lld種類" : {
-
-    },
     "×%lld" : {
-
+      "shouldTranslate" : false
     },
     "1以上の数値を入力してください。" : {
       "localizations" : {
@@ -726,6 +757,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clip Holdはオープンソースアプリケーションです。"
+          }
+        }
+      }
+    },
+    "copy_unit_plural" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピー"
+          }
+        }
+      }
+    },
+    "copy_unit_singular" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copies"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピー"
           }
         }
       }
@@ -3623,6 +3686,22 @@
         }
       }
     },
+    "どのアプリからもコピーされていません。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing was copied from any apps."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "どのアプリからもコピーされていません。"
+          }
+        }
+      }
+    },
     "なし" : {
       "localizations" : {
         "en" : {
@@ -3752,7 +3831,20 @@
       }
     },
     "ファイル" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Files"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイル"
+          }
+        }
+      }
     },
     "ファイル1つあたりの最大容量を設定" : {
       "localizations" : {
@@ -4651,7 +4743,20 @@
       }
     },
     "今日" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今日"
+          }
+        }
+      }
     },
     "以下の定型文は既存の項目とタイトルまたは内容が重複しています。\nタイトルまたは内容のどちらかを編集してください。" : {
       "localizations" : {
