@@ -173,17 +173,29 @@ struct StatisticsSettingsView: View {
                 // テキスト統計
                 VStack(alignment: .leading, spacing: 8) {
                     Text("テキスト")
-                        .font(.headline)
+                    HStack {
+                        HStack {
+                            Image(systemName: "textformat")
+                                .frame(width: 16, height: 16)
+                            Text("テキスト")
+                                .font(.headline)
+                        }
+                        Spacer()
+                        Text("\(todayStats.textCount)個")
+                            .foregroundColor(.secondary)
+                    }
                     
                     // テキストの種類を個数の多い順に並べる
                     let textTypes = [
-                        ("プレーンテキスト", todayTextStats.plainTextCount),
-                        ("リッチテキスト", todayTextStats.richTextCount),
-                        ("リンク", todayTextStats.linkCount)
-                    ].sorted { $0.1 > $1.1 }
+                        ("標準テキスト", "text.page", todayTextStats.plainTextCount),
+                        ("リッチテキスト", "richtext.page", todayTextStats.richTextCount),
+                        ("リンク", "paperclip", todayTextStats.linkCount)
+                    ].sorted { $0.2 > $1.2 }
                     
-                    ForEach(textTypes, id: \.0) { type, count in
+                    ForEach(textTypes, id: \.0) { type, icon, count in
                         HStack {
+                            Image(systemName: icon)
+                                .frame(width: 16, height: 16)
                             Text(type)
                             Spacer()
                             Text("\(count)個")
@@ -194,20 +206,36 @@ struct StatisticsSettingsView: View {
 
                 // ファイル統計
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("ファイル")
-                        .font(.headline)
+                    HStack {
+                        HStack {
+                            if #available(macOS 15.0, *) {
+                                Image(systemName: "document")
+                                    .frame(width: 16, height: 16)
+                            } else {
+                                Image(systemName: "doc")
+                                    .frame(width: 16, height: 16)
+                            }
+                            Text("ファイル")
+                                .font(.headline)
+                        }
+                        Spacer()
+                        Text("\(todayStats.fileCount)個")
+                            .foregroundColor(.secondary)
+                    }
                     
                     // ファイルの種類を個数の多い順に並べる
                     let fileTypes = [
-                        ("画像", todayFileStats.imageCount),
-                        ("動画", todayFileStats.videoCount),
-                        ("PDF", todayFileStats.pdfCount),
-                        ("フォルダ", todayFileStats.folderCount),
-                        ("その他", todayFileStats.otherCount)
-                    ].sorted { $0.1 > $1.1 }
+                        ("画像", "photo", todayFileStats.imageCount),
+                        ("動画", "movieclapper", todayFileStats.videoCount),
+                        ("PDF", "text.document", todayFileStats.pdfCount),
+                        ("フォルダ", "folder", todayFileStats.folderCount),
+                        ("その他", "document.badge.ellipsis", todayFileStats.otherCount)
+                    ].sorted { $0.2 > $1.2 }
                     
-                    ForEach(fileTypes, id: \.0) { type, count in
+                    ForEach(fileTypes, id: \.0) { type, icon, count in
                         HStack {
+                            Image(systemName: icon)
+                                .frame(width: 16, height: 16)
                             Text(type)
                             Spacer()
                             Text("\(count)個")
@@ -218,8 +246,13 @@ struct StatisticsSettingsView: View {
 
                 // アプリ統計
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("アプリ")
-                        .font(.headline)
+                    HStack {
+                        Text("アプリ")
+                            .font(.headline)
+                        Spacer()
+                        Text("\(todayAppStats.count)種類")
+                            .foregroundColor(.secondary)
+                    }
                     
                     ForEach(todayAppStats, id: \.path) { appInfo in
                         HStack {
