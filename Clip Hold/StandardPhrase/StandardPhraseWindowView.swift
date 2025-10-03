@@ -37,6 +37,8 @@ struct StandardPhraseItemRow: View {
     @Binding var showQRCodeSheet: Bool
     @Binding var selectedPhraseForQRCode: StandardPhrase?
     @Binding var phraseToEdit: StandardPhrase?
+    @Binding var phraseToEditAndCopy: StandardPhrase?
+    @Binding var showingEditAndCopySheet: Bool
 
     @Binding var showingMoveSheet: Bool
     @Binding var phraseToMove: StandardPhrase?
@@ -96,6 +98,12 @@ struct StandardPhraseItemRow: View {
                     showCopyConfirmation = true
                 } label: {
                     Label("コピー", systemImage: "document.on.document")
+                }
+                Button {
+                    phraseToEditAndCopy = phrase
+                    showingEditAndCopySheet = true
+                } label: {
+                    Text("変更してコピー...")
                 }
                 // 定型文がURLの場合、「リンクを開く」メニューを表示
                 if isURL, let url = URL(string: phrase.content) {
@@ -174,6 +182,8 @@ struct StandardPhraseWindowView: View {
     @State private var showQRCodeSheet: Bool = false
     @State private var selectedPhraseForQRCode: StandardPhrase?
     @State private var phraseToEdit: StandardPhrase? = nil
+    @State private var phraseToEditAndCopy: StandardPhrase?
+    @State private var showingEditAndCopySheet = false
     @State private var showingMoveSheet = false
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
@@ -423,6 +433,8 @@ struct StandardPhraseWindowView: View {
                                             showQRCodeSheet: $showQRCodeSheet,
                                             selectedPhraseForQRCode: $selectedPhraseForQRCode,
                                             phraseToEdit: $phraseToEdit,
+                                            phraseToEditAndCopy: $phraseToEditAndCopy,
+                                            showingEditAndCopySheet: $showingEditAndCopySheet,
                                             showingMoveSheet: $showingMoveSheet,
                                             phraseToMove: $phraseToMove,
                                             lineNumberTextWidth: lineNumberTextWidth,
@@ -446,6 +458,8 @@ struct StandardPhraseWindowView: View {
                                             showQRCodeSheet: $showQRCodeSheet,
                                             selectedPhraseForQRCode: $selectedPhraseForQRCode,
                                             phraseToEdit: $phraseToEdit,
+                                            phraseToEditAndCopy: $phraseToEditAndCopy,
+                                            showingEditAndCopySheet: $showingEditAndCopySheet,
                                             showingMoveSheet: $showingMoveSheet,
                                             phraseToMove: $phraseToMove,
                                             lineNumberTextWidth: lineNumberTextWidth,
@@ -487,6 +501,12 @@ struct StandardPhraseWindowView: View {
                                         }
                                     } label: {
                                         Label("コピー", systemImage: "document.on.document")
+                                    }
+                                    Button {
+                                        phraseToEditAndCopy = currentPhrase
+                                        showingEditAndCopySheet = true
+                                    } label: {
+                                        Text("変更してコピー...")
                                     }
                                     // 定型文がURLの場合、「リンクを開く」メニューを表示
                                     if isURL, let url = URL(string: currentPhrase.content) {
@@ -623,6 +643,22 @@ struct StandardPhraseWindowView: View {
             AddEditPhraseView(mode: .edit(phrase), presetManager: presetManager, isSheet: true)
                 .environmentObject(standardPhraseManager)
                 .environmentObject(presetManager)
+        }
+        .sheet(isPresented: $showingEditAndCopySheet) {
+            if let phrase = phraseToEditAndCopy {
+                EditHistoryItemView(content: phrase.content, onCopy: { editedContent in
+                    copyToClipboard(editedContent, clipboardManager: clipboardManager)
+                    showCopyConfirmation = true
+                    currentCopyConfirmationTask?.cancel()
+                    currentCopyConfirmationTask = Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                        guard !Task.isCancelled else { return }
+                        withAnimation {
+                            showCopyConfirmation = false
+                        }
+                    }
+                }, isSheet: true)
+            }
         }
         .sheet(isPresented: $showingAddPresetSheet) {
             AddEditPresetView(isSheet: true, editingPreset: nil)
