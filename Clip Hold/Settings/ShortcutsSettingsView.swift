@@ -246,7 +246,7 @@ struct ShortcutsSettingsView: View {
                     }
                 }
                 HStack {
-                    Text("最新の履歴を編集してコピーする")
+                    Text("最新の履歴を変更してコピーする")
                     Spacer()
                     KeyboardShortcuts.Recorder(for: .editAndCopyLatestHistory)
                     Button(action: {

@@ -299,7 +299,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     @MainActor
     func showEditHistoryWindow(withContent content: String) {
         let windowType: WindowType = .editHistory
-        let title = String(localized: "履歴を編集")
+        let title = String(localized: "履歴を変更してコピー")
         
         // 既存のウィンドウコントローラーがあればそれを最前面に表示
         if let existingController = windowControllers[windowType] {

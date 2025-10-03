@@ -211,7 +211,7 @@ struct HistoryContentList: View {
                                 itemToEdit = currentItem
                                 showingEditSheet = true
                             } label: {
-                                Text("編集してコピー...")
+                                Text("変更してコピー...")
                             }
                             if let qrContent = currentItem.qrCodeContent {
                                 Button {

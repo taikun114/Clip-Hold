@@ -156,17 +156,17 @@ struct HistoryItemRow: View {
                     Text("標準テキストとしてコピー")
                 }
                 Button {
-                    // 編集してコピーのアクションをここに実装
+                    // 変更してコピーのアクションをここに実装
                     showingEditSheet = true
                 } label: {
-                    Text("編集してコピー...")
+                    Text("変更してコピー...")
                 }
             } else {
                 Button {
                     // 標準テキストアイテムの場合、編集してコピー
                     showingEditSheet = true
                 } label: {
-                    Text("編集してコピー...")
+                    Text("変更してコピー...")
                 }
             }
             if let qrContent = item.qrCodeContent {

@@ -4894,18 +4894,18 @@
         }
       }
     },
-    "最新の履歴を編集してコピーする" : {
+    "最新の履歴を変更してコピーする" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Edit and Copy the Latest History Item"
+            "value" : "Change and Copy the Latest History Item"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "最新の履歴を編集してコピーする"
+            "value" : "最新の履歴を変更してコピーする"
           }
         }
       }
@@ -5130,6 +5130,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
+    "変更してコピー..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change and Copy..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "変更してコピー..."
           }
         }
       }
@@ -5886,6 +5902,22 @@
         }
       }
     },
+    "履歴を変更してコピー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change History and Copy"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴を変更してコピー"
+          }
+        }
+      }
+    },
     "履歴を検索" : {
       "localizations" : {
         "en" : {
@@ -5898,22 +5930,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴を検索"
-          }
-        }
-      }
-    },
-    "履歴を編集" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit History"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴を編集"
           }
         }
       }
@@ -6682,22 +6698,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集…"
-          }
-        }
-      }
-    },
-    "編集してコピー..." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit and Copy..."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "編集してコピー..."
           }
         }
       }

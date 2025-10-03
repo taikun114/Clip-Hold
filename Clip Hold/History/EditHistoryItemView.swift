@@ -11,13 +11,14 @@ struct EditHistoryItemView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("履歴を編集")
+                Text("履歴を変更してコピー")
                     .font(.headline)
                     .fontWeight(.bold)
                 Spacer()
             }
             
             TextEditor(text: $content)
+                .font(.system(.body, design: .monospaced))
                 .frame(minHeight: 100, maxHeight: 300)
                 .scrollContentBackground(.hidden)
                 .padding(.vertical, 8)

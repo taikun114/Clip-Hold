@@ -650,7 +650,7 @@ struct ClipHoldApp: App {
             }
         }
         
-        // 最新の履歴を編集してコピーするショートカットの登録
+        // 最新の履歴を変更してコピーするショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .editAndCopyLatestHistory) {
             let clipboardManager = ClipboardManager.shared
             let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
