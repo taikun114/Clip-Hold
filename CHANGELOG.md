@@ -49,6 +49,7 @@ Notes
   - When “Quick Paste” is off, the title and description in the settings item now appear in a lighter color, making it easier to see that the option is disabled.
 - **Change “Edit and Copy...” to “Change and Copy...” in the History window**
   - The feature name has been changed to make it clearer. No changes have been made to the functionality.
+- **Change to monospace font for text input field on the “Change and Copy” screen**
 - **Add help text to the preset list in the “Preset Settings” section of Standard Phrases Settings**
   - Hovering the mouse cursor over each list item now displays the full preset name in a tooltip.
 - **Add a character limit to the preset names in each preset picker**
