@@ -169,20 +169,20 @@ struct StatisticsSettingsView: View {
                         .foregroundColor(.secondary)
                     }
                 }
-                //.padding()
                 // テキスト統計
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("テキスト")
                     HStack {
                         HStack {
                             Image(systemName: "textformat")
                                 .frame(width: 16, height: 16)
                             Text("テキスト")
                                 .font(.headline)
+                                .fontWeight(.bold)
                         }
                         Spacer()
                         Text("\(todayStats.textCount)個")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(todayStats.textCount == 0 ? Color(.tertiaryLabelColor) : .secondary)
+                            .fontWeight(.bold)
                     }
                     
                     // テキストの種類を個数の多い順に並べる
@@ -197,9 +197,10 @@ struct StatisticsSettingsView: View {
                             Image(systemName: icon)
                                 .frame(width: 16, height: 16)
                             Text(type)
+                                .foregroundColor(count == 0 ? .secondary : .primary)
                             Spacer()
                             Text("\(count)個")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(count == 0 ? Color(.tertiaryLabelColor) : .secondary)
                         }
                     }
                 }
@@ -217,10 +218,11 @@ struct StatisticsSettingsView: View {
                             }
                             Text("ファイル")
                                 .font(.headline)
+                                .fontWeight(.bold)
                         }
                         Spacer()
                         Text("\(todayStats.fileCount)個")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(todayStats.fileCount == 0 ? Color(.tertiaryLabelColor) : .secondary)
                     }
                     
                     // ファイルの種類を個数の多い順に並べる
@@ -237,9 +239,10 @@ struct StatisticsSettingsView: View {
                             Image(systemName: icon)
                                 .frame(width: 16, height: 16)
                             Text(type)
+                                .foregroundColor(count == 0 ? .secondary : .primary)
                             Spacer()
                             Text("\(count)個")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(count == 0 ? Color(.tertiaryLabelColor) : .secondary)
                         }
                     }
                 }
@@ -247,11 +250,17 @@ struct StatisticsSettingsView: View {
                 // アプリ統計
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("アプリ")
-                            .font(.headline)
+                        HStack {
+                            Image(systemName: "app.badge.clock")
+                                .frame(width: 16, height: 16)
+                            Text("アプリ")
+                                .font(.headline)
+                                .fontWeight(.bold)
+                        }
                         Spacer()
                         Text("\(todayAppStats.count)種類")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(todayAppStats.isEmpty ? Color(.tertiaryLabelColor) : .secondary)
+                            .fontWeight(.bold)
                     }
                     
                     ForEach(todayAppStats, id: \.path) { appInfo in
