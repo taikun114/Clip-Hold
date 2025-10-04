@@ -21,6 +21,40 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.6.0
+### New Features
+- **Add the feature to set icons and colors for standard phrase presets**
+  - You can now assign colors and set your favorite icons for each preset.
+  - Icons can be selected from SF Symbols. While you can choose icons from the in-app symbol picker, using the [**SF Symbols app**](https://developer.apple.com/sf-symbols/) is convenient for viewing symbols in more detail or searching for them.
+  - You can change icons and colors from the edit screen in the “Preset Settings” section of the Standard Phrases settings.
+- **Add the “Overlay Display” option and “Overlay Transparency” option to the “History Window” section and “Standard Phrases Window” section in General Settings**
+  - **Overlay Display**
+    - When unfocused, make the window semi-transparent.
+  - **Overlay Transparency**
+    - When “Overlay Display” is enabled, you can set the transparency level of the semi-transparent window between 20% and 80%.
+- **Add the “Ignore Standard Phrases” option to the “History Settings” section in the Copy History Settings**
+  - Prevents copied standard phrases from being added to the history.
+- **Add the “Delete All History from This App...” feature to the History window’s context menu and action menu**
+- **Add the “Change and Copy...” feature to the Standard Phrases window’s context menu and action menu**
+  - Similar to the “Change and Copy...” feature (formerly “Edit and Copy...”) in the History window, a feature allowing you to edit a portion and create a new copy has been added to the Standard Phrases window.
+
+### Bug Fixes and Improvements
+- **Improve to remove animated effects when “Reduce Motion” is enabled**
+- **Improve the style of navigation buttons in the Settings window for macOS Sequoia or earlier versions**
+  - Icon positioning and spacing have been improved, bringing them closer to the navigation buttons in System Settings.
+- **Improve the default preset to be editable**
+  - You can now edit the default presets to change colors and icons (please note that you cannot change the names).
+- **Improve accessibility and notification permission status display in Privacy Settings to update in real time**
+- **Improve the style of “Quick Paste Only for Text” when “Quick Paste” is off**
+  - When “Quick Paste” is off, the title and description in the settings item now appear in a lighter color, making it easier to see that the option is disabled.
+- **Change “Edit and Copy...” to “Change and Copy...” in the History window**
+  - The feature name has been changed to make it clearer. No changes have been made to the functionality.
+- **Change to monospace font for text input field on the “Change and Copy” screen**
+- **Add help text to the preset list in the “Preset Settings” section of Standard Phrases Settings**
+  - Hovering the mouse cursor over each list item now displays the full preset name in a tooltip.
+- **Add a character limit to the preset names in each preset picker**
+  - Even if excessively long preset names are set, they no longer cover the screen or slow down processing.
+
 ## 1.5.0
 ### New Features
 - **Add “Plain Text Only” and “Rich Text Only” options to the filtering options**
