@@ -13,7 +13,11 @@ class PresetIconGenerator: ObservableObject {
     
     private init() {
         // Monitor appearance changes to regenerate icons when system accent color changes
-        appearanceObserver = NSApp.observe(\.effectiveAppearance) { [weak self] app, _ in
+        guard let app = NSApp else {
+            print("PresetIconGenerator: NSApp is nil, cannot observe appearance changes")
+            return
+        }
+        appearanceObserver = app.observe(\.effectiveAppearance) { [weak self] app, _ in
             DispatchQueue.main.async {
                 self?.regenerateAllIcons()
             }

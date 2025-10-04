@@ -21,6 +21,10 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.6.1
+### Bug Fixes and Improvements
+- **Fix issue ([#4](https://github.com/taikun114/Clip-Hold/issues/4)) that sometimes failed to launch Clip Hold**
+
 ## 1.6.0
 ### New Features
 - **Add the feature to set icons and colors for standard phrase presets**

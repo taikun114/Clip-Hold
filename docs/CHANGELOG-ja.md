@@ -21,6 +21,10 @@
 - IssueやPull Request、Discussionへのリンクを貼る場合は完全なURLを記載すること
 -->
 
+## 1.6.1
+### バグ修正と改善
+- **Clip Holdが起動できないことがあった問題（[#4](https://github.com/taikun114/Clip-Hold/issues/4)）を修正**
+
 ## 1.6.0
 ### 新機能
 - **定型文プリセットにアイコンと色を設定できる機能を追加**
