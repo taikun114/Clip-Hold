@@ -80,6 +80,7 @@ struct AddEditPhraseView: View {
 
             if !showingAddPresetSheet {
                 TextEditor(text: $content)
+                    .font(.system(.body).monospaced())
                     .frame(minHeight: 100, maxHeight: 300)
                     .scrollContentBackground(.hidden)
                     .padding(.vertical, 8)
