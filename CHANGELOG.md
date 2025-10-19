@@ -21,6 +21,20 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.6.2
+### Bug Fixes and Improvements
+- **Fix issue that sometimes prevented copying the correct folder**
+  - This issue occurred due to a malfunction in the duplicate detection feature. Fixed by skipping duplicate detection for folders.
+  - Since duplicate detection for folders is now disabled, please note that copying the same folder multiple times from another app will result in duplicate saves.
+- **Fix issue that allows saving with empty preset names**
+- **Improve Standard Phrases window to scroll to top when switching presets**
+  - Fixed issue where the list could be cut off when switching from a preset with long entries.
+- **Improve to automatically switch to newly added presets when new ones are added**
+- **Improve focus management in the add standard phrase screen**
+  - Pressing the Return key in the custom title input field now moves focus to the main text input field.
+- **Improve shortcut keys for the add standard phrase screen**
+  - Pressing `⌘ (Command)` + `S` while the add standard phrase screen is open now performs the save action.
+
 ## 1.6.1
 ### Bug Fixes and Improvements
 - **Fix issue ([#4](https://github.com/taikun114/Clip-Hold/issues/4)) that sometimes failed to launch Clip Hold**
