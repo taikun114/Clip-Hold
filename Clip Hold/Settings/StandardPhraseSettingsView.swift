@@ -1328,8 +1328,10 @@ struct PresetNameSheet: View {
                         TextField("プリセット名", text: $name)
                             .disabled(editingPreset?.id.uuidString == "00000000-0000-0000-0000-000000000000")
                             .onSubmit {
-                                let customColorData = self.color == "custom" ? PresetCustomColor(background: customBackgroundColor.toHex() ?? "#0000FF", icon: customIconColor.toHex() ?? "#FFFFFF") : nil
-                                onSave(customColorData)
+                                if !name.isEmpty {
+                                    let customColorData = self.color == "custom" ? PresetCustomColor(background: customBackgroundColor.toHex() ?? "#0000FF", icon: customIconColor.toHex() ?? "#FFFFFF") : nil
+                                    onSave(customColorData)
+                                }
                             }
                     }
                     

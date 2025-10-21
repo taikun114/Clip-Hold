@@ -27,7 +27,12 @@ struct AddEditPhraseView: View {
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
     private var isSheet: Bool = false
-    @FocusState private var isContentFocused: Bool
+
+    enum Field: Hashable {
+        case title
+        case content
+    }
+    @FocusState private var focusedField: Field?
 
     private let noPresetsUUID = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
     private let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
@@ -36,6 +41,7 @@ struct AddEditPhraseView: View {
         self.mode = mode
         self.onSave = onSave
         _phraseToEdit = State(initialValue: phraseToEdit ?? StandardPhrase(title: "", content: ""))
+        self.isSheet = isSheet
 
         switch mode {
         case .add:
@@ -56,6 +62,48 @@ struct AddEditPhraseView: View {
         }
     }
 
+    private func save() {
+        let finalTitle: String
+        if useCustomTitle {
+            finalTitle = title
+        } else {
+            finalTitle = content
+        }
+
+        let phrase = StandardPhrase(title: finalTitle, content: content)
+        
+        if case .add = mode {
+            if let onSave = onSave {
+                onSave(phrase)
+            } else {
+                // プリセットが選択されている場合はプリセットに追加、そうでなければデフォルトに追加
+                if let selectedPresetId = selectedPresetId,
+                   var selectedPreset = presetManager.presets.first(where: { $0.id == selectedPresetId }) {
+                    selectedPreset.phrases.append(phrase)
+                    presetManager.updatePreset(selectedPreset)
+                } else {
+                    standardPhraseManager.addPhrase(title: finalTitle, content: content)
+                }
+            }
+        } else if case .edit(let originalPhrase) = mode {
+            let updatedPhrase = StandardPhrase(id: originalPhrase.id, title: finalTitle, content: content)
+            if let onSave = onSave {
+                onSave(updatedPhrase)
+            } else {
+                // プリセットが選択されている場合はプリセットを更新、そうでなければデフォルトを更新
+                if let selectedPresetId = selectedPresetId,
+                   var selectedPreset = presetManager.presets.first(where: { $0.id == selectedPresetId }),
+                   let index = selectedPreset.phrases.firstIndex(where: { $0.id == originalPhrase.id }) {
+                    selectedPreset.phrases[index] = updatedPhrase
+                    presetManager.updatePreset(selectedPreset)
+                } else {
+                    standardPhraseManager.updatePhrase(id: originalPhrase.id, newTitle: finalTitle, newContent: content)
+                }
+            }
+        }
+        dismiss()
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -67,6 +115,10 @@ struct AddEditPhraseView: View {
 
             TextField("タイトル", text: $title)
                 .textFieldStyle(.roundedBorder)
+                .focused($focusedField, equals: .title)
+                .onSubmit {
+                    focusedField = .content
+                }
                 .disabled(!useCustomTitle)
 
             Toggle(isOn: $useCustomTitle) {
@@ -80,11 +132,12 @@ struct AddEditPhraseView: View {
 
             if !showingAddPresetSheet {
                 TextEditor(text: $content)
+                    .font(.system(.body).monospaced())
                     .frame(minHeight: 100, maxHeight: 300)
                     .scrollContentBackground(.hidden)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 4)
-                    .focused($isContentFocused)
+                    .focused($focusedField, equals: .content)
                     .background(Color.white.opacity(0.05))
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(
@@ -128,7 +181,7 @@ struct AddEditPhraseView: View {
                 .onChange(of: selectedPresetId) { _, newValue in
                     // 新規プリセット...が選択された場合、シートを表示
                     if newValue == newPresetUUID {
-                        isContentFocused = false
+                        focusedField = nil
                         showingAddPresetSheet = true
                         // ピッカーの選択を元に戻す
                         if presetManager.presets.isEmpty {
@@ -152,48 +205,10 @@ struct AddEditPhraseView: View {
 
                 Spacer()
                 Button(mode == .add ? "追加" : "保存") {
-                    let finalTitle: String
-                    if useCustomTitle {
-                        finalTitle = title
-                    } else {
-                        finalTitle = content
-                    }
-
-                    let phrase = StandardPhrase(title: finalTitle, content: content)
-                    
-                    if case .add = mode {
-                        if let onSave = onSave {
-                            onSave(phrase)
-                        } else {
-                            // プリセットが選択されている場合はプリセットに追加、そうでなければデフォルトに追加
-                            if let selectedPresetId = selectedPresetId,
-                               var selectedPreset = presetManager.presets.first(where: { $0.id == selectedPresetId }) {
-                                selectedPreset.phrases.append(phrase)
-                                presetManager.updatePreset(selectedPreset)
-                            } else {
-                                standardPhraseManager.addPhrase(title: finalTitle, content: content)
-                            }
-                        }
-                    } else if case .edit(let originalPhrase) = mode {
-                        let updatedPhrase = StandardPhrase(id: originalPhrase.id, title: finalTitle, content: content)
-                        if let onSave = onSave {
-                            onSave(updatedPhrase)
-                        } else {
-                            // プリセットが選択されている場合はプリセットを更新、そうでなければデフォルトを更新
-                            if let selectedPresetId = selectedPresetId,
-                               var selectedPreset = presetManager.presets.first(where: { $0.id == selectedPresetId }),
-                               let index = selectedPreset.phrases.firstIndex(where: { $0.id == originalPhrase.id }) {
-                                selectedPreset.phrases[index] = updatedPhrase
-                                presetManager.updatePreset(selectedPreset)
-                            } else {
-                                standardPhraseManager.updatePhrase(id: originalPhrase.id, newTitle: finalTitle, newContent: content)
-                            }
-                        }
-                    }
-                    dismiss()
+                    save()
                 }
                 .buttonStyle(.borderedProminent)
-                .keyboardShortcut(.defaultAction)
+                .keyboardShortcut("s", modifiers: .command)
                 .disabled(content.isEmpty || (useCustomTitle && title.isEmpty) || selectedPresetId == noPresetsUUID)
                 .controlSize(.large)
             }
@@ -201,7 +216,7 @@ struct AddEditPhraseView: View {
         .padding() // ここで全体にパディングが適用される
         .frame(minWidth: 400, minHeight: 350)
         .onAppear {
-            isContentFocused = true
+            focusedField = .content
         }
         .sheet(isPresented: $showingAddPresetSheet) {
             // プリセット追加画面（シート）を表示
@@ -211,7 +226,7 @@ struct AddEditPhraseView: View {
         }
         .onChange(of: showingAddPresetSheet) { _, isShowing in
             if !isShowing {
-                isContentFocused = true
+                focusedField = .content
             }
         }
         .onReceive(presetManager.presetAddedSubject) { _ in

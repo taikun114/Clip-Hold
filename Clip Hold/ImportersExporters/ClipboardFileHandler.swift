@@ -241,14 +241,22 @@ extension ClipboardManager {
                             return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: sandboxedHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
                         }
                     } else {
-                        // ハッシュが計算できなかった場合、従来のファイルサイズによるチェックを行う
-                        if let externalSize = externalFileAttributes.fileSize,
-                           let sandboxedSize = sandboxedFileAttributes.fileSize,
-                           externalSize == sandboxedSize {
-                            print("ClipboardManager: Found potential duplicate in sandbox based on file size (hash calculation failed): \(sandboxedFileURL.lastPathComponent)")
-                            // 重複が見つかった場合、既存のサンドボックスファイルを参照する新しいアイテムを返す
-                            let displayName = extractOriginalFileName(from: sandboxedFileURL.lastPathComponent)
-                            return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) // ハッシュがない場合はセットしない
+                        // ハッシュが計算できなかった場合 (フォルダの場合など)
+                        var isDirectory = false
+                        if let isDir = (try? fileURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory), isDir {
+                            isDirectory = true
+                        }
+
+                        // フォルダの場合はサイズでの重複チェックをスキップする
+                        if !isDirectory {
+                            if let externalSize = externalFileAttributes.fileSize,
+                               let sandboxedSize = sandboxedFileAttributes.fileSize,
+                               externalSize == sandboxedSize {
+                                print("ClipboardManager: Found potential duplicate in sandbox based on file size (hash calculation failed): \(sandboxedFileURL.lastPathComponent)")
+                                // 重複が見つかった場合、既存のサンドボックスファイルを参照する新しいアイテムを返す
+                                let displayName = extractOriginalFileName(from: sandboxedFileURL.lastPathComponent)
+                                return ClipboardItem(text: displayName, date: Date(), filePath: sandboxedFileURL, fileSize: sandboxedSize, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) // ハッシュがない場合はセットしない
+                            }
                         }
                     }
                 }

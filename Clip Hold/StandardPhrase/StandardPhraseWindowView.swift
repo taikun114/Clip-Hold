@@ -162,6 +162,7 @@ struct StandardPhraseItemRow: View {
 
 struct StandardPhraseWindowView: View {
     @Environment(\.colorSchemeContrast) var colorSchemeContrast
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @EnvironmentObject var clipboardManager: ClipboardManager
@@ -196,6 +197,8 @@ struct StandardPhraseWindowView: View {
     // 新規プリセット追加シート用の状態変数
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
+
+    @State private var presetChangedForScroll: Bool = false
 
     private var lineNumberTextWidth: CGFloat? {
         guard !hideNumbers, !filteredPhrases.isEmpty else { return nil }
@@ -405,6 +408,9 @@ struct StandardPhraseWindowView: View {
                     .onChange(of: presetManager.selectedPreset?.phrases) { _, _ in
                         performSearch(searchTerm: searchText)
                     }
+                    .onChange(of: presetManager.selectedPresetId) { _, _ in
+                        presetChangedForScroll = true
+                    }
                     
                     Spacer(minLength: 0)
                     
@@ -419,55 +425,71 @@ struct StandardPhraseWindowView: View {
                                 Spacer()
                             }
                         } else {
-                            List(selection: $selectedPhraseID) {
-                                if searchText.isEmpty {
-                                    ForEach(filteredPhrases) { phrase in
-                                        StandardPhraseItemRow(
-                                            phrase: phrase,
-                                            index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                            hideNumbers: hideNumbers,
-                                            phraseToDelete: $phraseToDelete,
-                                            showingDeleteConfirmation: $showingDeleteConfirmation,
-                                            selectedPhraseID: $selectedPhraseID,
-                                            showCopyConfirmation: $showCopyConfirmation,
-                                            showQRCodeSheet: $showQRCodeSheet,
-                                            selectedPhraseForQRCode: $selectedPhraseForQRCode,
-                                            phraseToEdit: $phraseToEdit,
-                                            phraseToEditAndCopy: $phraseToEditAndCopy,
-                                            showingEditAndCopySheet: $showingEditAndCopySheet,
-                                            showingMoveSheet: $showingMoveSheet,
-                                            phraseToMove: $phraseToMove,
-                                            lineNumberTextWidth: lineNumberTextWidth,
-                                            trailingPaddingForLineNumber: trailingPaddingForLineNumber
-                                        )
-                                        .tag(phrase.id)
-                                        .listRowBackground(Color.clear)
-                                        .draggable(phrase.content) // テキストをドラッグ可能にする
+                            ScrollViewReader { proxy in
+                                List(selection: $selectedPhraseID) {
+                                    if searchText.isEmpty {
+                                        ForEach(filteredPhrases) { phrase in
+                                            StandardPhraseItemRow(
+                                                phrase: phrase,
+                                                index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
+                                                hideNumbers: hideNumbers,
+                                                phraseToDelete: $phraseToDelete,
+                                                showingDeleteConfirmation: $showingDeleteConfirmation,
+                                                selectedPhraseID: $selectedPhraseID,
+                                                showCopyConfirmation: $showCopyConfirmation,
+                                                showQRCodeSheet: $showQRCodeSheet,
+                                                selectedPhraseForQRCode: $selectedPhraseForQRCode,
+                                                phraseToEdit: $phraseToEdit,
+                                                phraseToEditAndCopy: $phraseToEditAndCopy,
+                                                showingEditAndCopySheet: $showingEditAndCopySheet,
+                                                showingMoveSheet: $showingMoveSheet,
+                                                phraseToMove: $phraseToMove,
+                                                lineNumberTextWidth: lineNumberTextWidth,
+                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                            )
+                                            .tag(phrase.id)
+                                            .listRowBackground(Color.clear)
+                                            .draggable(phrase.content) // テキストをドラッグ可能にする
+                                        }
+                                        .onMove(perform: movePhrases)
+                                    } else {
+                                        ForEach(filteredPhrases) { phrase in
+                                            StandardPhraseItemRow(
+                                                phrase: phrase,
+                                                index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
+                                                hideNumbers: hideNumbers,
+                                                phraseToDelete: $phraseToDelete,
+                                                showingDeleteConfirmation: $showingDeleteConfirmation,
+                                                selectedPhraseID: $selectedPhraseID,
+                                                showCopyConfirmation: $showCopyConfirmation,
+                                                showQRCodeSheet: $showQRCodeSheet,
+                                                selectedPhraseForQRCode: $selectedPhraseForQRCode,
+                                                phraseToEdit: $phraseToEdit,
+                                                phraseToEditAndCopy: $phraseToEditAndCopy,
+                                                showingEditAndCopySheet: $showingEditAndCopySheet,
+                                                showingMoveSheet: $showingMoveSheet,
+                                                phraseToMove: $phraseToMove,
+                                                lineNumberTextWidth: lineNumberTextWidth,
+                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                            )
+                                            .tag(phrase.id)
+                                            .listRowBackground(Color.clear)
+                                            .draggable(phrase.content) // テキストをドラッグ可能にする
+                                        }
                                     }
-                                    .onMove(perform: movePhrases)
-                                } else {
-                                    ForEach(filteredPhrases) { phrase in
-                                        StandardPhraseItemRow(
-                                            phrase: phrase,
-                                            index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                            hideNumbers: hideNumbers,
-                                            phraseToDelete: $phraseToDelete,
-                                            showingDeleteConfirmation: $showingDeleteConfirmation,
-                                            selectedPhraseID: $selectedPhraseID,
-                                            showCopyConfirmation: $showCopyConfirmation,
-                                            showQRCodeSheet: $showQRCodeSheet,
-                                            selectedPhraseForQRCode: $selectedPhraseForQRCode,
-                                            phraseToEdit: $phraseToEdit,
-                                            phraseToEditAndCopy: $phraseToEditAndCopy,
-                                            showingEditAndCopySheet: $showingEditAndCopySheet,
-                                            showingMoveSheet: $showingMoveSheet,
-                                            phraseToMove: $phraseToMove,
-                                            lineNumberTextWidth: lineNumberTextWidth,
-                                            trailingPaddingForLineNumber: trailingPaddingForLineNumber
-                                        )
-                                        .tag(phrase.id)
-                                        .listRowBackground(Color.clear)
-                                        .draggable(phrase.content) // テキストをドラッグ可能にする
+                                }
+                                .onChange(of: filteredPhrases) { _, newValue in
+                                    if presetChangedForScroll {
+                                        if let firstId = newValue.first?.id {
+                                            if reduceMotion {
+                                                proxy.scrollTo(firstId, anchor: .top)
+                                            } else {
+                                                withAnimation {
+                                                    proxy.scrollTo(firstId, anchor: .top)
+                                                }
+                                            }
+                                        }
+                                        presetChangedForScroll = false
                                     }
                                 }
                             }

@@ -414,7 +414,7 @@ struct HistoryItemRow: View {
                         Text("\(item.text.count)文字")
                     }
                     
-                    if let fileSize = item.fileSize, item.filePath != nil {
+                    if let fileSize = item.fileSize, item.filePath != nil, !item.isFolder {
                         Text("-")
                         Text(formatFileSize(fileSize))
                     }

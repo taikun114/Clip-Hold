@@ -323,10 +323,8 @@ class StandardPhrasePresetManager: ObservableObject {
         let presetWithValidIcon = StandardPhrasePreset(id: preset.id, name: preset.name, phrases: preset.phrases, icon: iconToUse, color: preset.color, customColor: preset.customColor)
         
         presets.append(presetWithValidIcon)
-        // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
-        if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
-            selectedPresetId = presetWithValidIcon.id
-        }
+        // 新しく追加したプリセットを選択状態にする
+        selectedPresetId = presetWithValidIcon.id
         savePresetToFile(presetWithValidIcon)
         savePresetIndex()
         saveSelectedPresetId()
