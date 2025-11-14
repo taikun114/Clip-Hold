@@ -45,9 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
         let resumeMonitoringAction = UNNotificationAction(identifier: resumeMonitoringActionID, title: String(localized: "再開"), options: [.foreground])
         let category = UNNotificationCategory(identifier: clipboardPausedNotificationCategory, actions: [resumeMonitoringAction], intentIdentifiers: [], options: [])
-        UNUserNotificationCenter.current().setNotificationCategories([category])
-        print("通知カテゴリ '\(clipboardPausedNotificationCategory)' とアクション '\(resumeMonitoringActionID)' を登録しました。")
-        
+
         // マイグレーション失敗通知のカテゴリを登録
         let openDocumentationAction = UNNotificationAction(
             identifier: "OPEN_DOCUMENTATION_ACTION",
@@ -60,7 +58,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             intentIdentifiers: [],
             options: []
         )
-        UNUserNotificationCenter.current().setNotificationCategories([migrationFailureCategory])
+
+        // 複数のカテゴリを一度に登録
+        UNUserNotificationCenter.current().setNotificationCategories([category, migrationFailureCategory])
+        print("通知カテゴリ '\(clipboardPausedNotificationCategory)' とアクション '\(resumeMonitoringActionID)' を登録しました。")
         print("マイグレーション失敗通知のカテゴリを登録しました。")
 
         if UserDefaults.standard.bool(forKey: "isClipboardMonitoringPaused") {
