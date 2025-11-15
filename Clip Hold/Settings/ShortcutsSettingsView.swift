@@ -24,7 +24,7 @@ struct ShortcutsSettingsView: View {
     @StateObject private var presetManager = StandardPhrasePresetManager.shared
     @EnvironmentObject var clipboardManager: ClipboardManager
     @AppStorage("useFilteredHistoryForShortcuts") private var useFilteredHistoryForShortcuts: Bool = false
-
+    
     var body: some View {
         Form {
             Section(header: Text("ウィンドウ操作").font(.headline)) {
@@ -41,7 +41,7 @@ struct ShortcutsSettingsView: View {
                     .buttonStyle(.borderless)
                     .help("デフォルトのショートカットに戻します。")
                 }
-
+                
                 HStack {
                     Text("履歴ウィンドウを開く")
                     Spacer()
@@ -72,7 +72,7 @@ struct ShortcutsSettingsView: View {
                     .help("デフォルトのショートカットに戻します。")
                 }
             }
-
+            
             Section(header: Text("プリセット").font(.headline)) {
                 HStack {
                     Text("新しいプリセットを追加する")
@@ -154,7 +154,7 @@ struct ShortcutsSettingsView: View {
                             default: fatalError("Unexpected index for standard phrase shortcut")
                             }
                         }()
-
+                        
                         KeyboardShortcuts.Recorder(for: shortcutName)
                         Button(action: {
                             KeyboardShortcuts.reset(shortcutName)
@@ -212,7 +212,7 @@ struct ShortcutsSettingsView: View {
                     Toggle("", isOn: $useFilteredHistoryForShortcuts)
                         .labelsHidden()
                 }
-
+                
                 ForEach(0..<10, id: \.self) { index in
                     HStack {
                         Text("\((index + 1).ordinalSuffix)履歴をコピーする")
@@ -233,7 +233,7 @@ struct ShortcutsSettingsView: View {
                             default: fatalError("Unexpected index for clipboard history shortcut")
                             }
                         }()
-
+                        
                         KeyboardShortcuts.Recorder(for: shortcutName)
                         Button(action: {
                             KeyboardShortcuts.reset(shortcutName)

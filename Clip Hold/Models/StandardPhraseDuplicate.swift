@@ -8,7 +8,7 @@ struct StandardPhraseDuplicate: Identifiable {
     
     // UIの状態を追跡するためのプロパティ
     var useCustomTitle: Bool = false // カスタムタイトルを使用するかどうかのフラグ
-
+    
     // タイトルが既存のフレーズと重複しているか
     var hasTitleConflict: Bool {
         return newPhrase.title == existingPhrase.title

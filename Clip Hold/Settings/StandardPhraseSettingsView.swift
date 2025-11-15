@@ -259,9 +259,9 @@ private struct PresetSettingsSection: View {
         }
     }
     
-
     
-
+    
+    
     
     private func isDefaultPreset(id: UUID?) -> Bool {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
@@ -1310,8 +1310,8 @@ struct PresetNameSheet: View {
                                 Image(systemName: icon.isEmpty ? previousIcon : icon)
                                     .foregroundColor(
                                         color == "accent"
-                                            ? (NSColor.controlAccentColor.isAccentColorYellowOrGreen ? Color.black : Color.white)
-                                            : getSymbolColor(forPresetColor: color)
+                                        ? (NSColor.controlAccentColor.isAccentColorYellowOrGreen ? Color.black : Color.white)
+                                        : getSymbolColor(forPresetColor: color)
                                     )
                                     .font(.system(size: 14, weight: .bold))
                             }

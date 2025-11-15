@@ -12,7 +12,7 @@ struct ColorCodeParser {
     private static let rgbPattern = #"^rgb\(\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*\)$"#
     // HSL形式のパターン (カンマ区切りとスペース区切り、deg/turn表記、%省略に対応)
     private static let hslPattern = #"^hsl\(\s*(\d{1,3}(?:\.\d+)?)((?:deg)|(?:turn))?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*\)$"#
-
+    
     /// カラーコードを解析して、対応するColorオブジェクトを返す
     /// - Parameter text: 解析する文字列
     /// - Returns: 解析されたColorオブジェクト。解析できない場合はnil
@@ -145,8 +145,8 @@ struct ColorCodeParser {
         
         // %表記または数値表記のどちらかが必須
         guard (rPercent != nil || rValue != nil) &&
-              (gPercent != nil || gValue != nil) &&
-              (bPercent != nil || bValue != nil) else { return nil }
+                (gPercent != nil || gValue != nil) &&
+                (bPercent != nil || bValue != nil) else { return nil }
         
         // %表記と数値表記を0-255の範囲に変換
         let r: Double = rPercent != nil ? rPercent! * 2.55 : rValue!
@@ -199,8 +199,8 @@ struct ColorCodeParser {
         
         // %表記または数値表記のどちらかが必須
         guard (rPercent != nil || rValue != nil) &&
-              (gPercent != nil || gValue != nil) &&
-              (bPercent != nil || bValue != nil) else { return nil }
+                (gPercent != nil || gValue != nil) &&
+                (bPercent != nil || bValue != nil) else { return nil }
         
         // %表記と数値表記を0-255の範囲に変換
         let r: Double = rPercent != nil ? rPercent! * 2.55 : rValue!
@@ -245,7 +245,7 @@ struct ColorCodeParser {
               let l = Int(lString),
               s >= 0 && s <= 100,
               l >= 0 && l <= 100 else { return nil }
-              
+        
         var hDouble: Double? = nil
         if let h = Double(hString) {
             if unitString == "turn" {
@@ -255,10 +255,10 @@ struct ColorCodeParser {
                 hDouble = h
             }
         }
-              
+        
         guard let h = hDouble,
               h >= 0 && h <= 360 else { return nil }
-              
+        
         // HSLをRGBに変換
         let (r, g, b) = hslToRgb(h: h, s: Double(s), l: Double(l))
         return Color(.sRGB, red: r, green: g, blue: b, opacity: 1.0)
@@ -280,7 +280,7 @@ struct ColorCodeParser {
               let l = Double(lString),
               s >= 0 && s <= 100,
               l >= 0 && l <= 100 else { return nil }
-              
+        
         var hDouble: Double? = nil
         if let h = Double(hString) {
             if unitString == "turn" {
@@ -290,7 +290,7 @@ struct ColorCodeParser {
                 hDouble = h
             }
         }
-              
+        
         guard let h = hDouble,
               h >= 0 && h <= 360 else { return nil }
         

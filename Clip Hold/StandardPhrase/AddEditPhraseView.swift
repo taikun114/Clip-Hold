@@ -5,16 +5,16 @@ struct AddEditPhraseView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @StateObject var iconGenerator = PresetIconGenerator.shared
-
+    
     enum Mode: Equatable {
         case add
         case edit(StandardPhrase)
     }
-
+    
     let mode: Mode
     var onSave: ((StandardPhrase) -> Void)?
     @State var phraseToEdit: StandardPhrase
-
+    
     @State private var title: String
     @State private var content: String
     @State private var useCustomTitle: Bool = false
@@ -23,26 +23,26 @@ struct AddEditPhraseView: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
     
-
+    
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
     private var isSheet: Bool = false
-
+    
     enum Field: Hashable {
         case title
         case content
     }
     @FocusState private var focusedField: Field?
-
+    
     private let noPresetsUUID = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
     private let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-
+    
     init(mode: Mode, phraseToEdit: StandardPhrase? = nil, initialContent: String? = nil, presetManager: StandardPhrasePresetManager, isSheet: Bool = false, onSave: ((StandardPhrase) -> Void)? = nil) {
         self.mode = mode
         self.onSave = onSave
         _phraseToEdit = State(initialValue: phraseToEdit ?? StandardPhrase(title: "", content: ""))
         self.isSheet = isSheet
-
+        
         switch mode {
         case .add:
             _title = State(initialValue: "")
@@ -61,7 +61,7 @@ struct AddEditPhraseView: View {
             _selectedPresetId = State(initialValue: presetManager.selectedPresetId)
         }
     }
-
+    
     private func save() {
         let finalTitle: String
         if useCustomTitle {
@@ -69,7 +69,7 @@ struct AddEditPhraseView: View {
         } else {
             finalTitle = content
         }
-
+        
         let phrase = StandardPhrase(title: finalTitle, content: content)
         
         if case .add = mode {
@@ -103,7 +103,7 @@ struct AddEditPhraseView: View {
         }
         dismiss()
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
@@ -112,7 +112,7 @@ struct AddEditPhraseView: View {
                     .fontWeight(.bold)
                 Spacer()
             }
-
+            
             TextField("タイトル", text: $title)
                 .textFieldStyle(.roundedBorder)
                 .focused($focusedField, equals: .title)
@@ -120,7 +120,7 @@ struct AddEditPhraseView: View {
                     focusedField = .content
                 }
                 .disabled(!useCustomTitle)
-
+            
             Toggle(isOn: $useCustomTitle) {
                 Text("カスタムタイトルを使用する")
             }
@@ -129,7 +129,7 @@ struct AddEditPhraseView: View {
                     title = content
                 }
             }
-
+            
             if !showingAddPresetSheet {
                 TextEditor(text: $content)
                     .font(.system(.body).monospaced())
@@ -155,7 +155,7 @@ struct AddEditPhraseView: View {
                     .frame(minHeight: 100)
                     .padding(.vertical, 8)
             }
-
+            
             // プリセット選択ピッカー (追加モードでのみ表示)
             if case .add = mode {
                 Picker("保存先のプリセット:", selection: $selectedPresetId) {
@@ -166,11 +166,12 @@ struct AddEditPhraseView: View {
                         Label {
                             Text(preset.truncatedDisplayName(maxLength: 50))
                         } icon: {
-                                                if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
-                                                    Image(nsImage: iconImage)
-                                                } else {
-                                                    Image(systemName: "star.fill") // Fallback
-                                                }                        }
+                            if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
+                                Image(nsImage: iconImage)
+                            } else {
+                                Image(systemName: "star.fill") // Fallback
+                            }
+                        }
                         .tag(preset.id as UUID?)
                     }
                     Divider()
@@ -193,7 +194,7 @@ struct AddEditPhraseView: View {
                 }
                 .padding(.top, 10)
             }
-
+            
             Spacer()
             
             HStack {
@@ -202,7 +203,7 @@ struct AddEditPhraseView: View {
                 }
                 .controlSize(.large)
                 .keyboardShortcut(.cancelAction)
-
+                
                 Spacer()
                 Button(mode == .add ? "追加" : "保存") {
                     save()
@@ -244,7 +245,7 @@ struct AddEditPhraseView_Previews: PreviewProvider {
         AddEditPhraseView(mode: .add, presetManager: StandardPhrasePresetManager.shared)
             .environmentObject(StandardPhraseManager.shared)
             .environmentObject(StandardPhrasePresetManager.shared)
-
+        
         AddEditPhraseView(mode: .edit(StandardPhrase(title: "既存の定型文のタイトル", content: "これは既存の定型文の内容です。")), presetManager: StandardPhrasePresetManager.shared)
             .environmentObject(StandardPhraseManager.shared)
             .environmentObject(StandardPhrasePresetManager.shared)
@@ -254,10 +255,10 @@ struct AddEditPhraseView_Previews: PreviewProvider {
 // MARK: - Color Extension for Placeholder Text
 extension Color {
     static var placeholderText: Color {
-        #if os(macOS)
+#if os(macOS)
         return Color(NSColor.placeholderTextColor)
-        #else
+#else
         return Color(.placeholderText)
-        #endif
+#endif
     }
 }

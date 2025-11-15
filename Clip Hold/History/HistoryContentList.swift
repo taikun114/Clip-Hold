@@ -8,12 +8,12 @@ private func getLocalizedName(for sourceAppPath: String?) -> String? {
     
     let appURL = URL(fileURLWithPath: sourceAppPath)
     let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
-
+    
     if let appBundle = Bundle(url: appURL) {
         let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? 
-                     appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? 
-                     appBundle.infoDictionary?["CFBundleName"] as? String ?? 
-                     nonLocalizedName
+        appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? 
+        appBundle.infoDictionary?["CFBundleName"] as? String ?? 
+        nonLocalizedName
         return appName
     } else {
         return nonLocalizedName
@@ -26,7 +26,7 @@ struct HistoryContentList: View {
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
     @Environment(\.accessibilityReduceMotion) var reduceMotion
-
+    
     @Binding var filteredHistory: [ClipboardItem]
     @Binding var isLoading: Bool
     @Binding var showingDeleteConfirmation: Bool
@@ -38,7 +38,7 @@ struct HistoryContentList: View {
     @Binding var selectedItemForQRCode: ClipboardItem?
     @Binding var itemForNewPhrase: ClipboardItem?
     @Binding var previousClipboardHistoryCount: Int
-
+    
     // State variables for the exclude app alert
     @State private var showingExcludeAppAlert = false
     @State private var appToExclude: String?
@@ -46,14 +46,14 @@ struct HistoryContentList: View {
     // State variables for the delete all history from app alert
     @State private var showingDeleteAllFromAppAlert = false
     @State private var appToDeleteFrom: String?
-
+    
     // 各行のアイコンのNSView参照を保存するためのState
     @State private var rowIconViews: [UUID: NSView] = [:]
     
     // State variable for the edit sheet
     @State private var showingEditSheet = false
     @State private var itemToEdit: ClipboardItem?
-
+    
     let hideNumbersInHistoryWindow: Bool
     let closeWindowOnDoubleClickInHistoryWindow: Bool
     let scrollToTopOnUpdate: Bool
@@ -61,16 +61,16 @@ struct HistoryContentList: View {
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
     let searchText: String
-
+    
     var onCopyAction: (ClipboardItem) -> Void
-
-
+    
+    
     private func parseQRCode(from image: NSImage) -> String? {
         guard let ciImage = CIImage(data: image.tiffRepresentation ?? Data()) else { return nil }
-
+        
         let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
         let features = detector?.features(in: ciImage)
-
+        
         for feature in features ?? [] {
             if let qrCodeFeature = feature as? CIQRCodeFeature {
                 return qrCodeFeature.messageString
@@ -78,7 +78,7 @@ struct HistoryContentList: View {
         }
         return nil
     }
-
+    
     var body: some View {
         ZStack {
             if filteredHistory.isEmpty && !isLoading {
@@ -138,7 +138,7 @@ struct HistoryContentList: View {
                     }
                     .onChange(of: selectedItemID) { oldID, newID in
                         guard let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController else { return }
-
+                        
                         guard let newID = newID else {
                             controller.hideQuickLook()
                             return
@@ -147,11 +147,11 @@ struct HistoryContentList: View {
                         guard let selectedItem = filteredHistory.first(where: { $0.id == newID }) else {
                             return
                         }
-
+                        
                         guard QLPreviewPanel.sharedPreviewPanelExists() && QLPreviewPanel.shared().isVisible else {
                             return
                         }
-
+                        
                         // 選択が変更された場合も、正しいアイコンビューから再表示する
                         if let filePath = selectedItem.filePath,
                            let sourceView = rowIconViews[newID] {

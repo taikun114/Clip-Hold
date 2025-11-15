@@ -34,7 +34,7 @@ class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
         )
         
         window.title = title
-
+        
         // コンテンツビューの設定
         let hostingController = NSHostingController(rootView: rootView)
         window.contentViewController = hostingController

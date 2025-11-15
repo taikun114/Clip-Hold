@@ -6,26 +6,26 @@ import Combine
 @MainActor
 class PresetAppAssignmentManager: ObservableObject {
     static let shared = PresetAppAssignmentManager()
-
+    
     @Published var assignments: [UUID: [String]] = [:] {
         didSet {
             saveAssignments()
         }
     }
-
+    
     private let userDefaultsKey = "presetAppAssignments"
-
+    
     private init() {
         loadAssignments()
     }
-
+    
     func addAssignment(for presetId: UUID, bundleIdentifier: String) {
         if assignments[presetId]?.contains(bundleIdentifier) == false || assignments[presetId] == nil {
             assignments[presetId, default: []].append(bundleIdentifier)
             objectWillChange.send()
         }
     }
-
+    
     func removeAssignment(for bundleIdentifier: String) {
         for (presetId, _) in assignments {
             assignments[presetId]?.removeAll { $0 == bundleIdentifier }
@@ -37,11 +37,11 @@ class PresetAppAssignmentManager: ObservableObject {
         assignments[presetId]?.removeAll { $0 == bundleIdentifier }
         objectWillChange.send()
     }
-
+    
     func getAssignments(for presetId: UUID) -> [String] {
         return assignments[presetId] ?? []
     }
-
+    
     func getPresetId(for bundleIdentifier: String) -> UUID? {
         for (presetId, bundleIds) in assignments {
             if bundleIds.contains(bundleIdentifier) {
@@ -50,19 +50,19 @@ class PresetAppAssignmentManager: ObservableObject {
         }
         return nil
     }
-
+    
     func clearAssignments(for presetId: UUID) {
         assignments[presetId] = nil
         objectWillChange.send()
     }
-
+    
     private func saveAssignments() {
         let encodableAssignments = assignments.mapKeys { $0.uuidString }
         if let encoded = try? JSONEncoder().encode(encodableAssignments) {
             UserDefaults.standard.set(encoded, forKey: userDefaultsKey)
         }
     }
-
+    
     private func loadAssignments() {
         guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
               let decoded = try? JSONDecoder().decode([String: [String]].self, from: data) else {

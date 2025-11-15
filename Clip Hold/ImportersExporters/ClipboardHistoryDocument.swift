@@ -3,14 +3,14 @@ import UniformTypeIdentifiers
 
 struct ClipboardHistoryDocument: FileDocument {
     var clipboardItems: [ClipboardItem]
-
+    
     static var readableContentTypes: [UTType] { [.json] }
     static var writableContentTypes: [UTType] { [.json] }
-
+    
     init(clipboardItems: [ClipboardItem] = []) {
         self.clipboardItems = clipboardItems
     }
-
+    
     // ファイルから読み込む際のイニシャライザ
     init(configuration: ReadConfiguration) throws {
         guard let data = configuration.file.regularFileContents else {
@@ -20,7 +20,7 @@ struct ClipboardHistoryDocument: FileDocument {
         decoder.dateDecodingStrategy = .iso8601
         self.clipboardItems = try decoder.decode([ClipboardItem].self, from: data)
     }
-
+    
     // ファイルに書き込む際のメソッド
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
         let encoder = JSONEncoder()

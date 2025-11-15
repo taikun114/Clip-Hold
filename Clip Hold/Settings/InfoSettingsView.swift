@@ -6,7 +6,7 @@ import Darwin.sys.sysctl
 struct InfoSettingsView: View {
     // 現在のカラースキームを監視
     @Environment(\.colorScheme) var colorScheme
-
+    
     // アラート表示を制御するState変数
     @State private var showingFeedbackMailAlert = false
     @State private var showingContributorsAlert = false
@@ -18,8 +18,8 @@ struct InfoSettingsView: View {
     
     // ライセンス情報モーダル表示を制御するState変数
     @State private var showingLicenseInfoModal = false
-
-
+    
+    
     var body: some View {
         Form { // 全体をFormで囲む
             Section(header: Text("Clip Holdについて").font(.headline)) {
@@ -43,30 +43,30 @@ struct InfoSettingsView: View {
                             .padding(.leading, 0)
                             .padding(.trailing, -10)
                     }
-
+                    
                     VStack(alignment: .leading) {
                         Spacer()
-
+                        
                         VStack(alignment: .leading) {
                             Text("Clip Hold")
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
-
+                            
                             Text("バージョン: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "N/A"))")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
-
+                        
                         Spacer()
-
+                        
                         Text("生成AIと開発")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-
+                        
                         Text("Copyright ©︎ 2025 今浦大雅")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-
+                        
                         Spacer()
                     }
                     .frame(maxHeight: 128, alignment: .topLeading)
@@ -90,7 +90,7 @@ struct InfoSettingsView: View {
                         LicenseInfoModalView()
                     }
                 }
-
+                
                 // 開発に携わった貢献者セクション
                 HStack(alignment: .center) {
                     Text("開発に携わった貢献者")
@@ -108,7 +108,7 @@ struct InfoSettingsView: View {
                     .alert("リンクを開きますか？", isPresented: $showingContributorsAlert) {
                         Button("開く") {
                             if let url = URL(string: "https://github.com/taikun114/Clip-Hold/graphs/contributors"),
-                                NSWorkspace.shared.open(url) {
+                               NSWorkspace.shared.open(url) {
                                 // URLを開く処理が成功した場合（何もしない）
                             } else {
                                 print("Failed to open URL.")
@@ -122,7 +122,7 @@ struct InfoSettingsView: View {
                     }
                 }
             }
-
+            
             Section(header: Text("サポートとフィードバック").font(.headline)) {
                 HStack(alignment: .center) {
                     Text("バグを見つけましたか？")
@@ -140,7 +140,7 @@ struct InfoSettingsView: View {
                     .alert("リンクを開きますか？", isPresented: $showingBugReportAlert) {
                         Button("開く") {
                             if let url = URL(string: "https://github.com/taikun114/Clip-Hold/issues"),
-                                NSWorkspace.shared.open(url) {
+                               NSWorkspace.shared.open(url) {
                                 // URLを開く処理が成功した場合（何もしない）
                             } else {
                                 print("Failed to open URL.")
@@ -153,7 +153,7 @@ struct InfoSettingsView: View {
                         Text("GitHubのIssueページを開いてもよろしいですか？")
                     }
                 }
-
+                
                 HStack(alignment: .center) {
                     Text("アイデアがありますか？")
                     Spacer()
@@ -168,7 +168,7 @@ struct InfoSettingsView: View {
                     .buttonStyle(.bordered)
                     .help("フィードバックのメール送信画面を開きます。")
                 }
-
+                
                 HStack(alignment: .center) {
                     Text("質問や意見交換などを行いましょう")
                     Spacer()
@@ -185,7 +185,7 @@ struct InfoSettingsView: View {
                     .alert("リンクを開きますか？", isPresented: $showingCommunityAlert) {
                         Button("開く") {
                             if let url = URL(string: "https://github.com/taikun114/Clip-Hold/discussions"),
-                                NSWorkspace.shared.open(url) {
+                               NSWorkspace.shared.open(url) {
                                 // URLを開く処理が成功した場合（何もしない）
                             } else {
                                 print("Failed to open URL.")
@@ -199,7 +199,7 @@ struct InfoSettingsView: View {
                     }
                 }
             }
-
+            
             Section(header: Text("開発者をサポート").font(.headline)) {
                 // GitHubリポジトリにスターをつける
                 HStack(alignment: .center) {
@@ -224,7 +224,7 @@ struct InfoSettingsView: View {
                     .alert("リンクを開きますか？", isPresented: $showingGitHubStarAlert) {
                         Button("開く") {
                             if let url = URL(string: "https://github.com/taikun114/Clip-Hold"),
-                                NSWorkspace.shared.open(url) {
+                               NSWorkspace.shared.open(url) {
                                 // URLを開く処理が成功した場合（何もしない）
                             } else {
                                 print("Failed to open URL.")
@@ -237,7 +237,7 @@ struct InfoSettingsView: View {
                         Text("GitHubのリポジトリページを開いてもよろしいですか？")
                     }
                 }
-
+                
                 // 緑茶を買ってあげる
                 HStack(alignment: .center) {
                     VStack(alignment: .leading) {
@@ -261,7 +261,7 @@ struct InfoSettingsView: View {
                     .alert("リンクを開きますか？", isPresented: $showingBuyMeACoffeeAlert) {
                         Button("開く") {
                             if let url = URL(string: "https://www.buymeacoffee.com/i_am_taikun"),
-                                NSWorkspace.shared.open(url) {
+                               NSWorkspace.shared.open(url) {
                                 // URLを開く処理が成功した場合（何もしない）
                             } else {
                                 print("Failed to open URL.")
@@ -274,7 +274,7 @@ struct InfoSettingsView: View {
                         Text("Buy Me a Coffeeのページを開いてもよろしいですか？")
                     }
                 }
-
+                
                 // PayPalで寄付の項目
                 HStack(alignment: .center) {
                     VStack(alignment: .leading) {
@@ -298,7 +298,7 @@ struct InfoSettingsView: View {
                     .alert("リンクを開きますか？", isPresented: $showingPayPalAlert) {
                         Button("開く") {
                             if let url = URL(string: "https://paypal.me/taikun114"),
-                                NSWorkspace.shared.open(url) {
+                               NSWorkspace.shared.open(url) {
                                 // URLを開く処理が成功した場合（何もしない）
                             } else {
                                 print("Failed to open URL.")
@@ -317,7 +317,7 @@ struct InfoSettingsView: View {
         .alert("メール送信画面を開きますか？", isPresented: $showingFeedbackMailAlert) {
             Button("開く") {
                 if let url = URL(string: "mailto:contact.taikun@gmail.com?subject=\(formattedFeedbackSubject())&body=\(formattedFeedbackBody())"),
-                    NSWorkspace.shared.open(url) {
+                   NSWorkspace.shared.open(url) {
                     // URLを開く処理が成功した場合（何もしない）
                 } else {
                     print("Failed to open mailto URL.")
@@ -330,22 +330,22 @@ struct InfoSettingsView: View {
             Text("フィードバックのメール送信画面を開いてもよろしいですか？")
         }
     }
-
+    
     // メールの件名をURLエンコードして返すヘルパー関数
     private func formattedFeedbackSubject() -> String {
         let appName = "Clip Hold"
         let languageCode = Locale.current.language.languageCode?.identifier
-
+        
         let subjectPrefix: String
         if languageCode == "ja" {
             subjectPrefix = "\(appName)のフィードバック: "
         } else {
             subjectPrefix = "\(appName) Feedback: "
         }
-
+        
         return subjectPrefix.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
     }
-
+    
     // 機種IDを取得するヘルパー関数
     private func getMachineModelIdentifier() -> String {
         var size = 0
@@ -354,66 +354,66 @@ struct InfoSettingsView: View {
         sysctlbyname("hw.model", &model, &size, nil, 0)
         return String(cString: model)
     }
-
+    
     // メールの本文をURLエンコードして返すヘルパー関数
     private func formattedFeedbackBody() -> String {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
         let appBuildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "N/A"
-
+        
         // macOSのバージョン情報を取得
         let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
-
+        
         // CPUアーキテクチャの取得
-        #if arch(arm64)
+#if arch(arm64)
         let cpuArchitecture = "Apple Silicon (arm64)"
-        #elseif arch(x86_64)
+#elseif arch(x86_64)
         let cpuArchitecture = "Intel (x86_64)"
-        #else
+#else
         let cpuArchitecture = "N/A"
-        #endif
-
+#endif
+        
         // 機種IDを取得
         let machineModelIdentifier = getMachineModelIdentifier()
-
+        
         let languageCode = Locale.current.language.languageCode?.identifier
         let body: String
-
+        
         if languageCode == "ja" {
             body = """
             フィードバック内容を具体的に説明してください:
-
-
+            
+            
             システム情報:
-
+            
             ・システム
             　機種ID: \(machineModelIdentifier)
             　アーキテクチャ: \(cpuArchitecture)
-
+            
             ・macOS
             　\(osVersion)
-
+            
             ・アプリ
             　バージョン\(appVersion)（ビルド\(appBuildNumber)）
             """
         } else {
             body = """
             Please describe your feedback in detail:
-
-
+            
+            
             System Information:
-
+            
             ・System
             　Model ID: \(machineModelIdentifier)
             　Architecture: \(cpuArchitecture)
-
+            
             ・macOS
             　\(osVersion)
-
+            
             ・App
             　Version \(appVersion) (Build \(appBuildNumber))
             """
         }
-
+        
         return body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
     }
 }

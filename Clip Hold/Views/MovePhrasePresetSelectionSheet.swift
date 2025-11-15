@@ -9,8 +9,6 @@ struct MovePhrasePresetSelectionSheet: View {
     @Binding var selectedPresetId: UUID?
     var onConfirm: () -> Void
     
-
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("別のプリセットに移動")
@@ -25,11 +23,12 @@ struct MovePhrasePresetSelectionSheet: View {
                     Label {
                         Text(preset.truncatedDisplayName(maxLength: 50))
                     } icon: {
-                                            if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
-                                                Image(nsImage: iconImage)
-                                            } else {
-                                                Image(systemName: "star.fill") // Fallback
-                                            }                    }
+                        if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
+                            Image(nsImage: iconImage)
+                        } else {
+                            Image(systemName: "star.fill") // Fallback
+                        }
+                    }
                     .tag(preset.id as UUID?)
                 }
             }

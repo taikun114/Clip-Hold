@@ -6,17 +6,17 @@ import KeyboardShortcuts
 // アプリケーションのデリゲートクラス
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, NSWindowDelegate {
-
+    
     var historyWindowController: ClipHoldWindowController?
     var standardPhraseWindowController: ClipHoldWindowController?
     var settingsWindowController: SettingsWindowController?
-
+    
     // ウィンドウの種類ごとにウィンドウコントローラーを管理する
     private var windowControllers: [WindowType: ClipHoldStandardWindowController] = [:]
-
+    
     let resumeMonitoringActionID = "RESUME_MONITORING_ACTION"
     let clipboardPausedNotificationCategory = "CLIPBOARD_PAUSED_CATEGORY"
-
+    
     private var historyWindowAlwaysOnTopObserver: NSKeyValueObservation?
     private var standardPhraseWindowAlwaysOnTopObserver: NSKeyValueObservation?
     private var historyWindowOverlayTransparencyObserver: NSKeyValueObservation?
@@ -24,15 +24,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     private var historyWindowIsOverlayObserver: NSKeyValueObservation?
     private var standardPhraseWindowIsOverlayObserver: NSKeyValueObservation?
     private let frontmostAppMonitor = FrontmostAppMonitor.shared
-
+    
     // MARK: - Application Lifecycle
     func applicationDidFinishLaunching(_ notification: Notification) {
         frontmostAppMonitor.startMonitoring()
         print("AppDelegate: finished launching.")
-
+        
         NSApp.setActivationPolicy(.accessory)
         NSApp.delegate = self
-
+        
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
             if granted {
                 print("通知の許可が与えられました。")
@@ -42,10 +42,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
         
         UNUserNotificationCenter.current().delegate = self
-
+        
         let resumeMonitoringAction = UNNotificationAction(identifier: resumeMonitoringActionID, title: String(localized: "再開"), options: [.foreground])
         let category = UNNotificationCategory(identifier: clipboardPausedNotificationCategory, actions: [resumeMonitoringAction], intentIdentifiers: [], options: [])
-
+        
         // マイグレーション失敗通知のカテゴリを登録
         let openDocumentationAction = UNNotificationAction(
             identifier: "OPEN_DOCUMENTATION_ACTION",
@@ -58,18 +58,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             intentIdentifiers: [],
             options: []
         )
-
+        
         // 複数のカテゴリを一度に登録
         UNUserNotificationCenter.current().setNotificationCategories([category, migrationFailureCategory])
         print("通知カテゴリ '\(clipboardPausedNotificationCategory)' とアクション '\(resumeMonitoringActionID)' を登録しました。")
         print("マイグレーション失敗通知のカテゴリを登録しました。")
-
+        
         if UserDefaults.standard.bool(forKey: "isClipboardMonitoringPaused") {
             NotificationManager.shared.scheduleClipboardPausedNotification()
             print("AppDelegate: アプリ起動時、クリップボード監視は一時停止状態です。通知をスケジュールしました。")
         }
-
-                historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
+        
+        historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
             DispatchQueue.main.async {
                 guard let self = self, let alwaysOnTop = change.newValue else { return }
                 if let historyWindow = self.historyWindowController?.window {
@@ -77,7 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 }
             }
         }
-
+        
         standardPhraseWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.standardPhraseWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
             DispatchQueue.main.async {
                 guard let self = self, let alwaysOnTop = change.newValue else { return }
@@ -86,25 +86,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 }
             }
         }
-
+        
         historyWindowOverlayTransparencyObserver = UserDefaults.standard.observe(\.historyWindowOverlayTransparency, options: [.new]) { [weak self] _, _ in
             DispatchQueue.main.async {
                 self?.historyWindowController?.updateOverlay()
             }
         }
-
+        
         standardPhraseWindowOverlayTransparencyObserver = UserDefaults.standard.observe(\.standardPhraseWindowOverlayTransparency, options: [.new]) { [weak self] _, _ in
             DispatchQueue.main.async {
                 self?.standardPhraseWindowController?.updateOverlay()
             }
         }
-
+        
         historyWindowIsOverlayObserver = UserDefaults.standard.observe(\.historyWindowIsOverlay, options: [.new]) { [weak self] _, _ in
             DispatchQueue.main.async {
                 self?.historyWindowController?.updateOverlay()
             }
         }
-
+        
         standardPhraseWindowIsOverlayObserver = UserDefaults.standard.observe(\.standardPhraseWindowIsOverlay, options: [.new]) { [weak self] _, _ in
             DispatchQueue.main.async {
                 self?.standardPhraseWindowController?.updateOverlay()
@@ -123,7 +123,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     }
     
     // MARK: - Window Management
-
+    
     func showSettingsWindow() {
         if settingsWindowController == nil || settingsWindowController?.window == nil {
             settingsWindowController = SettingsWindowController()
@@ -136,7 +136,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             NSApp.activate(ignoringOtherApps: true)
         }
     }
-
+    
     @MainActor
     func showHistoryWindow() {
         if historyWindowController == nil || historyWindowController?.window == nil {
@@ -154,9 +154,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 backing: .buffered,
                 defer: false
             )
-
+            
             window.identifier = NSUserInterfaceItemIdentifier("HistoryWindow")
-
+            
             window.contentViewController = hostingController
             
             
@@ -185,7 +185,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
         }
     }
-
+    
     @MainActor
     func showStandardPhraseWindow() {
         if standardPhraseWindowController == nil || standardPhraseWindowController?.window == nil {
@@ -193,7 +193,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 .environmentObject(ClipboardManager.shared)
                 .environmentObject(StandardPhraseManager.shared)
                 .environmentObject(StandardPhrasePresetManager.shared)
-
+            
             let hostingController = NSHostingController(rootView: contentView)
             
             let window = NSWindow(
@@ -202,9 +202,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 backing: .buffered,
                 defer: false
             )
-
+            
             window.identifier = NSUserInterfaceItemIdentifier("StandardPhraseWindow")
-
+            
             window.contentViewController = hostingController
             
             standardPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, windowType: .standardPhrase, applyTransparentBackground: true, windowFrameAutosaveKey: "StandardPhraseWindowFrame")
@@ -231,7 +231,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
         }
     }
-
+    
     @MainActor
     func showAddPhraseWindow(withContent content: String) {
         let windowType: WindowType = .addPhrase
@@ -244,15 +244,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             print("AppDelegate: Reusing existing \(windowType) window.")
             return
         }
-
+        
         let contentView = AddEditPhraseView(mode: .add, initialContent: content, presetManager: StandardPhrasePresetManager.shared, isSheet: false)
             .environmentObject(StandardPhraseManager.shared)
             .environmentObject(StandardPhrasePresetManager.shared)
-
+        
         // 新しいウィンドウコントローラーを作成
         let windowController = ClipHoldStandardWindowController(rootView: contentView, title: title, windowType: windowType)
         windowControllers[windowType] = windowController
-
+        
         // ウィンドウを表示し、アプリをアクティブにする
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
@@ -284,12 +284,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 print("AppDelegate: \(windowType) window removed from windowControllers asynchronously.")
             }
         }, editingPreset: nil)
-        .environmentObject(StandardPhrasePresetManager.shared)
-
+            .environmentObject(StandardPhrasePresetManager.shared)
+        
         // 新しいウィンドウコントローラーを作成
         let windowController = ClipHoldStandardWindowController(rootView: contentView, title: title, windowType: windowType)
         windowControllers[windowType] = windowController
-
+        
         // ウィンドウを表示し、アプリをアクティブにする
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
@@ -309,28 +309,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             print("AppDelegate: Reusing existing \(windowType) window.")
             return
         }
-
+        
         let editView = EditHistoryItemView(content: content, onCopy: { editedContent in
             // コピー処理を実装
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(editedContent, forType: .string)
         }, isSheet: false)
-
+        
         // 新しいウィンドウコントローラーを作成
         let windowController = ClipHoldStandardWindowController(rootView: editView, title: title, windowType: windowType)
         windowControllers[windowType] = windowController
-
+        
         // ウィンドウを表示し、アプリをアクティブにする
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
         
         print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
     }
-
+    
     // MARK: - NSWindowDelegate
     func windowWillClose(_ notification: Notification) {
         guard let closedWindow = notification.object as? NSWindow else { return }
-
+        
         // ウィンドウの種類ごとにウィンドウコントローラーを管理する
         for (type, controller) in windowControllers {
             if closedWindow == controller.window {
@@ -341,7 +341,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
         }
     }
-
+    
     // MARK: - Application Delegate Methods for Reopening
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         UserDefaults.standard.set(false, forKey: "hideMenuBarExtra")
@@ -351,7 +351,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         return true
     }
-
+    
     // MARK: - UNUserNotificationCenterDelegate (通知アクションのハンドリング)
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let actionID = response.actionIdentifier
@@ -361,7 +361,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             print("通知アクション: '再開' が選択されました。")
             // NotificationManager を介して再開ロジックを実行
             NotificationManager.shared.resumeClipboardMonitoringAndSendNotification()
-
+            
             // アプリをフォアグラウンドに表示
             DispatchQueue.main.async {
                 NSApp.activate(ignoringOtherApps: true)
@@ -389,7 +389,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
         completionHandler()
     }
-
+    
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound])
     }

@@ -8,7 +8,7 @@ extension ClipboardManager {
     func presentLargeFileConfirmationAlert() { // private から internal に変更
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-
+            
             let alert = NSAlert()
             
             // 新しいプロパティがセットされている場合はそれを優先
@@ -23,12 +23,12 @@ extension ClipboardManager {
                 alertTitle = NSLocalizedString("大容量ファイルのコピー", comment: "")
             }
             alert.messageText = alertTitle
-
+            
             var informativeText: String
             
             // Format the largeFileAlertThreshold for display
             let formattedThreshold = ByteCountFormatter.string(fromByteCount: Int64(self.largeFileAlertThreshold), countStyle: .file)
-
+            
             // 新しいプロパティ (pendingLargeFileItemsWithSize) を使用
             if let pendingItemsWithSize = self.pendingLargeFileItemsWithSize {
                 if pendingItemsWithSize.count > 1 {
@@ -72,22 +72,22 @@ extension ClipboardManager {
                 // ファイルサイズが取得できない場合（既存のロジック）
                 informativeText = String(format: NSLocalizedString("%@を超えるファイルがコピーされました。履歴に保存してもよろしいですか？", comment: ""), formattedThreshold)
             }
-
+            
             alert.informativeText = informativeText
-
+            
             alert.alertStyle = .warning
             alert.addButton(withTitle: NSLocalizedString("はい", comment: "")) // NSAlertFirstButtonReturn (1000)
             alert.addButton(withTitle: NSLocalizedString("いいえ", comment: "")) // NSAlertSecondButtonReturn (1001)
-
+            
             let response = alert.runModal()
             print("DEBUG: presentLargeFileConfirmationAlert - Alert dismissed. Response: \(response.rawValue)")
-
+            
             // NSAlertFirstButtonReturn corresponds to "Yes", NSAlertSecondButtonReturn to "No"
             let shouldSave = (response == .alertFirstButtonReturn)
             self.handleLargeFileAlertConfirmation(shouldSave: shouldSave)
         }
     }
-
+    
     func handleLargeFileAlertConfirmation(shouldSave: Bool) {
         print("DEBUG: handleLargeFileAlertConfirmation - shouldSave: \(shouldSave)")
         if shouldSave {

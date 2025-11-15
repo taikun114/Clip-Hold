@@ -6,12 +6,12 @@ extension ClipboardManager {
     func copyItemToClipboard(_ item: ClipboardItem) {
         // 古い一時ファイルをすべて削除する
         cleanUpTemporaryFiles()
-
+        
         isPerformingInternalCopy = true // 内部コピー操作が開始されたことを示す
         print("DEBUG: copyItemToClipboard: isPerformingInternalCopy = true")
-
+        
         NSPasteboard.general.clearContents()
-
+        
         // ファイルコピー処理を非同期タスクで実行
         Task.detached { [weak self] in
             guard let self = self else { return }
@@ -36,7 +36,7 @@ extension ClipboardManager {
                 // ファイルパスが存在する場合は、テキストのコピーをスキップ
                 return
             }
-
+            
             // ファイルパスがない場合、テキストをコピー
             // item.text は非オプショナルなので、直接使用する
             await MainActor.run {
@@ -78,7 +78,7 @@ extension ClipboardManager {
             }
         }
     }
-
+    
     // 履歴にテキストアイテムを明示的に追加するメソッド
     // クリップボード監視以外からの入力 (例: ドラッグ&ドロップ) に使用
     func addTextItem(text: String) {
@@ -87,15 +87,15 @@ extension ClipboardManager {
             print("ClipboardManager: Duplicate text item detected via addTextItem, skipping. Text: \(text.prefix(50))...\n")
             return
         }
-
+        
         self.objectWillChange.send() // UI更新を促す
         let newItem = ClipboardItem(text: text, date: Date(), filePath: nil, fileSize: nil) // ファイルパスとサイズはnil
         clipboardHistory.insert(newItem, at: 0) // 先頭に追加
         print("ClipboardManager: New text item added via addTextItem. Total history: \(clipboardHistory.count)")
-
+        
         // 最大履歴数を超過した場合の処理を適用
         enforceMaxHistoryCount()
-
+        
         scheduleSaveClipboardHistory()
     }
 }

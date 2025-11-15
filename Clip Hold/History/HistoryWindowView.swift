@@ -13,7 +13,7 @@ struct HistoryWindowView: View {
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     @EnvironmentObject var frontmostAppMonitor: FrontmostAppMonitor
     @Environment(\.dismiss) var dismiss
-
+    
     @State private var searchText: String = ""
     @State private var filteredHistory: [ClipboardItem] = []
     
@@ -26,40 +26,40 @@ struct HistoryWindowView: View {
     
     @State private var copyConfirmationTask: Task<Void, Never>? = nil
     @State private var historyUpdateTask: Task<Void, Never>? = nil
-
+    
     @State private var showQRCodeSheet: Bool = false
     @State private var selectedItemForQRCode: ClipboardItem?
-
-    @State private var itemForNewPhrase: ClipboardItem? = nil
-
-    @State private var previousClipboardHistoryCount: Int = 0
-
     
-
+    @State private var itemForNewPhrase: ClipboardItem? = nil
+    
+    @State private var previousClipboardHistoryCount: Int = 0
+    
+    
+    
     @State private var searchDebounceTask: Task<Void, Never>? = nil
-
+    
     @FocusState private var isSearchFieldFocused: Bool
-
+    
     @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
     @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
-
+    
     private var lineNumberTextWidth: CGFloat? {
         guard !hideNumbersInHistoryWindow, !(clipboardManager.filteredHistoryForShortcuts ?? []).isEmpty else { return nil }
         
         let maxIndex = (clipboardManager.filteredHistoryForShortcuts ?? []).count
         let numDigits = String(maxIndex).count
-
+        
         let digitWidth: CGFloat = 7.0
         let periodWidth: CGFloat = 3.0
         let buffer: CGFloat = 1.0
-
+        
         return CGFloat(numDigits) * digitWidth + periodWidth + buffer
     }
-
+    
     private let trailingPaddingForLineNumber: CGFloat = 5
-
+    
     // 文字列を安全に切り詰めるヘルパー関数
     private func truncateString(_ text: String?, maxLength: Int) -> String {
         guard let text = text else { return "" }
@@ -68,7 +68,7 @@ struct HistoryWindowView: View {
         }
         return text
     }
-
+    
     // 検索、フィルタリング、並び替えを統合したタスク実行関数
     private func performUpdate(isIncrementalUpdate: Bool = false) {
         if !isIncrementalUpdate {
@@ -78,13 +78,13 @@ struct HistoryWindowView: View {
         }
         
         historyUpdateTask?.cancel()
-
+        
         historyUpdateTask = Task { @MainActor in
             guard !Task.isCancelled else {
                 isLoading = false
                 return
             }
-
+            
             let historyCopy = clipboardManager.clipboardHistory
             
             let filtered = historyCopy.filter { item in
@@ -108,7 +108,7 @@ struct HistoryWindowView: View {
                 
                 // Search text filter
                 let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
-
+                
                 // Item type filter
                 let matchesFilter: Bool
                 switch clipboardManager.historySelectedFilter {
@@ -142,10 +142,10 @@ struct HistoryWindowView: View {
                 case .colorCodeOnly:
                     matchesFilter = item.filePath == nil && ColorCodeParser.parseColor(from: item.text) != nil
                 }
-
+                
                 return matchesApp && matchesSearchText && matchesFilter
             }
-
+            
             let sorted = filtered.sorted { item1, item2 in
                 switch clipboardManager.historySelectedSort {
                 case .newest:
@@ -158,17 +158,17 @@ struct HistoryWindowView: View {
                     return (item1.fileSize ?? 0) < (item2.fileSize ?? 0)
                 }
             }
-
+            
             self.filteredHistory = sorted
             clipboardManager.filteredHistoryForShortcuts = sorted
             isLoading = false
         }
     }
-
+    
     var body: some View {
         ZStack {
             HistoryWindowBackground()
-
+            
             ZStack {
                 VStack(spacing: 0) {
                     HistorySearchBar(
@@ -180,34 +180,34 @@ struct HistoryWindowView: View {
                         selectedSort: $clipboardManager.historySelectedSort,
                         selectedApp: $clipboardManager.historySelectedApp
                     )
-
+                    
                     Spacer(minLength: 0)
-
-                                            HistoryContentList(
-                            filteredHistory: $filteredHistory,
-                            isLoading: $isLoading,
-                            showingDeleteConfirmation: $showingDeleteConfirmation,
-                            itemToDelete: $itemToDelete,
-                            selectedItemID: $selectedItemID,
-                            showCopyConfirmation: $showCopyConfirmation,
-                            currentCopyConfirmationTask: $currentCopyConfirmationTask,
-                            showQRCodeSheet: $showQRCodeSheet,
-                            selectedItemForQRCode: $selectedItemForQRCode,
-                            itemForNewPhrase: $itemForNewPhrase,
-                            previousClipboardHistoryCount: $previousClipboardHistoryCount,
-                            hideNumbersInHistoryWindow: hideNumbersInHistoryWindow,
-                            closeWindowOnDoubleClickInHistoryWindow: closeWindowOnDoubleClickInHistoryWindow,
-                            scrollToTopOnUpdate: scrollToTopOnUpdate,
-                            showCharacterCount: showCharacterCount,
-                            lineNumberTextWidth: lineNumberTextWidth,
-                            trailingPaddingForLineNumber: trailingPaddingForLineNumber,
-                            searchText: searchText,
-                            onCopyAction: { item in
-                                // 内部コピーフラグをtrueに設定
-                                clipboardManager.isPerformingInternalCopy = true
-                                ClipboardManager.shared.copyItemToClipboard(item)
-                            }
-                        )
+                    
+                    HistoryContentList(
+                        filteredHistory: $filteredHistory,
+                        isLoading: $isLoading,
+                        showingDeleteConfirmation: $showingDeleteConfirmation,
+                        itemToDelete: $itemToDelete,
+                        selectedItemID: $selectedItemID,
+                        showCopyConfirmation: $showCopyConfirmation,
+                        currentCopyConfirmationTask: $currentCopyConfirmationTask,
+                        showQRCodeSheet: $showQRCodeSheet,
+                        selectedItemForQRCode: $selectedItemForQRCode,
+                        itemForNewPhrase: $itemForNewPhrase,
+                        previousClipboardHistoryCount: $previousClipboardHistoryCount,
+                        hideNumbersInHistoryWindow: hideNumbersInHistoryWindow,
+                        closeWindowOnDoubleClickInHistoryWindow: closeWindowOnDoubleClickInHistoryWindow,
+                        scrollToTopOnUpdate: scrollToTopOnUpdate,
+                        showCharacterCount: showCharacterCount,
+                        lineNumberTextWidth: lineNumberTextWidth,
+                        trailingPaddingForLineNumber: trailingPaddingForLineNumber,
+                        searchText: searchText,
+                        onCopyAction: { item in
+                            // 内部コピーフラグをtrueに設定
+                            clipboardManager.isPerformingInternalCopy = true
+                            ClipboardManager.shared.copyItemToClipboard(item)
+                        }
+                    )
                 }
             }
             

@@ -4,15 +4,15 @@ import KeyboardShortcuts
 extension KeyboardShortcuts.Name {
     static let showAllStandardPhrases = Self("showAllStandardPhrases", default: .init(.v, modifiers: [.control, .command]))
     static let showAllCopyHistory = Self("showAllCopyHistory", default: .init(.v, modifiers: [.option, .command]))
-
+    
     static let addSNewtandardPhrase = Self("addSNewtandardPhrase", default: .init(.a, modifiers: [.control, .command]))
     static let addStandardPhraseFromClipboard = Self("addStandardPhraseFromClipboard", default: .init(.c, modifiers: [.control, .command]))
     static let addNewPreset = Self("addNewPreset", default: .init(.n, modifiers: [.control, .command]))
     static let nextPreset = Self("nextPreset", default: .init(.p, modifiers: [.control, .command]))
     static let previousPreset = Self("previousPreset", default: .init(.p, modifiers: [.shift, .control, .command]))
-
+    
     static let toggleClipboardMonitoring = Self("toggleClipboardMonitoring", default: .init(.m, modifiers: [.option, .command]))
-
+    
     static let copyStandardPhrase1 = Self("copyStandardPhrase1", default: .init(.one, modifiers: [.control, .command]))
     static let copyStandardPhrase2 = Self("copyStandardPhrase2", default: .init(.two, modifiers: [.control, .command]))
     static let copyStandardPhrase3 = Self("copyStandardPhrase3", default: .init(.three, modifiers: [.control, .command]))
@@ -23,7 +23,7 @@ extension KeyboardShortcuts.Name {
     static let copyStandardPhrase8 = Self("copyStandardPhrase8", default: .init(.eight, modifiers: [.control, .command]))
     static let copyStandardPhrase9 = Self("copyStandardPhrase9", default: .init(.nine, modifiers: [.control, .command]))
     static let copyStandardPhrase10 = Self("copyStandardPhrase10", default: .init(.zero, modifiers: [.control, .command]))
-
+    
     static var allStandardPhraseCopyShortcuts: [KeyboardShortcuts.Name] {
         return [
             .copyStandardPhrase1, .copyStandardPhrase2, .copyStandardPhrase3,
@@ -44,7 +44,7 @@ extension KeyboardShortcuts.Name {
     static let copyClipboardHistory9 = Self("copyClipboardHistory9", default: .init(.nine, modifiers: [.option, .command]))
     static let copyClipboardHistory10 = Self("copyClipboardHistory10", default: .init(.zero, modifiers: [.option, .command]))
     static let editAndCopyLatestHistory = Self("editAndCopyLatestHistory", default: .init(.e, modifiers: [.option, .command]))
-
+    
     static var allClipboardHistoryCopyShortcuts: [KeyboardShortcuts.Name] {
         return [
             .copyClipboardHistory1, .copyClipboardHistory2, .copyClipboardHistory3,

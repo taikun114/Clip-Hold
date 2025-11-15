@@ -8,20 +8,20 @@ enum ClipHoldWindowType {
 }
 
 class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate {
-
+    
     private let maxContentWidth: CGFloat = 900
     private let minContentWidth: CGFloat = 300
     private let minContentHeight: CGFloat = 300
     private let maxContentHeight: CGFloat = NSScreen.main?.visibleFrame.height ?? .infinity
-
+    
     private var windowType: ClipHoldWindowType
-
+    
     @AppStorage("closeWindowOnDoubleClick") var closeWindowOnDoubleClick: Bool = false
     @AppStorage("historyWindowIsOverlay") var historyWindowIsOverlay: Bool = false
     @AppStorage("standardPhraseWindowIsOverlay") var standardPhraseWindowIsOverlay: Bool = false
     @AppStorage("historyWindowOverlayTransparency") var historyWindowOverlayTransparency: Double = 0.5
     @AppStorage("standardPhraseWindowOverlayTransparency") var standardPhraseWindowOverlayTransparency: Double = 0.5
-
+    
     private var isOverlayEnabled: Bool {
         switch windowType {
         case .history:
@@ -30,7 +30,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
             return standardPhraseWindowIsOverlay
         }
     }
-
+    
     private var overlayOpacity: Double {
         switch windowType {
         case .history:
@@ -39,27 +39,27 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
             return standardPhraseWindowOverlayTransparency
         }
     }
-
+    
     var applyTransparentBackground: Bool = true
-
+    
     var windowFrameAutosaveKey: String?
     var onWindowWillClose: (() -> Void)?
-
+    
     // MARK: - Quick Look Properties
     private var quickLookItem: QLPreviewItem?
     private weak var quickLookSourceView: NSView?
-
+    
     // MARK: - Initializers
     override init(window: NSWindow?) {
         self.windowType = .history // Default value
         super.init(window: window)
     }
-
+    
     required init?(coder: NSCoder) {
         self.windowType = .history // Default value
         super.init(coder: coder)
     }
-
+    
     convenience init(wrappingWindow: NSWindow, windowType: ClipHoldWindowType, applyTransparentBackground: Bool = true, windowFrameAutosaveKey: String? = nil) {
         self.init(window: wrappingWindow)
         self.windowType = windowType
@@ -70,18 +70,18 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
         
         // ウィンドウのカスタマイズを適用
         applyWindowCustomizations(window: wrappingWindow)
-
+        
         if let key = self.windowFrameAutosaveKey {
             loadSavedFrame(for: key, to: wrappingWindow)
         }
         updateOverlay()
     }
-
+    
     // MARK: - Public Quick Look Methods
     func showQuickLook(for item: QLPreviewItem, from sourceView: NSView) {
         self.quickLookItem = item
         self.quickLookSourceView = sourceView
-
+        
         if let panel = QLPreviewPanel.shared() {
             if panel.dataSource === self {
                 panel.reloadData()
@@ -89,17 +89,17 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
             panel.makeKeyAndOrderFront(nil)
         }
     }
-
+    
     func hideQuickLook() {
         if QLPreviewPanel.sharedPreviewPanelExists(), QLPreviewPanel.shared().isVisible {
             QLPreviewPanel.shared().orderOut(nil)
         }
     }
-
+    
     // MARK: - NSWindowDelegate
     func windowDidUpdate(_ notification: Notification) {
     }
-
+    
     func windowDidBecomeKey(_ notification: Notification) {
         let currentAlpha = self.window?.alphaValue ?? 1.0
         if currentAlpha < 1.0 {
@@ -109,7 +109,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
             }
         }
     }
-
+    
     func windowDidResignKey(_ notification: Notification) {
         if isOverlayEnabled {
             NSAnimationContext.runAnimationGroup { context in
@@ -152,11 +152,11 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
             print("ClipHoldWindowController: Window will close (object unknown).")
         }
     }
-
+    
     func windowShouldClose(_ sender: NSWindow) -> Bool {
         return true
     }
-
+    
     // MARK: - ウィンドウのダブルクリック挙動を制御するデリゲートメソッド (タイトルバーなど)
     func windowShouldCloseOnDoubleClick(_ sender: NSWindow) -> Bool {
         // AppStorage の値に基づいて、ウィンドウを閉じるかどうかを決定
@@ -167,28 +167,28 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
     override func acceptsPreviewPanelControl(_ panel: QLPreviewPanel!) -> Bool {
         return true
     }
-
+    
     override func beginPreviewPanelControl(_ panel: QLPreviewPanel!) {
         panel.dataSource = self
         panel.delegate = self
     }
-
+    
     override func endPreviewPanelControl(_ panel: QLPreviewPanel!) {
         panel.dataSource = nil
         panel.delegate = nil
         self.quickLookItem = nil
         self.quickLookSourceView = nil
     }
-
+    
     // MARK: - QLPreviewPanelDataSource
     func numberOfPreviewItems(in panel: QLPreviewPanel!) -> Int {
         return self.quickLookItem == nil ? 0 : 1
     }
-
+    
     func previewPanel(_ panel: QLPreviewPanel!, previewItemAt index: Int) -> QLPreviewItem! {
         return self.quickLookItem
     }
-
+    
     // MARK: - QLPreviewPanelDelegate
     func previewPanel(_ panel: QLPreviewPanel!, sourceFrameOnScreenFor previewItem: QLPreviewItem!) -> NSRect {
         // アニメーションの開始位置を返す
@@ -198,26 +198,26 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
         let screenFrame = sourceView.convert(sourceView.bounds, to: nil)
         return window.convertToScreen(screenFrame)
     }
-
-
+    
+    
     // MARK: - ウィンドウのカスタマイズ適用
     func applyWindowCustomizations(window: NSWindow) {
         // ウィンドウの背景を透明にする
         window.isOpaque = false
         window.backgroundColor = .clear
-
+        
         // タイトルバーの非表示と、内容領域の拡張
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.styleMask.insert(.fullSizeContentView)
-
+        
         // ドロップシャドウを有効にする (必要に応じて)
         window.hasShadow = true
         
         if applyTransparentBackground {
             window.isOpaque = false
             window.backgroundColor = .clear
-
+            
             // SwiftUIコンテンツの背景レイヤーもクリアに設定 (念のため)
             if let contentView = window.contentView {
                 contentView.wantsLayer = true
@@ -239,7 +239,7 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
         UserDefaults.standard.set(frameString, forKey: key)
         print("ClipHoldWindowController: Saved frame for key '\(key)': \(frameString)")
     }
-
+    
     private func loadSavedFrame(for key: String, to window: NSWindow) {
         if let frameString = UserDefaults.standard.string(forKey: key) {
             let savedFrame = NSRectFromString(frameString)

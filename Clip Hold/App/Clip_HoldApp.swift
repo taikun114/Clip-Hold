@@ -7,11 +7,11 @@ import KeyboardShortcuts
 // PreAction機能を持つPrimitiveButtonStyle
 struct PreActionButtonStyle: PrimitiveButtonStyle {
     var preAction: () -> Void
-
+    
     init(preAction: @escaping () -> Void) {
         self.preAction = preAction
     }
-
+    
     func makeBody(configuration: Configuration) -> some View {
         Button(role: configuration.role) {
             preAction()
@@ -35,12 +35,12 @@ extension NSImage {
               let pngData = bitmapImageRep.representation(using: .png, properties: [:]) else {
             return nil
         }
-
+        
         let fileManager = FileManager.default
         let tempDirectory = fileManager.temporaryDirectory
         let fileName = UUID().uuidString + ".png"
         let fileURL = tempDirectory.appendingPathComponent(fileName)
-
+        
         do {
             try pngData.write(to: fileURL)
             let attachment = try UNNotificationAttachment(identifier: identifier, url: fileURL, options: nil)
@@ -62,16 +62,16 @@ struct ClipHoldApp: App {
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
-
+    
     @StateObject var standardPhraseManager = StandardPhraseManager.shared
     @StateObject var clipboardManager = ClipboardManager.shared
     @StateObject var presetManager = StandardPhrasePresetManager.shared
     @StateObject var frontmostAppMonitor = FrontmostAppMonitor.shared
     @StateObject var iconGenerator = PresetIconGenerator.shared
-
+    
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
-
+    
     init() {
         print("ClipHoldApp: Initializing with ClipboardManager and StandardPhraseManager.")
         
@@ -81,32 +81,32 @@ struct ClipHoldApp: App {
     // MARK: - キーボード操作をシミュレートする関数
     static func performPaste() {
         let delay: TimeInterval = 0.01
-
+        
         guard let source = CGEventSource(stateID: .combinedSessionState) else {
             print("Failed to create event source")
             return
         }
-
+        
         let commandDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: true)!
         commandDown.flags = .maskCommand
         commandDown.post(tap: .cgSessionEventTap)
         Thread.sleep(forTimeInterval: delay)
-
+        
         let vDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: true)!
         vDown.flags = .maskCommand
         vDown.post(tap: .cgSessionEventTap)
         Thread.sleep(forTimeInterval: delay)
-
+        
         let vUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: false)!
         vUp.flags = .maskCommand
         vUp.post(tap: .cgSessionEventTap)
         Thread.sleep(forTimeInterval: delay)
-
+        
         let commandUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: false)!
         commandUp.flags = []
         commandUp.post(tap: .cgSessionEventTap)
     }
-
+    
     private var menuBarExtraInsertionBinding: Binding<Bool> {
         Binding<Bool>(
             get: { !self.hideMenuBarExtra }, // hideMenuBarExtra が true なら非表示 (false)
@@ -114,8 +114,8 @@ struct ClipHoldApp: App {
         )
     }
     
-
-        
+    
+    
     var body: some Scene {
         MenuBarExtra(
             "Clip Hold", // <- titleKey
@@ -128,7 +128,7 @@ struct ClipHoldApp: App {
                     .font(.headline)
             }
             .padding(.bottom, 5)
-                        
+            
             let phrasesToShow = presetManager.selectedPreset?.phrases ?? []
             if phrasesToShow.isEmpty {
                 Text("定型文はありません")
@@ -187,7 +187,7 @@ struct ClipHoldApp: App {
             }
             
             Divider()
-
+            
             // プリセット選択メニュー
             Menu {
                 Picker("プリセット", selection: Binding(
@@ -284,7 +284,7 @@ struct ClipHoldApp: App {
                         formatter.timeStyle = .short
                         return formatter
                     }()
-                     
+                    
                     let displayText: String = {
                         let content: String
                         if item.text == "Image File" {
@@ -294,7 +294,7 @@ struct ClipHoldApp: App {
                         } else {
                             content = item.text
                         }
-
+                        
                         var displayContent = content.replacingOccurrences(of: "\n", with: " ")
                         let dateString = itemDateFormatter.string(from: item.date)
                         
@@ -394,7 +394,7 @@ struct ClipHoldApp: App {
                                     }
                                 }
                             }
-
+                            
                             Text(displayText)
                                 .font(.body)
                                 .lineLimit(1)
@@ -439,8 +439,8 @@ struct ClipHoldApp: App {
             CommandGroup(replacing: .appSettings) {
                 Button("設定...") {
                     if let delegate = NSApp.delegate as? AppDelegate {
-                    delegate.showSettingsWindow()
-                }
+                        delegate.showSettingsWindow()
+                    }
                 }
                 .keyboardShortcut(",", modifiers: .command)
             }
@@ -454,14 +454,14 @@ struct ClipHoldApp: App {
                 delegate.showStandardPhraseWindow()
             }
         }
-
+        
         KeyboardShortcuts.onKeyDown(for: .showAllCopyHistory) {
             print("「すべてのコピー履歴を表示」ショートカットが押されました！")
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showHistoryWindow()
             }
         }
-
+        
         KeyboardShortcuts.onKeyDown(for: .toggleClipboardMonitoring) {
             print("「クリップボード監視を切り替える」ショートカットが押されました！")
             let defaults = UserDefaults.standard
@@ -472,11 +472,11 @@ struct ClipHoldApp: App {
             
             // ショートカットで切り替えた際に通知を送信
             NotificationManager.shared.sendMonitoringStatusNotification(isPaused: !currentIsPaused)
-
+            
             // コンソール出力はUserDefaultsの変更結果に基づいて行う
             print("isClipboardMonitoringPaused の値を \(currentIsPaused) から \(!currentIsPaused) に変更しました。")
         }
-
+        
         // 新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addSNewtandardPhrase) {
             print("「新しい定型文を追加」ショートカットが押されました！")
@@ -484,7 +484,7 @@ struct ClipHoldApp: App {
                 delegate.showAddPhraseWindow(withContent: "")
             }
         }
-
+        
         // 新しいプリセットの追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addNewPreset) {
             print("「新しいプリセットを追加」ショートカットが押されました！")
@@ -492,7 +492,7 @@ struct ClipHoldApp: App {
                 delegate.showAddPresetWindow()
             }
         }
-
+        
         // 次のプリセットに切り替えるショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .nextPreset) {
             print("「次のプリセットに切り替える」ショートカットが押されました！")
@@ -517,7 +517,7 @@ struct ClipHoldApp: App {
                        let attachment = bigIcon.createNotificationAttachment(identifier: "presetIcon") {
                         content.attachments = [attachment]
                     }
-
+                    
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
                     notificationCenter.add(request) { error in
                         if let error = error {
@@ -527,7 +527,7 @@ struct ClipHoldApp: App {
                 }
             }
         }
-
+        
         // 前のプリセットに切り替えるショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .previousPreset) {
             print("「前のプリセットに切り替える」ショートカットが押されました！")
@@ -552,7 +552,7 @@ struct ClipHoldApp: App {
                        let attachment = bigIcon.createNotificationAttachment(identifier: "presetIcon") {
                         content.attachments = [attachment]
                     }
-
+                    
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
                     notificationCenter.add(request) { error in
                         if let error = error {
@@ -562,7 +562,7 @@ struct ClipHoldApp: App {
                 }
             }
         }
-
+        
         // クリップボードから新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addStandardPhraseFromClipboard) {
             print("「クリップボードから定型文を追加」ショートカットが押されました！")
@@ -571,7 +571,7 @@ struct ClipHoldApp: App {
                 delegate.showAddPhraseWindow(withContent: clipboardContent)
             }
         }
-
+        
         // 定型文コピーショートカットの登録
         for i in 0..<KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts.count {
             let shortcutName = KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts[i]
@@ -584,7 +584,7 @@ struct ClipHoldApp: App {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(phrase.content, forType: .string)
                     print("定型文「\(phrase.title)」がショートカットでコピーされました。")
-
+                    
                     let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                     if currentQuickPaste {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -597,7 +597,7 @@ struct ClipHoldApp: App {
                 }
             }
         }
-
+        
         // コピー履歴コピーショートカットの登録
         for i in 0..<KeyboardShortcuts.Name.allClipboardHistoryCopyShortcuts.count {
             let shortcutName = KeyboardShortcuts.Name.allClipboardHistoryCopyShortcuts[i]
@@ -605,27 +605,27 @@ struct ClipHoldApp: App {
                 // ClipboardManager はシングルトンなので、static context からも .shared でアクセス可能
                 let clipboardManager = ClipboardManager.shared
                 let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
-
+                
                 let historySource: [ClipboardItem]
                 if useFiltered, let filteredList = clipboardManager.filteredHistoryForShortcuts {
                     historySource = filteredList
                 } else {
                     historySource = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
                 }
-
+                
                 // 並び替えた配列に対してインデックスを適用
                 if historySource.indices.contains(i) {
                     let historyItem = historySource[i]
                     NSPasteboard.general.clearContents()
-
+                    
                     // 内部コピーフラグをtrueに設定
                     clipboardManager.isPerformingInternalCopy = true
                     clipboardManager.copyItemToClipboard(historyItem)
-
+                    
                     // quickPaste と textOnlyQuickPaste の最新の値を取得
                     let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                     let currentTextOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
-
+                    
                     // quickPaste がオンの場合、かつ textOnlyQuickPaste がオンの場合は、ファイルパスがなく、かつ画像でもない場合にのみペースト
                     if currentQuickPaste {
                         if currentTextOnlyQuickPaste {

@@ -18,16 +18,16 @@ struct PhraseDocument: FileDocument {
     var standardPhrases: [StandardPhrase]
     var presetData: [StandardPhrasePreset]?
     var isLegacyFormat: Bool
-
+    
     static var readableContentTypes: [UTType] { [.json] }
     static var writableContentTypes: [UTType] { [.json] }
-
+    
     init(standardPhrases: [StandardPhrase] = [], presetData: [StandardPhrasePreset]? = nil, isLegacyFormat: Bool = false) {
         self.standardPhrases = standardPhrases
         self.presetData = presetData
         self.isLegacyFormat = isLegacyFormat
     }
-
+    
     init(configuration: ReadConfiguration) throws {
         guard let data = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadCorruptFile)
@@ -57,7 +57,7 @@ struct PhraseDocument: FileDocument {
             throw CocoaError(.fileReadCorruptFile)
         }
     }
-
+    
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted]
@@ -89,7 +89,7 @@ struct StandardPhraseImportExportView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var iconGenerator: PresetIconGenerator
     @StateObject private var presetManager = StandardPhrasePresetManager.shared
-
+    
     @State private var showingFileExporter = false
     @State private var showingFileImporter = false
     @State private var importError: String? = nil
@@ -132,7 +132,7 @@ struct StandardPhraseImportExportView: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
     
-
+    
     
     var body: some View {
         HStack {
@@ -148,7 +148,7 @@ struct StandardPhraseImportExportView: View {
             }
             .buttonStyle(.bordered)
             .help("書き出した定型文のJSONファイルを読み込みます。") // インポートボタンのツールチップ
-
+            
             Button {
                 showingExportSheet = true
             } label: {
@@ -200,7 +200,7 @@ struct StandardPhraseImportExportView: View {
                 Toggle("旧バージョンで使用できるようにする", isOn: $useLegacyFormat)
                     .help("有効にすると、プリセット情報なしで定型文のみをエクスポートします。")
                 Spacer()
-
+                
                 HStack {
                     Button("キャンセル") {
                         showingExportSheet = false
@@ -340,7 +340,7 @@ struct StandardPhraseImportExportView: View {
             importError = "ファイルの読み込みに失敗しました: \(error.localizedDescription)"
         }
     }
-
+    
     private func restoreSelectionAfterImport() {
         if let presetId = presetIdBeforeImport, presetId.uuidString != "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
             presetManager.selectedPresetId = presetId
@@ -690,7 +690,7 @@ struct StandardPhraseImportExportView: View {
             // レガシーフォーマット: 選択されたプリセットまたはすべての定型文をマージ
             let phrases: [StandardPhrase]
             if let presetId = selectedExportPresetId, 
-               let preset = presetManager.presets.first(where: { $0.id == presetId }) {
+                let preset = presetManager.presets.first(where: { $0.id == presetId }) {
                 phrases = preset.phrases
             } else {
                 // すべてのプリセットの定型文をマージ

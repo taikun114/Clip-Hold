@@ -29,10 +29,10 @@ class PresetIconGenerator: ObservableObject {
         for preset in StandardPhrasePresetManager.shared.presets {
             let image = createImage(for: preset)
             iconCache[preset.id] = image
-
+            
             let miniImage = createMiniImage(for: preset)
             miniIconCache[preset.id] = miniImage
-
+            
             let bigImage = createBigImage(for: preset)
             bigIconCache[preset.id] = bigImage
         }
@@ -57,26 +57,26 @@ class PresetIconGenerator: ObservableObject {
         
         let image = createImage(for: preset)
         iconCache[preset.id] = image
-
+        
         let miniImage = createMiniImage(for: preset)
         miniIconCache[preset.id] = miniImage
-
+        
         let bigImage = createBigImage(for: preset)
         bigIconCache[preset.id] = bigImage
-
+        
         return image
     }
     
     func updateIcon(for preset: StandardPhrasePreset) {
         let image = createImage(for: preset)
         iconCache[preset.id] = image
-
+        
         let miniImage = createMiniImage(for: preset)
         miniIconCache[preset.id] = miniImage
-
+        
         let bigImage = createBigImage(for: preset)
         bigIconCache[preset.id] = bigImage
-
+        
         objectWillChange.send()
     }
     
@@ -115,7 +115,7 @@ class PresetIconGenerator: ObservableObject {
                 
                 // Determine symbol color based on preset color
                 let symbolForegroundColor = getSymbolColor(for: preset.color, with: preset.customColor, on: nsColor)
-
+                
                 // 3. Create a tinted version of the symbol
                 let tintedSymbol = NSImage(size: configuredSymbol.size, flipped: false) { (dstRect) -> Bool in
                     // Draw the tint color
@@ -138,7 +138,7 @@ class PresetIconGenerator: ObservableObject {
         image.unlockFocus()
         return image
     }
-
+    
     private func createMiniImage(for preset: StandardPhrasePreset) -> NSImage {
         let size = CGSize(width: 16, height: 16) // Mini size
         let image = NSImage(size: size)
@@ -160,7 +160,7 @@ class PresetIconGenerator: ObservableObject {
                 
                 // Determine symbol color based on preset color
                 let symbolForegroundColor = getSymbolColor(for: preset.color, with: preset.customColor, on: nsColor)
-
+                
                 // 3. Create a tinted version of the symbol
                 let tintedSymbol = NSImage(size: configuredSymbol.size, flipped: false) { (dstRect) -> Bool in
                     // Draw the tint color
@@ -183,7 +183,7 @@ class PresetIconGenerator: ObservableObject {
         image.unlockFocus()
         return image
     }
-
+    
     private func createBigImage(for preset: StandardPhrasePreset) -> NSImage {
         let size = CGSize(width: 32, height: 32) // Big size
         let image = NSImage(size: size)
@@ -205,7 +205,7 @@ class PresetIconGenerator: ObservableObject {
                 
                 // Determine symbol color based on preset color
                 let symbolForegroundColor = getSymbolColor(for: preset.color, with: preset.customColor, on: nsColor)
-
+                
                 // 3. Create a tinted version of the symbol
                 let tintedSymbol = NSImage(size: configuredSymbol.size, flipped: false) { (dstRect) -> Bool in
                     // Draw the tint color
@@ -228,7 +228,7 @@ class PresetIconGenerator: ObservableObject {
         image.unlockFocus()
         return image
     }
-
+    
     private func getColor(from colorName: String, with customColor: PresetCustomColor?) -> NSColor {
         if colorName == "custom", let custom = customColor {
             return NSColor(hex: custom.background)

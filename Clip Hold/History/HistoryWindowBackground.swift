@@ -2,7 +2,7 @@ import SwiftUI
 
 struct HistoryWindowBackground: View {
     @Environment(\.colorScheme) var colorScheme
-
+    
     var body: some View {
         if #available(macOS 26, *) {
             Color.clear

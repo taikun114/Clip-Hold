@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 struct SettingsView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var clipboardManager: ClipboardManager
-
+    
     @State private var selectedSection: String = "general"
     @State private var navigationHistory: [String] = ["general"]
     @State private var historyIndex: Int = 0
@@ -13,7 +13,7 @@ struct SettingsView: View {
     @Environment(\.colorSchemeContrast) var colorSchemeContrast
     @State private var isWindowFocused: Bool = true
     @FocusState private var isListFocused: Bool
-
+    
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedSection) {
@@ -189,15 +189,15 @@ struct SettingsView: View {
             }
         }
     }
-
+    
     private var canGoBack: Bool {
         historyIndex > 0
     }
-
+    
     private var canGoForward: Bool {
         historyIndex < navigationHistory.count - 1
     }
-
+    
     private func goBack() {
         if canGoBack {
             historyIndex -= 1
@@ -209,7 +209,7 @@ struct SettingsView: View {
             }
         }
     }
-
+    
     private func goForward() {
         if canGoForward {
             historyIndex += 1
