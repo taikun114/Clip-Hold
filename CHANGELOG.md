@@ -24,6 +24,10 @@ Notes
 ## 1.6.3 (under development)
 ### Bug Fixes and Improvements
 - **Fix issue where the “Resume” button did not appear in the notification panel sent when launching the app while clipboard monitoring was paused**
+- **Improve shortcut keys for the change history and copy screen**
+  - Pressing `⌘ (Command)` + `S` while the change history and copy screen is open now performs the copy action.
+- **Remove height restrictions on input fields in the history and standard phrases edit screens**
+  - When these screens are displayed as windows, increasing the window height now causes the input fields to expand accordingly.
 
 ## 1.6.2
 ### Bug Fixes and Improvements
