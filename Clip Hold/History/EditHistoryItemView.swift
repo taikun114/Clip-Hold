@@ -52,7 +52,7 @@ struct EditHistoryItemView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .keyboardShortcut(.defaultAction)
+                .keyboardShortcut("s", modifiers: .command)
                 .disabled(content.isEmpty)
                 .controlSize(.large)
             }
