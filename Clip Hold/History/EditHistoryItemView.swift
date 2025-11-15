@@ -19,7 +19,7 @@ struct EditHistoryItemView: View {
             
             TextEditor(text: $content)
                 .font(.system(.body, design: .monospaced))
-                .frame(minHeight: 100, maxHeight: 300)
+                .frame(minHeight: 100)
                 .scrollContentBackground(.hidden)
                 .padding(.vertical, 8)
                 .padding(.horizontal, 4)

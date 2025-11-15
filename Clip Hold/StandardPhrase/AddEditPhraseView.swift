@@ -133,7 +133,7 @@ struct AddEditPhraseView: View {
             if !showingAddPresetSheet {
                 TextEditor(text: $content)
                     .font(.system(.body).monospaced())
-                    .frame(minHeight: 100, maxHeight: 300)
+                    .frame(minHeight: 100)
                     .scrollContentBackground(.hidden)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 4)
@@ -152,7 +152,7 @@ struct AddEditPhraseView: View {
             } else {
                 Rectangle()
                     .fill(Color.clear)
-                    .frame(minHeight: 100, maxHeight: 300)
+                    .frame(minHeight: 100)
                     .padding(.vertical, 8)
             }
 
