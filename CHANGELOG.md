@@ -21,6 +21,10 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.6.3 (under development)
+### Bug Fixes and Improvements
+- **Fix issue where the “Resume” button did not appear in the notification panel sent when launching the app while clipboard monitoring was paused**
+
 ## 1.6.2
 ### Bug Fixes and Improvements
 - **Fix issue that sometimes prevented copying the correct folder**
