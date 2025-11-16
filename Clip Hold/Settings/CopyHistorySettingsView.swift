@@ -362,10 +362,15 @@ struct CopyHistorySettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
-                HStack {
-                    Text("保存フォルダの総容量:")
-                    Spacer()
-                    Text(ByteCountFormatter.string(fromByteCount: Int64(totalFolderSize), countStyle: .file))
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("保存フォルダの総容量:")
+                        Spacer()
+                        Text(ByteCountFormatter.string(fromByteCount: Int64(totalFolderSize), countStyle: .file))
+                            .foregroundStyle(.secondary)
+                    }
+                    Text("各フォルダの容量は正しく計算されないため、実際にはさらに多くの容量が使用されている場合があります。")
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))

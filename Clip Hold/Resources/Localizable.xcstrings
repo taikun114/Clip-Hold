@@ -5118,6 +5118,22 @@
         }
       }
     },
+    "各フォルダの容量は正しく計算されないため、実際にはさらに多くの容量が使用されている場合があります。" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The size of each folder will not be calculated correctly, so it is possible that more space is actually being used."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各フォルダの容量は正しく計算されないため、実際にはさらに多くの容量が使用されている場合があります。"
+          }
+        }
+      }
+    },
     "各項目に表示される番号を非表示にします。" : {
       "localizations" : {
         "en" : {
