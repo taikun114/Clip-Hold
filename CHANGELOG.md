@@ -22,6 +22,10 @@ Notes
 -->
 
 ## 1.6.3 (under development)
+### New Features
+- **Add German (`de`) localization by generative AI**
+  - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
+
 ### Bug Fixes and Improvements
 - **Fix issue where the “Resume” button did not appear in the notification panel sent when launching the app while clipboard monitoring was paused**
 - **Improve shortcut keys for the change history and copy screen**

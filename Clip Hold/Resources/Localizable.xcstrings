@@ -7,6 +7,24 @@
     " - %lld文字" : {
       "comment" : "文字数カウンターテキスト。その項目の文字数が表示されます。文字数が1文字または複数文字によって「文字」テキストの単数形と複数形が切り替えられます。",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : " - %lld Zeichen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : " - %lld Zeichen"
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -45,6 +63,12 @@
     "\"%@\"の操作を選択してください。%@" : {
       "comment" : "複数のプリセットをインポートした際に一つ一つ解決するときのタイトルメッセージ。1つ目にはプリセット名、2つ目には個数の進捗が「(現在のプリセット数/すべてのプリセット数)」の形式で表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie die Operation für „%1$@“. %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -62,6 +86,12 @@
     "「%@」" : {
       "comment" : "ショートカット設定でそのショートカットに割り当てられている定型文の名前が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%@“"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -79,6 +109,24 @@
     "「%@」からのすべての履歴を削除してもよろしいですか？%lld個の履歴が削除されます。この操作は元に戻せません。" : {
       "comment" : "特定のアプリからコピーされたすべての履歴を削除しようとしたときのアラートメッセージです。アプリ名と、そのアプリからコピーされた履歴の個数が表示されます。",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Möchten Sie den gesamten Verlauf von „%1$@“ wirklich löschen? %2$lld Element wird gelöscht. Dies kann nicht rückgängig gemacht werden."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Möchten Sie den gesamten Verlauf von „%1$@“ wirklich löschen? %2$lld Elemente werden gelöscht. Dies kann nicht rückgängig gemacht werden."
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -114,6 +162,12 @@
     "「%@」に切り替わりました。" : {
       "comment" : "ショートカットキーで定型文プリセットを切り替えたときに表示される通知メッセージです。プリセット名が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu „%@“ gewechselt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -131,6 +185,34 @@
     "「%@」のインポートの競合 (%lld/%lld)%@" : {
       "comment" : "複数のプリセットを1つずつ解決しようとしている時に表示されるタイトルです。プリセット名、現在処理しているプリセットの順番、そのプリセットに含まれる定型文の数、現在処理しているプリセットの順番と累計プリセット数のまとまったテキストが表示されます。arg3は「インポートの競合」テキストの複数形と単数形を分けるための引数です。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%#@arg3@ für „%1$@“ (%2$lld/%3$lld)%4$@"
+          },
+          "substitutions" : {
+            "arg3" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "Importkonflikt"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "Importkonflikte"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -186,6 +268,12 @@
     "「%@」は別のプリセット「%@」にすでに割り当てられています。このアプリを割り当てると、「%@」から割り当てが解除されます。アプリを割り当ててもよろしいですか？" : {
       "comment" : "既に別のプリセットに割り当てられたアプリを、さらに別のプリセットに割り当てようとしたときに表示される警告メッセージです。割り当てようとしているアプリ名、既にそのアプリが割り当てられているプリセット名、このまま割り当てた時に既に割り当てられていた割り当てが解除されるプリセット名（既にそのアプリが割り当てられているプリセット名と同じ）が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "„%1$@“ ist bereits dem Preset „%2$@“ zugewiesen. Wenn Sie diese App zuweisen, wird die Zuweisung von „%3$@“ aufgehoben. Möchten Sie diese App wirklich zuweisen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -203,6 +291,12 @@
     "「%@」を本当に削除しますか？" : {
       "comment" : "履歴と定型文ウィンドウ、定型文設定からその履歴または定型文を削除しようとしている際に表示されるアラートメッセージ。定型文のタイトルまたは履歴本文が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie „%@“ wirklich löschen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -220,6 +314,24 @@
     "「%@」を本当に削除しますか？このプリセットに含まれる%lld個の定型文も削除されます。この操作は元に戻せません。" : {
       "comment" : "定型文プリセットを削除しようとしている場合に表示されるアラートメッセージ。定型文の数によって「定型文」の単語が単数形または複数形に切り替えられます。プリセット名が表示されます。",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Möchten Sie „%1$@“ wirklich löschen? Dies löscht auch %2$lld Standardphrase, die in diesem Preset enthalten ist. Dies kann nicht rückgängig gemacht werden."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Möchten Sie „%1$@“ wirklich löschen? Dies löscht auch %2$lld Standardphrasen, die in diesem Preset enthalten sind. Dies kann nicht rückgängig gemacht werden."
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -255,6 +367,12 @@
     "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。" : {
       "comment" : "履歴ウィンドウから、過去にコピーされたファイルを削除しようとしている際に表示されるアラートメッセージ。ファイル名（履歴名）が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie „%@“ wirklich löschen? Die Datei wird aus dem Verlauf entfernt und alle anderen damit verbundenen Verlaufseinträge werden ebenfalls gelöscht."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -272,6 +390,12 @@
     "「%@」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。" : {
       "comment" : "履歴ウィンドウで、そのコピー履歴がコピーされたアプリを除外するアプリリストに追加しようとした場合に表示されるアラートメッセージ。除外しようとしているアプリ名が示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie „%@“ zu den auszuschließenden Apps hinzufügen? Sie können die auszuschließenden Apps in den „Datenschutz“-Einstellungen ändern."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -289,6 +413,12 @@
     "%@を超えるファイルがコピーされました。履歴に保存してもよろしいですか？" : {
       "comment" : "「コピーアラートを表示する容量」の設定値よりも大きいファイルがコピーされたときに表示されるアラートメッセージ。設定された容量が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Datei, die größer als %@ ist, wurde kopiert. Möchten Sie sie im Verlauf speichern?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -306,6 +436,12 @@
     "%@定型文をコピーする" : {
       "comment" : "特定のインデックスの定型文をコピーするショートカット設定の項目名。「1番目の」や「2番目の」のような序数詞が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die %@ Standardphrase kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -323,6 +459,12 @@
     "%@履歴をコピーする" : {
       "comment" : "特定のインデックスの履歴をコピーするショートカット設定の項目名。「1番目の」や「2番目の」のような序数詞が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den %@ Verlaufseintrag kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -340,6 +482,12 @@
     "%1$@を超える%2$d個のファイル（合計%3$@）がコピーされました。履歴に保存してもよろしいですか？" : {
       "comment" : "「コピーアラートを表示する容量」の設定値よりも大きいファイルが複数個コピーされたときに表示されるアラートメッセージ。設定された容量、コピーしたファイルの個数、それらを合わせた合計容量が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$d Dateien (insgesamt %3$@), die größer als %1$@ sind, wurden kopiert. Möchten Sie sie im Verlauf speichern?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -357,6 +505,12 @@
     "%1$@を超えるファイル（%2$@）がコピーされました。履歴に保存してもよろしいですか？" : {
       "comment" : "「コピーアラートを表示する容量」の設定値よりも大きいファイルがコピーされたときに表示されるアラートメッセージ。設定された容量とコピーしたファイルの容量が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Datei (%2$@), die größer als %1$@ ist, wurde kopiert. Möchten Sie sie im Verlauf speichern?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -391,6 +545,24 @@
     "%lld個" : {
       "comment" : "項目の個数を数えるテキスト。項目の数によって「項目」のテキストが単数形または複数形に切り替えられる。",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Element"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Elemente"
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -426,6 +598,24 @@
     "%lld個のプリセット" : {
       "comment" : "定型文プリセットの個数を数えるテキスト。プリセットの数によって「プリセット」のテキストが単数形または複数形に切り替えられる。",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Preset"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Presets"
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -461,6 +651,24 @@
     "%lld個の定型文" : {
       "comment" : "定型文の個数を数えるテキスト。定型文の数によって「定型文」のテキストが単数形または複数形に切り替えられる。",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Standardphrase"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Standardphrasen"
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -496,6 +704,24 @@
     "%lld個の履歴" : {
       "comment" : "履歴項目の個数を数えるテキスト。履歴項目の数によって「項目」のテキストが単数形または複数形に切り替えられる。",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Verlaufseintrag"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Verlaufseinträge"
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -531,6 +757,24 @@
     "%lld文字" : {
       "comment" : "履歴や定型文等の文字数を数えるテキスト。文字数によって「文字」のテキストが単数形または複数形に切り替えられる。",
       "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeichen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeichen"
+                }
+              }
+            }
+          }
+        },
         "en" : {
           "variations" : {
             "plural" : {
@@ -566,6 +810,12 @@
     "1以上の数値を入力してください。" : {
       "comment" : "コピー履歴や定型文の保存・表示数を設定する画面で1よりも小さい数(0や負の値など)が入力されたときのエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte geben Sie eine Zahl größer oder gleich 1 ein."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -583,6 +833,12 @@
     "Buy Me a Coffeeで、緑茶一杯分の金額からサポートしていただけます。" : {
       "comment" : "開発者をサポートセクションの、Buy Me a Coffeeで寄付できるボタンのところに表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können mich bei Buy Me a Coffee mit dem Preis einer Tasse grünen Tees unterstützen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -600,6 +856,12 @@
     "Buy Me a Coffeeのページを開いてもよろしいですか？" : {
       "comment" : "開発者をサポートセクションの、Buy Me a Coffeeで寄付ボタンをクリックしたときに表示されるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Buy Me a Coffee-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -617,6 +879,12 @@
     "Buy Me a Coffeeページへのリンクを開きます。" : {
       "comment" : "開発者をサポートセクションの、Buy Me a Coffeeで寄付ボタンのツールチップに表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Buy Me a Coffee-Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -637,6 +905,12 @@
     "Clip Holdについて" : {
       "comment" : "このアプリ(Clip Hold)についての画面に表示されるタイトルテキスト。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über Clip Hold"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -654,6 +928,12 @@
     "Clip Holdに保存する履歴の最大数を設定します。" : {
       "comment" : "コピー履歴設定の「履歴の最大保存数」オプションを説明するテキスト。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legen Sie die maximale Anzahl der im Clip Hold-Verlauf gespeicherten Elemente fest."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -671,6 +951,12 @@
     "Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。" : {
       "comment" : "定型文設定の「プリセットの割り当て」セクションにある「Clip Holdのウィンドウを除外」オプションを説明するテキスト。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verhindert das Umschalten des Presets, wenn das Clip Hold-Fenster (z. B. das Fenster für Standardphrasen) fokussiert wird."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -688,6 +974,12 @@
     "Clip Holdのウィンドウを除外" : {
       "comment" : "定型文設定の「プリセットの割り当て」セクションによる設定項目名。Clip Holdのウィンドウを無視する設定。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold-Fenster ausschließen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -705,6 +997,12 @@
     "Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。" : {
       "comment" : "一般設定の「メニューバーアイコンを隠す」オプションを説明するテキスト。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Clip Hold-Menüleistensymbol vorübergehend ausblenden. Es wird wieder angezeigt, wenn Sie die App erneut öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -722,6 +1020,12 @@
     "Clip Holdの設定" : {
       "comment" : "一般設定の、Clip Holdの動作を変更する設定セクションタイトル。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold-Einstellungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -739,6 +1043,12 @@
     "Clip Holdはオープンソースアプリケーションです。" : {
       "comment" : "設定画面の情報タブに表示される、このアプリ(Clip Hold)がオープンソースアプリケーションであることを表すテキスト。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold ist eine Open-Source-Anwendung."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -756,6 +1066,12 @@
     "Copyright ©︎ 2025 今浦大雅" : {
       "comment" : "このアプリ(Clip Hold)の著作権情報を表すテキスト。日本語以外では「Taiga Imaura」を使用する。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -776,6 +1092,12 @@
     "create-dmgのGitHubページへのリンクを開きます。" : {
       "comment" : "create-dmgのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur create-dmg GitHub-Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -793,6 +1115,12 @@
     "create-dmgのGitHubページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、create-dmgのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die create-dmg GitHub-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -810,6 +1138,12 @@
     "Default" : {
       "comment" : "デフォルトプリセットのデフォルト名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -827,6 +1161,12 @@
     "Finderで選択..." : {
       "comment" : "除外するアプリやプリセットの自動切り替えに割り当てたアプリを、ユーザにFinderで選択させる画面を開くためのボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Finder auswählen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -847,6 +1187,12 @@
     "Gemini CLIのGitHubページへのリンクを開きます。" : {
       "comment" : "Gemini CLIのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Gemini CLI GitHub-Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -864,6 +1210,12 @@
     "Gemini CLIのGitHubページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、Gemini CLIのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Gemini CLI GitHub-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -881,6 +1233,12 @@
     "GitHubのDiscussionページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、GitHubのディスカッションページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Diskussionsseite auf GitHub wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -898,6 +1256,12 @@
     "GitHubのIssueページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、GitHub上で公開されている、このアプリ(Clip Hold)のIssueページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Issue-Seite auf GitHub wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -915,6 +1279,12 @@
     "GitHubのリポジトリページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、GitHub上で公開されている、このアプリ(Clip Hold)のリポジトリページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die GitHub-Repository-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -932,6 +1302,12 @@
     "GitHubの貢献者ページへのリンクを開きます。" : {
       "comment" : "GitHubの貢献者ページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur GitHub-Mitwirkenden-Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -949,6 +1325,12 @@
     "GitHubの貢献者ページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、GitHubの貢献者情報が記載されたページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die GitHub-Mitwirkenden-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -966,6 +1348,12 @@
     "GitHubリポジトリにスターをつける" : {
       "comment" : "リポジトリにスターをつけるボタンの項目テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie dem GitHub-Repository einen Stern"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -983,6 +1371,12 @@
     "GitHubリポジトリページへのリンクを開きます。" : {
       "comment" : "GitHubのリポジトリページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur GitHub-Repository-Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1000,6 +1394,12 @@
     "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。" : {
       "comment" : "開発者向け機能設定の「カラーコードに基づくカラーアイコンを表示」機能を説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie einen Farbcode im HEX-, HSL/HSLA- oder RGB/RGBA-Format kopieren, wird im Verlaufs-/Standardphrasen-Fenster und im Menü ein Symbol für diese Farbe angezeigt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1017,6 +1417,12 @@
     "Image File" : {
       "comment" : "画像ファイルをコピーした際、その画像のファイル名を取得することができなかったときに表示される汎用項目名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilddatei"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1037,6 +1443,12 @@
     "KeyboardShortcutsのGitHubページへのリンクを開きます。" : {
       "comment" : "KeyboardShortcutsのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur KeyboardShortcuts GitHub-Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1054,6 +1466,12 @@
     "KeyboardShortcutsのGitHubページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、KeyboardShortcutsのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die KeyboardShortcuts GitHub-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1071,6 +1489,12 @@
     "Macのログイン時にClip Holdを自動で開くようにします。" : {
       "comment" : "一般設定の「ログイン時に開く」オプションを説明するテキスト、アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold automatisch beim Anmelden am Mac öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1088,6 +1512,12 @@
     "nd_suffix" : {
       "comment" : "「2番目の」の数字につく序数詞のサフィックス。数字部分は除く。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1116,6 +1546,12 @@
     "PayPal.Meのページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、PayPal.Meのページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die PayPal.Me-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1133,6 +1569,12 @@
     "PayPal.Meのリンクを開きます。" : {
       "comment" : "PayPal.Meへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zu PayPal.Me öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1150,6 +1592,12 @@
     "PayPalで寄付" : {
       "comment" : "PayPalを使って寄付するセクションのヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spenden Sie bei PayPal"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1167,6 +1615,12 @@
     "PayPalで直接寄付していただくこともできます。" : {
       "comment" : "PayPalを使って直接寄付することができることを紹介するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können auch direkt bei PayPal spenden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1184,6 +1638,12 @@
     "PDF File" : {
       "comment" : "PDFファイルをコピーした際、そのPDFのファイル名を取得することができなかったときに表示される汎用項目名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF-Datei"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1201,6 +1661,12 @@
     "PDFのみ" : {
       "comment" : "フィルタリングオプションの1つ、PDFファイルのみに絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur PDF"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1221,6 +1687,12 @@
     "QRコード" : {
       "comment" : "QRコード表示画面のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1238,6 +1710,12 @@
     "QRコードについて" : {
       "comment" : "謝辞セクションに表示される、QRコードについてを紹介するヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über QR-Code"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1255,6 +1733,12 @@
     "QRコードの内容をコピー" : {
       "comment" : "QRコードの中身を解析してテキストとしてコピーするオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code-Inhalt kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1272,6 +1756,12 @@
     "QRコードの生成に失敗しました。" : {
       "comment" : "QRコードの生成に失敗したときに表示されるエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code konnte nicht generiert werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1289,6 +1779,12 @@
     "QRコードは株式会社デンソーウェーブの登録商標です。" : {
       "comment" : "「QRコード」の単語が株式会社デンソーウェーブの登録商標であることを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR Code ist eine eingetragene Marke von DENSO WAVE INCORPORATED in Japan und in anderen Ländern."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1306,6 +1802,12 @@
     "QRコードを表示..." : {
       "comment" : "コピー履歴や定型文からQRコードを生成してQRコード画像を表示するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code anzeigen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1326,6 +1828,12 @@
     "Qwen CodeのGitHubページへのリンクを開きます。" : {
       "comment" : "Qwen CodeのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Qwen Code GitHub-Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1343,6 +1851,12 @@
     "Qwen CodeのGitHubページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、Qwen CodeのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Qwen Code GitHub-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1360,6 +1874,12 @@
     "rd_suffix" : {
       "comment" : "「3番目の」の数字につく序数詞のサフィックス。数字部分は除く。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1380,6 +1900,12 @@
     "SFSymbolsPickerのGitHubページへのリンクを開きます。" : {
       "comment" : "SFSymbolsPickerのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur SFSymbolsPicker GitHub-Seite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1397,6 +1923,12 @@
     "SFSymbolsPickerのGitHubページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、Qwen CodeのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die SFSymbolsPicker GitHub-Seite wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1414,6 +1946,12 @@
     "st_suffix" : {
       "comment" : "「1番目の」の数字につく序数詞のサフィックス。数字部分は除く。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1431,6 +1969,12 @@
     "th_suffix" : {
       "comment" : "「4番目の」から「10番目の」までの数字につく序数詞のサフィックス。数字部分は除く。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1448,6 +1992,12 @@
     "アイコン色" : {
       "comment" : "定型文プリセットのアイコン色(シンボル部分の色)を指定する画面のタイトルテキスト。隣にアイコン色を設定するためのカラーピッカーが表示されている。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbolfarbe"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1465,6 +2015,12 @@
     "アイデアがありますか？" : {
       "comment" : "フィードバック送信ボタンを押すように促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haben Sie eine Idee?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1482,6 +2038,12 @@
     "アクセシビリティ" : {
       "comment" : "プライバシー設定の権限確認画面に表示される項目のうちの1つ、アクセシビリティに関する権限のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienungshilfen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1499,6 +2061,12 @@
     "アクセシビリティ許可が付与されています。" : {
       "comment" : "アプリにアクセシビリティ権限が正常に付与されていることを表すメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienungshilfen-Berechtigung wurde erteilt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1516,6 +2084,12 @@
     "アクセントカラー" : {
       "comment" : "定形のプリセットのアイコン色を指定するオプションのうちの1つ、システムのアクセントカラーを使用するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akzentfarbe"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1533,6 +2107,12 @@
     "アプリ" : {
       "comment" : "フィルタリングオプションの1つ、特定のアプリで絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1550,6 +2130,12 @@
     "アプリ（自動）" : {
       "comment" : "フィルタリングオプションの1つ、特定のアプリで絞り込むためのオプション名。現在最前面のアプリによって自動的にフィルタリングするアプリを切り替えるオプションが選択されていることを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps (Automatisch)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1567,6 +2153,12 @@
     "アプリアイコンを表示" : {
       "comment" : "履歴ウィンドウの各項目にコピーされたアプリのアイコンを表示するかどうかを切り替えるトグルスイッチの設定項目名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Symbole anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1584,6 +2176,12 @@
     "アプリではありません" : {
       "comment" : "除外するアプリや定型文プリセットの自動切り替え機能に割り当てるアプリでFinderから選択された項目がアプリではなかった場合に表示されるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine App"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1601,6 +2199,12 @@
     "アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。" : {
       "comment" : "一般設定の「アプリの「自動」フィルタリングでClip Holdのウィンドウを除外」オプションを説明するテキスト。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wechseln Sie die gefilterte App nicht, wenn Sie das Clip Hold-Fenster (z. B. das Verlaufsfenster) fokussieren, während die „Automatische“ Filterung der App aktiv ist."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1618,6 +2222,12 @@
     "アプリの「自動」フィルタリングでClip Holdのウィンドウを除外" : {
       "comment" : "履歴ウィンドウのフィルタリングオプションにある「自動」フィルタリング中、このアプリ(Clip Hold)のウィンドウにフォーカスが当たってもフィルタリングアプリを切り替えないように無視するためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold-Fenster mit „Automatischer“ Filterung der App ausschließen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1635,6 +2245,12 @@
     "アプリのすべての設定を初期状態に戻します。コピー履歴と定型文は影響を受けません。" : {
       "comment" : "開発者向け設定の「すべての設定をリセット」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setzt alle Einstellungen der App auf ihre Standardwerte zurück. Kopiervorgangsverlauf und Standardphrasen sind nicht betroffen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1652,6 +2268,12 @@
     "アプリの全ての設定を初期状態に戻してもよろしいですか？この操作は元に戻せません。" : {
       "comment" : "開発者向け設定の「すべての設定をリセット」オプションのリセットボタンをクリックしたときに表示されるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie wirklich alle Einstellungen der App auf ihre Standardwerte zurücksetzen? Dies kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1669,6 +2291,12 @@
     "アラートを表示する容量を設定" : {
       "comment" : "ここで設定する一定の容量を超えたファイルをコピーしたときに、そのファイルを履歴にコピーするかどうかを尋ねるアラートを表示するオプションの設定項目名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe für Warnmeldung festlegen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1686,6 +2314,12 @@
     "いいえ" : {
       "comment" : "設定した容量を超えるファイルをコピーしたときに表示されるアラート画面で、履歴に保存するかどうかを尋ねられたときに保存しないことを選択するためのキャンセルボタン名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nein"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1703,6 +2337,12 @@
     "イエロー" : {
       "comment" : "定型文プリセットのアイコン色を選ぶカラーオプションのうちの1つ、黄色のオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelb"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1720,6 +2360,12 @@
     "インポート" : {
       "comment" : "コピー履歴や定型文をインポートするボタン名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1737,6 +2383,12 @@
     "インポートエラー" : {
       "comment" : "コピー履歴や定型文のインポートに失敗したときのエラーメッセージタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importfehler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1754,6 +2406,12 @@
     "ウィンドウを常に最も手前に表示します。" : {
       "comment" : "一般設定の「常に最前面に表示」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster immer im Vordergrund halten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1771,6 +2429,12 @@
     "ウィンドウ操作" : {
       "comment" : "ショートカット設定の、ウィンドウに関する操作がまとめられたセクション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fensteroperationen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1788,6 +2452,12 @@
     "エクスポート" : {
       "comment" : "コピー履歴や定型文をエクスポートするボタン名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1805,6 +2475,12 @@
     "エクスポートしたいプリセットを選択" : {
       "comment" : "プリセットのエクスポートボタンをクリックしたときに表示される画面で、エクスポートしたいプリセットを選ぶようユーザに求めるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie die Presets aus, die Sie exportieren möchten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1822,6 +2498,12 @@
     "エラー" : {
       "comment" : "何らかのエラーが起きたときに表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1839,6 +2521,12 @@
     "オーバーレイ時の透明度" : {
       "comment" : "履歴や定型文ウィンドウのオーバーレイ表示に関するオプションで、ウィンドウの透明度を設定するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlay-Transparenz"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1856,6 +2544,12 @@
     "オーバーレイ表示" : {
       "comment" : "履歴や定型文ウィンドウを半透明で表示するオーバーレイ表示機能のオプション名",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overlay-Anzeige"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1873,6 +2567,12 @@
     "オープンソースライセンス" : {
       "comment" : "オープンソースライセンスのヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open-Source-Lizenz"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1890,6 +2590,12 @@
     "オレンジ" : {
       "comment" : "定型文プリセットのアイコン色を選ぶカラーオプションのうちの1つ、橙色(オレンジ色)のオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orange"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1907,6 +2613,12 @@
     "オンにすると、Macのログイン時にClip Holdを自動で開くようにします。" : {
       "comment" : "一般設定の「ログイン時に開く」オプションを説明するアクセシビリティテキスト。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, wird Clip Hold automatisch beim Anmelden am Mac geöffnet."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1924,6 +2636,12 @@
     "オンにすると、コピーした定型文を履歴に追加しないようにします。" : {
       "comment" : "コピー履歴設定の「定型文を無視する」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, werden kopierte Standardphrasen nicht zum Verlauf hinzugefügt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1941,6 +2659,12 @@
     "オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。" : {
       "comment" : "一般設定の「自動スクロール」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, scrollt die Verlaufsliste bei Aktualisierung automatisch nach oben."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1958,6 +2682,12 @@
     "オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。" : {
       "comment" : "一般設定の定型文に関する設定項目で「番号を隠す」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, werden die in jedem Element des Standardphrasen-Fensters angezeigten Nummern ausgeblendet."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1975,6 +2705,12 @@
     "オンにすると、定型文ウィンドウを常に最も手前に表示します。" : {
       "comment" : "一般設定の定型文に関する設定項目で「常に最前面に表示」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, das Standardphrasen-Fenster immer im Vordergrund halten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1992,6 +2728,12 @@
     "オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。" : {
       "comment" : "一般設定の「クイックペースト」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, wird beim Auswählen einer Standardphrase oder eines Kopiervorgangsverlaufseintrags aus dem Menü oder beim Kopieren mit Tastenkombinationen die Tastenaktion Befehl + V gesendet. Eine Berechtigung für die Bedienungshilfen ist erforderlich."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2009,6 +2751,12 @@
     "オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。" : {
       "comment" : "一般設定の履歴に関する設定項目で「番号を隠す」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, werden die Nummern ausgeblendet, die in jedem Element im Verlaufsfenster angezeigt werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2026,6 +2774,12 @@
     "オンにすると、履歴ウィンドウを常に最も手前に表示します。" : {
       "comment" : "一般設定の履歴に関する設定項目で「常に最前面に表示」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, das Verlaufsfenster immer im Vordergrund halten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2043,6 +2797,12 @@
     "オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。" : {
       "comment" : "一般設定の「クイックペーストをテキストに限定」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, wird Quick Paste nur ausgeführt, wenn der Verlaufseintrag Text ist."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2060,6 +2820,12 @@
     "オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。" : {
       "comment" : "一般設定の「ダブルクリックでウィンドウを閉じる」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, wird das Fenster geschlossen, wenn Sie auf ein Element doppelklicken, um es zu kopieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2077,6 +2843,12 @@
     "カスタム" : {
       "comment" : "定型文プリセットのアイコン色を選ぶカラーオプションのうちの1つ、カスタムカラーを使用する場合のオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdef."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2094,6 +2866,12 @@
     "カスタム: %lld" : {
       "comment" : "数字や保存容量などをプリセット以外のカスタム値に設定するためのオプション。設定された値が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdef.: %lld"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2111,6 +2889,12 @@
     "カスタム: %lld %@" : {
       "comment" : "数字や保存容量などをプリセット以外のカスタム値に設定するためのオプション。設定された値、設定された容量単位が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdef.: %1$lld %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2128,6 +2912,12 @@
     "カスタム..." : {
       "comment" : "数字や保存容量などをプリセット以外のカスタム値に設定するためのオプション。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdef...."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2145,6 +2935,12 @@
     "カスタムタイトルを使用する" : {
       "comment" : "定型文の編集画面でお好みのタイトルを使用したい場合のチェックボックス名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzerdefinierten Titel verwenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2162,6 +2958,12 @@
     "カラー: %@" : {
       "comment" : "定型文プリセットの現在選択されているカラーが表示されるテキスト。現在選択中のカラー名が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbe: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2179,6 +2981,12 @@
     "カラーコード" : {
       "comment" : "開発者向け機能設定の、カラーコードに関する設定がまとめられたセクション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Farbcodes"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2196,6 +3004,12 @@
     "カラーコードでフィルタリングできるようにする" : {
       "comment" : "履歴のフィルタリングオプションに、カラーコードとして検出された項目だけにフィルタリングするオプションを追加するかどうかを切り替えるトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filterung nach Farbcodes zulassen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2213,6 +3027,12 @@
     "カラーコードに基づくカラーアイコンを表示" : {
       "comment" : "履歴や定型文の各項目がカラーコードとして検出された場合、そのコードに基づくカラーアイコンを表示するかどうかを切り替えるトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Farbsymbol basierend auf dem Farbcode anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2230,6 +3050,12 @@
     "カラーコードのみ" : {
       "comment" : "フィルタリングオプションの1つ、カラーコードのみに絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Farbcodes"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2247,6 +3073,12 @@
     "キャンセル" : {
       "comment" : "操作をキャンセルするボタン名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2264,6 +3096,12 @@
     "クイックペースト" : {
       "comment" : "「クイックペースト」の機能名。履歴や定型文をコピーした瞬間に自動でペーストしてくれる機能。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Paste"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2281,6 +3119,12 @@
     "クイックペーストをテキストに限定" : {
       "comment" : "コピーした項目がテキストの場合にのみクイックペーストを行うように設定するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Paste nur für Text"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2298,6 +3142,12 @@
     "クイックペースト機能を使用する場合は許可を与える必要があります。" : {
       "comment" : "クイックペースト機能には必要な許可を与える必要があることを示すメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um Quick Paste zu verwenden, müssen Sie die Berechtigung erteilen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2315,6 +3165,12 @@
     "クイックルック" : {
       "comment" : "Macの「クイックルック」機能名。履歴ウィンドウでファイルをクイックルックするオフ証明。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Look"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2332,6 +3188,12 @@
     "グリーン" : {
       "comment" : "定型文プリセットのアイコン色を選ぶカラーオプションのうちの1つ、緑色のオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grün"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2349,6 +3211,12 @@
     "クリップボード" : {
       "comment" : "プライバシー設定の、クリップボードに関する設定がまとめられたセクション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablage"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2366,6 +3234,12 @@
     "クリップボードの内容から定型文を追加する" : {
       "comment" : "最新のコピー履歴から定型文を追加するショートカットオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Standardphrase aus dem Inhalt der Zwischenablage hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2383,6 +3257,12 @@
     "クリップボードの履歴が保存されるようになります。" : {
       "comment" : "プライバシー設定のクリップボード監視を再開したときに表示される通知のテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Verlauf der Zwischenablage wird gespeichert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2400,6 +3280,12 @@
     "クリップボードの履歴が追加されなくなります。" : {
       "comment" : "プライバシー設定のクリップボード監視を一時停止したときに表示される通知のテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Verlauf der Zwischenablage wird nicht mehr hinzugefügt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2417,6 +3303,12 @@
     "クリップボードの履歴を保存できるようにするには、クリップボード監視を再開する必要があります。" : {
       "comment" : "プライバシー設定のクリップボード監視が一時停止された状態でアプリを開いたときに表示される通知のテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Überwachung der Zwischenablage muss fortgesetzt werden, um den Verlauf der Zwischenablage speichern zu können."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2434,6 +3326,12 @@
     "クリップボード履歴" : {
       "comment" : "クリップボード履歴を操作するオプションのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablageverlauf"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2451,6 +3349,12 @@
     "クリップボード履歴が正常にインポートされました。" : {
       "comment" : "クリップボード履歴のインポートが正常に完了した際に表示されるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablageverlauf erfolgreich importiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2468,6 +3372,12 @@
     "クリップボード履歴が正常にエクスポートされました。" : {
       "comment" : "クリップボード履歴のエクスポートが正常に完了した際に表示されるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablageverlauf erfolgreich exportiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2485,6 +3395,12 @@
     "クリップボード監視" : {
       "comment" : "クリップボードの変更を検知できるように監視する機能のオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablageüberwachung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2502,6 +3418,12 @@
     "クリップボード監視が一時停止されました。" : {
       "comment" : "プライバシー設定のクリップボード監視を一時停止したときに表示される通知のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zwischenablageüberwachung wurde angehalten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2519,6 +3441,12 @@
     "クリップボード監視が再開されました。" : {
       "comment" : "プライバシー設定のクリップボード監視を再開したときに表示される通知のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zwischenablageüberwachung wurde fortgesetzt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2536,6 +3464,12 @@
     "クリップボード監視は一時停止中です。" : {
       "comment" : "プライバシー設定のクリップボード監視が一時停止された状態でアプリを開いたときに表示される通知のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zwischenablageüberwachung ist angehalten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2553,6 +3487,12 @@
     "クリップボード監視を一時停止します。" : {
       "comment" : "プライバシー設定のクリップボード監視一時停止ボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablageüberwachung anhalten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2570,6 +3510,12 @@
     "クリップボード監視を再開します。" : {
       "comment" : "プライバシー設定のクリップボード監視再開ボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablageüberwachung fortsetzen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2587,6 +3533,12 @@
     "クリップボード監視を切り替える" : {
       "comment" : "プライバシー設定のクリップボード監視を切り替えるショートカットオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablageüberwachung umschalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2604,6 +3556,12 @@
     "ここで設定した容量よりも大きいファイルをコピーしようとした際に、コピーしたファイルを履歴に保存するかどうかを求めるアラートが表示されます。" : {
       "comment" : "コピー履歴設定の「コピーアラートを表示する容量」オフションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie eine Datei kopieren, die größer als die hier festgelegte Größe ist, erhalten Sie eine Warnung, in der Sie gefragt werden, ob Sie die kopierte Datei im Verlauf speichern möchten oder nicht."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2621,6 +3579,12 @@
     "ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。" : {
       "comment" : "コピー履歴設定の「各ファイルの最大容量」オフションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur wenn eine Datei kopiert wird, die kleiner als die hier festgelegte Größe ist, wird sie im Verlauf gespeichert. Frühere Verlaufseinträge sind nicht betroffen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2638,6 +3602,12 @@
     "ここに追加したアプリが最前面にあるときはコピー履歴に追加されません。" : {
       "comment" : "プライバシー設定の「除外するアプリ」セクションの説明テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn hier hinzugefügte Apps im Vordergrund sind, wird dies nicht zum Kopierverlauf hinzugefügt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2655,6 +3625,12 @@
     "このアプリからのすべての履歴を削除..." : {
       "comment" : "履歴ウィンドウで、特定のアプリからコピーされたすべての履歴を削除するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamten Verlauf dieser App löschen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2672,6 +3648,12 @@
     "このアプリケーションと使用されているライブラリのライセンス情報を表示します。" : {
       "comment" : "このアプリのライセンス情報を表示するボタンのツールチップに表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lizenzinformationen für diese Anwendung und die verwendeten Bibliotheken anzeigen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2689,6 +3671,12 @@
     "このアプリの履歴を削除" : {
       "comment" : "履歴ウィンドウで、特定のアプリからコピーされたすべての履歴を削除しようとしている際に表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf dieser App löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2706,6 +3694,12 @@
     "このアプリは既に別のプリセットに割り当てられています。上書きしてもよろしいですか？" : {
       "comment" : "プリセットの割り当て機能で、割り当てようとしているアプリが既に別のプリセットに割り当てられている場合に表示されるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese App ist bereits einem anderen Preset zugewiesen. Möchten Sie sie wirklich überschreiben?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2723,6 +3717,12 @@
     "このプリセットに割り当てられているすべてのアプリをリストから削除しますか？" : {
       "comment" : "プリセットの割り当てリストから、そのプリセットに割り当てられたすべてのアプリを削除しようとしている際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie wirklich alle diesem Preset zugewiesenen Apps aus der Liste entfernen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2740,6 +3740,12 @@
     "このプリセットのすべての割り当てを削除します。" : {
       "comment" : "プリセットの割り当てリストから、そのプリセットに割り当てられたすべてのアプリを削除するボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Zuweisungen für dieses Preset entfernen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2757,6 +3763,12 @@
     "このプリセットのすべての定型文を削除します。" : {
       "comment" : "そのプリセット内に含まれるすべての定型文を削除するボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Standardphrasen in diesem Preset löschen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2774,6 +3786,12 @@
     "このプリセットを本当に削除しますか？" : {
       "comment" : "そのプリセットを削除しようとしている際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie dieses Preset wirklich löschen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2791,6 +3809,12 @@
     "このまま追加" : {
       "comment" : "プリセットと定型文のインポート時に、既に登録されたものと同じ項目があった場合に、重複して追加するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2808,6 +3832,12 @@
     "このまま追加する" : {
       "comment" : "プリセットと定型文のインポート時に、既に登録されたものと同じ項目があった場合に、重複して追加するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2825,6 +3855,12 @@
     "この定型文をインポートしたいプリセットを選択" : {
       "comment" : "プリセット情報が含まれない定型文リストをインポートしようとした際に、その定型文リストをどのプリセットに追加するかをユーザに求めるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie das Preset aus, in das Sie diese Standardphrasen importieren möchten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2842,6 +3878,12 @@
     "この定型文を移動したいプリセットを選択" : {
       "comment" : "定型文を別のプリセットに移動しようとしている際、目的のプリセットを選択するようユーザに求めるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie das Preset aus, in das Sie diese Standardphrase verschieben möchten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2859,6 +3901,12 @@
     "コピー" : {
       "comment" : "コピーボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2876,6 +3924,12 @@
     "コピーアラートを表示する容量" : {
       "comment" : "一定の容量を超えたファイルコピーしようとした際にコピー履歴に追加するかどうかを求めるアラートを表示する容量を選択する設定項目名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Größe für Kopierwarnung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2893,6 +3947,12 @@
     "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。" : {
       "comment" : "一般設定の「アプリアイコンを表示」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigen Sie für jedes Element die App-Symbole an, die beim Kopieren im Vordergrund waren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2910,6 +3970,12 @@
     "コピーした定型文を履歴に追加しないようにします。" : {
       "comment" : "コピー履歴設定の「定型文を無視する」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verhindert, dass kopierte Standardphrasen zum Verlauf hinzugefügt werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2927,6 +3993,12 @@
     "コピーしました！" : {
       "comment" : "履歴と定型文ウィンドウで項目をコピーしたときに、コピーされたことを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert!"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2944,6 +4016,12 @@
     "コピー履歴" : {
       "comment" : "コピー履歴に関する設定タブ名・セクション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopierverlauf"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2961,6 +4039,12 @@
     "コミュニティ" : {
       "comment" : "コミュニティーページにアクセスするためのコミュニティーボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2978,6 +4062,12 @@
     "これはClip Holdからのテスト通知です。" : {
       "comment" : "プライバシー設定にある通知のテストボタンをクリックしたときに表示されるテスト通知のテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies ist eine Testbenachrichtigung von Clip Hold."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2995,6 +4085,12 @@
     "サポートとフィードバック" : {
       "comment" : "サポートとフィードバックセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support und Feedback"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3012,6 +4108,12 @@
     "システム設定のアクセシビリティ許可設定を開きます。" : {
       "comment" : "アクセシビリティ許可が与えられていないときに、プライバシー設定のアクセシビリティ許可の「設定を開く」ボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie die Einstellung für Bedienungshilfen-Berechtigungen in den Systemeinstellungen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3029,6 +4131,12 @@
     "システム設定の通知設定を開きます。" : {
       "comment" : "通知の許可が与えられていない時に、プライバシー設定の通知の「設定を開く」ボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie die Benachrichtigungseinstellungen in den Systemeinstellungen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3046,6 +4154,12 @@
     "ショートカット" : {
       "comment" : "ショートカットキーに関する設定タブ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kurzbefehle"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3063,6 +4177,12 @@
     "ショートカットキーで切り替えたときに通知を送信する" : {
       "comment" : "ショートカットキーを使って定型文プリセットを切り替えたときに通知を送信するかどうかを切り替えるトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Umschalten mit Tastenkombinationen eine Benachrichtigung senden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3080,6 +4200,12 @@
     "シンボルを検索" : {
       "comment" : "プリセットアイコンを選択する画面にある検索ボックスのサンフルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Symbole suchen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3097,6 +4223,12 @@
     "スキップ" : {
       "comment" : "プリセットと定型文のインポート時に、既に登録されたものと同じ項目があった場合に、追加をスキップするオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3114,6 +4246,12 @@
     "スキップする" : {
       "comment" : "プリセットと定型文のインポート時に、既に登録されたものと同じ項目があった場合に、追加をスキップするオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3131,6 +4269,12 @@
     "スターをつける" : {
       "comment" : "リポジトリにスターをつけるボタンテキスト。このボタンを押すとこのアプリ(Clip Hold)のリポジトリのリンクを開く。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einen Stern geben"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3148,6 +4292,12 @@
     "すでに割り当てられたアプリ" : {
       "comment" : "プリセットの割り当て機能で、割り当てようとしているアプリが既に別のプリセットに割り当てられている場合に表示されるアラートメッセージのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereits zugewiesene App"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3165,6 +4315,12 @@
     "すべて" : {
       "comment" : "エクスポートするプリセット選択画面ですべてのプリセットをエクスポート対象に含めるオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3182,6 +4338,12 @@
     "すべて、または特定のプリセットの定型文をJSONファイルとして書き出します。" : {
       "comment" : "定型文設定のエクスポートボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportieren Sie alle oder bestimmte Preset-Standardphrasen als JSON-Datei."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3199,6 +4361,12 @@
     "すべてスキップ" : {
       "comment" : "プリセットと定型文のインポート時に、既に登録されたものと同じ項目があった場合に、すべての項目に対して追加をスキップするオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle überspringen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3216,6 +4384,12 @@
     "すべてのアプリ" : {
       "comment" : "フィルタリングオプションの1つ、特定のアプリで絞り込む機能を解除(すべてのアプリを対象に)するためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Apps"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3233,6 +4407,12 @@
     "すべてのクリップボード履歴をJSONファイルとして書き出します。" : {
       "comment" : "コピー履歴設定のエクスポートボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamten Zwischenablageverlauf als JSON-Datei exportieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3250,6 +4430,12 @@
     "すべてのクリップボード履歴を削除" : {
       "comment" : "すべてのクリップボード履歴を削除しようとしている際に表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamten Zwischenablageverlauf löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3267,6 +4453,12 @@
     "すべてのクリップボード履歴を本当に削除しますか？この操作は元に戻せません。" : {
       "comment" : "すべてのクリップボード履歴を削除しようとしている際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie den gesamten Zwischenablageverlauf wirklich löschen? Dies kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3284,6 +4476,12 @@
     "すべてのコピー履歴を表示..." : {
       "comment" : "メニューバーに表示される、履歴ウィンドウを開くためのボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamten Kopierverlauf anzeigen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3301,6 +4499,12 @@
     "すべてのテキスト" : {
       "comment" : "フィルタリングオプションの1つ、あらゆる書類のテキストだけに絞り込む(すべての種類のテキストだけを対象にする)ためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aller Text"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3318,6 +4522,12 @@
     "すべてのファイル" : {
       "comment" : "フィルタリングオプションの1つ、あらゆる書類のファイルだけに絞り込む(すべての種類のファイルだけを対象にする)ためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Dateien"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3335,6 +4545,12 @@
     "すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。" : {
       "comment" : "すべての定型文を削除ボタンをクリックして、すべての定型文を削除しようとしている際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie wirklich Standardphrasen aus allen Presets löschen? Dies kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3352,6 +4568,12 @@
     "すべてのプリセットを削除" : {
       "comment" : "すべてのプリセットを削除するボタンテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Presets löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3369,6 +4591,12 @@
     "すべてのプリセットを本当に削除しますか？この操作は元に戻せません。" : {
       "comment" : "すべてのプリセットを削除ボタンをクリックして、すべてのプリセットを削除しようとしている際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie wirklich alle Presets löschen? Dies kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3386,6 +4614,12 @@
     "すべてのプロセスを表示" : {
       "comment" : "除外するアプリやプリセットに割り当てるアプリを追加する画面に表示されるアプリ一覧で、システムのプロセス等を表示するように切り替えるチェックボタンテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Prozesse anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3403,6 +4637,12 @@
     "すべての割り当てを削除" : {
       "comment" : "そのプリセットからすべてのアプリの割り当てを解除するボタンをクリックしたときに表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Zuweisungen entfernen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3420,6 +4660,12 @@
     "すべての定型文を削除" : {
       "comment" : "すべての定型文を削除ボタンをクリックして、すべての定型文を削除しようとしている際に表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Standardphrasen löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3437,6 +4683,12 @@
     "すべての定型文を表示..." : {
       "comment" : "メニューバーに表示される、定型文ウィンドウを開くためのボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Standardphrasen anzeigen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3454,6 +4706,12 @@
     "すべての履歴を削除" : {
       "comment" : "すべてのクリップボード履歴を削除ボタンをクリックして、すべてのコピー履歴を削除しようとしている際に表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamten Verlauf löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3471,6 +4729,12 @@
     "すべての競合を処理しました。" : {
       "comment" : "既に設定されているものとの重複が含まれるプリセットや定型文をインポートしている時、すべての重複項目に対して処理が完了したときに表示されるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Konflikte wurden gelöst."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3488,6 +4752,12 @@
     "すべての設定が初期状態に戻りました。変更を完全に適用するにはアプリを再起動してください。" : {
       "comment" : "開発者向け設定からリセットボタンをクリックしてアプリのすべての設定がリセットされた後に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Einstellungen wurden auf ihre Standardwerte zurückgesetzt. Bitte starten Sie die App neu, um die Änderungen vollständig zu übernehmen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3505,6 +4775,12 @@
     "すべての設定をリセット" : {
       "comment" : "開発者向け設定にある、すべての設定をリセットする項目のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Einstellungen zurücksetzen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3522,6 +4798,12 @@
     "すべての除外するアプリをリストから削除します。" : {
       "comment" : "除外するアプリリストから、設定されたすべてのアプリを削除するボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle auszuschließenden Apps aus der Liste entfernen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3539,6 +4821,12 @@
     "すべての除外するアプリを削除" : {
       "comment" : "除外するアプリリストから、設定されたすべてのアプリを削除するボタンをクリックしたときに表示されるアラートタイトル",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle auszuschließenden Apps entfernen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3556,6 +4844,12 @@
     "すべての項目" : {
       "comment" : "フィルタリングオプションの1つ、アプリ以外のフィルタリングを解除する(すべての項目を対象にする)ためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Elemente"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3573,6 +4867,12 @@
     "その他のファイル" : {
       "comment" : "フィルタリングオプションの1つ、その他の種類のファイルだけに絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere Dateien"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3590,6 +4890,12 @@
     "タイトル" : {
       "comment" : "定型文の追加編集画面にあるタイトル入力欄に表示されるサンプルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titel"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3607,6 +4913,12 @@
     "タイトル: **%@**" : {
       "comment" : "重複した定型文をインポートしているときに表示される競合解決画面に表示されるテキスト。現在処理中の定型文の既存のタイトルが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titel: **%@**"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3624,6 +4936,12 @@
     "タイトル: %@、内容: %@" : {
       "comment" : "定型文のタイトルとコンテンツを適切に読み上げるためのアクセシビリティラベル。定型文のタイトルとコンテンツが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titel: %1$@, Inhalt: %2$@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3641,6 +4959,12 @@
     "ダブルクリックでウィンドウを閉じる" : {
       "comment" : "履歴と定型文ウィンドウに表示される各項目をダブルクリックしてコピーした際にウィンドウを自動的に閉じるように設定するトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster bei Doppelklick schließen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3658,6 +4982,12 @@
     "ダブルクリックで定型文ウィンドウを閉じる" : {
       "comment" : "定型文ウィンドウに表示される各項目をダブルクリックしてコピーした際にウィンドウを自動的に閉じるように設定するトグルスイッチ名のアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasenfenster bei Doppelklick schließen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3675,6 +5005,12 @@
     "ダブルクリックで履歴ウィンドウを閉じる" : {
       "comment" : "履歴ウィンドウに表示される各項目をダブルクリックしてコピーした際にウィンドウを自動的に閉じるように設定するトグルスイッチ名のアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlaufsfenster bei Doppelklick schließen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3692,6 +5028,12 @@
     "ディスカッションページへのリンクを開きます." : {
       "comment" : "ディスカッションページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Diskussionsseite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3709,6 +5051,12 @@
     "テキスト" : {
       "comment" : "開発者向け機能設定のテキスト関係の設定項目がまとめられたセクションタイトル名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3726,6 +5074,12 @@
     "テキストのみ" : {
       "comment" : "テキスト関係のフィルタリングオプションのグループ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Text"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3743,6 +5097,12 @@
     "テスト通知" : {
       "comment" : "送信されたテスト通知のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benachrichtigungstest"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3760,6 +5120,12 @@
     "テスト通知を送信します。" : {
       "comment" : "テスト通知送信ボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Testbenachrichtigung senden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3777,6 +5143,12 @@
     "デバッグ" : {
       "comment" : "開発者向け機能設定のデバッグ関係の設定項目がまとめられたセクションタイトル名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3794,6 +5166,12 @@
     "デフォルトのショートカットに戻します。" : {
       "comment" : "ショートカット設定のカスタムショートカットをアプリのデフォルトショートカットに戻すボタンに表示されるツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf den Standard-Kurzbefehl zurücksetzen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3811,6 +5189,12 @@
     "ドキュメントを表示…" : {
       "comment" : "アプリ起動時、古い履歴ファイルが見つかった際のマイグレーションに失敗した際に送信される通知にある、手動でマイグレーションするための手順が書かれたドキュメント表示ボタンのテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokument anzeigen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3828,6 +5212,12 @@
     "なし" : {
       "comment" : "プリセットが1つも設定されていない時に現在選択されているプリセットとして表示される(プリセットが1つもないことを示す)テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3845,6 +5235,12 @@
     "バージョン: %@" : {
       "comment" : "使用されたオープンソースライブラリのバージョンを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3862,6 +5258,12 @@
     "バージョン: %@ (%@)" : {
       "comment" : "このアプリのバージョン情報を表示するためのテキスト。バージョン番号 (ビルド番号)",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version: %1$@ (%2$@)"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3879,6 +5281,12 @@
     "パープル" : {
       "comment" : "定型文プリセットのアイコン色を選ぶカラーオプションのうちの1つ、紫色のオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lila"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3896,6 +5304,12 @@
     "はい" : {
       "comment" : "設定した容量を超えるファイルをコピーしたときに表示されるアラート画面で、履歴に保存するかどうかを尋ねられたときに保存することを選択するための決定ボタン名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ja"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3913,6 +5327,12 @@
     "バグを報告" : {
       "comment" : "バグを報告するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einen Fehler melden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3930,6 +5350,12 @@
     "バグを見つけましたか？" : {
       "comment" : "バグ報告ボタンを押すように促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler gefunden?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3947,6 +5373,12 @@
     "ピンク" : {
       "comment" : "定型文プリセットのアイコン色を選ぶカラーオプションのうちの1つ、ピンク色のオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pink"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3964,6 +5396,12 @@
     "ファイル1つあたりの最大容量を設定" : {
       "comment" : "コピー履歴設定の「各ファイルの最大容量」オプションでカスタムオプションを設定する画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximale Größe pro Datei festlegen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3981,6 +5419,12 @@
     "ファイルサイズが大きい順" : {
       "comment" : "履歴ウィンドウの並べ替えオプションの1つ、上から順に、ファイルサイズが大きいものから小さいものへと表示するオプション。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateigrößen von groß nach klein"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3998,6 +5442,12 @@
     "ファイルサイズが小さい順" : {
       "comment" : "履歴ウィンドウの並べ替えオプションの1つ、上から順に、ファイルサイズが小さいものから大きいものへと表示するオプション。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateigrößen von klein nach groß"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4015,6 +5465,12 @@
     "ファイルのみ" : {
       "comment" : "ファイル関係のフィルタリングオプションのグループ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Dateien"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4032,6 +5488,12 @@
     "ファイルの保存先フォルダをFinderで開きます。" : {
       "comment" : "コピーしたファイルが保存される保存フォルダをFinderに表示するためのボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen Sie den Ordner, in dem die Datei gespeichert ist, im Finder."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4049,6 +5511,12 @@
     "ファイルの選択に失敗しました: %@" : {
       "comment" : "コピー履歴のインポート時に何らかの理由でユーザが選択したファイルを取得できなかった際に表示されるエラーメッセージ。エラーの理由が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datei konnte nicht ausgewählt werden: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4066,6 +5534,12 @@
     "ファイルへのアクセス権限がありません。ファイルパス: %@" : {
       "comment" : "コピー履歴のインポート時にユーザが選択したファイルのアクセス権がない場合に表示されるエラーメッセージ。ユーザが選択したファイルへのパスが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie haben keine Berechtigung, auf die Datei zuzugreifen. Dateipfad: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4083,6 +5557,12 @@
     "ファイルやフォルダをコピーしたときにデータが保存されるフォルダを管理します。" : {
       "comment" : "コピーしたファイルが保存される保存フォルダ管理のセクションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwaltet Ordner, in denen Daten gespeichert werden, wenn Sie eine Datei oder einen Ordner kopieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4100,6 +5580,12 @@
     "フィードバックのメール送信画面を開いてもよろしいですか？" : {
       "comment" : "ユーザに、フィードバックを送信するためのメール送信画面を開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie das Fenster zum Senden von Feedback-E-Mails wirklich öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4117,6 +5603,12 @@
     "フィードバックのメール送信画面を開きます。" : {
       "comment" : "フィードバック送信ボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster zum Senden von Feedback-E-Mails öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4134,6 +5626,12 @@
     "フィードバックを送信" : {
       "comment" : "フィードバックを送信ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feedback senden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4151,6 +5649,12 @@
     "フィルター" : {
       "comment" : "履歴ウィンドウのフィルタリングピッカーに表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4168,6 +5672,12 @@
     "フォーカスが当たっていない時は、ウィンドウを半透明にします。" : {
       "comment" : "一般設定の「オーバーレイ表示」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn das Fenster nicht fokussiert ist, machen Sie es halbtransparent."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4185,6 +5695,12 @@
     "フォルダのみ" : {
       "comment" : "フィルタリングオプションの1つ、フォルダだけに絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Ordner"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4202,6 +5718,12 @@
     "プライバシー" : {
       "comment" : "プライバシー設定のタブ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4219,6 +5741,12 @@
     "プリセット" : {
       "comment" : "定型文プリセットを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presets"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4236,6 +5764,12 @@
     "プリセット: %@" : {
       "comment" : "現在選択されているプリセットを表すテキスト。現在選ばれているプリセットが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4253,6 +5787,12 @@
     "プリセット「%@」からすべての定型文を本当に削除しますか？この操作は元に戻せません。" : {
       "comment" : "特定のプリセットからすべての定型文を削除しようとしている際に表示されるアラートメッセージ。すべての定型文を削除しようとしているプリセット名が表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie wirklich alle Standardphrasen aus dem Preset „%@“ löschen? Dies kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4270,6 +5810,12 @@
     "プリセットがありません" : {
       "comment" : "プリセットが1つもない時に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Presets"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4287,6 +5833,12 @@
     "プリセットの削除" : {
       "comment" : "プリセットを削除しようとしている際に表示されるタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4304,6 +5856,12 @@
     "プリセットの割り当て" : {
       "comment" : "プリセットをアプリに割り当てて、そのアプリが最前面にあるときに特定のプリセットに切り替えるオプションのセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presets zuweisen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4321,6 +5879,12 @@
     "プリセットの設定" : {
       "comment" : "定型文設定のプリセットに関する設定がまとめられたセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset-Einstellungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4338,6 +5902,12 @@
     "プリセットの順番はドラッグアンドドロップで並び替えることができます。" : {
       "comment" : "定型文設定の「プリセットの設定」セクションの説明テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können per Drag-and-Drop die Reihenfolge der Presets ändern."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4355,6 +5925,12 @@
     "プリセットをアプリに割り当てると、そのアプリが最前面の時は、自動で選択されたプリセットに切り替わるようになります。" : {
       "comment" : "定型文設定の「プリセットの割り当て」セクションの説明テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie Apps Presets zuweisen, wechseln diese automatisch zum ausgewählten Preset, wenn die App im Vordergrund ist."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4372,6 +5948,12 @@
     "プリセットを追加" : {
       "comment" : "プリセットの追加画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Preset hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4389,6 +5971,12 @@
     "プリセットを選択" : {
       "comment" : "プリセットのエクスポート画面や定型文を別のプリセットに移動する画面に表示される、目的のプリセットを選択するようにまとめるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset auswählen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4406,6 +5994,12 @@
     "プリセット名" : {
       "comment" : "プリセットの追加編集画面にあるプリセット名入力欄のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset-Name"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4423,6 +6017,12 @@
     "プリセット名を入力" : {
       "comment" : "プリセットの追加編集画面にあるプリセット名入力欄のサンプルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset-Namen eingeben"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4440,6 +6040,12 @@
     "プリセット名を編集" : {
       "comment" : "プリセットの編集画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preset-Namen bearbeiten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4457,6 +6063,12 @@
     "ブルー" : {
       "comment" : "定型文プリセットのアイコン色を選ぶカラーオプションのうちの1つ、青色のオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blau"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4474,6 +6086,12 @@
     "メール送信画面を開きますか？" : {
       "comment" : "メールの送信画面を開いても良いかを尋ねるメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fenster zum Senden von E-Mails öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4491,6 +6109,12 @@
     "メニュー" : {
       "comment" : "一般設定の、メニューバーに関する設定項目がまとめられたセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menü"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4508,6 +6132,12 @@
     "メニューに表示される定型文の最大数を設定します。" : {
       "comment" : "一般設定の「定型文の最大表示数」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legen Sie die maximale Anzahl der im Menü anzuzeigenden Standardphrasen fest."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4525,6 +6155,12 @@
     "メニューに表示される履歴の最大数を設定します。" : {
       "comment" : "一般設定の「履歴の最大表示数」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Legen Sie die maximale Anzahl der im Menü anzuzeigenden Verlaufseinträge fest."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4542,6 +6178,12 @@
     "メニューに表示する定型文の最大数を設定" : {
       "comment" : "一般設定の「定型文の最大表示数」オプションでカスタム値の設定画面に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximale Anzahl der im Menü anzuzeigenden Standardphrasen festlegen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4559,6 +6201,12 @@
     "メニューに表示する履歴の最大数を設定" : {
       "comment" : "一般設定の「履歴の最大表示数」オプションでカスタム値の設定画面に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximale Anzahl der im Menü anzuzeigenden Verlaufseinträge festlegen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4576,6 +6224,12 @@
     "メニューバーアイコンを隠す" : {
       "comment" : "メニューバーからアプリのアイコンを一時的に隠すオプション項目名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menüleistensymbol ausblenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4593,6 +6247,12 @@
     "よく使う定型文" : {
       "comment" : "メニューバーの定型文リストに表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favoriten-Standardphrasen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4610,6 +6270,12 @@
     "ライセンス情報" : {
       "comment" : "ライセンス情報を表示するためのボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lizenzinformationen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4627,6 +6293,12 @@
     "リストが更新されたとき、リストを自動的に最も上にスクロールします。" : {
       "comment" : "一般設定の「自動スクロール」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn die Liste aktualisiert wird, automatisch zum Anfang der Liste scrollen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4644,6 +6316,12 @@
     "リセット" : {
       "comment" : "開発者向け機能設定のすべての設定をリセットしようとしている際に表示されるアラートのリセットを実行するボタン名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurücksetzen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4661,6 +6339,12 @@
     "リセット..." : {
       "comment" : "開発者向け機能設定のすべての設定をリセットするボタン名。クリックするとアラートが表示される。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurücksetzen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4678,6 +6362,12 @@
     "リセット完了" : {
       "comment" : "開発者向け機能設定ですべての設定のリセットが完了したときに表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurücksetzen abgeschlossen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4695,6 +6385,12 @@
     "リッチテキストのみ" : {
       "comment" : "フィルタリングオプションの1つ、リッチテキストだけに絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Rich-Text"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4712,6 +6408,12 @@
     "リポジトリにスターをつけてくれるととてもうれしいです！" : {
       "comment" : "リポジトリにスターをつけるボタンを押すように促すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich würde mich sehr freuen, wenn Sie dem Repository einen Stern geben könnten!"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4729,6 +6431,12 @@
     "リンクのみ" : {
       "comment" : "フィルタリングオプションの1つ、リンク(ウェブURL)だけに絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Links"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4746,6 +6454,12 @@
     "リンクを開きますか？" : {
       "comment" : "外部リンクを開くアラートタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link öffnen?"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4763,6 +6477,12 @@
     "リンクを開く" : {
       "comment" : "履歴と定型文ウィンドウの各項目がリンクである場合に表示される、デフォルトのブラウザを使ってそのリンクを開くためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4780,6 +6500,12 @@
     "レッド" : {
       "comment" : "定型文プリセットのアイコン色を選ぶカラーオプションのうちの1つ、赤色のオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rot"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4797,6 +6523,12 @@
     "ログイン時に開く" : {
       "comment" : "アプリをMacのログイン時に開くかどうかを切り替えるトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Anmelden starten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4814,6 +6546,12 @@
     "一つ一つ解決する" : {
       "comment" : "プリセットのインポート時に、既に登録されたものと同じ項目があった場合に、すべての項目に対して各項目を一つ一つ確認して解決するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einzeln lösen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4831,6 +6569,12 @@
     "一時停止" : {
       "comment" : "クリップボード監視を一時停止するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4848,6 +6592,12 @@
     "一時停止中" : {
       "comment" : "クリップボード監視が現在一時停止中であることを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angehalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4865,6 +6615,12 @@
     "一般" : {
       "comment" : "一般設定のタブ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4882,6 +6638,12 @@
     "一部の機能には、システムの許可が必要です。" : {
       "comment" : "プライバシー設定の「権限」セクションの説明するテキスト、",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Funktionen erfordern Systemberechtigungen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4899,6 +6661,12 @@
     "並び替え" : {
       "comment" : "履歴ウィンドウの並び替えピッカーに表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sortieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4916,6 +6684,12 @@
     "以下の定型文は既存の項目とタイトルまたは内容が重複しています。\nタイトルまたは内容のどちらかを編集してください。" : {
       "comment" : "既に登録されているものと重複している定型文をインポートしようとしている際に表示される競合解決画面のテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die folgende Standardphrase hat einen doppelten Titel oder Inhalt mit einem vorhandenen Element.\nBitte bearbeiten Sie entweder den Titel oder den Inhalt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4933,6 +6707,12 @@
     "以前の履歴ファイルが使用されています。アップグレード方法はドキュメントをご覧ください。" : {
       "comment" : "アプリ起動時、古い履歴ファイルが見つかった際のマイグレーションに失敗した際に送信される通知のテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wird eine frühere Verlaufsdatei verwendet. Anweisungen zum Upgrade finden Sie in der Dokumentation."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4950,6 +6730,12 @@
     "作成" : {
       "comment" : "新たなプリセットを作成するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erstellen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4967,6 +6753,12 @@
     "保存" : {
       "comment" : "何らかの追加画面や設定入力画面を保存して閉じるボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -4984,6 +6776,12 @@
     "保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。" : {
       "comment" : "コピー履歴設定の「履歴の最大保存数」オプションでカスタム値を設定する画面に表示される注意書きテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie einen Wert festlegen, der kleiner als die Anzahl der gespeicherten Verlaufseinträge ist, wird der Betrag, der den festgelegten Wert überschreitet, bei der nächsten Aktualisierung des Zwischenablageverlaufs gelöscht."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5001,6 +6799,12 @@
     "保存フォルダの管理" : {
       "comment" : "コピー履歴設定の、コピーしたファイルが保存される保存フォルダを管理する設定がまとめられたセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherten Ordner verwalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5018,6 +6822,12 @@
     "保存フォルダの総容量:" : {
       "comment" : "コピーしたファイルが保存される保存フォルダで使用している容量が表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamtgröße des gespeicherten Ordners:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5035,6 +6845,12 @@
     "保存フォルダの項目数:" : {
       "comment" : "コピーしたファイルが保存される保存フォルダに含まれる項目数が表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl der Elemente im gespeicherten Ordner:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5052,6 +6868,12 @@
     "保存フォルダを空にする" : {
       "comment" : "コピーしたファイルが保存される保存フォルダを空っぽにするボタンテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherten Ordner leeren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5069,6 +6891,12 @@
     "保存フォルダを開く" : {
       "comment" : "コピーしたファイルが保存される保存フォルダをFinderで開くボタンテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherten Ordner öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5086,6 +6914,12 @@
     "保存先のプリセット:" : {
       "comment" : "プリセット情報が含まれない定型文をインポートする画面で、インポートしようとしている定型文をどのプリセットに保存するかを選ぶためのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Preset speichern:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5103,6 +6937,12 @@
     "値を調整" : {
       "comment" : "カスタム値を設定する画面に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wert anpassen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5120,6 +6960,12 @@
     "入力エラー" : {
       "comment" : "カスタム値入力画面で不正な値が入力されたときに表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eingabefehler"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5137,6 +6983,12 @@
     "入力された情報が長すぎるか、無効な文字が含まれている可能性があります。" : {
       "comment" : "何らかの理由によりQRコード画像の生成に失敗した場合に表示される汎用エラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die eingegebenen Informationen sind möglicherweise zu lang oder enthalten ungültige Zeichen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5154,6 +7006,12 @@
     "内容: %@" : {
       "comment" : "重複した定型文をインポートしているときに表示される競合解決画面に表示されるテキスト。現在処理中の定型文の既存のコンテンツが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inhalt: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5171,6 +7029,12 @@
     "再開" : {
       "comment" : "クリップボード監視を再開するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsetzen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5188,6 +7052,12 @@
     "最新の履歴を変更してコピーする" : {
       "comment" : "最新のコピー履歴のテキストを変更して新たにコピーする機能を呼び出すキーボードショートカット設定の項目。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den letzten Verlaufseintrag ändern und kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5205,6 +7075,12 @@
     "別のプリセットに移動" : {
       "comment" : "選択された定型文を特定のプリセットに移動する画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In ein anderes Preset verschieben"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5222,6 +7098,12 @@
     "別のプリセットに移動..." : {
       "comment" : "選択された定型文を特定のプリセットに移動するオプション名、",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In ein anderes Preset verschieben..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5239,6 +7121,12 @@
     "削除" : {
       "comment" : "履歴やプリセットなどを削除するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5256,6 +7144,12 @@
     "削除..." : {
       "comment" : "履歴をプリセットなどを削除するボタン。クリックした後にアラートが表示される。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5273,6 +7167,12 @@
     "前のプリセットに切り替える" : {
       "comment" : "前のプリセットに切り替えるキーボードショートカット設定の項目。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum vorherigen Preset wechseln"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5290,6 +7190,12 @@
     "割り当てる" : {
       "comment" : "アプリを特定のプリセットに割り当てようとしている時、そのアプリが既に別のプリセットに割り当てられているときに表示されるアラートで、既に割り当てられた別のプリセットから割り当てを解除して目的のプリセットに割り当てを実行するための割り当てボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuweisen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5307,6 +7213,12 @@
     "割り当てるアプリを追加します。" : {
       "comment" : "プリセット割り当てリストにアプリを追加するボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuzuweisende Apps hinzufügen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5324,6 +7236,12 @@
     "割り当てるプリセット" : {
       "comment" : "アプリをプリセットに割り当てる機能の割り当て先プリセットを選択するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zuzuweisendes Preset"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5341,6 +7259,12 @@
     "割り当てるプリセットにはアプリのみ追加することができます。" : {
       "comment" : "プリセット割り当てリストにアプリ以外のファイルを追加しようとした際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dem zuzuweisenden Preset können nur Apps hinzugefügt werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5358,6 +7282,12 @@
     "動作中" : {
       "comment" : "クリップボード監視が現在有効で動作中であることを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird ausgeführt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5375,6 +7305,12 @@
     "動画のみ" : {
       "comment" : "フィルタリングオプションの1つ、動画だけに絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Videos"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5392,6 +7328,12 @@
     "古い順" : {
       "comment" : "履歴ウィンドウの並べ替えオプションの1つ、上から順に、日付が古いものから新しいものへと表示するオプション。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Älteste zuerst"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5409,6 +7351,12 @@
     "各ファイルの最大容量" : {
       "comment" : "一定の容量を超えるファイルをコピーした時は履歴に保存しないように設定する機能の容量設定オプションの項目名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximale Dateigröße für jede Datei"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5426,6 +7374,12 @@
     "各フォルダの容量は正しく計算されないため、実際にはさらに多くの容量が使用されている場合があります。" : {
       "comment" : "コピーしたファイルが保存される保存フォルダの容量に関する注意書きテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Größe jedes Ordners wird nicht korrekt berechnet, daher ist es möglich, dass tatsächlich mehr Speicherplatz belegt wird."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5443,6 +7397,12 @@
     "各項目に表示される番号を非表示にします。" : {
       "comment" : "一般設定の「番号を隠す」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummern ausblenden, die in jedem Element angezeigt werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5460,6 +7420,12 @@
     "変更してコピー..." : {
       "comment" : "その項目をそのままコピーする代わりに、テキストの1部分を編集してから新たにコピーするオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändern und kopieren..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5477,6 +7443,12 @@
     "大容量ファイルのコピー" : {
       "comment" : "1つの大きなファイル(各ファイルの最大容量で設定された設定値を超えるファイル)をコピーしたときに表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Große Datei kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5494,6 +7466,12 @@
     "大容量ファイルの複数コピー" : {
       "comment" : "2つ以上の大きなファイル(各ファイルの最大容量で設定された設定値を超えるファイル)をコピーしたときに表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mehrere große Dateien kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5511,6 +7489,12 @@
     "完了" : {
       "comment" : "アラートを閉じたり競合解決を完了させたりするための完了ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5528,6 +7512,12 @@
     "定型文" : {
       "comment" : "定型文設定のタグ名・定型文自体を表す複数形のテキスト(特定の定型文に対してではなく、定型文全般に対する設定項目などに表示される)。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5545,6 +7535,12 @@
     "定型文ウィンドウ" : {
       "comment" : "設定された定型文を一覧で表示するウィンドウの名前。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasenfenster"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5562,6 +7558,12 @@
     "定型文ウィンドウの番号を隠す" : {
       "comment" : "一般設定の定型文ウィンドウの「番号を隠す」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummern im Standardphrasenfenster ausblenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5579,6 +7581,12 @@
     "定型文ウィンドウを常に最前面に表示" : {
       "comment" : "一般設定の定型文ウィンドウの「常に最前面に表示」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Standardphrasenfenster immer im Vordergrund anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5596,6 +7604,12 @@
     "定型文ウィンドウを開く" : {
       "comment" : "定型文ウィンドウを開くためのキーボードショートカットキー設定項目。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasenfenster öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5613,6 +7627,12 @@
     "定型文が設定されていません" : {
       "comment" : "1から10番目までの各定型文をコピーするキーボードショートカット設定で、そのショートカットに対応する定型文が設定されていない場合に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es ist keine Standardphrase festgelegt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5630,6 +7650,12 @@
     "定型文のインポート" : {
       "comment" : "定型文のインポート画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasen importieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5647,6 +7673,12 @@
     "定型文のエクスポート" : {
       "comment" : "定型文のエクスポート画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasen exportieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5664,6 +7696,12 @@
     "定型文の最大表示数" : {
       "comment" : "定型文をメニューに表示する最大数を設定するオプション名。ユーザは数字を選択できる。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximale Anzahl der anzuzeigenden Standardphrasen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5681,6 +7719,12 @@
     "定型文の削除" : {
       "comment" : "1つの定型文を削除しようとしている際に表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Standardphrase löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5698,6 +7742,12 @@
     "定型文の管理" : {
       "comment" : "定型文設定の、定型文を管理する設定がまとめられたセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasen verwalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5715,6 +7765,12 @@
     "定型文の設定" : {
       "comment" : "定型文に関する設定がまとめられたセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasen-Einstellungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5732,6 +7788,12 @@
     "定型文の順番はドラッグアンドドロップで並び替えることができます。" : {
       "comment" : "定型文設定の「定型文の設定」セクションの説明テキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können die Reihenfolge der Standardphrasen per Drag & Drop ändern."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5749,6 +7811,12 @@
     "定型文はありません" : {
       "comment" : "定型文が1つも設定されていない時に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Standardphrasen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5766,6 +7834,12 @@
     "定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。" : {
       "comment" : "一般設定の「クイックペースト」オプションを説明するテキスト、",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie eine Standardphrase oder einen Kopiervorgangsverlaufseintrag aus dem Menü auswählen oder mit Tastenkombinationen kopieren, wird die Tastenaktion Befehl + V gesendet. Eine Berechtigung für die Bedienungshilfen ist erforderlich."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5783,6 +7857,12 @@
     "定型文リスト" : {
       "comment" : "そのリストが定型文リストであることを表すアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasenliste"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5800,6 +7880,12 @@
     "定型文を検索" : {
       "comment" : "定型文ウィンドウにある検索ボックスに表示されるサンプルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasen suchen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5817,6 +7903,12 @@
     "定型文を無視する" : {
       "comment" : "コピーした定型文をコピー履歴に追加しないように設定するためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasen ignorieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5834,6 +7926,12 @@
     "定型文を編集" : {
       "comment" : "定型文の編集画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Standardphrase bearbeiten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5851,6 +7949,12 @@
     "定型文を追加" : {
       "comment" : "定型文設定の定型文リストで新たな定型文を追加するボタンのツールチップテキスト・新たな定型文を追加するキーボードショートカットキー設定項目。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Standardphrase hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5868,6 +7972,12 @@
     "実行中のアプリから追加" : {
       "comment" : "除外するアプリやプリセット割り当てリストにアプリを追加する画面に表示されるヘッドラインテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus ausgeführten Apps hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5885,6 +7995,12 @@
     "履歴ウィンドウ" : {
       "comment" : "保存されたコピー履歴を一覧で表示するウィンドウの名前。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlaufsfenster"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5902,6 +8018,12 @@
     "履歴ウィンドウが開いていてフィルタリングが適用されている場合、ショートカットキーでフィルタリングされた履歴をコピーできるようにします。" : {
       "comment" : "ショートカット設定の「履歴ウィンドウでフィルタリングされたコピー履歴を使用」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben Sie das Kopieren des gefilterten Verlaufs mit Tastenkombinationen, wenn das Verlaufsfenster geöffnet ist und die Filterung angewendet wird."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5919,6 +8041,12 @@
     "履歴ウィンドウでフィルタリングされたコピー履歴を使用" : {
       "comment" : "キーボードショートカットを使って各コピー履歴をコピーする際、履歴ウィンドウでフィルタリングが適用されている場合、フィルタリングされている順番でコピーできるようにするかどうかを切り替えるオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gefilterten Kopierverlauf im Verlaufsfenster verwenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5936,6 +8064,12 @@
     "履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。" : {
       "comment" : "開発者向け機能設定の「文字数カウントを表示」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigen Sie die Zeichenanzahl nach dem Datum im Verlaufsfenster und im Menü an."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5953,6 +8087,12 @@
     "履歴ウィンドウのフィルタリングオプションに「カラーコードのみ」を追加します。" : {
       "comment" : "開発者向け機能設定の「カラーコードでフィルタリングできるようにする」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fügen Sie „Nur Farbcodes“ zu den Filteroptionen im Verlaufsfenster hinzu."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5970,6 +8110,12 @@
     "履歴ウィンドウの番号を隠す" : {
       "comment" : "一般設定の履歴ウィンドウの「番号を隠す」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummern im Verlaufsfenster ausblenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5987,6 +8133,12 @@
     "履歴ウィンドウを常に最前面に表示" : {
       "comment" : "一般設定の履歴ウィンドウの「常に最前面に表示」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Verlaufsfenster immer im Vordergrund anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6004,6 +8156,12 @@
     "履歴ウィンドウを開く" : {
       "comment" : "履歴ウィンドウを開くためのキーボードショートカットキー設定項目。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlaufsfenster öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6021,6 +8179,12 @@
     "履歴に保存されたすべてのファイルとフォルダを削除しますか？関連する履歴も削除されます。この操作は元に戻せません。" : {
       "comment" : "コピー履歴設定で保存フォルダを空にするボタンをクリックしたときに表示されるアラートテキスト。保存フォルダを空にすると、保存フォルダに含まれるファイルやフォルダ等のコピー履歴も削除される(ファイルパスが含まれないコピー履歴はそのまま残る)。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie wirklich alle im Verlauf gespeicherten Dateien und Ordner löschen? Zugehöriger Verlauf wird ebenfalls gelöscht. Dies kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6038,6 +8202,12 @@
     "履歴のエクスポートに失敗しました: %@" : {
       "comment" : "コピー履歴のエクスポートに失敗したときに表示されるエラーメッセージ。エラー理由のテキストが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler beim Exportieren des Verlaufs: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6055,6 +8225,12 @@
     "履歴の保存数に合わせる" : {
       "comment" : "一般設定の「履歴の最大表示する」オプションの選択肢の1つ、コピー履歴設定の「履歴の最大保存数」で無制限以外に設定されている場合、保存数で設定された値と同じ数が表示されるように設定するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherten Verlauf abgleichen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6072,6 +8248,12 @@
     "履歴の最大保存数" : {
       "comment" : "コピー履歴をこのアプリ(Clip Hold)に保存する最大数を設定するオプション名。ユーザが数字を選択できる。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximale Anzahl der Verlaufsspeicherungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6089,6 +8271,12 @@
     "履歴の最大表示数" : {
       "comment" : "履歴をメニューに表示する最大数を設定するオプション名。ユーザは数字を選択できる。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximale Anzahl der anzuzeigenden Verlaufseinträge"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6106,6 +8294,12 @@
     "履歴の削除" : {
       "comment" : "履歴ウィンドウから、1つのコピー履歴を削除しようとしている際に表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlaufseintrag löschen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6123,6 +8317,12 @@
     "履歴の管理" : {
       "comment" : "コピー履歴設定の履歴を管理する設定がまとめられたセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf verwalten"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6140,6 +8340,12 @@
     "履歴の設定" : {
       "comment" : "コピー履歴設定のコピー履歴に関する設定がまた得られたセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlaufseinstellungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6157,6 +8363,12 @@
     "履歴はありません" : {
       "comment" : "コピー履歴が1つもない場合に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Verlauf"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6174,6 +8386,12 @@
     "履歴ファイルが最新の形式に正しく変換されました。" : {
       "comment" : "アプリ起動時、古い履歴ファイルが見つかった際のマイグレーションに成功した際に送信される通知のテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Verlaufsdatei wurde erfolgreich in das neueste Format konvertiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6191,6 +8409,12 @@
     "履歴ファイルのアップグレードに失敗しました" : {
       "comment" : "アプリ起動時、古い履歴ファイルが見つかった際のマイグレーションに失敗した際に送信される通知のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade der Verlaufsdatei fehlgeschlagen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6208,6 +8432,12 @@
     "履歴ファイルのアップグレードに成功しました" : {
       "comment" : "アプリ起動時、古い履歴ファイルが見つかった際のマイグレーションに成功した際に送信される通知のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upgrade der Verlaufsdatei erfolgreich"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6225,6 +8455,12 @@
     "履歴ファイルの読み込みまたは解析に失敗しました: %@" : {
       "comment" : "コピー履歴をインポートした際、インポートしたファイルの読み込みや解析に失敗した場合に表示されるエラーメッセージ。エラー理由のテキストが表示されます。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler beim Laden oder Parsen der Verlaufsdatei: %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6242,6 +8478,12 @@
     "履歴リスト" : {
       "comment" : "そのリストがコピー履歴リストであることを表すアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlaufsliste"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6259,6 +8501,12 @@
     "履歴を保存する最大数を設定" : {
       "comment" : "コピー履歴設定の「履歴の最大保存数」でカスタム値を設定する画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximale Anzahl der zu speichernden Verlaufseinträge festlegen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6276,6 +8524,12 @@
     "履歴を変更してコピー" : {
       "comment" : "その履歴項目をそのままコピーする代わりに、テキストの1部分を編集してから新たにコピーする画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf ändern und kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6293,6 +8547,12 @@
     "履歴を検索" : {
       "comment" : "履歴ウィンドウにある検索ボックスに表示されるサンプルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf durchsuchen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6310,6 +8570,12 @@
     "履歴項目がテキストである場合のみクイックペーストを行うようにします。" : {
       "comment" : "一般設定の「クイックペーストをテキストに限定」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Paste nur ausführen, wenn der Verlaufseintrag Text ist."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6327,6 +8593,12 @@
     "常に最前面に表示" : {
       "comment" : "履歴や定型文ウィンドウを、他のどのウィンドウよりも最前面に表示するかどうかを切り替えるトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Immer im Vordergrund"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6344,6 +8616,12 @@
     "情報" : {
       "comment" : "このアプリ(Clip Hold)についての画面を開く情報タブ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informationen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6361,6 +8639,12 @@
     "成功" : {
       "comment" : "クリップボード履歴のインポートに成功したときに表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfolg"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6378,6 +8662,12 @@
     "戻る" : {
       "comment" : "前の画面に戻るための戻るボタン、",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6395,6 +8685,12 @@
     "数値を入力" : {
       "comment" : "カスタム数値入力画面に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Zahl eingeben"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6412,6 +8708,12 @@
     "文字数カウントを表示" : {
       "comment" : "メニューのコピー履歴一覧や履歴ウィンドウの各項目にその項目に含まれる文字数カウンターを表示するかどうかを切り替えるトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeichenanzahl anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6429,6 +8731,12 @@
     "新しいタイトル" : {
       "comment" : "重複した定型文を解決するために、新たな別のタイトル入力欄のサンプルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Titel"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6446,6 +8754,12 @@
     "新しいタイトル:" : {
       "comment" : "重複した定型文を解決するために、新たな別のタイトル入力欄のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Titel:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6463,6 +8777,12 @@
     "新しいプリセットをリストに追加します。" : {
       "comment" : "定型文設定のプリセット追加ボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein neues Preset zur Liste hinzufügen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6480,6 +8800,12 @@
     "新しいプリセットを追加する" : {
       "comment" : "定型文プリセット追加画面のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein neues Preset hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6497,6 +8823,12 @@
     "新しい内容:" : {
       "comment" : "重複した定型文を解決するために、新たな別のコンテンツ入力欄のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Inhalt:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6514,6 +8846,12 @@
     "新しい定型文をリストに追加します。" : {
       "comment" : "定型文設定の定型文追加ボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine neue Standardphrase zur Liste hinzufügen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6531,6 +8869,12 @@
     "新しい定型文を追加" : {
       "comment" : "定型文追加画面のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine neue Standardphrase hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6548,6 +8892,12 @@
     "新しい定型文を追加する" : {
       "comment" : "定型文追加画面のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine neue Standardphrase hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6565,6 +8915,12 @@
     "新しい順" : {
       "comment" : "履歴ウィンドウの並べ替えオプションの1つ、上から順に、日付が新しいものから古いものへと表示するオプション。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neueste zuerst"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6582,6 +8938,12 @@
     "新規プリセット..." : {
       "comment" : "定型文プリセットリスト選択画面で新たなプリセットを追加するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Preset..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6599,6 +8961,12 @@
     "新規プリセットの作成" : {
       "comment" : "プリセットインポート画面で新たなプリセットを追加する画面に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein neues Preset erstellen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6616,6 +8984,12 @@
     "新規プリセットを作成" : {
       "comment" : "プリセットインポート画面で新たなプリセットを追加するボタン名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein neues Preset erstellen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6633,6 +9007,12 @@
     "既存: " : {
       "comment" : "プリセットや定型文をインポートしている時、重複したものがある場合に表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorhanden: "
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6650,6 +9030,12 @@
     "既知のバグ一覧と報告ページへのリンクを開きます。" : {
       "comment" : "既知のバグや報告リストへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur Liste bekannter Fehler und zur Berichtsseite öffnen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6667,6 +9053,12 @@
     "旧バージョンで使用できるようにする" : {
       "comment" : "プリセットをエクスポートする画面で、プリセット機能に対応する前の古いバージョンのClip Holdで読み込めるように、古い形式で定型文を書き出すかどうかを設定するチェックボックス。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit älteren Versionen kompatibel machen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6684,6 +9076,12 @@
     "書き出したクリップボード履歴のJSONファイルを読み込みます。" : {
       "comment" : "クリップボード履歴のインポートボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren Sie eine JSON-Datei des exportierten Zwischenablageverlaufs."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6701,6 +9099,12 @@
     "書き出した定型文のJSONファイルを読み込みます。" : {
       "comment" : "定型文のインポートボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren Sie eine JSON-Datei der exportierten Standardphrasen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6718,6 +9122,12 @@
     "有効な数値を入力してください。" : {
       "comment" : "カスタム値の入力画面で不正な値が入力された際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte geben Sie eine gültige Zahl ein."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6735,6 +9145,12 @@
     "有効にすると、プリセット情報なしで定型文のみをエクスポートします。" : {
       "comment" : "プリセットをエクスポートする画面で、プリセット機能に対応する前の古いバージョンのClip Holdで読み込めるように、古い形式で定型文を書き出すかどうかを設定するチェックボックスに表示されるツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, werden nur Standardphrasen ohne Preset-Informationen exportiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6752,6 +9168,12 @@
     "標準テキストとしてコピー" : {
       "comment" : "履歴ウィンドウの各項目がリッチテキストだった場合のオプションの1つで、リッチテキストの代わりにプレーンテキストとしてコピーするオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als reinen Text kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6769,6 +9191,12 @@
     "標準テキストのみ" : {
       "comment" : "フィルタリングオプションの1つ、プレーンテキストだけに絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur reiner Text"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6786,6 +9214,12 @@
     "権限" : {
       "comment" : "プライバシー設定の、必要な権限情報がまとめられたセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechtigung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6803,6 +9237,12 @@
     "次のプリセットがすでに存在しています。" : {
       "comment" : "重複したプリセットをインポートしようとしている際に表示される画面。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die folgenden Presets existieren bereits."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6820,6 +9260,12 @@
     "次のプリセットに切り替える" : {
       "comment" : "次のプリセットに切り替えるキーボードショートカット設定の項目。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zum nächsten Preset wechseln"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6837,6 +9283,12 @@
     "次へ" : {
       "comment" : "次の画面に進むボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6854,6 +9306,12 @@
     "無制限" : {
       "comment" : "履歴の最大保存数や各ファイルの最大容量等のオプションの選択肢の1つ、何らかの制限をかけずに無制限に保存できるようにするオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbegrenzt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6871,6 +9329,12 @@
     "現在、インポートとエクスポートはテキストのみサポートしています。" : {
       "comment" : "コピー履歴のインポートとエクスポートに関する注意書きテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Derzeit wird nur Text für den Import und Export unterstützt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6888,6 +9352,12 @@
     "現在のクリップボード内容を使って新しい定型文を追加します。" : {
       "comment" : "ショートカット設定の「クリップボードの内容から定型文を追加する」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fügen Sie eine neue Standardphrase mit dem aktuellen Inhalt der Zwischenablage hinzu."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6905,6 +9375,12 @@
     "生成AIと開発" : {
       "comment" : "生成AIを使って開発したことを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entwickelt mit generativer KI"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6922,6 +9398,12 @@
     "画像のみ" : {
       "comment" : "フィルタリングオプションの1つ、画像だけに絞り込むためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Bilder"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6939,6 +9421,12 @@
     "画像をコピー" : {
       "comment" : "表示されたQRコード画像をクリップボードにコピーするボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild kopieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6956,6 +9444,12 @@
     "画像を保存..." : {
       "comment" : "表示されたQRコード画像を指定のファイルやフォルダに保存するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bild speichern..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6973,6 +9467,12 @@
     "番号を隠す" : {
       "comment" : "履歴や定型文ウィンドウの各項目に表示されるインデックス番号を隠すかどうかを設定するトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummern ausblenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6990,6 +9490,12 @@
     "移動" : {
       "comment" : "定型文を別のプリセットに移動しようとしている際に表示される画面で移動を実行するための移動ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verschieben"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7007,6 +9513,12 @@
     "終了" : {
       "comment" : "アプリを終了するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7024,6 +9536,12 @@
     "統合する" : {
       "comment" : "重複したプリセットや定型文をインポートする際、全く同じのものをスキップして、重複していない項目だけを取り込むオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zusammenführen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7041,6 +9559,12 @@
     "続ける" : {
       "comment" : "次の操作に進むための続けるボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortfahren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7058,6 +9582,12 @@
     "続けるには操作を選択してください。" : {
       "comment" : "重複したプリセットをインポートしようとしているときに表示される画面にあるテキスト。重複したプリセットに対してこのまま追加するか一つ一つ解決するかなどの操作をユーザに求めている。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie eine Operation aus, um fortzufahren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7075,6 +9605,12 @@
     "緑茶を奢る" : {
       "comment" : "Buy Me a Coffeeを使って、開発者に緑茶を購入する(寄付する)ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grünen Tee kaufen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7092,6 +9628,12 @@
     "緑茶を買ってあげる" : {
       "comment" : "Buy Me a Coffeeを使って、開発者に緑茶を買ってあげる(寄付する)ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mir grünen Tee kaufen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7109,6 +9651,12 @@
     "編集..." : {
       "comment" : "定型文やプリセットの編集ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bearbeiten..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7126,6 +9674,12 @@
     "背景色" : {
       "comment" : "プリセットのアイコン色でカスタムカラーを選んだ場合の背景色を表すタイトルテキスト。隣に背景色を設定するためのカラーピッカーが表示されている。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hintergrundfarbe"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7143,6 +9697,12 @@
     "自動" : {
       "comment" : "フィルタリングオプションの1つ、特定のアプリで絞り込むためのオプション名。現在最前面のアプリによって自動的にフィルタリングするアプリを切り替えるオプション。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7160,6 +9720,12 @@
     "自動スクロール" : {
       "comment" : "履歴ウィンドウでリストの項目に変更があった場合(あなたのコピーが追加された場合やフィルタリング設定が変更された場合など)に、リストを最も上にスクロールする機能を切り替えるトグルスイッチ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-Scroll"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7177,6 +9743,12 @@
     "表示しない" : {
       "comment" : "コピー履歴設定の「コピーアラートを表示する容量」オプションの選択肢の1つで、大きな容量をコピーしてもコピーアラートを表示されないようにするためのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht anzeigen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7194,6 +9766,12 @@
     "複製" : {
       "comment" : "選択した定型文やプリセットを重複させるオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplizieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7211,6 +9789,12 @@
     "設定..." : {
       "comment" : "メニューバーから設定画面を開くオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7228,6 +9812,12 @@
     "設定を開く" : {
       "comment" : "プライバシー設定でアクセシビリティ権限が与えられていないことを検出した際に、アクセシビリティ権限の設定画面を開くためのボタン名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7245,6 +9835,12 @@
     "許可済み" : {
       "comment" : "プライバシー設定でアクセシビリティ権限が与えられていることを表すテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erteilt"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7262,6 +9858,12 @@
     "謝辞" : {
       "comment" : "このアプリで使われたオープンソースライセンスのパッケージなどを紹介する「謝辞」セクションのタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danksagungen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7279,6 +9881,12 @@
     "貢献者" : {
       "comment" : "このアプリ(Clip Hold)の開発に携わった貢献者が記載されたページを開くためのボタンテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitwirkende"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7296,6 +9904,12 @@
     "質問や意見交換などを行いましょう" : {
       "comment" : "コミュニティーページへのアクセスを促すテキストメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stellen Sie Fragen und tauschen Sie Ihre Meinungen aus"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7313,6 +9927,12 @@
     "追加" : {
       "comment" : "追加ボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7330,6 +9950,12 @@
     "通知" : {
       "comment" : "プライバシー設定の権限確認画面に表示される項目のうちの1つ、通知に関する権限のタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benachrichtigung"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7347,6 +9973,12 @@
     "通知をテスト" : {
       "comment" : "通知が正しく動作しているかをテストするための、テスト通知を送信するボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benachrichtigung testen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7364,6 +9996,12 @@
     "通知機能を使用する場合は許可を与える必要があります。" : {
       "comment" : "通知機能には必要な許可を与える必要があることを示すメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um die Benachrichtigungsfunktion zu verwenden, müssen Sie die Berechtigung erteilen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7381,6 +10019,12 @@
     "選択されたファイルがありません。" : {
       "comment" : "コピー履歴や定型文をインポートしようとした際にファイルが正しく取得できなかった際に表示されるエラーメッセージ。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Datei ausgewählt."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7398,6 +10042,12 @@
     "選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。" : {
       "comment" : "プリセット内のすべての定型文を削除ボタンをクリックして、選択しているプリセットからすべての定型文を削除しようとしている際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie wirklich alle Standardphrasen aus dem ausgewählten Preset löschen? Dies kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7415,6 +10065,12 @@
     "選択したアプリをリストから削除します。" : {
       "comment" : "除外するアプリやプリセット割り当てリストの中で選択されたアプリを削除するボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine ausgewählte App aus der Liste entfernen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7432,6 +10088,12 @@
     "選択したプリセットをリストから削除します。" : {
       "comment" : "定型文設定のプリセットリストから選択されたプリセットを削除するボタンのツールチップテキスト、",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein ausgewähltes Preset aus der Liste löschen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7449,6 +10111,12 @@
     "選択したプリセットを編集します。" : {
       "comment" : "定型文設定のプリセットリストから選択されたプリセットを編集するボタンのツールチェックテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein ausgewähltes Preset bearbeiten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7466,6 +10134,12 @@
     "選択した定型文をリストから削除します。" : {
       "comment" : "定型文設定の定型文リストから選択された定型文を削除するボタンのツールチップテキスト",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine ausgewählte Standardphrase aus der Liste löschen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7483,6 +10157,12 @@
     "選択した定型文を編集します。" : {
       "comment" : "定型文設定の定型文リストから選択された定型文を編集するボタンのツールチェックテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine ausgewählte Standardphrase bearbeiten."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7500,6 +10180,12 @@
     "重複したプリセット" : {
       "comment" : "重複したプリセットをインポートしようとしているときに表示されるタイトルテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doppelte Presets"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7517,6 +10203,12 @@
     "閉じる" : {
       "comment" : "閉じるボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7534,6 +10226,12 @@
     "開く" : {
       "comment" : "履歴ウィンドウでファイルを開くボタン・外部リンクを開くかどうかを尋ねるアラートの開くボタン。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7551,6 +10249,12 @@
     "開発に携わった貢献者" : {
       "comment" : "このアプリ(Clip Hold)の開発に携わった貢献者が記載されたページを開くためのボタンの横に表示されるテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An der Entwicklung beteiligte Mitwirkende"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7568,6 +10272,12 @@
     "開発者をサポート" : {
       "comment" : "開発者をサポートするセクションタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entwickler unterstützen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7585,6 +10295,12 @@
     "開発者向け機能" : {
       "comment" : "開発者向け機能設定のタブ名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entwicklerfunktionen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7602,6 +10318,12 @@
     "除外するアプリ" : {
       "comment" : "クリップボード監視から除外するアプリのオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auszuschließende Apps"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7619,6 +10341,12 @@
     "除外するアプリにはアプリのみ追加することができます。" : {
       "comment" : "除外するアプリリストにアプリ以外のファイルを追加しようとした際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Liste der auszuschließenden Apps können nur Apps hinzugefügt werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7636,6 +10364,12 @@
     "除外するアプリに追加" : {
       "comment" : "履歴ウィンドウから特定のアプリを除外するリストに追加しようとしている際に表示されるアラートタイトル。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu auszuschließenden Apps hinzufügen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7653,6 +10387,12 @@
     "除外するアプリに追加..." : {
       "comment" : "履歴ウィンドウから特定のアプリを除外するリストに追加するオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu auszuschließenden Apps hinzufügen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7670,6 +10410,12 @@
     "除外するアプリのリストを空にしてもよろしいですか？この操作は元に戻せません。" : {
       "comment" : "プライバシー設定の除外するアプリリストに設定されたすべてのアプリを削除しようとしている際に表示されるアラートテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die Liste der auszuschließenden Apps wirklich leeren? Dies kann nicht rückgängig gemacht werden."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7687,6 +10433,12 @@
     "除外するアプリリスト" : {
       "comment" : "そのリストが除外するアプリリストであることを説明するアクセシビリティテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste der auszuschließenden Apps"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7704,6 +10456,12 @@
     "除外するアプリを追加します。" : {
       "comment" : "プライバシー設定の除外するアプリリストにアプリを追加するボタンのツールチップテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine auszuschließende App hinzufügen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7721,6 +10479,12 @@
     "項目から定型文を作成..." : {
       "comment" : "履歴ウィンドウの項目から定型文を作成する画面を開くオプション名。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Standardphrase aus einem Element erstellen..."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -7738,6 +10502,12 @@
     "項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。" : {
       "comment" : "一般設定の「ダブルクリックウィンドウを閉じる」オプションを説明するテキスト。",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Fenster schließen, wenn Sie auf ein Element doppelklicken, um es zu kopieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
