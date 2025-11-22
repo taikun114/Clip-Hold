@@ -149,7 +149,14 @@ enum DataSizeUnit: String, CaseIterable, Identifiable, Hashable {
     case gigabytes = "GB"
     
     var id: String { self.rawValue }
-    var label: String { self.rawValue }
+    var label: String {
+        switch self {
+        case .bytes: return String(localized: "bytes_unit")
+        case .kilobytes: return String(localized: "kilobytes_unit")
+        case .megabytes: return String(localized: "megabytes_unit")
+        case .gigabytes: return String(localized: "gigabytes_unit")
+        }
+    }
     
     func byteValue(for value: Int) -> Int {
         switch self {

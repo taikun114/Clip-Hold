@@ -2135,6 +2135,41 @@
         }
       }
     },
+    "bytes_unit" : {
+      "comment" : "バイト単位の容量を表す単位。例：5 B",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "B"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "B"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "B"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "o"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "B"
+          }
+        }
+      }
+    },
     "Clip Hold" : {
       "shouldTranslate" : false
     },
@@ -2634,6 +2669,41 @@
         }
       }
     },
+    "gigabytes_unit" : {
+      "comment" : "ギガバイト単位の容量を表す単位。例：5 GB",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GB"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GB"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GB"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GB"
+          }
+        }
+      }
+    },
     "GitHubのDiscussionページを開いてもよろしいですか？" : {
       "comment" : "ユーザに、GitHubのディスカッションページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
@@ -3022,6 +3092,41 @@
         }
       }
     },
+    "kilobytes_unit" : {
+      "comment" : "キロバイト単位の容量を表す単位。例：5 KB",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KB"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KB"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KB"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ko"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KB"
+          }
+        }
+      }
+    },
     "Macのログイン時にClip Holdを自動で開くようにします。" : {
       "comment" : "一般設定の「ログイン時に開く」オプションを説明するテキスト、アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
@@ -3053,6 +3158,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Macのログイン時にClip Holdを自動で開くようにします。"
+          }
+        }
+      }
+    },
+    "megabytes_unit" : {
+      "comment" : "メガバイト単位の容量を表す単位。例：5 MB",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MB"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MB"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MB"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MB"
           }
         }
       }
