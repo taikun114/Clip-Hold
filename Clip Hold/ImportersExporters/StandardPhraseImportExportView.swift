@@ -230,9 +230,9 @@ struct StandardPhraseImportExportView: View {
         ) { result in
             switch result {
             case .success(let url):
-                print("エクスポート成功: \(url)")
+                print("Export successful: \(url)")
             case .failure(let error):
-                print("エクスポート失敗: \(error.localizedDescription)")
+                print("Export failed: \(error.localizedDescription)")
             }
             
             // エクスポート後に状態をリセット

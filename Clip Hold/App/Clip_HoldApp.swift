@@ -322,7 +322,7 @@ struct ClipHoldApp: App {
                                         ClipHoldApp.performPaste()
                                     }
                                 } else {
-                                    print("textOnlyQuickPasteがオンのため、テキスト以外のコンテンツはペーストされません。")
+                                    print("textOnlyQuickPaste is on, so non-text content will not be pasted.")
                                 }
                             } else {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -449,21 +449,21 @@ struct ClipHoldApp: App {
     
     static func setupGlobalShortcuts() {
         KeyboardShortcuts.onKeyDown(for: .showAllStandardPhrases) {
-            print("「すべての定型文を表示」ショートカットが押されました！")
+            print("Show All Standard Phrases shortcut pressed!")
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showStandardPhraseWindow()
             }
         }
         
         KeyboardShortcuts.onKeyDown(for: .showAllCopyHistory) {
-            print("「すべてのコピー履歴を表示」ショートカットが押されました！")
+            print("Show All Clipboard History shortcut pressed!")
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showHistoryWindow()
             }
         }
         
         KeyboardShortcuts.onKeyDown(for: .toggleClipboardMonitoring) {
-            print("「クリップボード監視を切り替える」ショートカットが押されました！")
+            print("Toggle Clipboard Monitoring shortcut pressed!")
             let defaults = UserDefaults.standard
             let currentIsPaused = defaults.bool(forKey: "isClipboardMonitoringPaused")
             
@@ -474,12 +474,12 @@ struct ClipHoldApp: App {
             NotificationManager.shared.sendMonitoringStatusNotification(isPaused: !currentIsPaused)
             
             // コンソール出力はUserDefaultsの変更結果に基づいて行う
-            print("isClipboardMonitoringPaused の値を \(currentIsPaused) から \(!currentIsPaused) に変更しました。")
+            print("Changed isClipboardMonitoringPaused value from \(currentIsPaused) to \(!currentIsPaused).")
         }
         
         // 新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addSNewtandardPhrase) {
-            print("「新しい定型文を追加」ショートカットが押されました！")
+            print("Add New Standard Phrase shortcut pressed!")
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showAddPhraseWindow(withContent: "")
             }
@@ -487,7 +487,7 @@ struct ClipHoldApp: App {
         
         // 新しいプリセットの追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addNewPreset) {
-            print("「新しいプリセットを追加」ショートカットが押されました！")
+            print("Add New Preset shortcut pressed!")
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showAddPresetWindow()
             }
@@ -495,7 +495,7 @@ struct ClipHoldApp: App {
         
         // 次のプリセットに切り替えるショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .nextPreset) {
-            print("「次のプリセットに切り替える」ショートカットが押されました！")
+            print("Switch to Next Preset shortcut pressed!")
             let presetManager = StandardPhrasePresetManager.shared
             if !presetManager.presets.isEmpty {
                 let currentIndex = presetManager.presets.firstIndex { $0.id == presetManager.selectedPresetId } ?? -1
@@ -521,7 +521,7 @@ struct ClipHoldApp: App {
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
                     notificationCenter.add(request) { error in
                         if let error = error {
-                            print("通知の送信に失敗しました: \(error.localizedDescription)")
+                            print("Failed to send notification: \(error.localizedDescription)")
                         }
                     }
                 }
@@ -530,7 +530,7 @@ struct ClipHoldApp: App {
         
         // 前のプリセットに切り替えるショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .previousPreset) {
-            print("「前のプリセットに切り替える」ショートカットが押されました！")
+            print("Switch to Previous Preset shortcut pressed!")
             let presetManager = StandardPhrasePresetManager.shared
             if !presetManager.presets.isEmpty {
                 let currentIndex = presetManager.presets.firstIndex { $0.id == presetManager.selectedPresetId } ?? -1
@@ -556,7 +556,7 @@ struct ClipHoldApp: App {
                     let request = UNNotificationRequest(identifier: "PresetChangeNotification", content: content, trigger: nil)
                     notificationCenter.add(request) { error in
                         if let error = error {
-                            print("通知の送信に失敗しました: \(error.localizedDescription)")
+                            print("Failed to send notification: \(error.localizedDescription)")
                         }
                     }
                 }
@@ -565,7 +565,7 @@ struct ClipHoldApp: App {
         
         // クリップボードから新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addStandardPhraseFromClipboard) {
-            print("「クリップボードから定型文を追加」ショートカットが押されました！")
+            print("Add Standard Phrase from Clipboard shortcut pressed!")
             if let delegate = NSApp.delegate as? AppDelegate {
                 let clipboardContent = NSPasteboard.general.string(forType: .string) ?? ""
                 delegate.showAddPhraseWindow(withContent: clipboardContent)
@@ -583,7 +583,7 @@ struct ClipHoldApp: App {
                     clipboardManager.isCopyingStandardPhrase = true
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(phrase.content, forType: .string)
-                    print("定型文「\(phrase.title)」がショートカットでコピーされました。")
+                    print("Standard phrase '\(phrase.title)' copied via shortcut.")
                     
                     let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                     if currentQuickPaste {
@@ -593,7 +593,7 @@ struct ClipHoldApp: App {
                         }
                     }
                 } else {
-                    print("定型文ショートカット \(i+1) が押されましたが、対応する定型文は存在しません。")
+                    print("Standard phrase shortcut \(i+1) was pressed, but no corresponding phrase exists.")
                 }
             }
         }
@@ -635,7 +635,7 @@ struct ClipHoldApp: App {
                                     print("performPaste")
                                 }
                             } else {
-                                print("textOnlyQuickPasteがオンのため、テキスト以外のコンテンツはペーストされません。")
+                                print("textOnlyQuickPaste is on, so non-text content will not be pasted.")
                             }
                         } else {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
@@ -645,7 +645,7 @@ struct ClipHoldApp: App {
                         }
                     }
                 } else {
-                    print("履歴ショートカット \(i+1) が押されましたが、対応する履歴（UI上\(i+1)番目）は存在しません。")
+                    print("History shortcut \(i+1) was pressed, but no corresponding history item (UI position \(i+1)) exists.")
                 }
             }
         }

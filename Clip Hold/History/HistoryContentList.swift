@@ -376,10 +376,10 @@ struct HistoryContentList: View {
                                             }
                                         }
                                     } else {
-                                        print("QRコードが見つかりませんでした。")
+                                        print("QR code not found.")
                                     }
                                 } else if let error = error {
-                                    print("画像のロードに失敗しました: \(error.localizedDescription)")
+                                    print("Failed to load image: \(error.localizedDescription)")
                                 }
                             }
                         }

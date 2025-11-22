@@ -155,7 +155,7 @@ extension ClipboardManager {
                     self.generateThumbnail(for: item, at: item.filePath!)
                 }
                 
-                print("ClipboardManager: 履歴をインポートしました。追加された項目数: \(newItems.count), 総履歴数: \(self.clipboardHistory.count)")
+                print("ClipboardManager: History imported. Added \(newItems.count) items, total history count: \(self.clipboardHistory.count)")
                 
                 // 新しい履歴管理システムに一括で保存
                 ChunkedHistoryManager.shared.clearAllHistory()
@@ -166,7 +166,7 @@ extension ClipboardManager {
     
     // MARK: - Max History Count Enforcement
     func enforceMaxHistoryCount() {
-        print("DEBUG: enforceMaxHistoryCount() - maxHistoryToSave: \(self.maxHistoryToSave), 現在の履歴数: \(self.clipboardHistory.count)")
+        print("DEBUG: enforceMaxHistoryCount() - maxHistoryToSave: \(self.maxHistoryToSave), current history count: \(self.clipboardHistory.count)")
         if self.maxHistoryToSave > 0 && self.clipboardHistory.count > self.maxHistoryToSave {
             // 履歴を日付の新しい順に並べ替える（メモリ内でのみ）
             let sortedHistory = self.clipboardHistory.sorted { $0.date > $1.date }
@@ -185,9 +185,9 @@ extension ClipboardManager {
             // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
             self.objectWillChange.send()
             self.clipboardHistory = itemsToKeep
-            print("DEBUG: enforceMaxHistoryCount() - 履歴を \(self.maxHistoryToSave) に調整しました。現在の履歴数: \(self.clipboardHistory.count)")
+            print("DEBUG: enforceMaxHistoryCount() - Adjusted history to \(self.maxHistoryToSave). Current history count: \(self.clipboardHistory.count)")
         } else if self.maxHistoryToSave == 0 { // 無制限の場合
-            print("DEBUG: enforceMaxHistoryCount() - 無制限設定のため調整なし。")
+            print("DEBUG: enforceMaxHistoryCount() - No adjustment needed for unlimited setting.")
         }
     }
     

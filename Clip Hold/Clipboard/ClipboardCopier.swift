@@ -21,13 +21,13 @@ extension ClipboardManager {
                     // 一時的なファイルリンクのURLをクリップボードに書き込む
                     await MainActor.run {
                         if NSPasteboard.general.writeObjects([tempURL as NSURL]) {
-                            print("クリップボードにファイルがコピーされました (元のファイル名): \(tempURL.lastPathComponent)")
+                            print("File copied to clipboard (original filename): \(tempURL.lastPathComponent)")
                             // success = true // 非同期タスク内なので直接UI更新はしない
                         } else {
-                            print("クリップボードに一時ファイル (NSURL) をコピーできませんでした。")
+                            print("Failed to copy temporary file (NSURL) to clipboard.")
                             // フォールバックとして、元のサンドボックスURLをコピー
                             if NSPasteboard.general.writeObjects([filePath as NSURL]) {
-                                print("フォールバック: サンドボックス内のファイルがコピーされました。")
+                                print("Fallback: File in sandbox copied to clipboard.")
                                 // success = true
                             }
                         }
@@ -50,27 +50,27 @@ extension ClipboardManager {
                         // Apple HTML pasteboard type を使用してHTMLフラグメントを書き込む
                         let appleHTMLType = NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type")
                         if pasteboard.setString(richText, forType: appleHTMLType) {
-                            print("クリップボードにApple HTMLがコピーされました: \(richText.prefix(20))...")
+                            print("Apple HTML copied to clipboard: \(richText.prefix(20))...")
                         }
                         // プレーンテキストも書き込む (フォールバック用)
                         if pasteboard.setString(item.text, forType: .string) {
-                            print("クリップボードにプレーンテキストがコピーされました: \(item.text.prefix(20))...")
+                            print("Plain text copied to clipboard: \(item.text.prefix(20))...")
                         }
                     } else {
                         // RTFを書き込む
                         if pasteboard.setString(richText, forType: .rtf) {
-                            print("クリップボードにリッチテキストがコピーされました: \(richText.prefix(20))...")
+                            print("Rich text copied to clipboard: \(richText.prefix(20))...")
                         }
                         // プレーンテキストも書き込む (フォールバック用)
                         if pasteboard.setString(item.text, forType: .string) {
-                            print("クリップボードにプレーンテキストがコピーされました: \(item.text.prefix(20))...")
+                            print("Plain text copied to clipboard: \(item.text.prefix(20))...")
                         }
                     }
                 } else {
                     // リッチテキストがない場合は、プレーンテキストのみを書き込む
                     if pasteboard.string(forType: .string) != item.text { // クリップボードの内容がすでに同じでなければコピー
                         if pasteboard.setString(item.text, forType: .string) {
-                            print("クリップボードにテキストがコピーされました: \(item.text.prefix(20))...")
+                            print("Text copied to clipboard: \(item.text.prefix(20))...")
                             // success = true
                         }
                     }

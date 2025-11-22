@@ -20,7 +20,7 @@ struct PrivacySettingsView: View {
             
             // 監視状態変更時の通知を送信
             NotificationManager.shared.sendMonitoringStatusNotification(isPaused: isClipboardMonitoringPaused)
-            print("PrivacySettingsView didSet: クリップボード監視状態が \(isClipboardMonitoringPaused ? "一時停止" : "再開") に変更されました。")
+            print("PrivacySettingsView didSet: Clipboard monitoring state changed to \(isClipboardMonitoringPaused ? "paused" : "resumed").")
         }
     }
     
@@ -182,7 +182,7 @@ struct PrivacySettingsView: View {
                     .help(notificationAuthorizationStatus == .authorized ? "テスト通知を送信します。" : "システム設定の通知設定を開きます。")
                 }
                 .onChange(of: notificationAuthorizationStatus) { oldValue, newValue in
-                    print("通知許可状態が変更されました: \(newValue.rawValue)")
+                    print("Notification permission status changed: \(newValue.rawValue)")
                 }
                 HStack {
                     if differentiateWithoutColor {

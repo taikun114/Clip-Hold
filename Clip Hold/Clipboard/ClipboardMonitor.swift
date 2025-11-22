@@ -35,7 +35,7 @@ extension ClipboardManager {
         RunLoop.main.add(newTimer, forMode: .common) // メインRunLoopに明示的に追加
         self.pasteboardMonitorTimer = newTimer // 新しいタイマーをプロパティに保持
         isMonitoring = true
-        print("ClipboardManager: クリップボード監視を開始しました。isMonitoring: \(isMonitoring)")
+        print("ClipboardManager: Clipboard monitoring started. isMonitoring: \(isMonitoring)")
     }
     
     public func stopMonitoringPasteboard() {

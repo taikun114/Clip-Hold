@@ -29,7 +29,7 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                 DispatchQueue.main.async {
                     self.currentAlert = .error(Text("選択されたファイルがありません。"))
                 }
-                print("選択されたファイルがありません。")
+                print("No file selected.")
                 return
             }
             
@@ -62,20 +62,20 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                 DispatchQueue.main.async {
                     clipboardManager.importHistory(from: importedHistory)
                     self.currentAlert = .success(Text("クリップボード履歴が正常にインポートされました。"))
-                    print("クリップボード履歴が正常にインポートされました: \(url.path)")
+                    print("Clipboard history imported successfully: \(url.path)")
                 }
                 
             } catch {
                 DispatchQueue.main.async {
                     self.currentAlert = .error(Text("履歴ファイルの読み込みまたは解析に失敗しました: \(error.localizedDescription)"))
                 }
-                print("履歴ファイルの読み込みまたは解析エラー: \(error.localizedDescription)")
+                print("History file read or parse error: \(error.localizedDescription)")
             }
         case .failure(let error):
             DispatchQueue.main.async {
                 self.currentAlert = .error(Text("ファイルの選択に失敗しました: \(error.localizedDescription)"))
             }
-            print("ファイルの選択エラー: \(error.localizedDescription)")
+            print("File selection error: \(error.localizedDescription)")
         }
     }
     
@@ -97,18 +97,18 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                 DispatchQueue.main.async {
                     self.currentAlert = .success(Text("クリップボード履歴が正常にエクスポートされました。"))
                 }
-                print("クリップボード履歴が正常にエクスポートされました: \(url.path)")
+                print("Clipboard history exported successfully: \(url.path)")
             } catch {
                 DispatchQueue.main.async {
                     self.currentAlert = .error(Text("履歴のエクスポートに失敗しました: \(error.localizedDescription)"))
                 }
-                print("履歴のエクスポートエラー: \(error.localizedDescription)")
+                print("History export error: \(error.localizedDescription)")
             }
         case .failure(let error):
             DispatchQueue.main.async {
                 self.currentAlert = .error(Text("ファイルの選択に失敗しました: \(error.localizedDescription)"))
             }
-            print("ファイルの選択エラー: \(error.localizedDescription)")
+            print("File selection error: \(error.localizedDescription)")
         }
     }
 }

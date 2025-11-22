@@ -254,7 +254,7 @@ class StandardPhraseManager: ObservableObject {
             }
             
             standardPhrases = updatedPhrases
-            print("インポートされたフレーズを追加しました。現在の定型文数: \(self.standardPhrases.count)")
+            print("Added imported phrases. Current standard phrases count: \(self.standardPhrases.count)")
         }
     }
 }

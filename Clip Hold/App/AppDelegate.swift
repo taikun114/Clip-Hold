@@ -35,9 +35,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
             if granted {
-                print("通知の許可が与えられました。")
+                print("Notification permission granted.")
             } else if let error = error {
-                print("通知許可のリクエストエラー: \(error.localizedDescription)")
+                print("Notification permission request error: \(error.localizedDescription)")
             }
         }
         
@@ -61,12 +61,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         // 複数のカテゴリを一度に登録
         UNUserNotificationCenter.current().setNotificationCategories([category, migrationFailureCategory])
-        print("通知カテゴリ '\(clipboardPausedNotificationCategory)' とアクション '\(resumeMonitoringActionID)' を登録しました。")
-        print("マイグレーション失敗通知のカテゴリを登録しました。")
+        print("Registered notification category '\(clipboardPausedNotificationCategory)' and action '\(resumeMonitoringActionID)'.")
+        print("Registered category for migration failure notification.")
         
         if UserDefaults.standard.bool(forKey: "isClipboardMonitoringPaused") {
             NotificationManager.shared.scheduleClipboardPausedNotification()
-            print("AppDelegate: アプリ起動時、クリップボード監視は一時停止状態です。通知をスケジュールしました。")
+            print("AppDelegate: Clipboard monitoring was paused at launch. Scheduled notification.")
         }
         
         historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
@@ -345,7 +345,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Application Delegate Methods for Reopening
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         UserDefaults.standard.set(false, forKey: "hideMenuBarExtra")
-        print("AppDelegate: hideMenuBarExtra を false に設定しました。メニューバーアイコンが表示されるようになります。")
+        print("AppDelegate: Set hideMenuBarExtra to false. Menu bar icon will be displayed.")
         
         NSApp.activate(ignoringOtherApps: true)
         
@@ -358,7 +358,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         let notificationCategory = response.notification.request.content.categoryIdentifier
         
         if actionID == resumeMonitoringActionID {
-            print("通知アクション: '再開' が選択されました。")
+            print("Notification action: 'Resume' was selected.")
             // NotificationManager を介して再開ロジックを実行
             NotificationManager.shared.resumeClipboardMonitoringAndSendNotification()
             
@@ -367,7 +367,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 NSApp.activate(ignoringOtherApps: true)
             }
         } else if actionID == "OPEN_DOCUMENTATION_ACTION" && notificationCategory == "MIGRATION_FAILURE_CATEGORY" {
-            print("通知アクション: 'ドキュメントを表示…' が選択されました。")
+            print("Notification action: 'Show Documentation...' was selected.")
             
             // ドキュメントのURLを決定
             let documentationURL: String

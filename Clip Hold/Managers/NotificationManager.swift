@@ -32,9 +32,9 @@ class NotificationManager {
         
         if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
             content.categoryIdentifier = appDelegate.clipboardPausedNotificationCategory
-            print("NotificationManager: スケジュールする通知にカテゴリ識別子 '\(appDelegate.clipboardPausedNotificationCategory)' を設定しました。")
+            print("NotificationManager: Set category identifier '\(appDelegate.clipboardPausedNotificationCategory)' for scheduled notification.")
         } else {
-            print("NotificationManager: AppDelegateが見つからないか、カテゴリ識別子が取得できませんでした。カテゴリなしで通知をスケジュールします。")
+            print("NotificationManager: AppDelegate not found or category identifier could not be retrieved. Scheduling notification without category.")
             // Fallback: カテゴリがない場合でも通知自体は表示されるが、アクションは表示されない
         }
         
@@ -42,9 +42,9 @@ class NotificationManager {
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("クリップボード一時停止通知のスケジュールエラー: \(error.localizedDescription)")
+                print("Clipboard paused notification schedule error: \(error.localizedDescription)")
             } else {
-                print("クリップボード一時停止通知をスケジュールしました。")
+                print("Clipboard paused notification scheduled.")
             }
         }
     }
@@ -52,15 +52,15 @@ class NotificationManager {
     func resumeClipboardMonitoringAndSendNotification() {
         // UserDefaults の状態を更新
         UserDefaults.standard.set(false, forKey: "isClipboardMonitoringPaused")
-        print("NotificationManager: UserDefaultsのisClipboardMonitoringPausedをfalseに設定。")
+        print("NotificationManager: Set UserDefaults isClipboardMonitoringPaused to false.")
         
         // クリップボード監視を再開
         ClipboardManager.shared.startMonitoringPasteboard()
-        print("NotificationManager: クリップボード監視を再開しました。")
+        print("NotificationManager: Clipboard monitoring resumed.")
         
         // 配信済みの「一時停止通知」を削除
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [clipboardPausedNotificationIdentifier])
-        print("NotificationManager: 配信済みの一時停止通知を削除しました。")
+        print("NotificationManager: Delivered pause notifications removed.")
         
         // 「再開されました」通知を送信
         sendMonitoringStatusNotification(isPaused: false)
@@ -69,7 +69,7 @@ class NotificationManager {
     func removeClipboardPausedNotification() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [clipboardPausedNotificationIdentifier])
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [clipboardPausedNotificationIdentifier])
-        print("クリップボード一時停止通知を削除しました。")
+        print("Clipboard paused notification removed.")
     }
     
     func sendMonitoringStatusNotification(isPaused: Bool) {
@@ -85,9 +85,9 @@ class NotificationManager {
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("監視状態変更通知の送信エラー: \(error.localizedDescription)")
+                print("Monitoring status change notification send error: \(error.localizedDescription)")
             } else {
-                print("監視状態変更通知を送信しました。一時停止状態: \(isPaused)")
+                print("Monitoring status change notification sent. Pause status: \(isPaused)")
             }
         }
     }
@@ -105,9 +105,9 @@ class NotificationManager {
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("テスト通知の送信エラー: \(error.localizedDescription)")
+                print("Test notification send error: \(error.localizedDescription)")
             } else {
-                print("テスト通知を送信しました。")
+                print("Test notification sent.")
             }
         }
     }
@@ -126,9 +126,9 @@ class NotificationManager {
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("マイグレーション成功通知の送信エラー: \(error.localizedDescription)")
+                print("Migration success notification send error: \(error.localizedDescription)")
             } else {
-                print("マイグレーション成功通知を送信しました。")
+                print("Migration success notification sent.")
             }
         }
     }
@@ -164,9 +164,9 @@ class NotificationManager {
         
         UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("マイグレーション失敗通知の送信エラー: \(error.localizedDescription)")
+                print("Migration failure notification send error: \(error.localizedDescription)")
             } else {
-                print("マイグレーション失敗通知を送信しました。")
+                print("Migration failure notification sent.")
             }
         }
     }
