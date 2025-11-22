@@ -54,6 +54,24 @@
               }
             }
           }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : " - %lld carácter"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : " - %lld caracteres"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -80,6 +98,12 @@
             "state" : "translated",
             "value" : "\"%1$@\"の操作を選択してください。%2$@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elija la operación para “%1$@”. %2$@"
+          }
         }
       }
     },
@@ -102,6 +126,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@”"
           }
         }
       }
@@ -156,6 +186,24 @@
               }
             }
           }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "¿Está seguro de que quiere eliminar todo el historial de “%1$@”? Se eliminará %2$lld elemento. Esta acción no se puede deshacer."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "¿Está seguro de que quiere eliminar todo el historial de “%1$@”? Se eliminarán %2$lld elementos. Esta acción no se puede deshacer."
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -178,6 +226,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」に切り替わりました。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiado a “%@”."
           }
         }
       }
@@ -262,6 +316,34 @@
               }
             }
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%#@arg3@ para “%1$@” (%2$lld/%3$lld)%4$@"
+          },
+          "substitutions" : {
+            "arg3" : {
+              "argNum" : 3,
+              "formatSpecifier" : "lld",
+              "variations" : {
+                "plural" : {
+                  "one" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "Conflicto de importación"
+                    }
+                  },
+                  "other" : {
+                    "stringUnit" : {
+                      "state" : "translated",
+                      "value" : "Conflictos de importación"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -285,6 +367,12 @@
             "state" : "translated",
             "value" : "「%1$@」は別のプリセット「%2$@」にすでに割り当てられています。このアプリを割り当てると、「%3$@」から割り当てが解除されます。アプリを割り当ててもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” ya está asignado a otro preajuste “%2$@”. Al asignar esta aplicación, se desasignará de “%3$@”. ¿Está seguro de que quiere asignar esta aplicación?"
+          }
         }
       }
     },
@@ -307,6 +395,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」を本当に削除しますか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar “%@”?"
           }
         }
       }
@@ -361,6 +455,24 @@
               }
             }
           }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "¿Está seguro de que quiere eliminar “%1$@”? Esto también eliminará %2$lld frase estándar incluida en este preajuste. Esta acción no se puede deshacer."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "¿Está seguro de que quiere eliminar “%1$@”? Esto también eliminará %2$lld frases estándar incluidas en este preajuste. Esta acción no se puede deshacer."
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -383,6 +495,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar “%@”? El archivo se eliminará del historial y también se eliminarán todos los demás elementos del historial asociados a este archivo."
           }
         }
       }
@@ -407,6 +525,12 @@
             "state" : "translated",
             "value" : "「%@」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere añadir “%@” a las aplicaciones a excluir? Puede cambiar las aplicaciones a excluir en los ajustes de “Privacidad”."
+          }
         }
       }
     },
@@ -429,6 +553,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@を超えるファイルがコピーされました。履歴に保存してもよろしいですか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha copiado un archivo de más de %@. ¿Está seguro de que quiere guardarlo en el historial?"
           }
         }
       }
@@ -453,6 +583,12 @@
             "state" : "translated",
             "value" : "%@定型文をコピーする"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar la frase estándar %@"
+          }
         }
       }
     },
@@ -475,6 +611,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@履歴をコピーする"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar el elemento del historial %@"
           }
         }
       }
@@ -499,6 +641,12 @@
             "state" : "translated",
             "value" : "%1$@を超える%2$d個のファイル（合計%3$@）がコピーされました。履歴に保存してもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se han copiado %2$d archivos (total %3$@) de más de %1$@. ¿Está seguro de que quiere guardarlos en el historial?"
+          }
         }
       }
     },
@@ -521,6 +669,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@を超えるファイル（%2$@）がコピーされました。履歴に保存してもよろしいですか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se ha copiado un archivo (%2$@) de más de %1$@. ¿Está seguro de que quiere guardarlo en el historial?"
           }
         }
       }
@@ -592,6 +746,24 @@
               }
             }
           }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elemento"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elementos"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -641,6 +813,24 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld個のプリセット"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld preajuste"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld preajustes"
                 }
               }
             }
@@ -698,6 +888,24 @@
               }
             }
           }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld frase estándar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld frases estándar"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -747,6 +955,24 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "%lld個の履歴"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elemento del historial"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld elementos del historial"
                 }
               }
             }
@@ -804,6 +1030,24 @@
               }
             }
           }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld carácter"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caracteres"
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -826,6 +1070,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1以上の数値を入力してください。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduzca un número igual o superior a 1."
           }
         }
       }
@@ -850,6 +1100,12 @@
             "state" : "translated",
             "value" : "Buy Me a Coffeeで、緑茶一杯分の金額からサポートしていただけます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede apoyarme en Buy Me a Coffee desde el precio de una taza de té verde."
+          }
         }
       }
     },
@@ -873,6 +1129,12 @@
             "state" : "translated",
             "value" : "Buy Me a Coffeeのページを開いてもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de Buy Me a Coffee?"
+          }
         }
       }
     },
@@ -895,6 +1157,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Buy Me a Coffeeページへのリンクを開きます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de Buy Me a Coffee."
           }
         }
       }
@@ -922,6 +1190,12 @@
             "state" : "translated",
             "value" : "Clip Holdについて"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca de Clip Hold"
+          }
         }
       }
     },
@@ -944,6 +1218,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clip Holdに保存する履歴の最大数を設定します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establece el número máximo de elementos guardados en el historial de Clip Hold."
           }
         }
       }
@@ -968,6 +1248,12 @@
             "state" : "translated",
             "value" : "Clip Holdのウィンドウ（定型文ウィンドウなど）をフォーカスしたときに、プリセットが切り替わらないようにします。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evita que el preajuste cambie cuando la ventana de Clip Hold (como la ventana de Frases estándar) está enfocada."
+          }
         }
       }
     },
@@ -990,6 +1276,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clip Holdのウィンドウを除外"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excluir ventanas de Clip Hold"
           }
         }
       }
@@ -1014,6 +1306,12 @@
             "state" : "translated",
             "value" : "Clip Holdのメニューバーアイコンを一時的に非表示にします。もう一度アプリを開くと再び表示されるようになります。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oculta temporalmente el icono de la barra de menús de Clip Hold. Volverá a aparecer cuando vuelva a abrir la aplicación."
+          }
         }
       }
     },
@@ -1036,6 +1334,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clip Holdの設定"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de Clip Hold"
           }
         }
       }
@@ -1060,6 +1364,12 @@
             "state" : "translated",
             "value" : "Clip Holdはオープンソースアプリケーションです。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold es una aplicación de código abierto."
+          }
         }
       }
     },
@@ -1082,6 +1392,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copyright ©︎ 2025 今浦大雅"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copyright ©︎ 2025 Taiga Imaura"
           }
         }
       }
@@ -1109,6 +1425,12 @@
             "state" : "translated",
             "value" : "create-dmgのGitHubページへのリンクを開きます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de create-dmg."
+          }
         }
       }
     },
@@ -1131,6 +1453,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "create-dmgのGitHubページを開いてもよろしいですか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de GitHub de create-dmg?"
           }
         }
       }
@@ -1155,6 +1483,12 @@
             "state" : "translated",
             "value" : "デフォルト"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por defecto"
+          }
         }
       }
     },
@@ -1177,6 +1511,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Finderで選択..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar en el Finder..."
           }
         }
       }
@@ -1204,6 +1544,12 @@
             "state" : "translated",
             "value" : "Gemini CLIのGitHubページへのリンクを開きます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de Gemini CLI."
+          }
         }
       }
     },
@@ -1226,6 +1572,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gemini CLIのGitHubページを開いてもよろしいですか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de GitHub de Gemini CLI?"
           }
         }
       }
@@ -1250,6 +1602,12 @@
             "state" : "translated",
             "value" : "GitHubのDiscussionページを開いてもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de Discusiones de GitHub?"
+          }
         }
       }
     },
@@ -1272,6 +1630,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHubのIssueページを開いてもよろしいですか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de Incidencias de GitHub?"
           }
         }
       }
@@ -1296,6 +1660,12 @@
             "state" : "translated",
             "value" : "GitHubのリポジトリページを開いてもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página del repositorio de GitHub?"
+          }
         }
       }
     },
@@ -1318,6 +1688,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHubの貢献者ページへのリンクを開きます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de colaboradores de GitHub."
           }
         }
       }
@@ -1342,6 +1718,12 @@
             "state" : "translated",
             "value" : "GitHubの貢献者ページを開いてもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de colaboradores de GitHub?"
+          }
         }
       }
     },
@@ -1364,6 +1746,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHubリポジトリにスターをつける"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dar una estrella al repositorio de GitHub"
           }
         }
       }
@@ -1388,6 +1776,12 @@
             "state" : "translated",
             "value" : "GitHubリポジトリページへのリンクを開きます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página del repositorio de GitHub."
+          }
         }
       }
     },
@@ -1411,6 +1805,12 @@
             "state" : "translated",
             "value" : "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando copie un código de color en formato HEX, HSL / HSLA o RGB / RGBA, se mostrará un icono de ese color en la ventana de Historial / Frases estándar y en el menú."
+          }
         }
       }
     },
@@ -1433,6 +1833,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "画像ファイル"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo de imagen"
           }
         }
       }
@@ -1460,6 +1866,12 @@
             "state" : "translated",
             "value" : "KeyboardShortcutsのGitHubページへのリンクを開きます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de KeyboardShortcuts."
+          }
         }
       }
     },
@@ -1482,6 +1894,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "KeyboardShortcutsのGitHubページを開いてもよろしいですか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de GitHub de KeyboardShortcuts?"
           }
         }
       }
@@ -1506,6 +1924,12 @@
             "state" : "translated",
             "value" : "Macのログイン時にClip Holdを自動で開くようにします。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hacer que Clip Hold se abra automáticamente al iniciar sesión en el Mac."
+          }
         }
       }
     },
@@ -1529,12 +1953,24 @@
             "state" : "translated",
             "value" : "番目の"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "º"
+          }
         }
       }
     },
     "OK" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -1563,6 +1999,12 @@
             "state" : "translated",
             "value" : "PayPal.Meのページを開いてもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de PayPal.Me?"
+          }
         }
       }
     },
@@ -1585,6 +2027,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PayPal.Meのリンクを開きます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a PayPal.Me."
           }
         }
       }
@@ -1609,6 +2057,12 @@
             "state" : "translated",
             "value" : "PayPalで寄付"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Donar en PayPal"
+          }
         }
       }
     },
@@ -1631,6 +2085,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PayPalで直接寄付していただくこともできます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "También puede donar directamente en PayPal."
           }
         }
       }
@@ -1655,6 +2115,12 @@
             "state" : "translated",
             "value" : "PDFファイル"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo PDF"
+          }
         }
       }
     },
@@ -1677,6 +2143,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PDFのみ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo PDF"
           }
         }
       }
@@ -1704,6 +2176,12 @@
             "state" : "translated",
             "value" : "QRコード"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código QR"
+          }
         }
       }
     },
@@ -1726,6 +2204,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QRコードについて"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acerca del código QR"
           }
         }
       }
@@ -1750,6 +2234,12 @@
             "state" : "translated",
             "value" : "QRコードの内容をコピー"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar contenido del código QR"
+          }
         }
       }
     },
@@ -1772,6 +2262,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QRコードの生成に失敗しました。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo generar el código QR."
           }
         }
       }
@@ -1796,6 +2292,12 @@
             "state" : "translated",
             "value" : "QRコードは株式会社デンソーウェーブの登録商標です。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR Code es una marca registrada de DENSO WAVE INCORPORATED en Japón y en otros países."
+          }
         }
       }
     },
@@ -1818,6 +2320,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QRコードを表示..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar código QR…"
           }
         }
       }
@@ -1845,6 +2353,12 @@
             "state" : "translated",
             "value" : "Qwen CodeのGitHubページへのリンクを開きます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de Qwen Code."
+          }
         }
       }
     },
@@ -1868,6 +2382,12 @@
             "state" : "translated",
             "value" : "Qwen CodeのGitHubページを開いてもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de GitHub de Qwen Code?"
+          }
         }
       }
     },
@@ -1890,6 +2410,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番目の"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "º"
           }
         }
       }
@@ -1917,6 +2443,12 @@
             "state" : "translated",
             "value" : "SFSymbolsPickerのGitHubページへのリンクを開きます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de SFSymbolsPicker."
+          }
         }
       }
     },
@@ -1939,6 +2471,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SFSymbolsPickerのGitHubページを開いてもよろしいですか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de GitHub de SFSymbolsPicker?"
           }
         }
       }
@@ -1963,6 +2501,12 @@
             "state" : "translated",
             "value" : "番目の"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "º"
+          }
         }
       }
     },
@@ -1985,6 +2529,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番目の"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "º"
           }
         }
       }
@@ -2009,6 +2559,12 @@
             "state" : "translated",
             "value" : "アイコン色"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color del icono"
+          }
         }
       }
     },
@@ -2031,6 +2587,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アイデアがありますか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Tiene una idea?"
           }
         }
       }
@@ -2055,6 +2617,12 @@
             "state" : "translated",
             "value" : "アクセシビリティ"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accesibilidad"
+          }
         }
       }
     },
@@ -2077,6 +2645,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アクセシビリティ許可が付与されています。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permiso de accesibilidad concedido."
           }
         }
       }
@@ -2101,6 +2675,12 @@
             "state" : "translated",
             "value" : "アクセントカラー"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color de acento"
+          }
         }
       }
     },
@@ -2123,6 +2703,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicaciones"
           }
         }
       }
@@ -2147,6 +2733,12 @@
             "state" : "translated",
             "value" : "アプリ（自動）"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicaciones (Automático)"
+          }
         }
       }
     },
@@ -2169,6 +2761,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリアイコンを表示"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar iconos de aplicaciones"
           }
         }
       }
@@ -2193,6 +2791,12 @@
             "state" : "translated",
             "value" : "アプリではありません"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No es la aplicación"
+          }
         }
       }
     },
@@ -2215,6 +2819,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cambie la aplicación filtrada cuando enfoque la ventana de Clip Hold (como la ventana de Historial) mientras el filtrado “Automático” de la aplicación esté activo."
           }
         }
       }
@@ -2239,6 +2849,12 @@
             "state" : "translated",
             "value" : "アプリの「自動」フィルタリングでClip Holdのウィンドウを除外"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Excluir ventanas de Clip Hold con el filtrado “Automático” de la aplicación"
+          }
         }
       }
     },
@@ -2261,6 +2877,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アプリのすべての設定を初期状態に戻します。コピー履歴と定型文は影響を受けません。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablece todos los ajustes de la aplicación a sus valores predeterminados. El historial de copia y las frases estándar no se ven afectados."
           }
         }
       }
@@ -2285,6 +2907,12 @@
             "state" : "translated",
             "value" : "アプリの全ての設定を初期状態に戻してもよろしいですか？この操作は元に戻せません。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere restablecer todos los ajustes de la aplicación a sus valores predeterminados? Esta acción no se puede deshacer."
+          }
         }
       }
     },
@@ -2307,6 +2935,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "アラートを表示する容量を設定"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer el tamaño para mostrar una alerta"
           }
         }
       }
@@ -2331,6 +2965,12 @@
             "state" : "translated",
             "value" : "いいえ"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No"
+          }
         }
       }
     },
@@ -2353,6 +2993,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "イエロー"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amarillo"
           }
         }
       }
@@ -2377,6 +3023,12 @@
             "state" : "translated",
             "value" : "インポート"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar"
+          }
         }
       }
     },
@@ -2399,6 +3051,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "インポートエラー"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de importación"
           }
         }
       }
@@ -2423,6 +3081,12 @@
             "state" : "translated",
             "value" : "ウィンドウを常に最も手前に表示します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener siempre la ventana en primer plano."
+          }
         }
       }
     },
@@ -2445,6 +3109,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ウィンドウ操作"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operaciones de ventana"
           }
         }
       }
@@ -2469,6 +3139,12 @@
             "state" : "translated",
             "value" : "エクスポート"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar"
+          }
         }
       }
     },
@@ -2491,6 +3167,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エクスポートしたいプリセットを選択"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione los preajustes que quiere exportar"
           }
         }
       }
@@ -2515,6 +3197,12 @@
             "state" : "translated",
             "value" : "エラー"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
         }
       }
     },
@@ -2537,6 +3225,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オーバーレイ時の透明度"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transparencia de la superposición"
           }
         }
       }
@@ -2561,6 +3255,12 @@
             "state" : "translated",
             "value" : "オーバーレイ表示"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visualización superpuesta"
+          }
         }
       }
     },
@@ -2583,6 +3283,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オープンソースライセンス"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Licencia de código abierto"
           }
         }
       }
@@ -2607,6 +3313,12 @@
             "state" : "translated",
             "value" : "オレンジ"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naranja"
+          }
         }
       }
     },
@@ -2629,6 +3341,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オンにすると、Macのログイン時にClip Holdを自動で開くようにします。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, Clip Hold se abre automáticamente al iniciar sesión en el Mac."
           }
         }
       }
@@ -2653,6 +3371,12 @@
             "state" : "translated",
             "value" : "オンにすると、コピーした定型文を履歴に追加しないようにします。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, evita que las frases estándar copiadas se añadan al historial."
+          }
         }
       }
     },
@@ -2675,6 +3399,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, desplaza automáticamente la lista del historial a la parte superior cuando la lista se actualiza."
           }
         }
       }
@@ -2699,6 +3429,12 @@
             "state" : "translated",
             "value" : "オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, oculta los números que se muestran en cada elemento de la ventana de Frases estándar."
+          }
         }
       }
     },
@@ -2721,6 +3457,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オンにすると、定型文ウィンドウを常に最も手前に表示します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, mantiene siempre la ventana de Frases estándar en primer plano."
           }
         }
       }
@@ -2745,6 +3487,12 @@
             "state" : "translated",
             "value" : "オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, al seleccionar una frase estándar o un elemento del historial de copia desde el menú, o al copiar usando atajos de teclado, se envía la acción de la tecla Comando + V. Se requiere permiso de accesibilidad."
+          }
         }
       }
     },
@@ -2767,6 +3515,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, oculta los números que se muestran en cada elemento de la ventana de Historial."
           }
         }
       }
@@ -2791,6 +3545,12 @@
             "state" : "translated",
             "value" : "オンにすると、履歴ウィンドウを常に最も手前に表示します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, mantiene siempre la ventana de Historial en primer plano."
+          }
         }
       }
     },
@@ -2813,6 +3573,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, hace que la Pegada rápida solo se realice si el elemento del historial es texto."
           }
         }
       }
@@ -2837,6 +3603,12 @@
             "state" : "translated",
             "value" : "オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, cierra la ventana al hacer doble clic en un elemento para copiarlo."
+          }
         }
       }
     },
@@ -2859,6 +3631,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カスタム"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizado"
           }
         }
       }
@@ -2883,6 +3661,12 @@
             "state" : "translated",
             "value" : "カスタム: %lld"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizado: %lld"
+          }
         }
       }
     },
@@ -2905,6 +3689,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カスタム: %lld %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizado: %1$lld %2$@"
           }
         }
       }
@@ -2929,6 +3719,12 @@
             "state" : "translated",
             "value" : "カスタム..."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Personalizado…"
+          }
         }
       }
     },
@@ -2951,6 +3747,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カスタムタイトルを使用する"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar título personalizado"
           }
         }
       }
@@ -2975,6 +3777,12 @@
             "state" : "translated",
             "value" : "カラー: %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color: %@"
+          }
         }
       }
     },
@@ -2997,6 +3805,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラーコード"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Códigos de color"
           }
         }
       }
@@ -3021,6 +3835,12 @@
             "state" : "translated",
             "value" : "カラーコードでフィルタリングできるようにする"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir filtrar por códigos de color"
+          }
         }
       }
     },
@@ -3043,6 +3863,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "カラーコードに基づくカラーアイコンを表示"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar un icono de color basado en el código de color"
           }
         }
       }
@@ -3067,6 +3893,12 @@
             "state" : "translated",
             "value" : "カラーコードのみ"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo códigos de color"
+          }
         }
       }
     },
@@ -3089,6 +3921,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "キャンセル"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         }
       }
@@ -3113,6 +3951,12 @@
             "state" : "translated",
             "value" : "クイックペースト"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegada rápida"
+          }
         }
       }
     },
@@ -3135,6 +3979,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイックペーストをテキストに限定"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegada rápida solo para texto"
           }
         }
       }
@@ -3159,6 +4009,12 @@
             "state" : "translated",
             "value" : "クイックペースト機能を使用する場合は許可を与える必要があります。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para usar la Pegada rápida, necesita conceder permiso."
+          }
         }
       }
     },
@@ -3181,6 +4037,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイックルック"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vista rápida"
           }
         }
       }
@@ -3205,6 +4067,12 @@
             "state" : "translated",
             "value" : "グリーン"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verde"
+          }
         }
       }
     },
@@ -3227,6 +4095,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボード"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portapapeles"
           }
         }
       }
@@ -3251,6 +4125,12 @@
             "state" : "translated",
             "value" : "クリップボードの内容から定型文を追加する"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una frase estándar desde el contenido del portapapeles"
+          }
         }
       }
     },
@@ -3273,6 +4153,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボードの履歴が保存されるようになります。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se guardará el historial del portapapeles."
           }
         }
       }
@@ -3297,6 +4183,12 @@
             "state" : "translated",
             "value" : "クリップボードの履歴が追加されなくなります。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ya no se añade el historial del portapapeles."
+          }
         }
       }
     },
@@ -3319,6 +4211,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボードの履歴を保存できるようにするには、クリップボード監視を再開する必要があります。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La supervisión del portapapeles debe reanudarse para poder guardar el historial del portapapeles."
           }
         }
       }
@@ -3343,6 +4241,12 @@
             "state" : "translated",
             "value" : "クリップボード履歴"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historial del portapapeles"
+          }
         }
       }
     },
@@ -3365,6 +4269,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボード履歴が正常にインポートされました。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historial del portapapeles importado con éxito."
           }
         }
       }
@@ -3389,6 +4299,12 @@
             "state" : "translated",
             "value" : "クリップボード履歴が正常にエクスポートされました。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historial del portapapeles exportado con éxito."
+          }
         }
       }
     },
@@ -3411,6 +4327,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボード監視"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supervisión del portapapeles"
           }
         }
       }
@@ -3435,6 +4357,12 @@
             "state" : "translated",
             "value" : "クリップボード監視が一時停止されました。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La supervisión del portapapeles se ha pausado."
+          }
         }
       }
     },
@@ -3457,6 +4385,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボード監視が再開されました。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La supervisión del portapapeles se ha reanudado."
           }
         }
       }
@@ -3481,6 +4415,12 @@
             "state" : "translated",
             "value" : "クリップボード監視は一時停止中です。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La supervisión del portapapeles está en pausa."
+          }
         }
       }
     },
@@ -3503,6 +4443,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボード監視を一時停止します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausar la supervisión del portapapeles."
           }
         }
       }
@@ -3527,6 +4473,12 @@
             "state" : "translated",
             "value" : "クリップボード監視を再開します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reanudar la supervisión del portapapeles."
+          }
         }
       }
     },
@@ -3549,6 +4501,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボード監視を切り替える"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar/desactivar supervisión del portapapeles"
           }
         }
       }
@@ -3573,6 +4531,12 @@
             "state" : "translated",
             "value" : "ここで設定した容量よりも大きいファイルをコピーしようとした際に、コピーしたファイルを履歴に保存するかどうかを求めるアラートが表示されます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando copie un archivo más grande que el tamaño establecido aquí, recibirá una alerta preguntándole si quiere guardar el archivo copiado en el historial o no."
+          }
         }
       }
     },
@@ -3595,6 +4559,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo cuando se copie un archivo más pequeño que el tamaño establecido aquí se guardará en el historial. Los elementos anteriores del historial no se ven afectados."
           }
         }
       }
@@ -3619,6 +4589,12 @@
             "state" : "translated",
             "value" : "ここに追加したアプリが最前面にあるときはコピー履歴に追加されません。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando las aplicaciones añadidas aquí estén en primer plano, no se añadirán al historial de copia."
+          }
         }
       }
     },
@@ -3641,6 +4617,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このアプリからのすべての履歴を削除..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todo el historial de esta aplicación..."
           }
         }
       }
@@ -3665,6 +4647,12 @@
             "state" : "translated",
             "value" : "このアプリケーションと使用されているライブラリのライセンス情報を表示します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar información de la licencia de esta aplicación y de las bibliotecas utilizadas."
+          }
         }
       }
     },
@@ -3687,6 +4675,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このアプリの履歴を削除"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar historial de esta aplicación"
           }
         }
       }
@@ -3711,6 +4705,12 @@
             "state" : "translated",
             "value" : "このアプリは既に別のプリセットに割り当てられています。上書きしてもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta aplicación ya está asignada a otro preajuste. ¿Está seguro de que quiere sobrescribirlo?"
+          }
         }
       }
     },
@@ -3733,6 +4733,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このプリセットに割り当てられているすべてのアプリをリストから削除しますか？"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar de la lista todas las aplicaciones asignadas a este preajuste?"
           }
         }
       }
@@ -3757,6 +4763,12 @@
             "state" : "translated",
             "value" : "このプリセットのすべての割り当てを削除します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todas las asignaciones para este preajuste."
+          }
         }
       }
     },
@@ -3779,6 +4791,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このプリセットのすべての定型文を削除します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todas las frases estándar de este preajuste."
           }
         }
       }
@@ -3803,6 +4821,12 @@
             "state" : "translated",
             "value" : "このプリセットを本当に削除しますか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar este preajuste?"
+          }
         }
       }
     },
@@ -3825,6 +4849,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "このまま追加"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir tal cual"
           }
         }
       }
@@ -3849,6 +4879,12 @@
             "state" : "translated",
             "value" : "このまま追加する"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir tal cual"
+          }
         }
       }
     },
@@ -3871,6 +4907,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この定型文をインポートしたいプリセットを選択"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione el preajuste al que quiere importar estas frases estándar"
           }
         }
       }
@@ -3895,6 +4937,12 @@
             "state" : "translated",
             "value" : "この定型文を移動したいプリセットを選択"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione el preajuste al que quiere mover esta frase estándar"
+          }
         }
       }
     },
@@ -3917,6 +4965,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コピー"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar"
           }
         }
       }
@@ -3941,6 +4995,12 @@
             "state" : "translated",
             "value" : "コピーアラートを表示する容量"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño para alerta de copia"
+          }
         }
       }
     },
@@ -3963,6 +5023,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar los iconos de las aplicaciones que estaban en primer plano cuando los copiaste para cada elemento."
           }
         }
       }
@@ -3987,6 +5053,12 @@
             "state" : "translated",
             "value" : "コピーした定型文を履歴に追加しないようにします。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evita que las frases estándar copiadas se añadan al historial."
+          }
         }
       }
     },
@@ -4009,6 +5081,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コピーしました！"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Copiado!"
           }
         }
       }
@@ -4033,6 +5111,12 @@
             "state" : "translated",
             "value" : "コピー履歴"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historial de copia"
+          }
         }
       }
     },
@@ -4055,6 +5139,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コミュニティ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comunidad"
           }
         }
       }
@@ -4079,6 +5169,12 @@
             "state" : "translated",
             "value" : "これはClip Holdからのテスト通知です。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta es una notificación de prueba de Clip Hold."
+          }
         }
       }
     },
@@ -4101,6 +5197,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サポートとフィードバック"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soporte y comentarios"
           }
         }
       }
@@ -4125,6 +5227,12 @@
             "state" : "translated",
             "value" : "システム設定のアクセシビリティ許可設定を開きます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir el ajuste de Permisos de accesibilidad en los Ajustes del sistema."
+          }
         }
       }
     },
@@ -4147,6 +5255,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "システム設定の通知設定を開きます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir los Ajustes de notificaciones en los Ajustes del sistema."
           }
         }
       }
@@ -4171,6 +5285,12 @@
             "state" : "translated",
             "value" : "ショートカット"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajos"
+          }
         }
       }
     },
@@ -4193,6 +5313,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ショートカットキーで切り替えたときに通知を送信する"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar una notificación al cambiar con atajos de teclado"
           }
         }
       }
@@ -4217,6 +5343,12 @@
             "state" : "translated",
             "value" : "シンボルを検索"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar símbolos"
+          }
         }
       }
     },
@@ -4239,6 +5371,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スキップ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omitir"
           }
         }
       }
@@ -4263,6 +5401,12 @@
             "state" : "translated",
             "value" : "スキップする"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omitir"
+          }
         }
       }
     },
@@ -4285,6 +5429,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スターをつける"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dar una estrella"
           }
         }
       }
@@ -4309,6 +5459,12 @@
             "state" : "translated",
             "value" : "すでに割り当てられたアプリ"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicación ya asignada"
+          }
         }
       }
     },
@@ -4331,6 +5487,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべて"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos"
           }
         }
       }
@@ -4355,6 +5517,12 @@
             "state" : "translated",
             "value" : "すべて、または特定のプリセットの定型文をJSONファイルとして書き出します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar todas o frases estándar de preajustes específicos como un archivo JSON."
+          }
         }
       }
     },
@@ -4377,6 +5545,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてスキップ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omitir todo"
           }
         }
       }
@@ -4401,6 +5575,12 @@
             "state" : "translated",
             "value" : "すべてのアプリ"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todas las aplicaciones"
+          }
         }
       }
     },
@@ -4423,6 +5603,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのクリップボード履歴をJSONファイルとして書き出します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar todo el historial del portapapeles como un archivo JSON."
           }
         }
       }
@@ -4447,6 +5633,12 @@
             "state" : "translated",
             "value" : "すべてのクリップボード履歴を削除"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todo el historial del portapapeles"
+          }
         }
       }
     },
@@ -4469,6 +5661,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのクリップボード履歴を本当に削除しますか？この操作は元に戻せません。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar todo el historial del portapapeles? Esta acción no se puede deshacer."
           }
         }
       }
@@ -4493,6 +5691,12 @@
             "state" : "translated",
             "value" : "すべてのコピー履歴を表示..."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar todo el historial de copia…"
+          }
         }
       }
     },
@@ -4515,6 +5719,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのテキスト"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo el texto"
           }
         }
       }
@@ -4539,6 +5749,12 @@
             "state" : "translated",
             "value" : "すべてのファイル"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los archivos"
+          }
         }
       }
     },
@@ -4561,6 +5777,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar las frases estándar de todos los preajustes? Esta acción no se puede deshacer."
           }
         }
       }
@@ -4585,6 +5807,12 @@
             "state" : "translated",
             "value" : "すべてのプリセットを削除"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todos los preajustes"
+          }
         }
       }
     },
@@ -4607,6 +5835,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのプリセットを本当に削除しますか？この操作は元に戻せません。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar todos los preajustes? Esta acción no se puede deshacer."
           }
         }
       }
@@ -4631,6 +5865,12 @@
             "state" : "translated",
             "value" : "すべてのプロセスを表示"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar todos los procesos"
+          }
         }
       }
     },
@@ -4653,6 +5893,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての割り当てを削除"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todas las asignaciones"
           }
         }
       }
@@ -4677,6 +5923,12 @@
             "state" : "translated",
             "value" : "すべての定型文を削除"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todas las frases estándar"
+          }
         }
       }
     },
@@ -4699,6 +5951,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての定型文を表示..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar todas las frases estándar…"
           }
         }
       }
@@ -4723,6 +5981,12 @@
             "state" : "translated",
             "value" : "すべての履歴を削除"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todo el historial"
+          }
         }
       }
     },
@@ -4745,6 +6009,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての競合を処理しました。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los conflictos han sido resueltos."
           }
         }
       }
@@ -4769,6 +6039,12 @@
             "state" : "translated",
             "value" : "すべての設定が初期状態に戻りました。変更を完全に適用するにはアプリを再起動してください。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los ajustes han sido restablecidos a sus valores predeterminados. Por favor, reinicie la aplicación para aplicar completamente los cambios."
+          }
         }
       }
     },
@@ -4791,6 +6067,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての設定をリセット"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer todos los ajustes"
           }
         }
       }
@@ -4815,6 +6097,12 @@
             "state" : "translated",
             "value" : "すべての除外するアプリをリストから削除します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todas las aplicaciones a excluir de la lista."
+          }
         }
       }
     },
@@ -4837,6 +6125,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての除外するアプリを削除"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todas las aplicaciones a excluir"
           }
         }
       }
@@ -4861,6 +6155,12 @@
             "state" : "translated",
             "value" : "すべての項目"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todos los elementos"
+          }
         }
       }
     },
@@ -4883,6 +6183,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "その他のファイル"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otros archivos"
           }
         }
       }
@@ -4907,6 +6213,12 @@
             "state" : "translated",
             "value" : "タイトル"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Título"
+          }
         }
       }
     },
@@ -4929,6 +6241,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "タイトル: **%@**"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Título: **%@**"
           }
         }
       }
@@ -4953,6 +6271,12 @@
             "state" : "translated",
             "value" : "タイトル: %1$@、内容: %2$@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Título: %1$@, Contenido: %2$@"
+          }
         }
       }
     },
@@ -4975,6 +6299,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ダブルクリックでウィンドウを閉じる"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar ventana con doble clic"
           }
         }
       }
@@ -4999,6 +6329,12 @@
             "state" : "translated",
             "value" : "ダブルクリックで定型文ウィンドウを閉じる"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar ventana de frases estándar con doble clic"
+          }
         }
       }
     },
@@ -5021,6 +6357,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ダブルクリックで履歴ウィンドウを閉じる"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar ventana de historial con doble clic"
           }
         }
       }
@@ -5045,6 +6387,12 @@
             "state" : "translated",
             "value" : "ディスカッションページへのリンクを開きます."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de discusión."
+          }
         }
       }
     },
@@ -5067,6 +6415,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "テキスト"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texto"
           }
         }
       }
@@ -5091,6 +6445,12 @@
             "state" : "translated",
             "value" : "テキストのみ"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo texto"
+          }
         }
       }
     },
@@ -5113,6 +6473,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "テスト通知"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba de notificación"
           }
         }
       }
@@ -5137,6 +6503,12 @@
             "state" : "translated",
             "value" : "テスト通知を送信します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar notificación de prueba."
+          }
         }
       }
     },
@@ -5159,6 +6531,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "デバッグ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depurar"
           }
         }
       }
@@ -5183,6 +6561,12 @@
             "state" : "translated",
             "value" : "デフォルトのショートカットに戻します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer al atajo predeterminado."
+          }
         }
       }
     },
@@ -5205,6 +6589,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ドキュメントを表示…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ver documento..."
           }
         }
       }
@@ -5229,6 +6619,12 @@
             "state" : "translated",
             "value" : "なし"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguno"
+          }
         }
       }
     },
@@ -5251,6 +6647,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バージョン: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: %@"
           }
         }
       }
@@ -5275,6 +6677,12 @@
             "state" : "translated",
             "value" : "バージョン: %@ (%@)"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión: %1$@ (%2$@)"
+          }
         }
       }
     },
@@ -5297,6 +6705,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "パープル"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Morado"
           }
         }
       }
@@ -5321,6 +6735,12 @@
             "state" : "translated",
             "value" : "はい"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sí"
+          }
         }
       }
     },
@@ -5343,6 +6763,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "バグを報告"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informar de un error"
           }
         }
       }
@@ -5367,6 +6793,12 @@
             "state" : "translated",
             "value" : "バグを見つけましたか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Ha encontrado un error?"
+          }
         }
       }
     },
@@ -5389,6 +6821,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ピンク"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rosa"
           }
         }
       }
@@ -5413,6 +6851,12 @@
             "state" : "translated",
             "value" : "ファイル1つあたりの最大容量を設定"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer tamaño máximo por archivo"
+          }
         }
       }
     },
@@ -5435,6 +6879,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイルサイズが大きい順"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaños de archivo de mayor a menor"
           }
         }
       }
@@ -5459,6 +6909,12 @@
             "state" : "translated",
             "value" : "ファイルサイズが小さい順"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaños de archivo de menor a mayor"
+          }
         }
       }
     },
@@ -5481,6 +6937,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイルのみ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo archivos"
           }
         }
       }
@@ -5505,6 +6967,12 @@
             "state" : "translated",
             "value" : "ファイルの保存先フォルダをFinderで開きます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la carpeta donde se guarda el archivo en el Finder."
+          }
         }
       }
     },
@@ -5527,6 +6995,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイルの選択に失敗しました: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al seleccionar el archivo: %@"
           }
         }
       }
@@ -5551,6 +7025,12 @@
             "state" : "translated",
             "value" : "ファイルへのアクセス権限がありません。ファイルパス: %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tiene permiso para acceder al archivo. Ruta del archivo: %@"
+          }
         }
       }
     },
@@ -5573,6 +7053,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイルやフォルダをコピーしたときにデータが保存されるフォルダを管理します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestiona las carpetas donde se guardan los datos cuando copia un archivo o una carpeta."
           }
         }
       }
@@ -5597,6 +7083,12 @@
             "state" : "translated",
             "value" : "フィードバックのメール送信画面を開いてもよろしいですか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la ventana de envío de correo electrónico de comentarios?"
+          }
         }
       }
     },
@@ -5619,6 +7111,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フィードバックのメール送信画面を開きます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir la ventana de envío de correo electrónico de comentarios."
           }
         }
       }
@@ -5643,6 +7141,12 @@
             "state" : "translated",
             "value" : "フィードバックを送信"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviar comentarios"
+          }
         }
       }
     },
@@ -5665,6 +7169,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フィルター"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtro"
           }
         }
       }
@@ -5689,6 +7199,12 @@
             "state" : "translated",
             "value" : "フォーカスが当たっていない時は、ウィンドウを半透明にします。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando no esté enfocado, haga que la ventana sea semitransparente."
+          }
         }
       }
     },
@@ -5711,6 +7227,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フォルダのみ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo carpetas"
           }
         }
       }
@@ -5735,6 +7257,12 @@
             "state" : "translated",
             "value" : "プライバシー"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacidad"
+          }
         }
       }
     },
@@ -5757,6 +7285,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセット"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preajustes"
           }
         }
       }
@@ -5781,6 +7315,12 @@
             "state" : "translated",
             "value" : "プリセット: %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preajuste: %@"
+          }
         }
       }
     },
@@ -5803,6 +7343,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセット「%@」からすべての定型文を本当に削除しますか？この操作は元に戻せません。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar todas las frases estándar del preajuste “%@”? Esta acción no se puede deshacer."
           }
         }
       }
@@ -5827,6 +7373,12 @@
             "state" : "translated",
             "value" : "プリセットがありません"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay preajustes"
+          }
         }
       }
     },
@@ -5849,6 +7401,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセットの削除"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar preajuste"
           }
         }
       }
@@ -5873,6 +7431,12 @@
             "state" : "translated",
             "value" : "プリセットの割り当て"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asignar preajustes"
+          }
         }
       }
     },
@@ -5895,6 +7459,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセットの設定"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de preajuste"
           }
         }
       }
@@ -5919,6 +7489,12 @@
             "state" : "translated",
             "value" : "プリセットの順番はドラッグアンドドロップで並び替えることができます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede arrastrar y soltar para cambiar el orden de los preajustes."
+          }
         }
       }
     },
@@ -5941,6 +7517,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセットをアプリに割り当てると、そのアプリが最前面の時は、自動で選択されたプリセットに切り替わるようになります。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si asigna preajustes a las aplicaciones, cambiarán automáticamente al preajuste seleccionado cuando la aplicación esté en primer plano."
           }
         }
       }
@@ -5965,6 +7547,12 @@
             "state" : "translated",
             "value" : "プリセットを追加"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir un preajuste"
+          }
         }
       }
     },
@@ -5987,6 +7575,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセットを選択"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccionar preajuste"
           }
         }
       }
@@ -6011,6 +7605,12 @@
             "state" : "translated",
             "value" : "プリセット名"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre del preajuste"
+          }
         }
       }
     },
@@ -6033,6 +7633,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセット名を入力"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introducir nombre del preajuste"
           }
         }
       }
@@ -6057,6 +7663,12 @@
             "state" : "translated",
             "value" : "プリセット名を編集"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar nombre del preajuste"
+          }
         }
       }
     },
@@ -6079,6 +7691,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ブルー"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Azul"
           }
         }
       }
@@ -6103,6 +7721,12 @@
             "state" : "translated",
             "value" : "メール送信画面を開きますか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Abrir la ventana de envío de correo electrónico?"
+          }
         }
       }
     },
@@ -6125,6 +7749,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メニュー"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menú"
           }
         }
       }
@@ -6149,6 +7779,12 @@
             "state" : "translated",
             "value" : "メニューに表示される定型文の最大数を設定します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establece el número máximo de frases estándar que se mostrarán en el menú."
+          }
         }
       }
     },
@@ -6171,6 +7807,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メニューに表示される履歴の最大数を設定します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establece el número máximo de elementos del historial que se mostrarán en el menú."
           }
         }
       }
@@ -6195,6 +7837,12 @@
             "state" : "translated",
             "value" : "メニューに表示する定型文の最大数を設定"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer el número máximo de frases estándar que se mostrarán en el menú"
+          }
         }
       }
     },
@@ -6217,6 +7865,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メニューに表示する履歴の最大数を設定"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer el número máximo de elementos del historial que se mostrarán en el menú"
           }
         }
       }
@@ -6241,6 +7895,12 @@
             "state" : "translated",
             "value" : "メニューバーアイコンを隠す"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar el icono de la barra de menús"
+          }
         }
       }
     },
@@ -6263,6 +7923,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "よく使う定型文"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frases estándar favoritas"
           }
         }
       }
@@ -6287,6 +7953,12 @@
             "state" : "translated",
             "value" : "ライセンス情報"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información de la licencia"
+          }
         }
       }
     },
@@ -6309,6 +7981,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リストが更新されたとき、リストを自動的に最も上にスクロールします。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando la lista se actualice, desplazarse automáticamente a la parte superior de la lista."
           }
         }
       }
@@ -6333,6 +8011,12 @@
             "state" : "translated",
             "value" : "リセット"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer"
+          }
         }
       }
     },
@@ -6355,6 +8039,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リセット..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer…"
           }
         }
       }
@@ -6379,6 +8069,12 @@
             "state" : "translated",
             "value" : "リセット完了"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecimiento completado"
+          }
         }
       }
     },
@@ -6401,6 +8097,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リッチテキストのみ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo texto enriquecido"
           }
         }
       }
@@ -6425,6 +8127,12 @@
             "state" : "translated",
             "value" : "リポジトリにスターをつけてくれるととてもうれしいです！"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¡Me alegraría mucho si pudiera darle una estrella al repositorio!"
+          }
         }
       }
     },
@@ -6447,6 +8155,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リンクのみ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo enlaces"
           }
         }
       }
@@ -6471,6 +8185,12 @@
             "state" : "translated",
             "value" : "リンクを開きますか？"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Abrir enlace?"
+          }
         }
       }
     },
@@ -6493,6 +8213,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "リンクを開く"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace"
           }
         }
       }
@@ -6517,6 +8243,12 @@
             "state" : "translated",
             "value" : "レッド"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rojo"
+          }
         }
       }
     },
@@ -6539,6 +8271,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ログイン時に開く"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lanzar al iniciar sesión"
           }
         }
       }
@@ -6563,6 +8301,12 @@
             "state" : "translated",
             "value" : "一つ一つ解決する"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolver individualmente"
+          }
         }
       }
     },
@@ -6585,6 +8329,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一時停止"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausa"
           }
         }
       }
@@ -6609,6 +8359,12 @@
             "state" : "translated",
             "value" : "一時停止中"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En pausa"
+          }
         }
       }
     },
@@ -6631,6 +8387,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "一般"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
           }
         }
       }
@@ -6655,6 +8417,12 @@
             "state" : "translated",
             "value" : "一部の機能には、システムの許可が必要です。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas funciones requieren permisos del sistema."
+          }
         }
       }
     },
@@ -6677,6 +8445,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並び替え"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ordenar"
           }
         }
       }
@@ -6701,6 +8475,12 @@
             "state" : "translated",
             "value" : "以下の定型文は既存の項目とタイトルまたは内容が重複しています。\nタイトルまたは内容のどちらかを編集してください。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La siguiente frase estándar tiene un título o contenido duplicado con un elemento existente.\nEdite el título o el contenido."
+          }
         }
       }
     },
@@ -6723,6 +8503,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "以前の履歴ファイルが使用されています。アップグレード方法はドキュメントをご覧ください。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se utiliza el archivo de historial anterior. Consulte la documentación para obtener instrucciones de actualización."
           }
         }
       }
@@ -6747,6 +8533,12 @@
             "state" : "translated",
             "value" : "作成"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear"
+          }
         }
       }
     },
@@ -6769,6 +8561,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar"
           }
         }
       }
@@ -6793,6 +8591,12 @@
             "state" : "translated",
             "value" : "保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si establece un valor inferior al número de elementos del historial guardados, la cantidad que exceda el valor establecido se eliminará la próxima vez que se actualice el historial del portapapeles."
+          }
         }
       }
     },
@@ -6815,6 +8619,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存フォルダの管理"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestiona la carpeta guardada"
           }
         }
       }
@@ -6839,6 +8649,12 @@
             "state" : "translated",
             "value" : "保存フォルダの総容量:"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño total de la carpeta guardada:"
+          }
         }
       }
     },
@@ -6861,6 +8677,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存フォルダの項目数:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número de elementos en la carpeta guardada:"
           }
         }
       }
@@ -6885,6 +8707,12 @@
             "state" : "translated",
             "value" : "保存フォルダを空にする"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaciar la carpeta guardada"
+          }
         }
       }
     },
@@ -6907,6 +8735,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存フォルダを開く"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir carpeta guardada"
           }
         }
       }
@@ -6931,6 +8765,12 @@
             "state" : "translated",
             "value" : "保存先のプリセット:"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar en preajuste:"
+          }
         }
       }
     },
@@ -6953,6 +8793,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "値を調整"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustar valor"
           }
         }
       }
@@ -6977,6 +8823,12 @@
             "state" : "translated",
             "value" : "入力エラー"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error de entrada"
+          }
         }
       }
     },
@@ -6999,6 +8851,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "入力された情報が長すぎるか、無効な文字が含まれている可能性があります。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La información introducida puede ser demasiado larga o contener caracteres no válidos."
           }
         }
       }
@@ -7023,6 +8881,12 @@
             "state" : "translated",
             "value" : "内容: %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contenido: %@"
+          }
         }
       }
     },
@@ -7045,6 +8909,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再開"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reanudar"
           }
         }
       }
@@ -7069,6 +8939,12 @@
             "state" : "translated",
             "value" : "最新の履歴を変更してコピーする"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar y copiar el último elemento del historial"
+          }
         }
       }
     },
@@ -7091,6 +8967,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "別のプリセットに移動"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a otro preajuste"
           }
         }
       }
@@ -7115,6 +8997,12 @@
             "state" : "translated",
             "value" : "別のプリセットに移動..."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover a otro preajuste..."
+          }
         }
       }
     },
@@ -7137,6 +9025,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "削除"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
           }
         }
       }
@@ -7161,6 +9055,12 @@
             "state" : "translated",
             "value" : "削除..."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar…"
+          }
         }
       }
     },
@@ -7183,6 +9083,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "前のプリセットに切り替える"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar al preajuste anterior"
           }
         }
       }
@@ -7207,6 +9113,12 @@
             "state" : "translated",
             "value" : "割り当てる"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asignar"
+          }
         }
       }
     },
@@ -7229,6 +9141,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "割り当てるアプリを追加します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir aplicaciones para asignar."
           }
         }
       }
@@ -7253,6 +9171,12 @@
             "state" : "translated",
             "value" : "割り当てるプリセット"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preajuste para asignar"
+          }
         }
       }
     },
@@ -7275,6 +9199,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "割り当てるプリセットにはアプリのみ追加することができます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo se pueden añadir aplicaciones al preajuste para asignar."
           }
         }
       }
@@ -7299,6 +9229,12 @@
             "state" : "translated",
             "value" : "動作中"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En ejecución"
+          }
         }
       }
     },
@@ -7321,6 +9257,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "動画のみ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo vídeos"
           }
         }
       }
@@ -7345,6 +9287,12 @@
             "state" : "translated",
             "value" : "古い順"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De más antiguo a más nuevo"
+          }
         }
       }
     },
@@ -7367,6 +9315,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "各ファイルの最大容量"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño máximo de archivo para cada archivo"
           }
         }
       }
@@ -7391,6 +9345,12 @@
             "state" : "translated",
             "value" : "各フォルダの容量は正しく計算されないため、実際にはさらに多くの容量が使用されている場合があります。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El tamaño de cada carpeta no se calculará correctamente, por lo que es posible que se esté utilizando más espacio en realidad."
+          }
         }
       }
     },
@@ -7413,6 +9373,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "各項目に表示される番号を非表示にします。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar los números que se muestran en cada elemento."
           }
         }
       }
@@ -7437,6 +9403,12 @@
             "state" : "translated",
             "value" : "変更してコピー..."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar y copiar..."
+          }
         }
       }
     },
@@ -7459,6 +9431,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "大容量ファイルのコピー"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiando un archivo grande"
           }
         }
       }
@@ -7483,6 +9461,12 @@
             "state" : "translated",
             "value" : "大容量ファイルの複数コピー"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiando varios archivos grandes"
+          }
         }
       }
     },
@@ -7505,6 +9489,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "完了"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hecho"
           }
         }
       }
@@ -7529,6 +9519,12 @@
             "state" : "translated",
             "value" : "定型文"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frases estándar"
+          }
         }
       }
     },
@@ -7551,6 +9547,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文ウィンドウ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ventana de frases estándar"
           }
         }
       }
@@ -7575,6 +9577,12 @@
             "state" : "translated",
             "value" : "定型文ウィンドウの番号を隠す"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar números en la ventana de frases estándar"
+          }
         }
       }
     },
@@ -7597,6 +9605,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文ウィンドウを常に最前面に表示"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar la ventana de frases estándar siempre en primer plano"
           }
         }
       }
@@ -7621,6 +9635,12 @@
             "state" : "translated",
             "value" : "定型文ウィンドウを開く"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ventana de frases estándar"
+          }
         }
       }
     },
@@ -7643,6 +9663,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文が設定されていません"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha configurado una frase estándar."
           }
         }
       }
@@ -7667,6 +9693,12 @@
             "state" : "translated",
             "value" : "定型文のインポート"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar frases estándar"
+          }
         }
       }
     },
@@ -7689,6 +9721,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文のエクスポート"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar frases estándar"
           }
         }
       }
@@ -7713,6 +9751,12 @@
             "state" : "translated",
             "value" : "定型文の最大表示数"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número máximo de frases estándar a mostrar"
+          }
         }
       }
     },
@@ -7735,6 +9779,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文の削除"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar una frase estándar"
           }
         }
       }
@@ -7759,6 +9809,12 @@
             "state" : "translated",
             "value" : "定型文の管理"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar frases estándar"
+          }
         }
       }
     },
@@ -7781,6 +9837,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文の設定"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes de frases estándar"
           }
         }
       }
@@ -7805,6 +9867,12 @@
             "state" : "translated",
             "value" : "定型文の順番はドラッグアンドドロップで並び替えることができます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede arrastrar y soltar para cambiar el orden de las frases estándar."
+          }
         }
       }
     },
@@ -7827,6 +9895,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文はありません"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay frases estándar"
           }
         }
       }
@@ -7851,6 +9925,12 @@
             "state" : "translated",
             "value" : "定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al seleccionar una frase estándar o un elemento del historial de copia del menú, o al copiar usando atajos de teclado, se envía la acción de la tecla Comando + V. Se requiere permiso de accesibilidad."
+          }
         }
       }
     },
@@ -7873,6 +9953,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文リスト"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista de frases estándar"
           }
         }
       }
@@ -7897,6 +9983,12 @@
             "state" : "translated",
             "value" : "定型文を検索"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar frases estándar"
+          }
         }
       }
     },
@@ -7919,6 +10011,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文を無視する"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorar frases estándar"
           }
         }
       }
@@ -7943,6 +10041,12 @@
             "state" : "translated",
             "value" : "定型文を編集"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar una frase estándar"
+          }
         }
       }
     },
@@ -7965,6 +10069,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文を追加"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una frase estándar"
           }
         }
       }
@@ -7989,6 +10099,12 @@
             "state" : "translated",
             "value" : "実行中のアプリから追加"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir desde aplicaciones en ejecución"
+          }
         }
       }
     },
@@ -8011,6 +10127,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ventana de historial"
           }
         }
       }
@@ -8035,6 +10157,12 @@
             "state" : "translated",
             "value" : "履歴ウィンドウが開いていてフィルタリングが適用されている場合、ショートカットキーでフィルタリングされた履歴をコピーできるようにします。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir copiar el historial filtrado usando atajos de teclado cuando la ventana de Historial está abierta y se aplica el filtrado."
+          }
         }
       }
     },
@@ -8057,6 +10185,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウでフィルタリングされたコピー履歴を使用"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar historial de copia filtrado en la ventana de historial"
           }
         }
       }
@@ -8081,6 +10215,12 @@
             "state" : "translated",
             "value" : "履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar el recuento de caracteres después de la fecha en la ventana de Historial y en el menú."
+          }
         }
       }
     },
@@ -8103,6 +10243,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウのフィルタリングオプションに「カラーコードのみ」を追加します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir “Solo códigos de color” a las opciones de filtrado en la ventana de Historial."
           }
         }
       }
@@ -8127,6 +10273,12 @@
             "state" : "translated",
             "value" : "履歴ウィンドウの番号を隠す"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar números en la ventana de Historial"
+          }
         }
       }
     },
@@ -8149,6 +10301,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ウィンドウを常に最前面に表示"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar la ventana de Historial siempre en primer plano"
           }
         }
       }
@@ -8173,6 +10331,12 @@
             "state" : "translated",
             "value" : "履歴ウィンドウを開く"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ventana de Historial"
+          }
         }
       }
     },
@@ -8195,6 +10359,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴に保存されたすべてのファイルとフォルダを削除しますか？関連する履歴も削除されます。この操作は元に戻せません。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar todos los archivos y carpetas guardados en el historial? El historial relacionado también se eliminará. Esta acción no se puede deshacer."
           }
         }
       }
@@ -8219,6 +10389,12 @@
             "state" : "translated",
             "value" : "履歴のエクスポートに失敗しました: %@"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al exportar el historial: %@"
+          }
         }
       }
     },
@@ -8241,6 +10417,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の保存数に合わせる"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coincidir con el historial guardado"
           }
         }
       }
@@ -8265,6 +10447,12 @@
             "state" : "translated",
             "value" : "履歴の最大保存数"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número máximo de guardados de historial"
+          }
         }
       }
     },
@@ -8287,6 +10475,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の最大表示数"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número máximo de elementos de historial a mostrar"
           }
         }
       }
@@ -8311,6 +10505,12 @@
             "state" : "translated",
             "value" : "履歴の削除"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar elemento del historial"
+          }
         }
       }
     },
@@ -8333,6 +10533,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の管理"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestionar historial"
           }
         }
       }
@@ -8357,6 +10563,12 @@
             "state" : "translated",
             "value" : "履歴の設定"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes del historial"
+          }
         }
       }
     },
@@ -8379,6 +10591,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴はありません"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay historial"
           }
         }
       }
@@ -8403,6 +10621,12 @@
             "state" : "translated",
             "value" : "履歴ファイルが最新の形式に正しく変換されました。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El archivo de historial se ha convertido al formato más reciente con éxito."
+          }
         }
       }
     },
@@ -8425,6 +10649,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ファイルのアップグレードに失敗しました"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al actualizar el archivo de historial"
           }
         }
       }
@@ -8449,6 +10679,12 @@
             "state" : "translated",
             "value" : "履歴ファイルのアップグレードに成功しました"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo de historial actualizado con éxito"
+          }
         }
       }
     },
@@ -8471,6 +10707,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ファイルの読み込みまたは解析に失敗しました: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error al cargar o analizar el archivo de historial: %@"
           }
         }
       }
@@ -8495,6 +10737,12 @@
             "state" : "translated",
             "value" : "履歴リスト"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista de historial"
+          }
         }
       }
     },
@@ -8517,6 +10765,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴を保存する最大数を設定"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer el número máximo de elementos de historial a guardar"
           }
         }
       }
@@ -8541,6 +10795,12 @@
             "state" : "translated",
             "value" : "履歴を変更してコピー"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar historial y copiar"
+          }
         }
       }
     },
@@ -8563,6 +10823,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴を検索"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar historial"
           }
         }
       }
@@ -8587,6 +10853,12 @@
             "state" : "translated",
             "value" : "履歴項目がテキストである場合のみクイックペーストを行うようにします。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hacer que la Pegada rápida solo se realice si el elemento del historial es texto."
+          }
         }
       }
     },
@@ -8609,6 +10881,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "常に最前面に表示"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siempre en primer plano"
           }
         }
       }
@@ -8633,6 +10911,12 @@
             "state" : "translated",
             "value" : "情報"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Información"
+          }
         }
       }
     },
@@ -8655,6 +10939,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "成功"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éxito"
           }
         }
       }
@@ -8679,6 +10969,12 @@
             "state" : "translated",
             "value" : "戻る"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atrás"
+          }
         }
       }
     },
@@ -8701,6 +10997,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "数値を入力"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introducir un número"
           }
         }
       }
@@ -8725,6 +11027,12 @@
             "state" : "translated",
             "value" : "文字数カウントを表示"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar recuento de caracteres"
+          }
         }
       }
     },
@@ -8747,6 +11055,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新しいタイトル"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo título"
           }
         }
       }
@@ -8771,6 +11085,12 @@
             "state" : "translated",
             "value" : "新しいタイトル:"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo título:"
+          }
         }
       }
     },
@@ -8793,6 +11113,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新しいプリセットをリストに追加します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir un nuevo preajuste a la lista."
           }
         }
       }
@@ -8817,6 +11143,12 @@
             "state" : "translated",
             "value" : "新しいプリセットを追加する"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir un nuevo preajuste"
+          }
         }
       }
     },
@@ -8839,6 +11171,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新しい内容:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo contenido:"
           }
         }
       }
@@ -8863,6 +11201,12 @@
             "state" : "translated",
             "value" : "新しい定型文をリストに追加します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una nueva frase estándar a la lista."
+          }
         }
       }
     },
@@ -8885,6 +11229,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新しい定型文を追加"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una nueva frase estándar"
           }
         }
       }
@@ -8909,6 +11259,12 @@
             "state" : "translated",
             "value" : "新しい定型文を追加する"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una nueva frase estándar"
+          }
         }
       }
     },
@@ -8931,6 +11287,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新しい順"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De más reciente a más antiguo"
           }
         }
       }
@@ -8955,6 +11317,12 @@
             "state" : "translated",
             "value" : "新規プリセット…"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuevo preajuste…"
+          }
         }
       }
     },
@@ -8977,6 +11345,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新規プリセットの作成"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear un nuevo preajuste"
           }
         }
       }
@@ -9001,6 +11375,12 @@
             "state" : "translated",
             "value" : "新規プリセットを作成"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear un nuevo preajuste"
+          }
         }
       }
     },
@@ -9023,6 +11403,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "既存: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Existente: "
           }
         }
       }
@@ -9047,6 +11433,12 @@
             "state" : "translated",
             "value" : "既知のバグ一覧と報告ページへのリンクを開きます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la lista de errores conocidos y a la página de informes."
+          }
         }
       }
     },
@@ -9069,6 +11461,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "旧バージョンで使用できるようにする"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hacer que funcione con versiones anteriores"
           }
         }
       }
@@ -9093,6 +11491,12 @@
             "state" : "translated",
             "value" : "書き出したクリップボード履歴のJSONファイルを読み込みます。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar un archivo JSON del historial del portapapeles exportado."
+          }
         }
       }
     },
@@ -9115,6 +11519,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "書き出した定型文のJSONファイルを読み込みます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar un archivo JSON de las frases estándar exportadas."
           }
         }
       }
@@ -9139,6 +11549,12 @@
             "state" : "translated",
             "value" : "有効な数値を入力してください。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Introduzca un número válido."
+          }
         }
       }
     },
@@ -9161,6 +11577,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "有効にすると、プリセット情報なしで定型文のみをエクスポートします。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, solo se exportan frases estándar sin información de preajuste."
           }
         }
       }
@@ -9185,6 +11607,12 @@
             "state" : "translated",
             "value" : "標準テキストとしてコピー"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar como texto sin formato"
+          }
         }
       }
     },
@@ -9207,6 +11635,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "標準テキストのみ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo texto sin formato"
           }
         }
       }
@@ -9231,6 +11665,12 @@
             "state" : "translated",
             "value" : "権限"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permiso"
+          }
         }
       }
     },
@@ -9253,6 +11693,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次のプリセットがすでに存在しています。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los siguientes preajustes ya existen."
           }
         }
       }
@@ -9277,6 +11723,12 @@
             "state" : "translated",
             "value" : "次のプリセットに切り替える"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar al siguiente preajuste"
+          }
         }
       }
     },
@@ -9299,6 +11751,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "次へ"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siguiente"
           }
         }
       }
@@ -9323,6 +11781,12 @@
             "state" : "translated",
             "value" : "無制限"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ilimitado"
+          }
         }
       }
     },
@@ -9345,6 +11809,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在、インポートとエクスポートはテキストのみサポートしています。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualmente, solo se admite texto para importar y exportar."
           }
         }
       }
@@ -9369,6 +11839,12 @@
             "state" : "translated",
             "value" : "現在のクリップボード内容を使って新しい定型文を追加します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una nueva frase estándar usando el contenido actual del portapapeles."
+          }
         }
       }
     },
@@ -9391,6 +11867,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "生成AIと開発"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desarrollado con IA generativa"
           }
         }
       }
@@ -9415,6 +11897,12 @@
             "state" : "translated",
             "value" : "画像のみ"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo imágenes"
+          }
         }
       }
     },
@@ -9437,6 +11925,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "画像をコピー"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar imagen"
           }
         }
       }
@@ -9461,6 +11955,12 @@
             "state" : "translated",
             "value" : "画像を保存..."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardar imagen..."
+          }
         }
       }
     },
@@ -9483,6 +11983,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番号を隠す"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar números"
           }
         }
       }
@@ -9507,6 +12013,12 @@
             "state" : "translated",
             "value" : "移動"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mover"
+          }
         }
       }
     },
@@ -9529,6 +12041,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "終了"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir"
           }
         }
       }
@@ -9553,6 +12071,12 @@
             "state" : "translated",
             "value" : "統合する"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fusionar"
+          }
         }
       }
     },
@@ -9575,6 +12099,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "続ける"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
           }
         }
       }
@@ -9599,6 +12129,12 @@
             "state" : "translated",
             "value" : "続けるには操作を選択してください。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione una operación para continuar."
+          }
         }
       }
     },
@@ -9621,6 +12157,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "緑茶を奢る"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprar té verde"
           }
         }
       }
@@ -9645,6 +12187,12 @@
             "state" : "translated",
             "value" : "緑茶を買ってあげる"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprarme té verde"
+          }
         }
       }
     },
@@ -9667,6 +12215,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar…"
           }
         }
       }
@@ -9691,6 +12245,12 @@
             "state" : "translated",
             "value" : "背景色"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color de fondo"
+          }
         }
       }
     },
@@ -9713,6 +12273,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自動"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automático"
           }
         }
       }
@@ -9737,6 +12303,12 @@
             "state" : "translated",
             "value" : "自動スクロール"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desplazamiento automático"
+          }
         }
       }
     },
@@ -9759,6 +12331,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "表示しない"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No mostrar"
           }
         }
       }
@@ -9783,6 +12361,12 @@
             "state" : "translated",
             "value" : "複製"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplicar"
+          }
         }
       }
     },
@@ -9805,6 +12389,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes…"
           }
         }
       }
@@ -9829,6 +12419,12 @@
             "state" : "translated",
             "value" : "設定を開く"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ajustes"
+          }
         }
       }
     },
@@ -9851,6 +12447,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "許可済み"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Concedido"
           }
         }
       }
@@ -9875,6 +12477,12 @@
             "state" : "translated",
             "value" : "謝辞"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agradecimientos"
+          }
         }
       }
     },
@@ -9897,6 +12505,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "貢献者"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colaboradores"
           }
         }
       }
@@ -9921,6 +12535,12 @@
             "state" : "translated",
             "value" : "質問や意見交換などを行いましょう"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haga preguntas y comparta sus opiniones"
+          }
         }
       }
     },
@@ -9943,6 +12563,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "追加"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir"
           }
         }
       }
@@ -9967,6 +12593,12 @@
             "state" : "translated",
             "value" : "通知"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notificación"
+          }
         }
       }
     },
@@ -9989,6 +12621,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "通知をテスト"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probar notificación"
           }
         }
       }
@@ -10013,6 +12651,12 @@
             "state" : "translated",
             "value" : "通知機能を使用する場合は許可を与える必要があります。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para usar la función de notificación, necesita conceder permiso."
+          }
         }
       }
     },
@@ -10035,6 +12679,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択されたファイルがありません。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se ha seleccionado ningún archivo."
           }
         }
       }
@@ -10059,6 +12709,12 @@
             "state" : "translated",
             "value" : "選択されているプリセットからすべての定型文を本当に削除しますか？この操作は元に戻せません。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar todas las frases estándar del preajuste seleccionado? Esta acción no se puede deshacer."
+          }
         }
       }
     },
@@ -10081,6 +12737,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択したアプリをリストから削除します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar una aplicación seleccionada de la lista."
           }
         }
       }
@@ -10105,6 +12767,12 @@
             "state" : "translated",
             "value" : "選択したプリセットをリストから削除します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar un preajuste seleccionado de la lista."
+          }
         }
       }
     },
@@ -10127,6 +12795,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択したプリセットを編集します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar un preajuste seleccionado."
           }
         }
       }
@@ -10151,6 +12825,12 @@
             "state" : "translated",
             "value" : "選択した定型文をリストから削除します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar una frase estándar seleccionada de la lista."
+          }
         }
       }
     },
@@ -10173,6 +12853,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "選択した定型文を編集します。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar una frase estándar seleccionada."
           }
         }
       }
@@ -10197,6 +12883,12 @@
             "state" : "translated",
             "value" : "重複したプリセット"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preajustes duplicados"
+          }
         }
       }
     },
@@ -10219,6 +12911,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "閉じる"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar"
           }
         }
       }
@@ -10243,6 +12941,12 @@
             "state" : "translated",
             "value" : "開く"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir"
+          }
         }
       }
     },
@@ -10265,6 +12969,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開発に携わった貢献者"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colaboradores involucrados en el desarrollo"
           }
         }
       }
@@ -10289,6 +12999,12 @@
             "state" : "translated",
             "value" : "開発者をサポート"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apoyar al desarrollador"
+          }
         }
       }
     },
@@ -10311,6 +13027,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開発者向け機能"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Funciones para desarrolladores"
           }
         }
       }
@@ -10335,6 +13057,12 @@
             "state" : "translated",
             "value" : "除外するアプリ"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplicaciones a excluir"
+          }
         }
       }
     },
@@ -10357,6 +13085,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "除外するアプリにはアプリのみ追加することができます。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo se pueden añadir aplicaciones a la lista de Aplicaciones a excluir."
           }
         }
       }
@@ -10381,6 +13115,12 @@
             "state" : "translated",
             "value" : "除外するアプリに追加"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a aplicaciones a excluir"
+          }
         }
       }
     },
@@ -10403,6 +13143,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "除外するアプリに追加..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a aplicaciones a excluir…"
           }
         }
       }
@@ -10427,6 +13173,12 @@
             "state" : "translated",
             "value" : "除外するアプリのリストを空にしてもよろしいですか？この操作は元に戻せません。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere vaciar la lista de Aplicaciones a excluir? Esta acción no se puede deshacer."
+          }
         }
       }
     },
@@ -10449,6 +13201,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "除外するアプリリスト"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lista de aplicaciones a excluir"
           }
         }
       }
@@ -10473,6 +13231,12 @@
             "state" : "translated",
             "value" : "除外するアプリを追加します。"
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir una aplicación a excluir."
+          }
         }
       }
     },
@@ -10496,6 +13260,12 @@
             "state" : "translated",
             "value" : "項目から定型文を作成..."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear una frase estándar a partir de un elemento..."
+          }
         }
       }
     },
@@ -10518,6 +13288,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hacer que la ventana se cierre cuando haga doble clic en un elemento para copiarlo."
           }
         }
       }
