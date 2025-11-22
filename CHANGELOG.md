@@ -23,9 +23,7 @@ Notes
 
 ## 1.6.3 (under development)
 ### New Features
-- **Add German (`de`) localization by generative AI**
-  - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
-- **Add Spanish (`es`) localization by generative AI**
+- **Add French (`fr`), German (`de`), Spanish (`es`) localization by generative AI**
   - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
 
 ### Bug Fixes and Improvements

@@ -28,7 +28,7 @@ struct LicenseInfoModalView: View {
     }
     
     // Gemini CLIの使用バージョン
-    private let geminiCLIVersionString: String = "0.17.0"
+    private let geminiCLIVersionString: String = "0.17.1"
     
     // Qwen Codeの使用バージョン
     private let qwenCodeVersionString: String = "0.2.1"
