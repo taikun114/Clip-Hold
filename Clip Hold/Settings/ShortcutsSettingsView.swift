@@ -2,21 +2,38 @@ import SwiftUI
 import KeyboardShortcuts
 
 extension Int {
-    var ordinalSuffix: String {
-        let suffixString: String
-        let ones = self % 10
-        let tens = (self / 10) % 10
-        if tens == 1 {
-            suffixString = String(localized: "th_suffix")
-        } else {
-            switch ones {
-            case 1: suffixString = String(localized: "st_suffix")
-            case 2: suffixString = String(localized: "nd_suffix")
-            case 3: suffixString = String(localized: "rd_suffix")
-            default: suffixString = String(localized: "th_suffix")
-            }
+    var ordinalSuffixForHistory: String {
+        switch self {
+        case 1: return String(localized: "1_suffix_history")
+        case 2: return String(localized: "2_suffix_history")
+        case 3: return String(localized: "3_suffix_history")
+        case 4: return String(localized: "4_suffix_history")
+        case 5: return String(localized: "5_suffix_history")
+        case 6: return String(localized: "6_suffix_history")
+        case 7: return String(localized: "7_suffix_history")
+        case 8: return String(localized: "8_suffix_history")
+        case 9: return String(localized: "9_suffix_history")
+        case 10: return String(localized: "10_suffix_history")
+        default:
+            return self.description
         }
-        return "\(self)\(suffixString)"
+    }
+
+    var ordinalSuffixForStandardPhrase: String {
+        switch self {
+        case 1: return String(localized: "1_suffix_standard_phrase")
+        case 2: return String(localized: "2_suffix_standard_phrase")
+        case 3: return String(localized: "3_suffix_standard_phrase")
+        case 4: return String(localized: "4_suffix_standard_phrase")
+        case 5: return String(localized: "5_suffix_standard_phrase")
+        case 6: return String(localized: "6_suffix_standard_phrase")
+        case 7: return String(localized: "7_suffix_standard_phrase")
+        case 8: return String(localized: "8_suffix_standard_phrase")
+        case 9: return String(localized: "9_suffix_standard_phrase")
+        case 10: return String(localized: "10_suffix_standard_phrase")
+        default:
+            return self.description
+        }
     }
 }
 
@@ -120,7 +137,7 @@ struct ShortcutsSettingsView: View {
                     HStack {
                         VStack(alignment: .leading) {
                             // OrdinalSuffix を使用して英語表記の順序数にする
-                            Text("\((index + 1).ordinalSuffix)定型文をコピーする")
+                            Text("\((index + 1).ordinalSuffixForStandardPhrase)定型文をコピーする")
                             
                             let currentPhrases = presetManager.selectedPreset?.phrases ?? []
                             let phraseExists = currentPhrases.indices.contains(index)
@@ -215,7 +232,7 @@ struct ShortcutsSettingsView: View {
                 
                 ForEach(0..<10, id: \.self) { index in
                     HStack {
-                        Text("\((index + 1).ordinalSuffix)履歴をコピーする")
+                        Text("\((index + 1).ordinalSuffixForHistory)履歴をコピーする")
                         Spacer()
                         
                         let shortcutName: KeyboardShortcuts.Name = {

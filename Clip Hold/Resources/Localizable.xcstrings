@@ -1295,6 +1295,76 @@
         }
       }
     },
+    "1_suffix_history" : {
+      "comment" : "「1番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「1番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "st"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "er"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "1_suffix_standard_phrase" : {
+      "comment" : "「1番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「1番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "st"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "re"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
     "1以上の数値を入力してください。" : {
       "comment" : "コピー履歴や定型文の保存・表示数を設定する画面で1よりも小さい数(0や負の値など)が入力されたときのエラーメッセージ。",
       "localizations" : {
@@ -1326,6 +1396,636 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1以上の数値を入力してください。"
+          }
+        }
+      }
+    },
+    "2_suffix_history" : {
+      "comment" : "「2番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「2番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nd"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "2_suffix_standard_phrase" : {
+      "comment" : "「2番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「2番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nd"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "3_suffix_history" : {
+      "comment" : "「3番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「3番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rd"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "3_suffix_standard_phrase" : {
+      "comment" : "「3番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「3番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rd"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "4_suffix_history" : {
+      "comment" : "「4番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「4番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "4_suffix_standard_phrase" : {
+      "comment" : "「4番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「4番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "5_suffix_history" : {
+      "comment" : "「5番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「5番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "5_suffix_standard_phrase" : {
+      "comment" : "「5番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「5番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "6_suffix_history" : {
+      "comment" : "「6番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「6番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "6_suffix_standard_phrase" : {
+      "comment" : "「6番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「6番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "7_suffix_history" : {
+      "comment" : "「7番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「7番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "7_suffix_standard_phrase" : {
+      "comment" : "「7番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「7番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "8_suffix_history" : {
+      "comment" : "「8番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「8番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "8_suffix_standard_phrase" : {
+      "comment" : "「8番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「8番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "9_suffix_history" : {
+      "comment" : "「9番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「9番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "9_suffix_standard_phrase" : {
+      "comment" : "「9番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「9番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "10_suffix_history" : {
+      "comment" : "「10番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「10番目の履歴をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
+          }
+        }
+      }
+    },
+    "10_suffix_standard_phrase" : {
+      "comment" : "「10番目の定型文」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「定型文」という言葉にくっつきます（例えば「10番目の定型文をコピーする」）。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "th"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".ª"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "e"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番目の"
           }
         }
       }
@@ -2357,41 +3057,6 @@
         }
       }
     },
-    "nd_suffix" : {
-      "comment" : "「2番目の」の数字につく序数詞のサフィックス。数字部分は除く。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "nd"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "º"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "e"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "番目の"
-          }
-        }
-      }
-    },
     "OK" : {
       "localizations" : {
         "en" : {
@@ -2905,41 +3570,6 @@
         }
       }
     },
-    "rd_suffix" : {
-      "comment" : "「3番目の」の数字につく序数詞のサフィックス。数字部分は除く。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "rd"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "º"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "e"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "番目の"
-          }
-        }
-      }
-    },
     "SFSymbolsPicker by Kenny Wang" : {
       "shouldTranslate" : false
     },
@@ -3009,76 +3639,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "SFSymbolsPickerのGitHubページを開いてもよろしいですか？"
-          }
-        }
-      }
-    },
-    "st_suffix" : {
-      "comment" : "「1番目の」の数字につく序数詞のサフィックス。数字部分は除く。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "st"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "º"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "er"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "番目の"
-          }
-        }
-      }
-    },
-    "th_suffix" : {
-      "comment" : "「4番目の」から「10番目の」までの数字につく序数詞のサフィックス。数字部分は除く。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "th"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "º"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "e"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "番目の"
           }
         }
       }
