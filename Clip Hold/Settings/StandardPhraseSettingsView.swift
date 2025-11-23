@@ -99,7 +99,11 @@ private struct PresetSettingsSection: View {
                     Button {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             editingPreset = preset
-                            newPresetName = preset.name
+                            if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+                                newPresetName = preset.displayName
+                            } else {
+                                newPresetName = preset.name
+                            }
                             newPresetIcon = preset.icon
                             newPresetColor = preset.color
                         }
@@ -121,7 +125,11 @@ private struct PresetSettingsSection: View {
                 if let selectedId = selection.first {
                     if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
-                        newPresetName = preset.name
+                        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+                            newPresetName = preset.displayName
+                        } else {
+                            newPresetName = preset.name
+                        }
                         newPresetIcon = preset.icon
                         newPresetColor = preset.color
                     }
@@ -213,7 +221,11 @@ private struct PresetSettingsSection: View {
                 Button(action: {
                     if let selectedId = selectedPresetId, let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
-                        newPresetName = preset.name
+                        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+                            newPresetName = preset.displayName
+                        } else {
+                            newPresetName = preset.name
+                        }
                         newPresetIcon = preset.icon
                         newPresetColor = preset.color
                     }
