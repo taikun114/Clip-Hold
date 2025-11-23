@@ -693,76 +693,6 @@
         }
       }
     },
-    "%@定型文をコピーする" : {
-      "comment" : "特定のインデックスの定型文をコピーするショートカット設定の項目名。「1番目の」や「2番目の」のような序数詞が表示されます。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die %@ Standardphrase kopieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy the %@ Standard Phrase"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar la frase estándar %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copier la phrase standard %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@定型文をコピーする"
-          }
-        }
-      }
-    },
-    "%@履歴をコピーする" : {
-      "comment" : "特定のインデックスの履歴をコピーするショートカット設定の項目名。「1番目の」や「2番目の」のような序数詞が表示されます。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Den %@ Verlaufseintrag kopieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy the %@ History Item"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar el elemento del historial %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copier l'élément d'historique %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@履歴をコピーする"
-          }
-        }
-      }
-    },
     "%1$@を超える%2$d個のファイル（合計%3$@）がコピーされました。履歴に保存してもよろしいですか？" : {
       "comment" : "「コピーアラートを表示する容量」の設定値よりも大きいファイルが複数個コピーされたときに表示されるアラートメッセージ。設定された容量、コピーしたファイルの個数、それらを合わせた合計容量が表示されます。",
       "localizations" : {
@@ -846,6 +776,76 @@
     },
     "%lld." : {
       "shouldTranslate" : false
+    },
+    "%lld%@定型文をコピーする" : {
+      "comment" : "特定のインデックスの定型文をコピーするショートカット設定の項目名。「1番目の」や「2番目の」のような序数詞が表示されます。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die %lld%@ Standardphrase kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy the %lld%@ Standard Phrase"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar la frase estándar %lld%@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier la phrase standard %lld%@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%@定型文をコピーする"
+          }
+        }
+      }
+    },
+    "%lld%@履歴をコピーする" : {
+      "comment" : "特定のインデックスの履歴をコピーするショートカット設定の項目名。「1番目の」や「2番目の」のような序数詞が表示されます。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den %lld%@ Verlaufseintrag kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy the %lld%@ History Item"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar el elemento del historial %lld%@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier l'élément d'historique %lld%@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld%@履歴をコピーする"
+          }
+        }
+      }
     },
     "%lld%%" : {
       "shouldTranslate" : false

@@ -137,7 +137,7 @@ struct ShortcutsSettingsView: View {
                     HStack {
                         VStack(alignment: .leading) {
                             // OrdinalSuffix を使用して英語表記の順序数にする
-                            Text("\((index + 1).ordinalSuffixForStandardPhrase)定型文をコピーする")
+                            Text("\(index + 1)\((index + 1).ordinalSuffixForStandardPhrase)定型文をコピーする")
                             
                             let currentPhrases = presetManager.selectedPreset?.phrases ?? []
                             let phraseExists = currentPhrases.indices.contains(index)
@@ -232,7 +232,7 @@ struct ShortcutsSettingsView: View {
                 
                 ForEach(0..<10, id: \.self) { index in
                     HStack {
-                        Text("\((index + 1).ordinalSuffixForHistory)履歴をコピーする")
+                        Text("\(index + 1)\((index + 1).ordinalSuffixForHistory)履歴をコピーする")
                         Spacer()
                         
                         let shortcutName: KeyboardShortcuts.Name = {
