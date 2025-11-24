@@ -33,7 +33,8 @@ Notes
   - The issue where the “Change History and Copy” was also displayed on the change and copy standard phrases screen has been fixed.
 - **Improve shortcut keys for the change history and copy screen**
   - Pressing `⌘ (Command)` + `S` while the change history and copy screen is open now performs the copy action.
-- **Improve the input field box highlighting on the edit and copy screens for history and standard phrases, and on the add edit screen for standard phrases, when “Increase Contrast” is enabled in System Settings**
+- **Improve the input field box highlighting on the change and copy screens for history and standard phrases, and on the add edit screen for standard phrases, when “Increase Contrast” is enabled in System Settings**
+- **Improve to send a notification when the shortcut key for standard phrases that are not set is pressed**
 - **Add a description regarding size calculation to the “Total Size of Saved Folder:” in Copy History Settings**
 - **Remove height restrictions on input fields in the history and standard phrases edit screens**
   - When these screens are displayed as windows, increasing the window height now causes the input fields to expand accordingly.

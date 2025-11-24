@@ -763,6 +763,76 @@
         }
       }
     },
+    "%1$d%2$@定型文は設定されていません" : {
+      "comment" : "定型文が設定されていないインデックスのショートカットキーを押されたときに送信される通知のタイトル。押された定型文の数字と、それに対応する序数詞サフィックスが表示されます。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die %1$d%2$@ Standardphrase ist nicht festgelegt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The %1$d%2$@ standard phrase is not set."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La %1$d%2$@ frase estándar no está configurada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La %1$d%2$@ phrase standard n'est pas définie."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d%2$@定型文は設定されていません"
+          }
+        }
+      }
+    },
+    "%1$d%2$@定型文を呼び出すショートカットキーが押されましたが、この定型文は設定されていません。" : {
+      "comment" : "定型文が設定されていないインデックスのショートカットキーを押されたときに送信される通知の本文。押された定型文の数字と、それに対応する序数詞サフィックスが表示されます。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Tastenkombination zum Aufrufen der %1$d%2$@ Standardphrase wurde gedrückt, aber diese Standardphrase ist nicht festgelegt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shortcut key to call the %1$d%2$@ standard phrase was pressed, but this standard phrase is not set."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se presionó la tecla de acceso rápido para llamar a la %1$d%2$@ frase estándar, pero esta frase estándar no está configurada."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La touche de raccourci pour appeler la %1$d%2$@ phrase standard a été enfoncée, mais cette phrase standard n'est pas définie."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d%2$@定型文を呼び出すショートカットキーが押されましたが、この定型文は設定されていません。"
+          }
+        }
+      }
+    },
     "%lld %@" : {
       "localizations" : {
         "en" : {

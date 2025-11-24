@@ -593,7 +593,20 @@ struct ClipHoldApp: App {
                         }
                     }
                 } else {
-                    print("Standard phrase shortcut \(i+1) was pressed, but no corresponding phrase exists.")
+                    // 通知のタイトルと本文を構築
+                    let number = i + 1
+                    let ordinalSuffix = number.ordinalSuffixForStandardPhrase
+                    let title = String(format: String(localized: "%1$d%2$@定型文は設定されていません"), number, ordinalSuffix)
+                    let body = String(format: String(localized: "%1$d%2$@定型文を呼び出すショートカットキーが押されましたが、この定型文は設定されていません。"), number, ordinalSuffix)
+                    
+                    // 無音通知を送信
+                    NotificationManager.shared.sendSilentNotification(
+                        title: title,
+                        body: body,
+                        identifier: "standardPhraseNotSet_\(number)"
+                    )
+                    
+                    print("Standard phrase shortcut \(number) was pressed, but no corresponding phrase exists. Silent notification sent.")
                 }
             }
         }

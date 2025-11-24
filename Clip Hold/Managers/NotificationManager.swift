@@ -170,4 +170,31 @@ class NotificationManager {
             }
         }
     }
+
+    func sendSilentNotification(title: String, body: String, identifier: String) {
+        // 同じidentifierの通知が保留中または配信済みであれば削除
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])
+        
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = nil // 無音通知
+        
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Silent notification send error (ID: \(identifier)): \(error.localizedDescription)")
+            } else {
+                print("Silent notification sent (ID: \(identifier)).")
+                
+                // 5秒後に通知を削除
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])
+                    print("Removed silent notification (ID: \(identifier)) after 5 seconds.")
+                }
+            }
+        }
+    }
 }
