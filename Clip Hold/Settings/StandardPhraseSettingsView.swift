@@ -1314,7 +1314,9 @@ struct PresetNameSheet: View {
                 VStack(alignment: .leading, spacing: 10) {
                     // アイコン選択ボタンと入力フィールド
                     HStack {
-                        SFSymbolsPicker(selection: $icon, prompt: String(localized: "シンボルを検索")) {
+                        Button(action: {
+                            showingIconPicker = true
+                        }) {
                             ZStack {
                                 Circle()
                                     .fill(color == "custom" ? customBackgroundColor : getColor(from: color))
@@ -1329,6 +1331,11 @@ struct PresetNameSheet: View {
                             }
                         }
                         .buttonStyle(.plain)
+                        .sfSymbolsPicker(
+                            isPresented: $showingIconPicker,
+                            selection: $icon,
+                            prompt: String(localized: "シンボルを検索")
+                        )
                         .onChange(of: icon) { oldValue, newValue in
                             if newValue.isEmpty {
                                 icon = previousIcon
