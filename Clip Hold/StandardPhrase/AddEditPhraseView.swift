@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AddEditPhraseView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @StateObject var iconGenerator = PresetIconGenerator.shared
@@ -120,6 +121,12 @@ struct AddEditPhraseView: View {
                     focusedField = .content
                 }
                 .disabled(!useCustomTitle)
+                .overlay {
+                    if colorSchemeContrast == .increased {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.primary, lineWidth: 1)
+                    }
+                }
             
             Toggle(isOn: $useCustomTitle) {
                 Text("カスタムタイトルを使用する")
@@ -142,7 +149,7 @@ struct AddEditPhraseView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            .stroke(colorSchemeContrast == .increased ? Color.primary : Color.gray.opacity(0.3), lineWidth: 1)
                     )
                     .onChange(of: content) {
                         if !useCustomTitle {
