@@ -29,6 +29,8 @@ Notes
 ### Bug Fixes and Improvements
 - **Fix issue where the “Resume” button did not appear in the notification panel sent when launching the app while clipboard monitoring was paused**
 - **Fix issue that preset name in the edit screen for default presets was not localized**
+- **Fix “Change History and Copy” to “Change Item and Copy”**
+  - The issue where the “Change History and Copy” was also displayed on the change and copy standard phrases screen has been fixed.
 - **Improve shortcut keys for the change history and copy screen**
   - Pressing `⌘ (Command)` + `S` while the change history and copy screen is open now performs the copy action.
 - **Improve the input field box highlighting on the edit and copy screens for history and standard phrases, and on the add edit screen for standard phrases, when “Increase Contrast” is enabled in System Settings**

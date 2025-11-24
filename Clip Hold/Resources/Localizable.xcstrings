@@ -13747,7 +13747,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Modifier l'historique et copier"
+            "value" : "Changer l'historique et copier"
           }
         },
         "ja" : {
@@ -16764,6 +16764,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。"
+          }
+        }
+      }
+    },
+    "項目を変更してコピー" : {
+      "comment" : "履歴や定型文を変更してコピーする画面のタイトル",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Element ändern und kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Item and Copy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar elemento y copiar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer l'élément et copier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "項目を変更してコピー"
           }
         }
       }

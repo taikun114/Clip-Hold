@@ -12,7 +12,7 @@ struct EditHistoryItemView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("履歴を変更してコピー")
+                Text("項目を変更してコピー")
                     .font(.headline)
                     .fontWeight(.bold)
                 Spacer()
