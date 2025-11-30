@@ -2,24 +2,6 @@ import SwiftUI
 import AppKit
 import Quartz
 
-// sourceAppPathからローカライズされたアプリ名を取得するヘルパー関数
-private func getLocalizedName(for sourceAppPath: String?) -> String? {
-    guard let sourceAppPath = sourceAppPath else { return nil }
-    
-    let appURL = URL(fileURLWithPath: sourceAppPath)
-    let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
-    
-    if let appBundle = Bundle(url: appURL) {
-        let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? 
-        appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? 
-        appBundle.infoDictionary?["CFBundleName"] as? String ?? 
-        nonLocalizedName
-        return appName
-    } else {
-        return nonLocalizedName
-    }
-}
-
 struct HistoryContentList: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
@@ -111,6 +93,7 @@ struct HistoryContentList: View {
                                 rowIconViews: $rowIconViews, // アイコンビュー辞書へのBindingを渡す
                                 showCharacterCount: showCharacterCount // showCharacterCountを渡す
                             )
+                            .environmentObject(clipboardManager)
                             .environmentObject(standardPhraseManager)
                             .environmentObject(presetManager)
                             .tag(item.id)
@@ -386,6 +369,14 @@ struct HistoryContentList: View {
                         return true
                     }
                     .onChange(of: filteredHistory) { _, newValue in
+                        // 不要になったrowIconViewsのエントリをクリーンアップする
+                        let newIDs = Set(newValue.map { $0.id })
+                        let oldIDs = Set(rowIconViews.keys)
+                        let unusedIDs = oldIDs.subtracting(newIDs)
+                        for id in unusedIDs {
+                            rowIconViews.removeValue(forKey: id)
+                        }
+                        
                         // filteredHistory が更新され、かつscrollToTopOnUpdateがtrue、かつ検索中でない場合
                         // さらに、元の履歴の数が変わった場合のみに限定する
                         if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && newValue.count > previousClipboardHistoryCount {
@@ -425,7 +416,7 @@ struct HistoryContentList: View {
                         }
                     } message: {
                         if let appPath = appToExclude {
-                            let appName = getLocalizedName(for: appPath) ?? appPath
+                            let appName = clipboardManager.getLocalizedName(for: appPath) ?? appPath
                             Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
                         }
                     }
@@ -438,7 +429,7 @@ struct HistoryContentList: View {
                         Button("キャンセル", role: .cancel) { }
                     } message: {
                         if let appPath = appToDeleteFrom {
-                            let appName = getLocalizedName(for: appPath) ?? appPath
+                            let appName = clipboardManager.getLocalizedName(for: appPath) ?? appPath
                             let count = clipboardManager.countHistoryFromApp(sourceAppPath: appPath)
                             Text("「\(appName)」からのすべての履歴を削除してもよろしいですか？\(count)個の履歴が削除されます。この操作は元に戻せません。")
                         }

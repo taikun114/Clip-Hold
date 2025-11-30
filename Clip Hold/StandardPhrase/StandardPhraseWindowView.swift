@@ -700,6 +700,9 @@ struct StandardPhraseWindowView: View {
                 isSearchFieldFocused = true
             }
         }
+        .onDisappear {
+            currentCopyConfirmationTask?.cancel()
+        }
     }
 }
 

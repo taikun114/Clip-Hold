@@ -21,24 +21,6 @@ private struct IconViewAccessor: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
-// sourceAppPathからローカライズされたアプリ名を取得するヘルパー関数
-private func getLocalizedName(for sourceAppPath: String?) -> String? {
-    guard let sourceAppPath = sourceAppPath else { return nil }
-    
-    let appURL = URL(fileURLWithPath: sourceAppPath)
-    let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
-    
-    if let appBundle = Bundle(url: appURL) {
-        let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? 
-        appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? 
-        appBundle.infoDictionary?["CFBundleName"] as? String ?? 
-        nonLocalizedName
-        return appName
-    } else {
-        return nonLocalizedName
-    }
-}
-
 private let itemDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .short
@@ -266,7 +248,7 @@ struct HistoryItemRow: View {
                     
                     // カラーアイコンにもアプリアイコンを表示する (showAppIconOverlayがtrueの場合のみ)
                     if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
-                        let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
+                        let appName = clipboardManager.getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView
                                 .overlay(
@@ -357,7 +339,7 @@ struct HistoryItemRow: View {
                     
                     // アプリアイコンをオーバーレイ表示 (showAppIconOverlayがtrueの場合のみ)
                     if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
-                        let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
+                        let appName = clipboardManager.getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView
                                 .overlay(
@@ -489,7 +471,7 @@ struct HistoryItemRow: View {
             }
         } message: {
             if let appPath = appToExclude {
-                let appName = getLocalizedName(for: appPath) ?? appPath
+                let appName = clipboardManager.getLocalizedName(for: appPath) ?? appPath
                 Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
             }
         }
@@ -512,7 +494,7 @@ struct HistoryItemRow: View {
             Button("キャンセル", role: .cancel) { }
         } message: {
             if let appPath = appToDeleteFrom {
-                let appName = getLocalizedName(for: appPath) ?? appPath
+                let appName = clipboardManager.getLocalizedName(for: appPath) ?? appPath
                 let count = clipboardManager.countHistoryFromApp(sourceAppPath: appPath)
                 Text("「\(appName)」からのすべての履歴を削除してもよろしいですか？\(count)個の履歴が削除されます。この操作は元に戻せません。")
             }

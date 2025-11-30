@@ -259,7 +259,8 @@ struct HistoryWindowView: View {
         .onDisappear {
             clipboardManager.filteredHistoryForShortcuts = nil
             
-            
+            // コピー確認のタスクをキャンセル
+            currentCopyConfirmationTask?.cancel()
             
             // ウインドウが閉じる際に実行中のタスクをキャンセルしてメモリを解放
             searchDebounceTask?.cancel()

@@ -11,10 +11,42 @@ class ClipboardManager: ObservableObject {
     @Published var clipboardHistory: [ClipboardItem] = []
     @Published var filteredHistoryForShortcuts: [ClipboardItem]? = nil
     
+    // アプリケーション名のキャッシュ
+    @Published var localizedAppNames: [String: String] = [:]
+    
     // History Window States
     @Published var historySelectedFilter: ItemFilter = .all
     @Published var historySelectedSort: ItemSort = .newest
     @Published var historySelectedApp: String? = nil
+    
+    // キャッシュを利用してローカライズされたアプリ名を取得するメソッド
+    func getLocalizedName(for sourceAppPath: String?) -> String? {
+        guard let sourceAppPath = sourceAppPath else { return nil }
+        
+        // 1. キャッシュを確認
+        if let cachedName = localizedAppNames[sourceAppPath] {
+            return cachedName
+        }
+        
+        // 2. キャッシュにない場合はファイルシステムから取得
+        let appURL = URL(fileURLWithPath: sourceAppPath)
+        let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
+        
+        var finalName = nonLocalizedName
+        if let appBundle = Bundle(url: appURL) {
+            finalName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ??
+            appBundle.localizedInfoDictionary?["CFBundleName"] as? String ??
+            appBundle.infoDictionary?["CFBundleName"] as? String ??
+            nonLocalizedName
+        }
+        
+        // 3. 取得した名前をキャッシュに保存
+        DispatchQueue.main.async {
+            self.localizedAppNames[sourceAppPath] = finalName
+        }
+        
+        return finalName
+    }
     
     func resetHistoryViewFilters() {
         historySelectedFilter = .all
