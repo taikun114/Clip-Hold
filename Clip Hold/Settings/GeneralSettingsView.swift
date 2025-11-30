@@ -68,6 +68,7 @@ class LoginItemManager: ObservableObject {
 
 struct GeneralSettingsView: View {
     @StateObject private var loginItemManager = LoginItemManager()
+    @EnvironmentObject var dateReloader: DateReloader
     
     @AppStorage("dateDisplayFormatInMenu") var dateDisplayFormatInMenu: String = "absolute"
     
@@ -329,17 +330,17 @@ struct GeneralSettingsView: View {
                     VStack(alignment: .leading) {
                         Text("日付と時刻の表示方法")
                         
-                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: Date())!
+                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
                         let exampleText: String = {
                             switch dateDisplayFormatInMenu {
                             case "absolute":
                                 return fiveMinutesAgo.formattedAsAbsolute()
                             case "both":
                                 let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
-                                let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: Date())
+                                let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
                                 return "\(absolutePart) (\(relativePart))"
                             case "relative":
-                                return RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: Date())
+                                return RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
                             default:
                                 return ""
                             }

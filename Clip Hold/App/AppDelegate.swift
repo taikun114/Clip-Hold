@@ -10,6 +10,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     var historyWindowController: ClipHoldWindowController?
     var standardPhraseWindowController: ClipHoldWindowController?
     var settingsWindowController: SettingsWindowController?
+    var dateReloader: DateReloader?
     
     // ウィンドウの種類ごとにウィンドウコントローラーを管理する
     private var windowControllers: [WindowType: ClipHoldStandardWindowController] = [:]
@@ -126,7 +127,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     func showSettingsWindow() {
         if settingsWindowController == nil || settingsWindowController?.window == nil {
-            settingsWindowController = SettingsWindowController()
+            settingsWindowController = SettingsWindowController(dateReloader: self.dateReloader!)
             settingsWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
