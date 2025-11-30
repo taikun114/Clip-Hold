@@ -148,7 +148,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             
             let hostingController = NSHostingController(rootView: contentView)
             
-            let window = NSWindow(
+            let window = CancellableWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 500, height: 500),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                 backing: .buffered,
@@ -196,7 +196,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             
             let hostingController = NSHostingController(rootView: contentView)
             
-            let window = NSWindow(
+            let window = CancellableWindow(
                 contentRect: NSRect(x: 0, y: 0, width: 375, height: 400),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                 backing: .buffered,

@@ -219,9 +219,6 @@ struct HistoryWindowView: View {
                     currentCopyConfirmationTask?.cancel()
                 }
         }
-        .onExitCommand {
-            dismiss()
-        }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
         .onChange(of: searchText) { _, _ in
             searchDebounceTask?.cancel()

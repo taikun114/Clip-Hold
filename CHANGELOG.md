@@ -31,6 +31,7 @@ Notes
 - **Fix issue that preset name in the edit screen for default presets was not localized**
 - **Fix “Change History and Copy” to “Change Item and Copy”**
   - The issue where the “Change History and Copy” was also displayed on the change and copy standard phrases screen has been fixed.
+- **Fix issue where the History and Standard Phrases window could not be closed using the Escape key**
 - **Improve app performance**
   - Proper cache utilization and automatic cleanup of unnecessary data now help prevent performance degradation even when Clip Hold is running for long periods.
 - **Improve shortcut keys for the change history and copy screen**

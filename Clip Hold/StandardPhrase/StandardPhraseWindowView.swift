@@ -632,9 +632,6 @@ struct StandardPhraseWindowView: View {
             .animation(.easeOut(duration: 0.1), value: showCopyConfirmation)
             .allowsHitTesting(false) // クリックイベントを透過させる
         }
-        .onExitCommand {
-            dismiss()
-        }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation) {
             Button("削除", role: .destructive) {
