@@ -25,7 +25,7 @@ extension Date {
     // アクセスレベルをinternalに変更
     func formattedAsRelative(currentDate: Date) -> String {
         let timeInterval = currentDate.timeIntervalSince(self)
-        if timeInterval < 30 && timeInterval >= 0 {
+        if abs(timeInterval) < 30 {
             return String(localized: "たった今")
         }
         let formatter = RelativeDateTimeFormatter()
