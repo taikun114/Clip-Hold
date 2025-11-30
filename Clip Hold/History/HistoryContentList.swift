@@ -99,6 +99,7 @@ struct HistoryContentList: View {
                             .environmentObject(clipboardManager)
                             .environmentObject(standardPhraseManager)
                             .environmentObject(presetManager)
+                            .environmentObject(dateReloader)
                             .tag(item.id)
                         }
                     }

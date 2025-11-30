@@ -432,6 +432,7 @@ struct ClipHoldApp: App {
         .environmentObject(standardPhraseManager)
         .environmentObject(presetManager)
         .environmentObject(frontmostAppMonitor)
+        .environmentObject(dateReloader)
         .commands {
             CommandGroup(replacing: .appSettings) {
                 Button("設定...") {
