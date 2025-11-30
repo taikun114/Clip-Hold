@@ -69,6 +69,8 @@ class LoginItemManager: ObservableObject {
 struct GeneralSettingsView: View {
     @StateObject private var loginItemManager = LoginItemManager()
     
+    @AppStorage("dateDisplayFormatInMenu") var dateDisplayFormatInMenu: String = "absolute"
+    
     @AppStorage("maxHistoryInMenu") var maxHistoryInMenu: Int = 10
     @State private var tempSelectedMenuOption: MenuHistoryOption
     @State private var initialMenuOption: MenuHistoryOption
@@ -321,6 +323,42 @@ struct GeneralSettingsView: View {
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
+                // 日付と時刻の表示方法
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("日付と時刻の表示方法")
+                        
+                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: Date())!
+                        let exampleText: String = {
+                            switch dateDisplayFormatInMenu {
+                            case "absolute":
+                                return fiveMinutesAgo.formattedAsAbsolute()
+                            case "both":
+                                let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
+                                let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: Date())
+                                return "\(absolutePart) (\(relativePart))"
+                            case "relative":
+                                return RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: Date())
+                            default:
+                                return ""
+                            }
+                        }()
+                        
+                        Text("コピーされた日付の表示方法を変更します。\n例: \(exampleText)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInMenu) {
+                        Text("絶対的").tag("absolute")
+                        Text("両方").tag("both")
+                        Text("相対的").tag("relative")
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 
                 HStack {
                     VStack(alignment: .leading) {

@@ -56,6 +56,7 @@ extension NSImage {
 struct ClipHoldApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
+    @AppStorage("dateDisplayFormatInMenu") var dateDisplayFormatInMenu: String = "absolute"
     @AppStorage("maxHistoryInMenu") var maxHistoryInMenu: Int = 10
     @AppStorage("maxPhrasesInMenu") var maxPhrasesInMenu: Int = 5
     @AppStorage("quickPaste") var quickPaste: Bool = false
@@ -278,13 +279,6 @@ struct ClipHoldApp: App {
                 ForEach(sortedHistory.prefix(displayLimit)) {
                     item in
                     
-                    let itemDateFormatter: DateFormatter = {
-                        let formatter = DateFormatter()
-                        formatter.dateStyle = .short
-                        formatter.timeStyle = .short
-                        return formatter
-                    }()
-                    
                     let displayText: String = {
                         let content: String
                         if item.text == "Image File" {
@@ -296,7 +290,7 @@ struct ClipHoldApp: App {
                         }
                         
                         var displayContent = content.replacingOccurrences(of: "\n", with: " ")
-                        let dateString = itemDateFormatter.string(from: item.date)
+                        let dateString = item.date.formatted(for: dateDisplayFormatInMenu)
                         
                         let characterCountText = showCharacterCount ? String(localized:" - \(item.text.count)文字") : ""
                         

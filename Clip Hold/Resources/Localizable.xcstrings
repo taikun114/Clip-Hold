@@ -6828,6 +6828,41 @@
         }
       }
     },
+    "コピーされた日付の表示方法を変更します。\n例: %@" : {
+      "comment" : "一般設定で日付と時刻の表示方法を設定する項目の説明文。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändert die Anzeige des Datums kopierter Elemente.\nBeispiel: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changes how the date of copied items is displayed.\nExample: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia cómo se muestra la fecha de los elementos copiados.\nEjemplo: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifie la façon dont la date des éléments copiés est affichée.\nExemple : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーされた日付の表示方法を変更します。\n例: %@"
+          }
+        }
+      }
+    },
     "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。" : {
       "comment" : "一般設定の「アプリアイコンを表示」オプションを説明するテキスト。",
       "localizations" : {
@@ -10958,6 +10993,41 @@
         }
       }
     },
+    "両方" : {
+      "comment" : "日付と時刻の表示方法の選択肢：絶対的と相対的な表示を両方。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beide"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Both"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ambos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les deux"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "両方"
+          }
+        }
+      }
+    },
     "並び替え" : {
       "comment" : "履歴ウィンドウの並び替えピッカーに表示されるタイトルテキスト。",
       "localizations" : {
@@ -14598,6 +14668,41 @@
         }
       }
     },
+    "日付と時刻の表示方法" : {
+      "comment" : "一般設定で日付と時刻の表示方法を設定する項目のタイトル。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datums- und Zeitformat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date and Time Display Format"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formato de visualización de fecha y hora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Format d'affichage de la date et de l'heure"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日付と時刻の表示方法"
+          }
+        }
+      }
+    },
     "旧バージョンで使用できるようにする" : {
       "comment" : "プリセットをエクスポートする画面で、プリセット機能に対応する前の古いバージョンのClip Holdで読み込めるように、古い形式で定型文を書き出すかどうかを設定するチェックボックス。",
       "localizations" : {
@@ -15263,6 +15368,41 @@
         }
       }
     },
+    "相対的" : {
+      "comment" : "日付と時刻の表示方法の選択肢：相対的な表示。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relativ"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relative"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relativo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relatif"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "相対的"
+          }
+        }
+      }
+    },
     "移動" : {
       "comment" : "定型文を別のプリセットに移動しようとしている際に表示される画面で移動を実行するための移動ボタン。",
       "localizations" : {
@@ -15364,6 +15504,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "統合する"
+          }
+        }
+      }
+    },
+    "絶対的" : {
+      "comment" : "日付と時刻の表示方法の選択肢：絶対的な表示。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Absolut"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Absolute"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Absoluto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Absolu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "絶対的"
           }
         }
       }
