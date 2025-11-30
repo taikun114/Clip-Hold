@@ -8403,6 +8403,41 @@
         }
       }
     },
+    "たった今" : {
+      "comment" : "その項目がコピーされたのが直近30秒以内の場合に表示される時刻のテキスト。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerade eben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Justo ahora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À l'instant"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "たった今"
+          }
+        }
+      }
+    },
     "ダブルクリックでウィンドウを閉じる" : {
       "comment" : "履歴と定型文ウィンドウに表示される各項目をダブルクリックしてコピーした際にウィンドウを自動的に閉じるように設定するトグルスイッチ名。",
       "localizations" : {
