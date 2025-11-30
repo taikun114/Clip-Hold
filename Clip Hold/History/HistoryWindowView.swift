@@ -12,6 +12,7 @@ struct HistoryWindowView: View {
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     @EnvironmentObject var frontmostAppMonitor: FrontmostAppMonitor
+    @EnvironmentObject var dateReloader: DateReloader
     @Environment(\.dismiss) var dismiss
     
     @State private var searchText: String = ""
@@ -44,6 +45,7 @@ struct HistoryWindowView: View {
     @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
+    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
     
     private var lineNumberTextWidth: CGFloat? {
         guard !hideNumbersInHistoryWindow, !(clipboardManager.filteredHistoryForShortcuts ?? []).isEmpty else { return nil }
@@ -305,4 +307,6 @@ struct HistoryWindowView: View {
         .environmentObject(ClipboardManager.shared)
         .environmentObject(StandardPhraseManager.shared)
         .environmentObject(StandardPhrasePresetManager.shared)
+        .environmentObject(DateReloader())
 }
+

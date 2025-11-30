@@ -146,6 +146,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 .environmentObject(StandardPhraseManager.shared)
                 .environmentObject(StandardPhrasePresetManager.shared)
                 .environmentObject(frontmostAppMonitor)
+                .environmentObject(dateReloader!)
             
             let hostingController = NSHostingController(rootView: contentView)
             

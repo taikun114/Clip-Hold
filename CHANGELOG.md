@@ -25,7 +25,7 @@ Notes
 ### New Features
 - **Add French (`fr`), German (`de`), Spanish (`es`) localization by generative AI**
   - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
-- **Add the “Date and Time Display Format” option to the “Menu” section in General Settings**
+- **Add the “Date and Time Display Format” option to the “Menu” section and “History Window” section in General Settings**
   - Changes how the date is displayed when copied. You can choose from “Absolute,” “Both,” or “Relative.”
     - **Absolute (Default)**\
       Example: 11/30/2025, 12:34PM

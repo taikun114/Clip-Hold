@@ -63,6 +63,8 @@ struct HistoryItemRow: View {
     @Binding var rowIconViews: [UUID: NSView]
     
     let showCharacterCount: Bool
+    @EnvironmentObject var dateReloader: DateReloader
+    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
     @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
     
     let lineNumberTextWidth: CGFloat?
@@ -89,7 +91,7 @@ struct HistoryItemRow: View {
          lineNumberTextWidth: CGFloat?,
          trailingPaddingForLineNumber: CGFloat,
          rowIconViews: Binding<[UUID: NSView]>,
-         showCharacterCount: Bool) { // initにBindingを追加
+         showCharacterCount: Bool) {
         
         self.item = item
         self.index = index
@@ -104,7 +106,7 @@ struct HistoryItemRow: View {
         _itemForNewPhrase = itemForNewPhrase
         self.lineNumberTextWidth = lineNumberTextWidth
         self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
-        self._rowIconViews = rowIconViews // Bindingを初期化
+        self._rowIconViews = rowIconViews
         self.showCharacterCount = showCharacterCount
     }
     
@@ -389,7 +391,7 @@ struct HistoryItemRow: View {
                     .truncationMode(.tail)
                     .foregroundStyle(.primary)
                 HStack(spacing: 4) {
-                    Text(item.date, formatter: itemDateFormatter)
+                    Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
                     
                     if showCharacterCount {
                         Text("-")

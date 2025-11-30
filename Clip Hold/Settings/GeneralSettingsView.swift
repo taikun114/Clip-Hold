@@ -71,6 +71,7 @@ struct GeneralSettingsView: View {
     @EnvironmentObject var dateReloader: DateReloader
     
     @AppStorage("dateDisplayFormatInMenu") var dateDisplayFormatInMenu: String = "absolute"
+    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
     
     @AppStorage("maxHistoryInMenu") var maxHistoryInMenu: Int = 10
     @State private var tempSelectedMenuOption: MenuHistoryOption
@@ -544,6 +545,40 @@ struct GeneralSettingsView: View {
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("日付と時刻の表示方法")
+                        
+                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
+                        let exampleText: String = {
+                            switch dateDisplayFormatInHistoryWindow {
+                            case "absolute":
+                                return fiveMinutesAgo.formattedAsAbsolute()
+                            case "both":
+                                let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
+                                let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
+                                return "\(absolutePart) (\(relativePart))"
+                            case "relative":
+                                return RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
+                            default:
+                                return ""
+                            }
+                        }()
+                        
+                        Text("コピーされた日付の表示方法を変更します。\n例: \(exampleText)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInHistoryWindow) {
+                        Text("絶対的").tag("absolute")
+                        Text("両方").tag("both")
+                        Text("相対的").tag("relative")
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 HStack {
                     VStack(alignment: .leading) {
                         Text("自動スクロール")

@@ -43,6 +43,9 @@ struct HistoryContentList: View {
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
     let searchText: String
+    @EnvironmentObject var dateReloader: DateReloader
+    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
+
     
     var onCopyAction: (ClipboardItem) -> Void
     
