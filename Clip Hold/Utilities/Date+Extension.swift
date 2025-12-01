@@ -23,7 +23,6 @@ extension Date {
         }
     }
     
-    // アクセスレベルをinternalに変更
     func formattedAsAbsolute() -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -31,7 +30,6 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    // アクセスレベルをinternalに変更
     func formattedAsRelative(currentDate: Date) -> String {
         let timeInterval = currentDate.timeIntervalSince(self)
         if abs(timeInterval) < 30 {

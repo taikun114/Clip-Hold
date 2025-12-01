@@ -205,7 +205,7 @@ extension ClipboardManager {
                         // アラートしきい値を超えている場合、アラート表示を要求
                         await MainActor.run {
                             self.pendingLargeFileItem = (fileURL, qrCodeContent)
-                            self.pendingLargeFileItemsSourceAppPath = sourceAppPath // ここを追加
+                            self.pendingLargeFileItemsSourceAppPath = sourceAppPath
                             self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
                             print("DEBUG: createClipboardItemForFileURL - Setting showingLargeFileAlert to true for file: \(fileURL.lastPathComponent)")
                         }
@@ -297,7 +297,7 @@ extension ClipboardManager {
                     // アラートしきい値を超えている場合、アラート表示を要求
                     await MainActor.run {
                         self.pendingLargeImageData = (imageData, qrCodeContent)
-                        self.pendingLargeFileItemsSourceAppPath = sourceAppPath // ここを追加
+                        self.pendingLargeFileItemsSourceAppPath = sourceAppPath
                         self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
                         print("DEBUG: createClipboardItemFromImageData - Setting showingLargeFileAlert to true for image data (size: \(newImageSize))")
                     }

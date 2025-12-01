@@ -221,7 +221,7 @@ struct AddEditPhraseView: View {
                 .controlSize(.large)
             }
         }
-        .padding() // ここで全体にパディングが適用される
+        .padding()
         .frame(minWidth: 400, minHeight: 350)
         .onAppear {
             focusedField = .content

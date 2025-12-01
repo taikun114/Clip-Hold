@@ -140,7 +140,6 @@ struct HistoryItemRow: View {
                     Text("標準テキストとしてコピー")
                 }
                 Button {
-                    // 変更してコピーのアクションをここに実装
                     showingEditSheet = true
                 } label: {
                     Text("変更してコピー...")

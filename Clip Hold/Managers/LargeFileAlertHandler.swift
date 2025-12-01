@@ -154,7 +154,7 @@ extension ClipboardManager {
                     // ここで createClipboardItemFromImageData を呼び出すことで重複検知ロジックが適用される
                     // アラート確認からの呼び出しであることを示すフラグをtrueにする
                     print("DEBUG: handleLargeFileAlertConfirmation - Attempting to add pending image data.")
-                    let sourceAppPath = self.pendingLargeFileItemsSourceAppPath // ここで取得
+                    let sourceAppPath = self.pendingLargeFileItemsSourceAppPath
                     if let newItem = await self.createClipboardItemFromImageData(pendingImageData.imageData, qrCodeContent: pendingImageData.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true) {
                         await MainActor.run {
                             self.addAndSaveItem(newItem)

@@ -98,7 +98,7 @@ struct StandardPhraseImportExportView: View {
     @State private var presetConflicts: [PresetConflictInfo] = []
     // 現在処理中のプリセットのインデックス
     @State private var currentPresetIndexForConflictResolution: Int = 0
-    @State private var currentSelectedURL: URL? = nil // 追加: 現在選択されているURLを保持
+    @State private var currentSelectedURL: URL? = nil
     
     // プリセット選択シート用の状態変数
     @State private var showingImportPresetSelectionSheet = false
@@ -250,7 +250,7 @@ struct StandardPhraseImportExportView: View {
                 presetIdBeforeImport = presetManager.selectedPresetId
                 
                 guard let selectedURL = urls.first else { return }
-                currentSelectedURL = selectedURL // 追加: 選択されたURLを保持
+                currentSelectedURL = selectedURL
                 let gotAccess = selectedURL.startAccessingSecurityScopedResource()
                 defer {
                     if gotAccess {

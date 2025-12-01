@@ -27,7 +27,7 @@ struct AddEditPresetView: View {
             name: $presetName,
             icon: $presetIcon,
             color: $presetColor,
-            editingPreset: editingPreset, // ここで渡す
+            editingPreset: editingPreset,
             title: String(localized: editingPreset == nil ? "プリセットを追加" : "プリセットを編集"),
             onSave: { customColor in
                 let iconToSave = presetIcon.isEmpty ? "list.bullet.rectangle.portrait" : presetIcon
