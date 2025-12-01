@@ -69,7 +69,7 @@ struct ClipHoldApp: App {
     @StateObject var presetManager = StandardPhrasePresetManager.shared
     @StateObject var frontmostAppMonitor = FrontmostAppMonitor.shared
     @StateObject var iconGenerator = PresetIconGenerator.shared
-    @StateObject var dateReloader = DateReloader()
+    let dateReloader = DateReloader.shared
     
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
@@ -78,8 +78,6 @@ struct ClipHoldApp: App {
         print("ClipHoldApp: Initializing with ClipboardManager and StandardPhraseManager.")
         
         ClipHoldApp.setupGlobalShortcuts()
-
-        _appDelegate.wrappedValue.dateReloader = dateReloader
     }
     
     // MARK: - キーボード操作をシミュレートする関数

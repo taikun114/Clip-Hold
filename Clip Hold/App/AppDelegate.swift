@@ -10,7 +10,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     var historyWindowController: ClipHoldWindowController?
     var standardPhraseWindowController: ClipHoldWindowController?
     var settingsWindowController: SettingsWindowController?
-    var dateReloader: DateReloader?
     
     // ウィンドウの種類ごとにウィンドウコントローラーを管理する
     private var windowControllers: [WindowType: ClipHoldStandardWindowController] = [:]
@@ -127,7 +126,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     func showSettingsWindow() {
         if settingsWindowController == nil || settingsWindowController?.window == nil {
-            settingsWindowController = SettingsWindowController(dateReloader: self.dateReloader!)
+            settingsWindowController = SettingsWindowController()
             settingsWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
@@ -146,7 +145,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 .environmentObject(StandardPhraseManager.shared)
                 .environmentObject(StandardPhrasePresetManager.shared)
                 .environmentObject(frontmostAppMonitor)
-                .environmentObject(dateReloader!)
+                .environmentObject(DateReloader.shared)
             
             let hostingController = NSHostingController(rootView: contentView)
             

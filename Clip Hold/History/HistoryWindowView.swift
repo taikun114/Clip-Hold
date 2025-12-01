@@ -307,6 +307,6 @@ struct HistoryWindowView: View {
         .environmentObject(ClipboardManager.shared)
         .environmentObject(StandardPhraseManager.shared)
         .environmentObject(StandardPhrasePresetManager.shared)
-        .environmentObject(DateReloader())
+        .environmentObject(DateReloader.shared)
 }
 

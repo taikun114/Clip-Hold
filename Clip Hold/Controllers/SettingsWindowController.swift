@@ -2,14 +2,12 @@ import AppKit
 import SwiftUI
 
 class SettingsWindowController: NSWindowController, NSWindowDelegate {
-    var dateReloader: DateReloader // DateReloaderを保持するプロパティ
 
-    init(dateReloader: DateReloader) {
-        self.dateReloader = dateReloader
+    init() {
         let settingsView = SettingsView()
             .environmentObject(ClipboardManager.shared)
             .environmentObject(StandardPhraseManager.shared)
-            .environmentObject(dateReloader)
+            .environmentObject(DateReloader.shared)
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 700, height: 550),
