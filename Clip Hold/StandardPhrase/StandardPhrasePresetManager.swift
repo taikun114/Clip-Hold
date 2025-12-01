@@ -63,6 +63,8 @@ class StandardPhrasePresetManager: ObservableObject {
         savePresetToFile(defaultPreset)
         savePresetIndex()
         saveSelectedPresetId()
+        // アイコンを生成
+        let _ = PresetIconGenerator.shared.generateIcon(for: defaultPreset)
     }
     
     private func loadPresetsFromFileSystem() {
