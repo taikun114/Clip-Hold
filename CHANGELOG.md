@@ -21,7 +21,7 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
-## 1.6.3 (under development)
+## 1.6.3
 ### New Features
 - **Add French (`fr`), German (`de`), Spanish (`es`) localization by generative AI**
   - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
