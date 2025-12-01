@@ -95,11 +95,11 @@ struct PrivacySettingsView: View {
             Section(header: Text("クリップボード").font(.headline)) {
                 HStack {
                     if differentiateWithoutColor {
-                        Image(systemName: isClipboardMonitoringPaused ? "xmark" : "checkmark")
+                        Image(systemName: isClipboardMonitoringPaused ? "pause.fill" : "play.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 10, height: 10)
-                            .foregroundStyle(isClipboardMonitoringPaused ? .red : .green)
+                            .foregroundStyle(isClipboardMonitoringPaused ? .gray : .green)
                             .fontWeight(.bold)
                     } else {
                         Circle()
