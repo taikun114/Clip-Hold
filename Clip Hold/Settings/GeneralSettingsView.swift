@@ -333,17 +333,24 @@ struct GeneralSettingsView: View {
                         
                         let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
                         let exampleText: String = {
+                            let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
+                            let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
+                            
                             switch dateDisplayFormatInMenu {
                             case "absolute":
-                                return fiveMinutesAgo.formattedAsAbsolute()
-                            case "both":
-                                let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
-                                let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
-                                return "\(absolutePart) (\(relativePart))"
+                                return absolutePart
                             case "relative":
-                                return RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
+                                return relativePart
+                            case "both_abs_rel_paren":
+                                return "\(absolutePart) (\(relativePart))"
+                            case "both_abs_rel_hyphen":
+                                return "\(absolutePart) - \(relativePart)"
+                            case "both_rel_abs_paren":
+                                return "\(relativePart) (\(absolutePart))"
+                            case "both_rel_abs_hyphen":
+                                return "\(relativePart) - \(absolutePart)"
                             default:
-                                return ""
+                                return absolutePart
                             }
                         }()
                         
@@ -354,8 +361,11 @@ struct GeneralSettingsView: View {
                     Spacer()
                     Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInMenu) {
                         Text("絶対的").tag("absolute")
-                        Text("両方").tag("both")
                         Text("相対的").tag("relative")
+                        Text("両方: 絶対的 (相対的)").tag("both_abs_rel_paren")
+                        Text("両方: 絶対的 - 相対的").tag("both_abs_rel_hyphen")
+                        Text("両方: 相対的 (絶対的)").tag("both_rel_abs_paren")
+                        Text("両方: 相対的 - 絶対的").tag("both_rel_abs_hyphen")
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
@@ -551,17 +561,24 @@ struct GeneralSettingsView: View {
                         
                         let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
                         let exampleText: String = {
+                            let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
+                            let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
+                            
                             switch dateDisplayFormatInHistoryWindow {
                             case "absolute":
-                                return fiveMinutesAgo.formattedAsAbsolute()
-                            case "both":
-                                let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
-                                let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
-                                return "\(absolutePart) (\(relativePart))"
+                                return absolutePart
                             case "relative":
-                                return RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
+                                return relativePart
+                            case "both_abs_rel_paren":
+                                return "\(absolutePart) (\(relativePart))"
+                            case "both_abs_rel_hyphen":
+                                return "\(absolutePart) - \(relativePart)"
+                            case "both_rel_abs_paren":
+                                return "\(relativePart) (\(absolutePart))"
+                            case "both_rel_abs_hyphen":
+                                return "\(relativePart) - \(absolutePart)"
                             default:
-                                return ""
+                                return absolutePart
                             }
                         }()
                         
@@ -572,8 +589,11 @@ struct GeneralSettingsView: View {
                     Spacer()
                     Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInHistoryWindow) {
                         Text("絶対的").tag("absolute")
-                        Text("両方").tag("both")
                         Text("相対的").tag("relative")
+                        Text("両方: 絶対的 (相対的)").tag("both_abs_rel_paren")
+                        Text("両方: 絶対的 - 相対的").tag("both_abs_rel_hyphen")
+                        Text("両方: 相対的 (絶対的)").tag("both_rel_abs_paren")
+                        Text("両方: 相対的 - 絶対的").tag("both_rel_abs_hyphen")
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)

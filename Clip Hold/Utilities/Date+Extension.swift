@@ -2,15 +2,24 @@ import Foundation
 
 extension Date {
     func formatted(for format: String, currentDate: Date) -> String {
+        let absolutePart = self.formattedAsAbsolute()
+        let relativePart = self.formattedAsRelative(currentDate: currentDate)
+
         switch format {
         case "absolute":
-            return self.formattedAsAbsolute()
-        case "both":
-            return self.formattedAsBoth(currentDate: currentDate)
+            return absolutePart
         case "relative":
-            return self.formattedAsRelative(currentDate: currentDate)
+            return relativePart
+        case "both_abs_rel_paren":
+            return "\(absolutePart) (\(relativePart))"
+        case "both_abs_rel_hyphen":
+            return "\(absolutePart) - \(relativePart)"
+        case "both_rel_abs_paren":
+            return "\(relativePart) (\(absolutePart))"
+        case "both_rel_abs_hyphen":
+            return "\(relativePart) - \(absolutePart)"
         default:
-            return self.formattedAsAbsolute()
+            return absolutePart
         }
     }
     
@@ -31,12 +40,5 @@ extension Date {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full
         return formatter.localizedString(for: self, relativeTo: currentDate)
-    }
-    
-    // アクセスレベルをinternalに変更
-    func formattedAsBoth(currentDate: Date) -> String {
-        let absolutePart = self.formattedAsAbsolute()
-        let relativePart = self.formattedAsRelative(currentDate: currentDate)
-        return "\(absolutePart) (\(relativePart))"
     }
 }

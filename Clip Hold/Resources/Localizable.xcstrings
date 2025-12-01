@@ -11028,37 +11028,142 @@
         }
       }
     },
-    "両方" : {
-      "comment" : "日付と時刻の表示方法の選択肢：絶対的と相対的な表示を両方。",
+    "両方: 相対的 - 絶対的" : {
+      "comment" : "日付と時刻の表示方法の選択肢：絶対的と相対的な表示を両方。「相対的な時刻 - 絶対的な日付」のように記載される。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Beide"
+            "value" : "Beide: Relativ - Absolut"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Both"
+            "value" : "Both: Relative - Absolute"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ambos"
+            "value" : "Ambos: Relativo - Absoluto"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les deux"
+            "value" : "Les deux : Relatif - Absolu"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "両方"
+            "value" : "両方: 相対的 - 絶対的"
+          }
+        }
+      }
+    },
+    "両方: 相対的 (絶対的)" : {
+      "comment" : "日付と時刻の表示方法の選択肢：絶対的と相対的な表示を両方。「相対的な時刻 (絶対的な日付)」のように記載される。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beide: Relativ (Absolut)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Both: Relative (Absolute)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ambos: Relativo (Absoluto)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les deux : Relatif (Absolu)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "両方: 相対的 (絶対的)"
+          }
+        }
+      }
+    },
+    "両方: 絶対的 - 相対的" : {
+      "comment" : "日付と時刻の表示方法の選択肢：絶対的と相対的な表示を両方。「絶対的な日付 - 相対的な時刻」のように記載される。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beide: Absolut - Relativ"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Both: Absolute - Relative"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ambos: Absoluto - Relativo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les deux : Absolu - Relatif"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "両方: 絶対的 - 相対的"
+          }
+        }
+      }
+    },
+    "両方: 絶対的 (相対的)" : {
+      "comment" : "日付と時刻の表示方法の選択肢：絶対的と相対的な表示を両方。「絶対的な日付 (相対的な時刻)」のように記載される。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beide: Absolut (Relativ)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Both: Absolute (Relative)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ambos: Absoluto (Relativo)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les deux : Absolu (Relatif)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "両方: 絶対的 (相対的)"
           }
         }
       }
