@@ -16,7 +16,7 @@ struct QRCodeView: View {
             Text("QRコード")
                 .font(.title)
                 .fontWeight(.bold)
-
+            
             if let qrCodeImage = generateQRCode(from: text) {
                 Image(nsImage: qrCodeImage)
                     .interpolation(.none)
@@ -117,7 +117,7 @@ struct QRCodeView: View {
         nsImage.addRepresentation(rep)
         return nsImage
     }
-
+    
     private func createSafeFileName(from text: String) -> String {
         var fileName = text.components(separatedBy: .newlines).first ?? "QRCode"
         
@@ -148,7 +148,7 @@ extension NSImage {
 // これにより、Swift 6のSendableチェックに根本的に準拠します。
 struct ImageDocument: FileDocument {
     var pngData: Data // NSImageの代わりにPNGデータを保持
-
+    
     static var readableContentTypes: [UTType] { [.png, .jpeg, .tiff] }
     static var writableContentTypes: [UTType] { [.png] }
     
@@ -156,7 +156,7 @@ struct ImageDocument: FileDocument {
     init(pngData: Data) {
         self.pngData = pngData
     }
-
+    
     // FileDocumentの要件を満たすためのイニシャライザ（今回は使用しないためfatalError）
     init(configuration: ReadConfiguration) throws {
         fatalError("Reading not implemented for ImageDocument")

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct HistoryCopyConfirmation: View {
     @Binding var showCopyConfirmation: Bool
-
+    
     var body: some View {
         VStack {
             Spacer() // 下部に寄せる

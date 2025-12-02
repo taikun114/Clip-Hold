@@ -6,9 +6,9 @@ import UserNotifications
 struct PrivacySettingsView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
     @EnvironmentObject var clipboardManager: ClipboardManager
-
+    
     @ObservedObject private var accessibilityChecker = AccessibilityPermissionChecker.shared
-
+    
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false {
         // isClipboardMonitoringPausedが変更されたときに監視状態を更新
         didSet {
@@ -20,10 +20,10 @@ struct PrivacySettingsView: View {
             
             // 監視状態変更時の通知を送信
             NotificationManager.shared.sendMonitoringStatusNotification(isPaused: isClipboardMonitoringPaused)
-            print("PrivacySettingsView didSet: クリップボード監視状態が \(isClipboardMonitoringPaused ? "一時停止" : "再開") に変更されました。")
+            print("PrivacySettingsView didSet: Clipboard monitoring state changed to \(isClipboardMonitoringPaused ? "paused" : "resumed").")
         }
     }
-
+    
     @AppStorage("excludedAppIdentifiersData") var excludedAppIdentifiersData: Data = Data()
     @State private var excludedAppIdentifiers: [String] = [] {
         didSet {
@@ -33,20 +33,20 @@ struct PrivacySettingsView: View {
             clipboardManager.updateExcludedAppIdentifiers(excludedAppIdentifiers)
         }
     }
-
+    
     @State private var isShowingAddAppPopover: Bool = false
     @State private var showAllRunningApps: Bool = false
     @State private var selectedExcludedAppId: String? = nil
     @State private var runningApplications: [NSRunningApplication] = []
     @State private var showingFinderPanel = false
     @State private var showingInvalidAppAlert = false
-
+    
     @State private var notificationAuthorizationStatus: UNAuthorizationStatus = .notDetermined
-
+    
     @State private var showingClearAllExcludedAppsConfirmation = false
-
+    
     @State private var timer: Timer? = nil
-
+    
     // MARK: - ヘルパー関数
     private func addAppToExclusionList(bundleIdentifier: String) {
         if !excludedAppIdentifiers.contains(bundleIdentifier) {
@@ -56,7 +56,7 @@ struct PrivacySettingsView: View {
             print("App already in exclusion list: \(bundleIdentifier)")
         }
     }
-
+    
     private func removeAppFromExclusionList(bundleIdentifier: String) {
         excludedAppIdentifiers.removeAll { $0 == bundleIdentifier }
         print("Excluded app removed: \(bundleIdentifier)")
@@ -66,7 +66,7 @@ struct PrivacySettingsView: View {
             self.notificationAuthorizationStatus = status
         }
     }
-
+    
     private func filterRunningApplications(applications: [NSRunningApplication]) -> [NSRunningApplication] {
         var filteredApps = applications.filter { app in
             // activationPolicy == .regular のアプリのみを表示するフィルタリングを追加
@@ -89,17 +89,17 @@ struct PrivacySettingsView: View {
         
         return filteredApps
     }
-
+    
     var body: some View {
         Form {
             Section(header: Text("クリップボード").font(.headline)) {
                 HStack {
                     if differentiateWithoutColor {
-                        Image(systemName: isClipboardMonitoringPaused ? "xmark" : "checkmark")
+                        Image(systemName: isClipboardMonitoringPaused ? "pause.fill" : "play.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 10, height: 10)
-                            .foregroundStyle(isClipboardMonitoringPaused ? .red : .green)
+                            .foregroundStyle(isClipboardMonitoringPaused ? .gray : .green)
                             .fontWeight(.bold)
                     } else {
                         Circle()
@@ -127,16 +127,16 @@ struct PrivacySettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             }
-
+            
             Section(header:
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("権限")
-                        .font(.headline)
-                    Text("一部の機能には、システムの許可が必要です。")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                        VStack(alignment: .leading, spacing: 4) {
+                Text("権限")
+                    .font(.headline)
+                Text("一部の機能には、システムの許可が必要です。")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             ) {
                 HStack {
                     if differentiateWithoutColor {
@@ -159,7 +159,7 @@ struct PrivacySettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-
+                    
                     Button(action: {
                         if notificationAuthorizationStatus == .authorized {
                             NotificationManager.shared.sendTestNotification()
@@ -182,7 +182,7 @@ struct PrivacySettingsView: View {
                     .help(notificationAuthorizationStatus == .authorized ? "テスト通知を送信します。" : "システム設定の通知設定を開きます。")
                 }
                 .onChange(of: notificationAuthorizationStatus) { oldValue, newValue in
-                    print("通知許可状態が変更されました: \(newValue.rawValue)")
+                    print("Notification permission status changed: \(newValue.rawValue)")
                 }
                 HStack {
                     if differentiateWithoutColor {
@@ -219,7 +219,7 @@ struct PrivacySettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             }
-
+            
             // MARK: - 除外するアプリ セクション
             Section {
                 List(selection: $selectedExcludedAppId) {
@@ -248,7 +248,7 @@ struct PrivacySettingsView: View {
                            let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? appBundle.infoDictionary?["CFBundleName"] as? String {
                             
                             let appIcon = NSWorkspace.shared.icon(forFile: appURL.path)
-
+                            
                             HStack {
                                 Image(nsImage: appIcon)
                                     .resizable()
@@ -375,7 +375,7 @@ struct PrivacySettingsView: View {
                                         .font(.subheadline)
                                     }
                                     .padding(.bottom, 4)
-
+                                    
                                     ScrollView {
                                         VStack(alignment: .leading) {
                                             ForEach(filterRunningApplications(applications: runningApplications).sorted(by: { ($0.localizedName ?? "") < ($1.localizedName ?? "") }), id: \.self) { app in
@@ -408,7 +408,7 @@ struct PrivacySettingsView: View {
                                     
                                     Divider()
                                         .padding(.vertical, 4)
-
+                                    
                                     Button(action: {
                                         showingFinderPanel = true
                                         isShowingAddAppPopover = false
@@ -426,12 +426,12 @@ struct PrivacySettingsView: View {
                                 .padding()
                                 .frame(minWidth: 280, maxWidth: 400)
                             }
-
+                            
                             Divider()
                                 .frame(width: 1, height: 16)
                                 .background(Color.gray.opacity(0.1))
                                 .padding(.horizontal, 4)
-
+                            
                             Button(action: {
                                 print("Remove App button tapped. Selected: \(selectedExcludedAppId ?? "None")")
                                 if let selectedId = selectedExcludedAppId {
@@ -449,7 +449,7 @@ struct PrivacySettingsView: View {
                             .buttonStyle(.borderless)
                             .disabled(selectedExcludedAppId == nil)
                             .help("選択したアプリをリストから削除します。")
-
+                            
                             Spacer()
                             Button(action: {
                                 showingClearAllExcludedAppsConfirmation = true

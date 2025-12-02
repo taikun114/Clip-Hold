@@ -11,7 +11,7 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     @Published var fileHash: String? // 新しく追加
     @Published var qrCodeContent: String?
     @Published var sourceAppPath: String?
-
+    
     // ファイルが画像かどうかを判断するヘルパープロパティ
     var isImage: Bool {
         guard let filePath = filePath else { return false }
@@ -46,7 +46,7 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         }
         return false
     }
-
+    
     // ファイルがフォルダかどうかを判断するヘルパープロパティ
     var isFolder: Bool {
         guard let filePath = filePath else { return false }
@@ -54,7 +54,7 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         let fileExists = FileManager.default.fileExists(atPath: filePath.path, isDirectory: &isDirectory)
         return fileExists && isDirectory.boolValue
     }
-
+    
     // テキストが有効なURLであるかどうかを判断するヘルパープロパティ
     var isURL: Bool {
         guard !text.isEmpty,
@@ -64,7 +64,7 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         // URLスキームがhttpまたはhttpsであることを確認
         return url.scheme == "http" || url.scheme == "https"
     }
-
+    
     // Codableではないため @Published にできない。
     // UIの自動更新は、このプロパティの変更後に親のObservableObject (ClipboardManager) の変更を通知することで実現
     var cachedThumbnailImage: NSImage?
@@ -85,7 +85,7 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.qrCodeContent = qrCodeContent
         self.sourceAppPath = sourceAppPath
     }
-
+    
     // 新しいClipboardItemを作成するためのイニシャライザ (ファイルパス、サイズ、ハッシュあり)
     init(text: String, date: Date = Date(), filePath: URL?, fileSize: UInt64?, fileHash: String? = nil, qrCodeContent: String? = nil, sourceAppPath: String? = nil) {
         self.id = UUID()
@@ -111,7 +111,7 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.qrCodeContent = qrCodeContent
         self.sourceAppPath = sourceAppPath
     }
-
+    
     // CodableのためのDecodableイニシャライザ
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

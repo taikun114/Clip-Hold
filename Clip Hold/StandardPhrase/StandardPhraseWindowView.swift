@@ -30,22 +30,22 @@ struct StandardPhraseItemRow: View {
     @Binding var showingDeleteConfirmation: Bool
     @Binding var selectedPhraseID: UUID?
     @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
-
+    
     @Environment(\.colorScheme) var colorScheme
-
+    
     @Binding var showCopyConfirmation: Bool
     @Binding var showQRCodeSheet: Bool
     @Binding var selectedPhraseForQRCode: StandardPhrase?
     @Binding var phraseToEdit: StandardPhrase?
     @Binding var phraseToEditAndCopy: StandardPhrase?
     @Binding var showingEditAndCopySheet: Bool
-
+    
     @Binding var showingMoveSheet: Bool
     @Binding var phraseToMove: StandardPhrase?
-
+    
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
-
+    
     var body: some View {
         // isURLをbodyのトップレベルで定義
         let isURL: Bool = {
@@ -55,7 +55,7 @@ struct StandardPhraseItemRow: View {
             }
             return url.scheme == "http" || url.scheme == "https"
         }()
-
+        
         HStack(spacing: 8) {
             if !hideNumbers {
                 Text("\(index + 1).")
@@ -89,7 +89,7 @@ struct StandardPhraseItemRow: View {
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
-
+            
             Spacer()
             
             Menu {
@@ -168,9 +168,9 @@ struct StandardPhraseWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
-
+    
     @StateObject var iconGenerator = PresetIconGenerator.shared
-
+    
     @State private var searchText: String = ""
     @State private var filteredPhrases: [StandardPhrase] = []
     @State private var selectedPhraseID: UUID?
@@ -188,33 +188,33 @@ struct StandardPhraseWindowView: View {
     @State private var showingMoveSheet = false
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
-
+    
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
     @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
-
+    
     @FocusState private var isSearchFieldFocused: Bool
-
+    
     // 新規プリセット追加シート用の状態変数
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
-
+    
     @State private var presetChangedForScroll: Bool = false
-
+    
     private var lineNumberTextWidth: CGFloat? {
         guard !hideNumbers, !filteredPhrases.isEmpty else { return nil }
         
         let maxIndex = filteredPhrases.count
         let numDigits = String(maxIndex).count
-
+        
         let digitWidth: CGFloat = 7.0
         let periodWidth: CGFloat = 3.0
         let buffer: CGFloat = 1.0
-
+        
         return CGFloat(numDigits) * digitWidth + periodWidth + buffer
     }
-
+    
     private let trailingPaddingForLineNumber: CGFloat = 5
-
+    
     private func performSearch(searchTerm: String) {
         let currentPhrases: [StandardPhrase]
         if presetManager.selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
@@ -239,7 +239,7 @@ struct StandardPhraseWindowView: View {
         }
         self.filteredPhrases = newFilteredPhrases
     }
-
+    
     private func movePhrases(from source: IndexSet, to destination: Int) {
         // 検索中の場合は並び替えを許可しない
         if searchText.isEmpty {
@@ -255,7 +255,7 @@ struct StandardPhraseWindowView: View {
         }
     }
     
-
+    
     
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
@@ -268,7 +268,7 @@ struct StandardPhraseWindowView: View {
                 VisualEffectView(material: .menu, blendingMode: .behindWindow)
                     .ignoresSafeArea()
             }
-
+            
             ZStack { // メインコンテンツを囲むZStack
                 VStack(spacing: 0) {
                     HStack {
@@ -333,22 +333,22 @@ struct StandardPhraseWindowView: View {
                             }
                             .pickerStyle(.inline)
                             .labelStyle(.titleAndIcon)
-
+                            
                             Divider()
                             
                             Button("新規プリセット...") {
                                 showingAddPresetSheet = true
                             }
                         } label: {
-                                if let selectedPreset = presetManager.selectedPreset,
-                                   let icon = iconGenerator.iconCache[selectedPreset.id] {
-                                    Image(nsImage: icon)
-                                } else {
-                                    Image(systemName: "star.square")
-                                        .imageScale(.large)
-                                        .foregroundStyle(.secondary)
-                                }
+                            if let selectedPreset = presetManager.selectedPreset,
+                               let icon = iconGenerator.iconCache[selectedPreset.id] {
+                                Image(nsImage: icon)
+                            } else {
+                                Image(systemName: "star.square")
+                                    .imageScale(.large)
+                                    .foregroundStyle(.secondary)
                             }
+                        }
                         .menuStyle(.borderlessButton)
                         .frame(width: 48)
                         .padding(.trailing, 4)
@@ -383,21 +383,21 @@ struct StandardPhraseWindowView: View {
                         searchTask = Task { @MainActor in
                             let initialDelayNanoseconds: UInt64 = 150_000_000
                             try? await Task.sleep(nanoseconds: initialDelayNanoseconds)
-
+                            
                             guard !Task.isCancelled else {
                                 return
                             }
                             
                             isLoading = true
-
+                            
                             let remainingDebounceNanoseconds: UInt64 = 150_000_000
                             try? await Task.sleep(nanoseconds: remainingDebounceNanoseconds)
-
+                            
                             guard !Task.isCancelled else {
                                 isLoading = false
                                 return
                             }
-
+                            
                             performSearch(searchTerm: newValue)
                             isLoading = false
                         }
@@ -589,7 +589,7 @@ struct StandardPhraseWindowView: View {
                                 }
                             })
                         }
-
+                        
                         if isLoading {
                             ProgressView()
                                 .progressViewStyle(.circular)
@@ -600,7 +600,7 @@ struct StandardPhraseWindowView: View {
                     }
                 }
             } // メインコンテンツを囲むZStackの終わり
-
+            
             // コピー確認メッセージ (元の場所で、このZStackの直下に配置)
             VStack {
                 Spacer() // 下部に寄せる
@@ -631,9 +631,6 @@ struct StandardPhraseWindowView: View {
             }
             .animation(.easeOut(duration: 0.1), value: showCopyConfirmation)
             .allowsHitTesting(false) // クリックイベントを透過させる
-        }
-        .onExitCommand {
-            dismiss()
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation) {
@@ -699,6 +696,9 @@ struct StandardPhraseWindowView: View {
             DispatchQueue.main.async {
                 isSearchFieldFocused = true
             }
+        }
+        .onDisappear {
+            currentCopyConfirmationTask?.cancel()
         }
     }
 }

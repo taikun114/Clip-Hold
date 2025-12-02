@@ -5,15 +5,15 @@ struct CustomNumberInputSheet: View {
     let description: Text?
     @Binding var currentValue: Int
     @Binding var selectedUnit: DataSizeUnit? // オプション型に変更
-
+    
     var onSave: (Int) -> Void
     var onCancel: () -> Void
-
+    
     @Environment(\.dismiss) var dismiss
-
+    
     @State private var inputText: String = ""
     @State private var showAlert = false
-
+    
     init(title: Text, description: Text?, currentValue: Binding<Int>, selectedUnit: Binding<DataSizeUnit?> = .constant(nil), onSave: @escaping (Int) -> Void, onCancel: @escaping () -> Void) {
         self.title = title
         self.description = description
@@ -22,22 +22,22 @@ struct CustomNumberInputSheet: View {
         self.onSave = onSave
         self.onCancel = onCancel
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             title
                 .font(.headline)
-
+            
             HStack {
                 TextField("数値を入力", text: $inputText)
                     .textFieldStyle(.roundedBorder)
                     .onSubmit {
                         performSave()
                     }
-
+                
                 Stepper("値を調整", value: $currentValue, in: 1...Int.max)
                     .labelsHidden()
-
+                
                 // MARK: - 単位選択ピッカーの追加
                 if selectedUnit != nil {
                     Picker("", selection: Binding<DataSizeUnit>(
@@ -56,11 +56,11 @@ struct CustomNumberInputSheet: View {
             .onChange(of: inputText) { oldValue, newValue in
                 let halfWidthConverted = convertFullWidthToHalfWidthNumbers(newValue)
                 let filtered = halfWidthConverted.filter { $0.isNumber }
-
+                
                 if filtered != newValue {
                     inputText = filtered
                 }
-
+                
                 if let newInt = Int(inputText) {
                     currentValue = newInt
                 } else if inputText.isEmpty {
@@ -77,15 +77,15 @@ struct CustomNumberInputSheet: View {
             .onAppear {
                 inputText = String(currentValue)
             }
-
+            
             if let description = description {
                 description
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-
+            
             Spacer(minLength: 0)
-
+            
             HStack {
                 Button("キャンセル") {
                     onCancel()
@@ -93,15 +93,15 @@ struct CustomNumberInputSheet: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
-
+                
                 Spacer()
-
+                
                 Button("保存") {
                     performSave()
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
-
+                
             }
         }
         .padding()
@@ -117,7 +117,7 @@ struct CustomNumberInputSheet: View {
             }
         }
     }
-
+    
     private func performSave() {
         if let newInt = Int(inputText) {
             if newInt >= 1 {

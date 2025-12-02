@@ -10,11 +10,11 @@ class FrontmostAppMonitor: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     private var previousPresetId: UUID? = nil
-
+    
     private init() {
         self.frontmostAppBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
     }
-
+    
     func startMonitoring() {
         NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didActivateApplicationNotification)
             .compactMap { notification -> String? in
@@ -26,17 +26,17 @@ class FrontmostAppMonitor: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] bundleIdentifier in
                 guard let self = self else { return }
-
+                
                 if UserDefaults.standard.bool(forKey: "excludeClipHoldWindowsFromAutoFilter") && bundleIdentifier == "design.taikun.Clip-Hold" {
                     return
                 }
-
+                
                 self.frontmostAppBundleIdentifier = bundleIdentifier
                 self.handleAppActivation(bundleIdentifier: bundleIdentifier)
             }
             .store(in: &cancellables)
     }
-
+    
     private func handleAppActivation(bundleIdentifier: String) {
         // 定型文ウィンドウが除外設定になっている場合は処理を中断
         if UserDefaults.standard.bool(forKey: "excludeStandardPhraseWindowFromPresetSwitching") {
@@ -47,10 +47,10 @@ class FrontmostAppMonitor: ObservableObject {
                 return
             }
         }
-
+        
         let presetManager = StandardPhrasePresetManager.shared
         let assignmentManager = PresetAppAssignmentManager.shared
-
+        
         if let assignedPresetId = assignmentManager.getPresetId(for: bundleIdentifier) {
             // アプリにプリセットが割り当てられている場合
             if presetManager.selectedPresetId != assignedPresetId {

@@ -5,7 +5,7 @@ enum HistoryOption: Hashable, Identifiable, CaseIterable {
     case preset(Int)
     case custom(Int?)
     case unlimited
-
+    
     var id: String {
         switch self {
         case .preset(let value): return "preset_\(value)"
@@ -18,7 +18,7 @@ enum HistoryOption: Hashable, Identifiable, CaseIterable {
         case .unlimited: return "unlimited"
         }
     }
-
+    
     var stringValue: LocalizedStringKey {
         switch self {
         case .preset(let value): return LocalizedStringKey(String(value)) // 数値はString(value)で直接変換し、それをLocalizedStringKeyでラップ
@@ -31,7 +31,7 @@ enum HistoryOption: Hashable, Identifiable, CaseIterable {
         case .unlimited: return "無制限"
         }
     }
-
+    
     var intValue: Int? {
         switch self {
         case .preset(let value): return value
@@ -39,16 +39,16 @@ enum HistoryOption: Hashable, Identifiable, CaseIterable {
         case .unlimited: return 0
         }
     }
-
+    
     static let presets: [HistoryOption] = [.preset(5), .preset(10), .preset(20), .preset(50)]
-
+    
     static var allCases: [HistoryOption] {
         var cases = HistoryOption.presets
         cases.append(.unlimited)
         cases.append(.custom(nil))
         return cases
     }
-
+    
     static func == (lhs: HistoryOption, rhs: HistoryOption) -> Bool {
         switch (lhs, rhs) {
         case (.preset(let lv), .preset(let rv)): return lv == rv
@@ -57,7 +57,7 @@ enum HistoryOption: Hashable, Identifiable, CaseIterable {
         default: return false
         }
     }
-
+    
     func hash(into hasher: inout Hasher) {
         switch self {
         case .preset(let value):
@@ -76,7 +76,7 @@ enum MenuHistoryOption: Hashable, Identifiable, CaseIterable {
     case preset(Int)
     case custom(Int?)
     case sameAsSaved
-
+    
     var id: String {
         switch self {
         case .preset(let value): return "preset_\(value)"
@@ -89,7 +89,7 @@ enum MenuHistoryOption: Hashable, Identifiable, CaseIterable {
         case .sameAsSaved: return "same_as_saved"
         }
     }
-
+    
     var stringValue: LocalizedStringKey {
         switch self {
         case .preset(let value): return LocalizedStringKey(String(value)) // 数値はString(value)で直接変換し、それをLocalizedStringKeyでラップ
@@ -102,7 +102,7 @@ enum MenuHistoryOption: Hashable, Identifiable, CaseIterable {
         case .sameAsSaved: return "履歴の保存数に合わせる"
         }
     }
-
+    
     var intValue: Int? {
         switch self {
         case .preset(let value): return value
@@ -110,15 +110,15 @@ enum MenuHistoryOption: Hashable, Identifiable, CaseIterable {
         case .sameAsSaved: return nil // sameAsSavedは特定の数値を持たないためnil
         }
     }
-
+    
     static let presetsAndSameAsSaved: [MenuHistoryOption] = [.preset(5), .preset(10), .preset(20), .preset(50), .sameAsSaved]
-
+    
     static var allCases: [MenuHistoryOption] {
         var cases = MenuHistoryOption.presetsAndSameAsSaved
         cases.append(.custom(nil))
         return cases
     }
-
+    
     static func == (lhs: MenuHistoryOption, rhs: MenuHistoryOption) -> Bool {
         switch (lhs, rhs) {
         case (.preset(let lv), .preset(let rv)): return lv == rv
@@ -127,7 +127,7 @@ enum MenuHistoryOption: Hashable, Identifiable, CaseIterable {
         default: return false
         }
     }
-
+    
     func hash(into hasher: inout Hasher) {
         switch self {
         case .preset(let value):
@@ -147,10 +147,17 @@ enum DataSizeUnit: String, CaseIterable, Identifiable, Hashable {
     case kilobytes = "KB"
     case megabytes = "MB"
     case gigabytes = "GB"
-
+    
     var id: String { self.rawValue }
-    var label: String { self.rawValue }
-
+    var label: String {
+        switch self {
+        case .bytes: return String(localized: "bytes_unit")
+        case .kilobytes: return String(localized: "kilobytes_unit")
+        case .megabytes: return String(localized: "megabytes_unit")
+        case .gigabytes: return String(localized: "gigabytes_unit")
+        }
+    }
+    
     func byteValue(for value: Int) -> Int {
         switch self {
         case .bytes: return value
@@ -166,7 +173,7 @@ enum DataSizeOption: Hashable, Identifiable, CaseIterable {
     case preset(Int, DataSizeUnit) // value, unit
     case custom(Int?, DataSizeUnit?) // value, unit (nil for "カスタム..." initial state)
     case unlimited
-
+    
     var id: String {
         switch self {
         case .preset(let value, let unit): return "preset_\(value)_\(unit.rawValue)"
@@ -179,7 +186,7 @@ enum DataSizeOption: Hashable, Identifiable, CaseIterable {
         case .unlimited: return "unlimited"
         }
     }
-
+    
     var stringValue: LocalizedStringKey {
         switch self {
         case .preset(let value, let unit): return LocalizedStringKey("\(value) \(unit.label)")
@@ -192,7 +199,7 @@ enum DataSizeOption: Hashable, Identifiable, CaseIterable {
         case .unlimited: return "無制限"
         }
     }
-
+    
     // This property returns the byte value for the option.
     var byteValue: Int? {
         switch self {
@@ -205,14 +212,14 @@ enum DataSizeOption: Hashable, Identifiable, CaseIterable {
         case .unlimited: return 0 // Unlimited is represented as 0 bytes
         }
     }
-
+    
     static let presets: [DataSizeOption] = [
         .preset(1, .megabytes),
         .preset(50, .megabytes),
         .preset(500, .megabytes),
         .preset(1, .gigabytes)
     ]
-
+    
     // CaseIterableの要件を満たすために、すべてのケースを定義
     static var allCases: [DataSizeOption] {
         var cases = DataSizeOption.presets
@@ -220,7 +227,7 @@ enum DataSizeOption: Hashable, Identifiable, CaseIterable {
         cases.append(.custom(nil, nil))
         return cases
     }
-
+    
     // IdentifiableとHashableの要件を満たすために、== と hash(into:) を実装
     static func == (lhs: DataSizeOption, rhs: DataSizeOption) -> Bool {
         switch (lhs, rhs) {
@@ -234,7 +241,7 @@ enum DataSizeOption: Hashable, Identifiable, CaseIterable {
             return false
         }
     }
-
+    
     func hash(into hasher: inout Hasher) {
         switch self {
         case .preset(let value, let unit):
@@ -255,7 +262,7 @@ enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
     case preset(Int, DataSizeUnit)
     case custom(Int?, DataSizeUnit?)
     case noAlert // アラートを表示しない
-
+    
     var id: String {
         switch self {
         case .preset(let value, let unit): return "preset_\(value)_\(unit.rawValue)"
@@ -268,7 +275,7 @@ enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
         case .noAlert: return "no_alert"
         }
     }
-
+    
     var stringValue: LocalizedStringKey {
         switch self {
         case .preset(let value, let unit): return LocalizedStringKey("\(value) \(unit.label)")
@@ -281,7 +288,7 @@ enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
         case .noAlert: return "表示しない"
         }
     }
-
+    
     var byteValue: Int? {
         switch self {
         case .preset(let value, let unit): return unit.byteValue(for: value)
@@ -309,7 +316,7 @@ enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
             return LocalizedStringKey("\(value) \(unit.label)")
         }
     }
-
+    
     static let presets: [DataSizeAlertOption] = [
         .preset(1, .gigabytes),
         .preset(2, .gigabytes),
@@ -336,7 +343,7 @@ enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
             return false
         }
     }
-
+    
     func hash(into hasher: inout Hasher) {
         switch self {
         case .preset(let value, let unit):
@@ -367,9 +374,9 @@ enum ItemFilter: String, CaseIterable, Identifiable {
     case otherFiles
     case pdfOnly
     case colorCodeOnly
-
+    
     var id: String { self.rawValue }
-
+    
     var displayName: LocalizedStringKey {
         switch self {
         case .all: return "すべての項目"
@@ -393,9 +400,9 @@ enum ItemSort: String, CaseIterable, Identifiable {
     case oldest
     case largestFileSize
     case smallestFileSize
-
+    
     var id: String { self.rawValue }
-
+    
     var displayName: LocalizedStringKey {
         switch self {
         case .newest: return "新しい順"
@@ -418,6 +425,6 @@ extension Date {
         formatter.formatOptions = formatOption
         return formatter.string(from: self)
     }
-
+    
     static var iso8601: ISO8601DateFormatter.Options { .withInternetDateTime }
 }

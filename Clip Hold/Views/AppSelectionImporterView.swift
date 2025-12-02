@@ -5,7 +5,7 @@ struct AppSelectionImporterView: View {
     @Binding var isPresented: Bool // Finderパネルの表示状態を親ビューから受け取る
     var onAppSelected: (String) -> Void // 選択されたアプリのバンドル識別子を親に渡すクロージャ
     var onSelectionCancelled: () -> Void // キャンセル時に親に通知するクロージャ
-
+    
     var body: some View {
         // このビュー自体はUI要素を持たず、fileImporterモディファイアを適用するだけの透明なビューとして機能します。
         // あるいは、デバッグ用に一時的にボタンを配置することもできますが、通常は不要です。

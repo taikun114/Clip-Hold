@@ -7,24 +7,24 @@ struct HistorySearchBar: View {
     @Binding var isLoading: Bool
     @FocusState var isSearchFieldFocused: Bool
     var clipboardHistoryCount: Int
-
+    
     @State private var searchTask: Task<Void, Never>? = nil
-
+    
     @Binding var selectedFilter: ItemFilter
     @Binding var selectedSort: ItemSort
     @Binding var selectedApp: String?
     
     // カラーコードフィルタリング設定のバインディング
     @AppStorage("enableColorCodeFilter") var enableColorCodeFilter: Bool = false
-
+    
     private func resizedAppIcon(for path: String) -> NSImage {
         let originalIcon = NSWorkspace.shared.icon(forFile: path)
         let resizedIcon = NSImage(size: CGSize(width: 16, height: 16))
         resizedIcon.lockFocus()
         originalIcon.draw(in: NSRect(origin: .zero, size: CGSize(width: 16, height: 16)),
-                           from: NSRect(origin: .zero, size: originalIcon.size),
-                           operation: .sourceOver,
-                           fraction: 1.0)
+                          from: NSRect(origin: .zero, size: originalIcon.size),
+                          operation: .sourceOver,
+                          fraction: 1.0)
         resizedIcon.unlockFocus()
         return resizedIcon
     }
@@ -55,7 +55,7 @@ struct HistorySearchBar: View {
             Label("アプリ", systemImage: "app")
         }
     }
-
+    
     var body: some View {
         HStack {
             TextField(
@@ -148,7 +148,7 @@ struct HistorySearchBar: View {
                     if enableColorCodeFilter {
                         Label(ItemFilter.colorCodeOnly.displayName, systemImage: "paintpalette").tag(ItemFilter.colorCodeOnly)
                     }
-
+                    
                     if !clipboardManager.appUsageHistory.isEmpty {
                         Divider()
                         Picker(selection: $selectedApp) {
@@ -184,7 +184,7 @@ struct HistorySearchBar: View {
             .frame(width: 30)
             .padding(.horizontal, 4)
             .disabled(isLoading) // 読み込み中に無効化
-
+            
             // 並び替えボタン
             Menu {
                 Picker("並び替え", selection: $selectedSort) {
@@ -205,7 +205,7 @@ struct HistorySearchBar: View {
                 .pickerStyle(.inline)
             } label: {
                 Image(systemName: "arrow.up.arrow.down")
-                    // 並び替えがデフォルト以外の場合はアクセントカラーを適用
+                // 並び替えがデフォルト以外の場合はアクセントカラーを適用
                     .tint(selectedSort != .newest ? .accentColor : .secondary)
                     .contentShape(Rectangle())
             }
@@ -213,7 +213,7 @@ struct HistorySearchBar: View {
             .frame(width: 30)
             .padding(.horizontal, 4)
             .disabled(isLoading) // 読み込み中に無効化
-
+            
         }
         .padding(.horizontal, 10)
         .padding(.bottom, 5)

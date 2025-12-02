@@ -21,6 +21,43 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.6.3
+### New Features
+- **Add French (`fr`), German (`de`), Spanish (`es`) localization by generative AI**
+  - Since I have no knowledge of languages other than Japanese and English, translations may contain strange translations. If you notice any translations that need correction, I would appreciate it if you could send feedback on what to change and how!
+- **Add the “Date and Time Display Format” option to the “Menu” section and “History Window” section in General Settings**
+  - Changes how the date is displayed when copied. You can choose from the following options.
+    - **Absolute** (Default)\
+      Example: 11/30/2025, 12:34PM
+    - **Relative**\
+      Example: 5 minutes ago
+    - **Both: Absolute (Relative)**\
+      Example: 11/30/2025, 12:34PM (5 minutes ago)
+    - **Both: Absolute - Relative**\
+      Example: 11/30/2025, 12:34PM - 5 minutes ago
+    - **Both: Relative (Absolute)**\
+      Example: 5 minutes ago (11/30/2025, 12:34PM)
+    - **Both: Relative - Absolute**\
+      Example: 5 minutes ago - 11/30/2025, 12:34PM
+
+### Bug Fixes and Improvements
+- **Fix issue where the “Resume” button did not appear in the notification panel sent when launching the app while clipboard monitoring was paused**
+- **Fix issue that preset name in the edit screen for default presets was not localized**
+- **Fix “Change History and Copy” to “Change Item and Copy”**
+  - The issue where the “Change History and Copy” was also displayed on the change and copy standard phrases screen has been fixed.
+- **Fix issue where the History and Standard Phrases window could not be closed using the Escape key**
+- **Fix issue where the default preset icon was not generated**
+- **Improve app performance**
+  - Proper cache utilization and automatic cleanup of unnecessary data now help prevent performance degradation even when Clip Hold is running for long periods.
+- **Improve shortcut keys for the change history and copy screen**
+  - Pressing `⌘ (Command)` + `S` while the change history and copy screen is open now performs the copy action.
+- **Improve the input field box highlighting on the change and copy screens for history and standard phrases, and on the add edit screen for standard phrases, when “Increase Contrast” is enabled in System Settings**
+- **Improve to send a notification when the shortcut key for standard phrases that are not set is pressed**
+- **Improve the clipboard monitoring indicator in the Privacy Settings when “Differentiate Without Color” is enabled in System Settings**
+- **Add a description regarding size calculation to the “Total Size of Saved Folder:” in Copy History Settings**
+- **Remove height restrictions on input fields in the history and standard phrases edit screens**
+  - When these screens are displayed as windows, increasing the window height now causes the input fields to expand accordingly.
+
 ## 1.6.2
 ### Bug Fixes and Improvements
 - **Fix issue that sometimes prevented copying the correct folder**

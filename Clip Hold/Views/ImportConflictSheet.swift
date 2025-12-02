@@ -11,7 +11,7 @@ struct PresetConflictInfo {
 struct ImportConflictSheet: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
-
+    
     // プリセットごとの競合情報を保持する配列
     @Binding var presetConflicts: [PresetConflictInfo]
     
@@ -22,7 +22,7 @@ struct ImportConflictSheet: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
     
-
+    
     private var currentPresetConflict: PresetConflictInfo? {
         guard currentPresetIndex < presetConflicts.count else { return nil }
         return presetConflicts[currentPresetIndex]
@@ -37,13 +37,13 @@ struct ImportConflictSheet: View {
     
     // すべてのプリセットの処理が完了したときに呼ばれるクロージャ
     var onAllPresetsCompleted: ([PresetConflictInfo]) -> Void
-
+    
     private var currentConflict: Binding<StandardPhraseDuplicate>? {
         guard let currentPreset = currentPresetConflict,
               currentConflictIndex < currentPreset.conflicts.count else { return nil }
         return $presetConflicts[currentPresetIndex].conflicts[currentConflictIndex]
     }
-
+    
     private var isConflictUnresolved: Bool {
         if let conflict = currentConflict?.wrappedValue {
             return conflict.hasTitleConflict || conflict.hasContentConflict
@@ -60,7 +60,7 @@ struct ImportConflictSheet: View {
     private var currentNonConflictingPhrases: [StandardPhrase] {
         return currentPresetConflict?.nonConflictingPhrases ?? []
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 15) {
             // タイトル: プリセットが複数ある場合は追加のカウンターを表示
@@ -70,11 +70,11 @@ struct ImportConflictSheet: View {
                     .font(.headline)
                     .fontWeight(.bold)
             }
-
+            
             Text("以下の定型文は既存の項目とタイトルまたは内容が重複しています。\nタイトルまたは内容のどちらかを編集してください。")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-
+            
             if let conflictBinding = currentConflict {
                 VStack(alignment: .leading, spacing: 10) {
                     VStack(alignment: .leading, spacing: 5) {
@@ -97,7 +97,7 @@ struct ImportConflictSheet: View {
                             Spacer()
                         }
                         .help(conflictBinding.wrappedValue.existingPhrase.content)
-
+                        
                         VStack(alignment: .leading) {
                             Text("新しいタイトル:")
                             TextField("新しいタイトル", text: conflictBinding.newPhrase.title)
@@ -144,7 +144,7 @@ struct ImportConflictSheet: View {
                     .foregroundStyle(.secondary)
                 Spacer()
             }
-
+            
             // MARK: - ボタン配置
             HStack {
                 Button("キャンセル") {
@@ -152,22 +152,22 @@ struct ImportConflictSheet: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
-
+                
                 Spacer()
-
+                
                 Button("すべてスキップ") {
                     // 現在のプリセットの処理を完了し、次のプリセットに進む
                     completeCurrentPreset()
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
-
+                
                 Button("スキップ") {
                     goToNextConflict()
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.large)
-
+                
                 Button {
                     if let currentConflictValue = currentConflict?.wrappedValue {
                         // 要望の仕様に合わせるため、詳細なチェックを行う
@@ -213,7 +213,7 @@ struct ImportConflictSheet: View {
         .padding()
         .frame(minWidth: 500, idealWidth: 600, maxWidth: 800, minHeight: 400)
     }
-
+    
     private func goToNextConflict() {
         if currentConflictIndex < currentConflicts.count - 1 {
             currentConflictIndex += 1

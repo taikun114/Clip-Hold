@@ -2,12 +2,13 @@ import AppKit
 import SwiftUI
 
 class SettingsWindowController: NSWindowController, NSWindowDelegate {
-    
-    convenience init() {
+
+    init() {
         let settingsView = SettingsView()
             .environmentObject(ClipboardManager.shared)
             .environmentObject(StandardPhraseManager.shared)
-        
+            .environmentObject(DateReloader.shared)
+
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 700, height: 550),
             styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
@@ -18,8 +19,8 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
         window.title = "設定"
         window.identifier = NSUserInterfaceItemIdentifier("SettingsWindow")
         
-        self.init(window: window)
-        
+        super.init(window: window) // designated initializerを呼び出す
+
         // ウィンドウデリゲートの設定
         window.delegate = self
         
@@ -33,6 +34,10 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
             name: NSWindow.willCloseNotification,
             object: window
         )
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // ウィンドウの位置とサイズをUserDefaultsから復元

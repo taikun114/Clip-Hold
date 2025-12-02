@@ -2,31 +2,13 @@ import SwiftUI
 import AppKit
 import Quartz
 
-// sourceAppPathからローカライズされたアプリ名を取得するヘルパー関数
-private func getLocalizedName(for sourceAppPath: String?) -> String? {
-    guard let sourceAppPath = sourceAppPath else { return nil }
-    
-    let appURL = URL(fileURLWithPath: sourceAppPath)
-    let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
-
-    if let appBundle = Bundle(url: appURL) {
-        let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? 
-                     appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? 
-                     appBundle.infoDictionary?["CFBundleName"] as? String ?? 
-                     nonLocalizedName
-        return appName
-    } else {
-        return nonLocalizedName
-    }
-}
-
 struct HistoryContentList: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @Environment(\.dismiss) var dismiss
     @Environment(\.accessibilityReduceMotion) var reduceMotion
-
+    
     @Binding var filteredHistory: [ClipboardItem]
     @Binding var isLoading: Bool
     @Binding var showingDeleteConfirmation: Bool
@@ -38,7 +20,7 @@ struct HistoryContentList: View {
     @Binding var selectedItemForQRCode: ClipboardItem?
     @Binding var itemForNewPhrase: ClipboardItem?
     @Binding var previousClipboardHistoryCount: Int
-
+    
     // State variables for the exclude app alert
     @State private var showingExcludeAppAlert = false
     @State private var appToExclude: String?
@@ -46,14 +28,14 @@ struct HistoryContentList: View {
     // State variables for the delete all history from app alert
     @State private var showingDeleteAllFromAppAlert = false
     @State private var appToDeleteFrom: String?
-
+    
     // 各行のアイコンのNSView参照を保存するためのState
     @State private var rowIconViews: [UUID: NSView] = [:]
     
     // State variable for the edit sheet
     @State private var showingEditSheet = false
     @State private var itemToEdit: ClipboardItem?
-
+    
     let hideNumbersInHistoryWindow: Bool
     let closeWindowOnDoubleClickInHistoryWindow: Bool
     let scrollToTopOnUpdate: Bool
@@ -61,16 +43,19 @@ struct HistoryContentList: View {
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
     let searchText: String
+    @EnvironmentObject var dateReloader: DateReloader
+    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
 
+    
     var onCopyAction: (ClipboardItem) -> Void
-
-
+    
+    
     private func parseQRCode(from image: NSImage) -> String? {
         guard let ciImage = CIImage(data: image.tiffRepresentation ?? Data()) else { return nil }
-
+        
         let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
         let features = detector?.features(in: ciImage)
-
+        
         for feature in features ?? [] {
             if let qrCodeFeature = feature as? CIQRCodeFeature {
                 return qrCodeFeature.messageString
@@ -78,7 +63,7 @@ struct HistoryContentList: View {
         }
         return nil
     }
-
+    
     var body: some View {
         ZStack {
             if filteredHistory.isEmpty && !isLoading {
@@ -111,8 +96,10 @@ struct HistoryContentList: View {
                                 rowIconViews: $rowIconViews, // アイコンビュー辞書へのBindingを渡す
                                 showCharacterCount: showCharacterCount // showCharacterCountを渡す
                             )
+                            .environmentObject(clipboardManager)
                             .environmentObject(standardPhraseManager)
                             .environmentObject(presetManager)
+                            .environmentObject(dateReloader)
                             .tag(item.id)
                         }
                     }
@@ -138,7 +125,7 @@ struct HistoryContentList: View {
                     }
                     .onChange(of: selectedItemID) { oldID, newID in
                         guard let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController else { return }
-
+                        
                         guard let newID = newID else {
                             controller.hideQuickLook()
                             return
@@ -147,11 +134,11 @@ struct HistoryContentList: View {
                         guard let selectedItem = filteredHistory.first(where: { $0.id == newID }) else {
                             return
                         }
-
+                        
                         guard QLPreviewPanel.sharedPreviewPanelExists() && QLPreviewPanel.shared().isVisible else {
                             return
                         }
-
+                        
                         // 選択が変更された場合も、正しいアイコンビューから再表示する
                         if let filePath = selectedItem.filePath,
                            let sourceView = rowIconViews[newID] {
@@ -376,16 +363,24 @@ struct HistoryContentList: View {
                                             }
                                         }
                                     } else {
-                                        print("QRコードが見つかりませんでした。")
+                                        print("QR code not found.")
                                     }
                                 } else if let error = error {
-                                    print("画像のロードに失敗しました: \(error.localizedDescription)")
+                                    print("Failed to load image: \(error.localizedDescription)")
                                 }
                             }
                         }
                         return true
                     }
                     .onChange(of: filteredHistory) { _, newValue in
+                        // 不要になったrowIconViewsのエントリをクリーンアップする
+                        let newIDs = Set(newValue.map { $0.id })
+                        let oldIDs = Set(rowIconViews.keys)
+                        let unusedIDs = oldIDs.subtracting(newIDs)
+                        for id in unusedIDs {
+                            rowIconViews.removeValue(forKey: id)
+                        }
+                        
                         // filteredHistory が更新され、かつscrollToTopOnUpdateがtrue、かつ検索中でない場合
                         // さらに、元の履歴の数が変わった場合のみに限定する
                         if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && newValue.count > previousClipboardHistoryCount {
@@ -425,7 +420,7 @@ struct HistoryContentList: View {
                         }
                     } message: {
                         if let appPath = appToExclude {
-                            let appName = getLocalizedName(for: appPath) ?? appPath
+                            let appName = clipboardManager.getLocalizedName(for: appPath) ?? appPath
                             Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
                         }
                     }
@@ -438,7 +433,7 @@ struct HistoryContentList: View {
                         Button("キャンセル", role: .cancel) { }
                     } message: {
                         if let appPath = appToDeleteFrom {
-                            let appName = getLocalizedName(for: appPath) ?? appPath
+                            let appName = clipboardManager.getLocalizedName(for: appPath) ?? appPath
                             let count = clipboardManager.countHistoryFromApp(sourceAppPath: appPath)
                             Text("「\(appName)」からのすべての履歴を削除してもよろしいですか？\(count)個の履歴が削除されます。この操作は元に戻せません。")
                         }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EditHistoryItemView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @State var content: String
     var onCopy: (String) -> Void
     var isSheet: Bool = false
@@ -11,7 +12,7 @@ struct EditHistoryItemView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("履歴を変更してコピー")
+                Text("項目を変更してコピー")
                     .font(.headline)
                     .fontWeight(.bold)
                 Spacer()
@@ -19,7 +20,7 @@ struct EditHistoryItemView: View {
             
             TextEditor(text: $content)
                 .font(.system(.body, design: .monospaced))
-                .frame(minHeight: 100, maxHeight: 300)
+                .frame(minHeight: 100)
                 .scrollContentBackground(.hidden)
                 .padding(.vertical, 8)
                 .padding(.horizontal, 4)
@@ -28,7 +29,7 @@ struct EditHistoryItemView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        .stroke(colorSchemeContrast == .increased ? Color.primary : Color.gray.opacity(0.3), lineWidth: 1)
                 )
             Spacer()
             HStack {
@@ -52,7 +53,7 @@ struct EditHistoryItemView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .keyboardShortcut(.defaultAction)
+                .keyboardShortcut("s", modifiers: .command)
                 .disabled(content.isEmpty)
                 .controlSize(.large)
             }

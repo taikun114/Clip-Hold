@@ -1,30 +1,12 @@
 import SwiftUI
 import KeyboardShortcuts
 
-extension Int {
-    var ordinalSuffix: String {
-        let suffixString: String
-        let ones = self % 10
-        let tens = (self / 10) % 10
-        if tens == 1 {
-            suffixString = String(localized: "th_suffix")
-        } else {
-            switch ones {
-            case 1: suffixString = String(localized: "st_suffix")
-            case 2: suffixString = String(localized: "nd_suffix")
-            case 3: suffixString = String(localized: "rd_suffix")
-            default: suffixString = String(localized: "th_suffix")
-            }
-        }
-        return "\(self)\(suffixString)"
-    }
-}
 
 struct ShortcutsSettingsView: View {
     @StateObject private var presetManager = StandardPhrasePresetManager.shared
     @EnvironmentObject var clipboardManager: ClipboardManager
     @AppStorage("useFilteredHistoryForShortcuts") private var useFilteredHistoryForShortcuts: Bool = false
-
+    
     var body: some View {
         Form {
             Section(header: Text("ウィンドウ操作").font(.headline)) {
@@ -41,7 +23,7 @@ struct ShortcutsSettingsView: View {
                     .buttonStyle(.borderless)
                     .help("デフォルトのショートカットに戻します。")
                 }
-
+                
                 HStack {
                     Text("履歴ウィンドウを開く")
                     Spacer()
@@ -72,7 +54,7 @@ struct ShortcutsSettingsView: View {
                     .help("デフォルトのショートカットに戻します。")
                 }
             }
-
+            
             Section(header: Text("プリセット").font(.headline)) {
                 HStack {
                     Text("新しいプリセットを追加する")
@@ -120,7 +102,7 @@ struct ShortcutsSettingsView: View {
                     HStack {
                         VStack(alignment: .leading) {
                             // OrdinalSuffix を使用して英語表記の順序数にする
-                            Text("\((index + 1).ordinalSuffix)定型文をコピーする")
+                            Text("\(index + 1)\((index + 1).ordinalSuffixForStandardPhrase)定型文をコピーする")
                             
                             let currentPhrases = presetManager.selectedPreset?.phrases ?? []
                             let phraseExists = currentPhrases.indices.contains(index)
@@ -154,7 +136,7 @@ struct ShortcutsSettingsView: View {
                             default: fatalError("Unexpected index for standard phrase shortcut")
                             }
                         }()
-
+                        
                         KeyboardShortcuts.Recorder(for: shortcutName)
                         Button(action: {
                             KeyboardShortcuts.reset(shortcutName)
@@ -212,10 +194,10 @@ struct ShortcutsSettingsView: View {
                     Toggle("", isOn: $useFilteredHistoryForShortcuts)
                         .labelsHidden()
                 }
-
+                
                 ForEach(0..<10, id: \.self) { index in
                     HStack {
-                        Text("\((index + 1).ordinalSuffix)履歴をコピーする")
+                        Text("\(index + 1)\((index + 1).ordinalSuffixForHistory)履歴をコピーする")
                         Spacer()
                         
                         let shortcutName: KeyboardShortcuts.Name = {
@@ -233,7 +215,7 @@ struct ShortcutsSettingsView: View {
                             default: fatalError("Unexpected index for clipboard history shortcut")
                             }
                         }()
-
+                        
                         KeyboardShortcuts.Recorder(for: shortcutName)
                         Button(action: {
                             KeyboardShortcuts.reset(shortcutName)

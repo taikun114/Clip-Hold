@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jaywcjlove/SFSymbolsPicker",
       "state" : {
-        "revision" : "603a9c1b8bad4daef411ca569b386bdbb9342329",
-        "version" : "1.0.4"
+        "revision" : "a28f7a3b089c9b86d1dcc4b63817bfdf17b5bdef",
+        "version" : "1.0.6"
       }
     }
   ],

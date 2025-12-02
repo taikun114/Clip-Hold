@@ -13,11 +13,11 @@ extension ClipboardManager {
         }
         return directory.appendingPathComponent("ClipHold")
     }
-
+    
     func createClipboardFilesDirectoryIfNeeded() -> URL? { // private から internal に変更
         guard let appSpecificDirectory = getAppSpecificDirectory() else { return nil }
         let filesDirectory = appSpecificDirectory.appendingPathComponent(filesDirectoryName, isDirectory: true)
-
+        
         if !FileManager.default.fileExists(atPath: filesDirectory.path) {
             do {
                 try FileManager.default.createDirectory(at: filesDirectory, withIntermediateDirectories: true, attributes: nil)
@@ -29,17 +29,17 @@ extension ClipboardManager {
         }
         return filesDirectory
     }
-
+    
     // ファイルをアプリのサンドボックスにコピーする処理を非同期化
     private func copyFileToAppSandbox(from sourceURL: URL) async -> URL? {
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
-
+        
         let fileName = sourceURL.lastPathComponent
         // 同じファイル名が既に存在する場合に備えて、ユニークな名前を生成
         // ここで UUID を含む名前を生成し、実際のファイル名として使用
         let uniqueFileName = "\(UUID().uuidString)-\(fileName)"
         let destinationURL = filesDirectory.appendingPathComponent(uniqueFileName)
-
+        
         do {
             if FileManager.default.fileExists(atPath: destinationURL.path) {
                 try FileManager.default.removeItem(at: destinationURL)
@@ -52,7 +52,7 @@ extension ClipboardManager {
             return nil
         }
     }
-
+    
     func deleteFileFromSandbox(at fileURL: URL) { // private から internal に変更
         do {
             if FileManager.default.fileExists(atPath: fileURL.path) {
@@ -63,7 +63,7 @@ extension ClipboardManager {
             print("ClipboardManager: Error deleting file from sandbox: \(error.localizedDescription)")
         }
     }
-
+    
     // ヘルパー関数: ファイルの属性（サイズと変更日時）を取得
     func getFileAttributes(_ url: URL) -> (fileSize: UInt64?, modificationDate: Date?) { // private から internal に変更
         do {
@@ -76,7 +76,7 @@ extension ClipboardManager {
             return (nil, nil)
         }
     }
-
+    
     // ヘルパー関数: 元のファイル名を抽出
     func extractOriginalFileName(from fileName: String) -> String { // private から internal に変更
         // UUIDプレフィックスを削除する正規表現パターン
@@ -91,7 +91,7 @@ extension ClipboardManager {
             return fileName
         }
     }
-
+    
     // ヘルパー関数: 複数のファイルURLを処理
     func handleMultipleFilesChange(fileURLs: [URL], sourceAppPath: String?) async {
         var itemsWithQRCode: [(fileURL: URL, qrCodeContent: String?)] = []
@@ -133,7 +133,7 @@ extension ClipboardManager {
             }
             return savedItems.isEmpty ? nil : savedItems
         }
-
+        
         var totalFileSize: UInt64 = 0
         var fileItemsWithAttributes: [(fileURL: URL, qrCodeContent: String?, fileSize: UInt64?)] = []
         
@@ -179,19 +179,19 @@ extension ClipboardManager {
         
         return savedItems.isEmpty ? nil : savedItems
     }
-
+    
     // ヘルパー関数: ファイルURLからClipboardItemを作成（物理的な重複コピー防止ロジックを含む）
     func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? { // private から internal に変更
         let filesDirectory = createClipboardFilesDirectoryIfNeeded()
-
+        
         // 外部ファイルの属性を取得
         let externalFileAttributes = getFileAttributes(fileURL)
         
         // 外部ファイルのハッシュを計算
         let externalFileHash = HashCalculator.calculateFileHash(at: fileURL)
-
+        
         print("DEBUG: createClipboardItemForFileURL - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
-
+        
         // MARK: - ファイルサイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
         // isPerformingInternalCopy が true の場合は、アラート表示を完全にスキップして保存処理に進む
         if !isPerformingInternalCopy { // 内部コピーでない場合のみ、アラート表示の可能性を考慮
@@ -205,7 +205,7 @@ extension ClipboardManager {
                         // アラートしきい値を超えている場合、アラート表示を要求
                         await MainActor.run {
                             self.pendingLargeFileItem = (fileURL, qrCodeContent)
-                            self.pendingLargeFileItemsSourceAppPath = sourceAppPath // ここを追加
+                            self.pendingLargeFileItemsSourceAppPath = sourceAppPath
                             self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
                             print("DEBUG: createClipboardItemForFileURL - Setting showingLargeFileAlert to true for file: \(fileURL.lastPathComponent)")
                         }
@@ -216,12 +216,12 @@ extension ClipboardManager {
         }
         // ここに到達した場合は、アラート表示が不要（内部コピー、またはアラート確認済み、またはサイズ制限内）なので、
         // そのまま保存ロジックに進む
-
+        
         // サンドボックス内の既存ファイルを走査し、重複をチェック
         if let filesDirectory = filesDirectory {
             do {
                 let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.contentModificationDateKey, .fileSizeKey], options: .skipsHiddenFiles)
-
+                
                 for sandboxedFileURL in sandboxedFileContents {
                     let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
                     
@@ -246,7 +246,7 @@ extension ClipboardManager {
                         if let isDir = (try? fileURL.resourceValues(forKeys: [.isDirectoryKey]).isDirectory), isDir {
                             isDirectory = true
                         }
-
+                        
                         // フォルダの場合はサイズでの重複チェックをスキップする
                         if !isDirectory {
                             if let externalSize = externalFileAttributes.fileSize,
@@ -264,28 +264,28 @@ extension ClipboardManager {
                 print("ClipboardManager: Error getting contents of sandbox directory for duplicate check: \(error.localizedDescription)")
             }
         }
-
+        
         // 重複ファイルが見つからなかった場合、ファイルをサンドボックスにコピーして新しいアイテムを返す
         if let copiedFileURL = await copyFileToAppSandbox(from: fileURL) {
             let displayName = fileURL.lastPathComponent
             // 新しいアイテムにもファイルサイズとハッシュをセット
             return ClipboardItem(text: displayName, date: Date(), filePath: copiedFileURL, fileSize: externalFileAttributes.fileSize, fileHash: externalFileHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
         }
-
+        
         print("ClipboardManager: Failed to copy external item to sandbox: \(fileURL.lastPathComponent).")
         return nil
     }
-
+    
     // MARK: - New Helper function for image duplication check and saving
     func createClipboardItemFromImageData(_ imageData: Data, qrCodeContent: String?, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? { // private から internal に変更
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
-
+        
         let newImageSize = UInt64(imageData.count)
         // 画像データのハッシュを計算
         let newImageHash = HashCalculator.calculateImageDataHash(imageData)
-
+        
         print("DEBUG: createClipboardItemFromImageData - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
-
+        
         // MARK: - 画像サイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
         // isPerformingInternalCopy が true の場合は、アラート表示を完全にスキップして保存処理に進む
         if !isPerformingInternalCopy { // 内部コピーでない場合のみ、アラート表示の可能性を考慮
@@ -293,11 +293,11 @@ extension ClipboardManager {
                 if maxFileSizeToSave > 0 && newImageSize > maxFileSizeToSave {
                     print("ClipboardManager: Image not saved due to size limit. Image size: \(newImageSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
                     return nil // サイズ制限を超えている場合はnilを返す
-                    } else if largeFileAlertThreshold > 0 && newImageSize > largeFileAlertThreshold {
+                } else if largeFileAlertThreshold > 0 && newImageSize > largeFileAlertThreshold {
                     // アラートしきい値を超えている場合、アラート表示を要求
                     await MainActor.run {
                         self.pendingLargeImageData = (imageData, qrCodeContent)
-                        self.pendingLargeFileItemsSourceAppPath = sourceAppPath // ここを追加
+                        self.pendingLargeFileItemsSourceAppPath = sourceAppPath
                         self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
                         print("DEBUG: createClipboardItemFromImageData - Setting showingLargeFileAlert to true for image data (size: \(newImageSize))")
                     }
@@ -307,10 +307,10 @@ extension ClipboardManager {
         }
         // ここに到達した場合は、アラート表示が不要（内部コピー、またはアラート確認済み、またはサイズ制限内）なので、
         // そのまま保存ロジックに進む
-
+        
         do {
             let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles)
-
+            
             for sandboxedFileURL in sandboxedFileContents {
                 if sandboxedFileURL.lastPathComponent.hasSuffix("-image.png") {
                     let sandboxedFileAttributes = getFileAttributes(sandboxedFileURL)
@@ -335,11 +335,11 @@ extension ClipboardManager {
         } catch {
             print("ClipboardManager: Error getting contents of sandbox directory for image duplicate check: \(error.localizedDescription)")
         }
-
+        
         // 重複が見つからなかった場合、新しい画像を保存
         let uniqueFileName = "\(UUID().uuidString)-image.png"
         let destinationURL = filesDirectory.appendingPathComponent(uniqueFileName)
-
+        
         do {
             try imageData.write(to: destinationURL)
             print("ClipboardManager: New image saved to sandbox as \(destinationURL.lastPathComponent)")
@@ -350,17 +350,17 @@ extension ClipboardManager {
             return nil
         }
     }
-
+    
     // MARK: - New Helper function for PDF duplication check and saving
     func createClipboardItemFromPDFData(_ pdfData: Data, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? {
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
-
+        
         let newPDFSize = UInt64(pdfData.count)
         // PDFデータのハッシュを計算
         let newPDFHash = HashCalculator.calculateImageDataHash(pdfData)
-
+        
         print("DEBUG: createClipboardItemFromPDFData - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
-
+        
         // MARK: - PDFサイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
         if !isPerformingInternalCopy {
             if !isFromAlertConfirmation {
@@ -379,10 +379,10 @@ extension ClipboardManager {
                 }
             }
         }
-
+        
         do {
             let sandboxedFileContents = try FileManager.default.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles)
-
+            
             for sandboxedFileURL in sandboxedFileContents {
                 if sandboxedFileURL.pathExtension.lowercased() == "pdf" {
                     if let sandboxedData = try? Data(contentsOf: sandboxedFileURL) {
@@ -398,11 +398,11 @@ extension ClipboardManager {
         } catch {
             print("ClipboardManager: Error getting contents of sandbox directory for PDF duplicate check: \(error.localizedDescription)")
         }
-
+        
         // 重複が見つからなかった場合、新しいPDFを保存
         let uniqueFileName = "\(UUID().uuidString)-file.pdf"
         let destinationURL = filesDirectory.appendingPathComponent(uniqueFileName)
-
+        
         do {
             try pdfData.write(to: destinationURL)
             print("ClipboardManager: New PDF saved to sandbox as \(destinationURL.lastPathComponent)")
@@ -412,7 +412,7 @@ extension ClipboardManager {
             return nil
         }
     }
-
+    
     // MARK: - Helper function for duplication check
     func isDuplicate(_ newItem: ClipboardItem, of existingItem: ClipboardItem) -> Bool { // private から internal に変更
         // ファイルアイテムの場合、ファイルハッシュで重複を判定（ハッシュが利用可能な場合）
@@ -446,12 +446,12 @@ extension ClipboardManager {
         // 片方だけがファイルアイテムの場合は重複ではない
         return false
     }
-
+    
     // MARK: - Thumbnail Generation
     func generateThumbnail(for item: ClipboardItem, at fileURL: URL) { // private から internal に変更
         let thumbnailSize = CGSize(width: 40, height: 40) // メニューバーの表示サイズに合わせる
         let request = QLThumbnailGenerator.Request(fileAt: fileURL, size: thumbnailSize, scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
-
+        
         Task.detached {
             do {
                 let thumbnail = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
@@ -477,46 +477,46 @@ extension ClipboardManager {
             }
         }
     }
-
+    
     // MARK: - ファイルコピーのためのヘルパー
     // 元のファイル名で一時的なファイルを作成する
     func createTemporaryCopy(for item: ClipboardItem) async -> URL? { // private から internal に変更
         guard let originalFilePath = item.filePath else {
             return nil
         }
-
+        
         let originalFileName = extractOriginalFileName(from: originalFilePath.lastPathComponent)
-
+        
         let tempDirectoryURL = FileManager.default.temporaryDirectory
         let tempFileURL = tempDirectoryURL.appendingPathComponent(originalFileName)
-
+        
         // 既存のファイルがあれば削除
         if FileManager.default.fileExists(atPath: tempFileURL.path) {
             try? FileManager.default.removeItem(at: tempFileURL)
         }
-
+        
         do {
             try FileManager.default.copyItem(at: originalFilePath, to: tempFileURL)
             print("ClipboardManager: Temporary file created at \(tempFileURL.path) from original file \(originalFilePath.path)")
-
+            
             // 追跡リストに追加
             await MainActor.run {
                 _ = self.temporaryFileUrls.insert(tempFileURL) // 明示的に結果を無視
             }
-
+            
             return tempFileURL
         } catch {
             print("ClipboardManager: Error creating temporary file copy: \(error.localizedDescription)")
             return nil
         }
     }
-
+    
     // MARK: - 一時ファイルクリーンアップ
     func cleanUpTemporaryFiles() { // private から internal に変更
         let fileManager = FileManager.default
         let tempDirectoryURL = fileManager.temporaryDirectory
         print("ClipboardManager: Attempting to clean up temporary files in \(tempDirectoryURL.path)")
-
+        
         do {
             let tempContents = try fileManager.contentsOfDirectory(at: tempDirectoryURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
             var cleanedCount = 0

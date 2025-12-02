@@ -7,7 +7,7 @@ struct DeveloperSettingsView: View {
     
     @State private var showingResetConfirmation = false
     @State private var showingResetComplete = false
-
+    
     var body: some View {
         Form {
             // MARK: - テキスト
@@ -29,7 +29,7 @@ struct DeveloperSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: テキスト
-
+            
             // MARK: - カラーコード
             Section(header: Text("カラーコード").font(.headline)) {
                 HStack {

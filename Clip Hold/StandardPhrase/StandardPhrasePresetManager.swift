@@ -63,12 +63,14 @@ class StandardPhrasePresetManager: ObservableObject {
         savePresetToFile(defaultPreset)
         savePresetIndex()
         saveSelectedPresetId()
+        // アイコンを生成
+        let _ = PresetIconGenerator.shared.generateIcon(for: defaultPreset)
     }
     
     private func loadPresetsFromFileSystem() {
         // アイコンキャッシュをクリア
         PresetIconGenerator.shared.clearCache()
-
+        
         guard let presetDirectory = getPresetDirectory() else {
             presets = []
             return
@@ -95,7 +97,7 @@ class StandardPhrasePresetManager: ObservableObject {
         for preset in presets {
             loadPresetPhrases(for: preset.id)
         }
-
+        
         // すべて読み込んだプリセットのアイコンを生成
         for preset in presets {
             let _ = PresetIconGenerator.shared.generateIcon(for: preset)
@@ -430,7 +432,7 @@ class StandardPhrasePresetManager: ObservableObject {
             updatePreset(presets[presetIndex])
         }
     }
-
+    
     func move(phrase: StandardPhrase, to destinationPresetId: UUID) {
         guard let sourcePresetId = selectedPresetId,
               sourcePresetId != destinationPresetId,
@@ -439,13 +441,13 @@ class StandardPhrasePresetManager: ObservableObject {
         else {
             return
         }
-
+        
         // 元の場所から削除
         sourcePreset.phrases.removeAll { $0.id == phrase.id }
-
+        
         // 移動先に追加
         destinationPreset.phrases.append(phrase)
-
+        
         // 両方のプリセットを更新
         updatePreset(sourcePreset)
         updatePreset(destinationPreset)

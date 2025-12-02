@@ -10,14 +10,14 @@ class LoginItemManager: ObservableObject {
             updateLoginItemStatus(launchAtLogin)
         }
     }
-
+    
     init() {
         // 初期化時に現在のログイン項目の状態を読み込む
         // SMAppService.mainApp.status は現在の登録状態を返します
         self.launchAtLogin = SMAppService.mainApp.status == .enabled
         print("DEBUG: LoginItemManager init() - Initial login item status: \(self.launchAtLogin ? "Enabled" : "Disabled")")
     }
-
+    
     private func updateLoginItemStatus(_ enable: Bool) {
         if enable {
             // ログイン項目として登録する
@@ -59,7 +59,7 @@ class LoginItemManager: ObservableObject {
             }
         }
     }
-
+    
     // システム設定のログイン項目パネルを開くヘルパーメソッド
     func openSystemSettingsLoginItems() {
         SMAppService.openSystemSettingsLoginItems()
@@ -68,21 +68,25 @@ class LoginItemManager: ObservableObject {
 
 struct GeneralSettingsView: View {
     @StateObject private var loginItemManager = LoginItemManager()
-
+    @EnvironmentObject var dateReloader: DateReloader
+    
+    @AppStorage("dateDisplayFormatInMenu") var dateDisplayFormatInMenu: String = "absolute"
+    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
+    
     @AppStorage("maxHistoryInMenu") var maxHistoryInMenu: Int = 10
     @State private var tempSelectedMenuOption: MenuHistoryOption
     @State private var initialMenuOption: MenuHistoryOption
-
+    
     @AppStorage("maxPhrasesInMenu") var maxPhrasesInMenu: Int = 5
     @State private var tempSelectedPhraseMenuOption: HistoryOption
     @State private var initialPhraseMenuOption: HistoryOption
-
+    
     @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
     @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
     @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
     @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
-
+    
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbersInStandardPhrasesWindow: Bool = false
     @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
     @AppStorage("historyWindowAlwaysOnTop") var historyWindowAlwaysOnTop: Bool = false
@@ -92,33 +96,33 @@ struct GeneralSettingsView: View {
     @AppStorage("historyWindowOverlayTransparency") var historyWindowOverlayTransparency: Double = 0.5
     @AppStorage("standardPhraseWindowOverlayTransparency") var standardPhraseWindowOverlayTransparency: Double = 0.5
     @AppStorage("excludeClipHoldWindowsFromAutoFilter") var excludeClipHoldWindowsFromAutoFilter: Bool = false
-
+    
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
-
+    
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
-
+    
     @State private var showingCustomMenuHistorySheet = false
     @State private var showingCustomPhraseMenuSheet = false
     @State private var customPhraseValueWasSaved = false
     @State private var customHistoryValueWasSaved = false
-
+    
     @State private var tempCustomMenuHistoryValue: Int = 10
     @State private var tempCustomPhrasesInMenuValue: Int = 5
-
+    
     init() {
         let savedMaxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryInMenu")
         let savedMaxPhrasesInMenu = UserDefaults.standard.integer(forKey: "maxPhrasesInMenu")
-
+        
         // DEBUG print for initial values from UserDefaults (accessing AppStorage directly here is fine)
         print("DEBUG: init() - savedMaxHistoryInMenu: \(savedMaxHistoryInMenu)")
-
-
+        
+        
         // MARK: - ローカル変数を宣言し、それらの値を決定するロジック
         // tempSelectedMenuOption の値を決定
         let determinedTempSelectedMenuOption: MenuHistoryOption
         var determinedTempCustomMenuHistoryValue: Int
-
+        
         if savedMaxHistoryInMenu == 0 { // デフォルトデリートなどで0になった場合の優先処理
             determinedTempSelectedMenuOption = .preset(10)
             determinedTempCustomMenuHistoryValue = 10
@@ -134,11 +138,11 @@ struct GeneralSettingsView: View {
             determinedTempCustomMenuHistoryValue = savedMaxHistoryInMenu
         }
         print("DEBUG: init() - determinedTempSelectedMenuOption after logic: \(determinedTempSelectedMenuOption)") // ローカル変数をプリント
-
+        
         // tempSelectedPhraseMenuOption の値を決定
         let determinedTempSelectedPhraseMenuOption: HistoryOption
         var determinedTempCustomPhrasesInMenuValue: Int
-
+        
         // savedMaxPhrasesInMenu が 0 の場合、デフォルト値の 5 を使用する
         if savedMaxPhrasesInMenu == 0 {
             // savedMaxPhrasesInMenu はletなので変更できない
@@ -147,25 +151,25 @@ struct GeneralSettingsView: View {
         } else {
             determinedTempCustomPhrasesInMenuValue = savedMaxPhrasesInMenu
         }
-    
+        
         if let preset = HistoryOption.presets.first(where: { $0.intValue == determinedTempCustomPhrasesInMenuValue }) {
             determinedTempSelectedPhraseMenuOption = preset
         } else {
             determinedTempSelectedPhraseMenuOption = .custom(determinedTempCustomPhrasesInMenuValue)
         }
-
+        
         // MARK: - すべての @State プロパティの初期化を一括で行う
         _tempSelectedMenuOption = State(initialValue: determinedTempSelectedMenuOption)
         _tempCustomMenuHistoryValue = State(initialValue: determinedTempCustomMenuHistoryValue)
-
+        
         _tempSelectedPhraseMenuOption = State(initialValue: determinedTempSelectedPhraseMenuOption)
         _tempCustomPhrasesInMenuValue = State(initialValue: determinedTempCustomPhrasesInMenuValue)
-
+        
         // initialオプションは、対応するtempオプションが確定した後に初期化
         _initialMenuOption = State(initialValue: determinedTempSelectedMenuOption)
         _initialPhraseMenuOption = State(initialValue: determinedTempSelectedPhraseMenuOption)
     }
-
+    
     var body: some View {
         Form {
             // MARK: - Clip Holdの設定
@@ -186,7 +190,7 @@ struct GeneralSettingsView: View {
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
+                
                 HStack {
                     VStack(alignment: .leading) {
                         Text("クイックペースト")
@@ -203,7 +207,7 @@ struct GeneralSettingsView: View {
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
+                
                 HStack {
                     VStack(alignment: .leading) {
                         Text("クイックペーストをテキストに限定")
@@ -224,7 +228,7 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: Clip Holdの設定
-
+            
             // MARK: - メニュー
             Section(header: Text("メニュー").font(.headline)) {
                 // 定型文の最大表示数
@@ -236,7 +240,7 @@ struct GeneralSettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-
+                    
                     Picker("定型文の最大表示数", selection: $tempSelectedPhraseMenuOption) {
                         ForEach(HistoryOption.presets) { option in
                             Text(option.stringValue)
@@ -247,7 +251,7 @@ struct GeneralSettingsView: View {
                         Text("カスタム...")
                             .tag(HistoryOption.custom(nil))
                             .frame(maxWidth: .infinity, alignment: .leading)
-
+                        
                         if !HistoryOption.presets.contains(where: { $0.intValue == maxPhrasesInMenu }) && tempSelectedPhraseMenuOption != .custom(nil) {
                             Divider()
                             Text("カスタム: \(maxPhrasesInMenu)")
@@ -268,7 +272,7 @@ struct GeneralSettingsView: View {
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
+                
                 // 履歴の最大表示数
                 HStack {
                     VStack(alignment: .leading) {
@@ -278,7 +282,7 @@ struct GeneralSettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-
+                    
                     Picker("履歴の最大表示数", selection: $tempSelectedMenuOption) {
                         ForEach(MenuHistoryOption.presetsAndSameAsSaved.filter { option in
                             if case .sameAsSaved = option {
@@ -295,11 +299,11 @@ struct GeneralSettingsView: View {
                         Text("カスタム...")
                             .tag(MenuHistoryOption.custom(nil))
                             .frame(maxWidth: .infinity, alignment: .leading)
-
+                        
                         // 条件を MenuHistoryOption.presetsAndSameAsSaved に合わせて調整
                         if !MenuHistoryOption.presetsAndSameAsSaved.contains(where: { $0.intValue == maxHistoryInMenu }) &&
-                           tempSelectedMenuOption != .custom(nil) &&
-                           tempSelectedMenuOption != .sameAsSaved {
+                            tempSelectedMenuOption != .custom(nil) &&
+                            tempSelectedMenuOption != .sameAsSaved {
                             Divider()
                             Text("カスタム: \(maxHistoryInMenu)")
                                 .tag(MenuHistoryOption.custom(maxHistoryInMenu))
@@ -322,6 +326,52 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
+                // 日付と時刻の表示方法
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("日付と時刻の表示方法")
+                        
+                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
+                        let exampleText: String = {
+                            let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
+                            let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
+                            
+                            switch dateDisplayFormatInMenu {
+                            case "absolute":
+                                return absolutePart
+                            case "relative":
+                                return relativePart
+                            case "both_abs_rel_paren":
+                                return "\(absolutePart) (\(relativePart))"
+                            case "both_abs_rel_hyphen":
+                                return "\(absolutePart) - \(relativePart)"
+                            case "both_rel_abs_paren":
+                                return "\(relativePart) (\(absolutePart))"
+                            case "both_rel_abs_hyphen":
+                                return "\(relativePart) - \(absolutePart)"
+                            default:
+                                return absolutePart
+                            }
+                        }()
+                        
+                        Text("コピーされた日付の表示方法を変更します。\n例: \(exampleText)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInMenu) {
+                        Text("絶対的").tag("absolute")
+                        Text("相対的").tag("relative")
+                        Text("両方: 絶対的 (相対的)").tag("both_abs_rel_paren")
+                        Text("両方: 絶対的 - 相対的").tag("both_abs_rel_hyphen")
+                        Text("両方: 相対的 (絶対的)").tag("both_rel_abs_paren")
+                        Text("両方: 相対的 - 絶対的").tag("both_rel_abs_hyphen")
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                
                 HStack {
                     VStack(alignment: .leading) {
                         Text("メニューバーアイコンを隠す")
@@ -339,7 +389,7 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: メニュー
-
+            
             // MARK: - 定型文ウィンドウ
             Section(header: Text("定型文ウィンドウ").font(.headline)) {
                 HStack {
@@ -413,7 +463,7 @@ struct GeneralSettingsView: View {
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
+                
                 HStack {
                     VStack(alignment: .leading) {
                         Text("ダブルクリックでウィンドウを閉じる")
@@ -431,7 +481,7 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: 定型文ウィンドウ
-
+            
             // MARK: - 履歴をウィンドウ
             Section(header: Text("履歴ウィンドウ").font(.headline)) {
                 HStack {
@@ -507,6 +557,50 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
                     VStack(alignment: .leading) {
+                        Text("日付と時刻の表示方法")
+                        
+                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
+                        let exampleText: String = {
+                            let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
+                            let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
+                            
+                            switch dateDisplayFormatInHistoryWindow {
+                            case "absolute":
+                                return absolutePart
+                            case "relative":
+                                return relativePart
+                            case "both_abs_rel_paren":
+                                return "\(absolutePart) (\(relativePart))"
+                            case "both_abs_rel_hyphen":
+                                return "\(absolutePart) - \(relativePart)"
+                            case "both_rel_abs_paren":
+                                return "\(relativePart) (\(absolutePart))"
+                            case "both_rel_abs_hyphen":
+                                return "\(relativePart) - \(absolutePart)"
+                            default:
+                                return absolutePart
+                            }
+                        }()
+                        
+                        Text("コピーされた日付の表示方法を変更します。\n例: \(exampleText)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInHistoryWindow) {
+                        Text("絶対的").tag("absolute")
+                        Text("相対的").tag("relative")
+                        Text("両方: 絶対的 (相対的)").tag("both_abs_rel_paren")
+                        Text("両方: 絶対的 - 相対的").tag("both_abs_rel_hyphen")
+                        Text("両方: 相対的 (絶対的)").tag("both_rel_abs_paren")
+                        Text("両方: 相対的 - 絶対的").tag("both_rel_abs_hyphen")
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
                         Text("自動スクロール")
                         Text("リストが更新されたとき、リストを自動的に最も上にスクロールします。")
                             .font(.caption)
@@ -537,7 +631,7 @@ struct GeneralSettingsView: View {
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-
+                
                 HStack {
                     VStack(alignment: .leading) {
                         Text("ダブルクリックでウィンドウを閉じる")
@@ -596,7 +690,7 @@ struct GeneralSettingsView: View {
                 onSave: { newValue in
                     maxHistoryInMenu = newValue
                     customHistoryValueWasSaved = true // 保存されたことをマーク
-
+                    
                     if newValue == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
                         tempSelectedMenuOption = .sameAsSaved
                     } else if let savedPreset = MenuHistoryOption.presetsAndSameAsSaved.first(where: { $0.intValue == newValue }) {
@@ -627,7 +721,7 @@ struct GeneralSettingsView: View {
                 onSave: { newValue in
                     maxPhrasesInMenu = newValue
                     customPhraseValueWasSaved = true // 保存されたことをマーク
-
+                    
                     if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == newValue }) {
                         tempSelectedPhraseMenuOption = savedPreset
                     } else {

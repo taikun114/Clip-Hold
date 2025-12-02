@@ -4,33 +4,33 @@ import Combine
 
 class StandardPhraseManager: ObservableObject {
     static let shared = StandardPhraseManager()
-
+    
     @Published var standardPhrases: [StandardPhrase] = [] {
         didSet {
             saveStandardPhrases()
         }
     }
-
+    
     private let phrasesFileName = "standardPhrases.json"
     private let presetDirectoryName = "standardPhrasesPreset"
-
+    
     private init() {
         migrateToPresetDirectory()
         loadStandardPhrases()
         print("StandardPhraseManager: Initialized with phrase count: \(standardPhrases.count)")
     }
-
+    
     // MARK: - Migration to Preset Directory
     private func migrateToPresetDirectory() {
         guard let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             print("StandardPhraseManager: Could not find Application Support directory (migration).")
             return
         }
-
+        
         let appSpecificDirectory = directory.appendingPathComponent("ClipHold")
         let oldFileURL = appSpecificDirectory.appendingPathComponent(phrasesFileName)
         let presetDirectory = appSpecificDirectory.appendingPathComponent(presetDirectoryName)
-
+        
         // プリセットディレクトリが存在しない場合は作成
         if !FileManager.default.fileExists(atPath: presetDirectory.path) {
             do {
@@ -40,7 +40,7 @@ class StandardPhraseManager: ObservableObject {
                 return
             }
         }
-
+        
         // 既存のstandardPhrases.jsonファイルがあれば、default.jsonとしてリネーム
         if FileManager.default.fileExists(atPath: oldFileURL.path) {
             let defaultFileURL = presetDirectory.appendingPathComponent("default.json")
@@ -52,18 +52,18 @@ class StandardPhraseManager: ObservableObject {
             }
         }
     }
-
+    
     // MARK: - Persistence (ファイルシステムに保存)
     private func saveStandardPhrases() {
         guard let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             print("StandardPhraseManager: Could not find Application Support directory (save).")
             return
         }
-
+        
         // アプリ固有のサブディレクトリとプリセットディレクトリを取得
         let appSpecificDirectory = directory.appendingPathComponent("ClipHold")
         let presetDirectory = appSpecificDirectory.appendingPathComponent(presetDirectoryName)
-
+        
         // プリセットディレクトリが存在しない場合は作成
         if !FileManager.default.fileExists(atPath: presetDirectory.path) {
             do {
@@ -73,10 +73,10 @@ class StandardPhraseManager: ObservableObject {
                 return
             }
         }
-
+        
         // デフォルトプリセットとして保存
         let defaultFileURL = presetDirectory.appendingPathComponent("default.json")
-
+        
         do {
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted // 可読性のために整形 (Optional)
@@ -87,7 +87,7 @@ class StandardPhraseManager: ObservableObject {
             print("StandardPhraseManager: Error saving standard phrases to file: \(error.localizedDescription)")
         }
     }
-
+    
     // MARK: - Loading (ファイルシステムからロード)
     private func loadStandardPhrases() {
         guard let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
@@ -128,12 +128,12 @@ class StandardPhraseManager: ObservableObject {
             print("StandardPhraseManager: Error loading standard phrases from file: \(error.localizedDescription)")
         }
     }
-
+    
     func addPhrase(title: String, content: String) {
         let newPhrase = StandardPhrase(title: title, content: content)
         standardPhrases.append(newPhrase)
     }
-
+    
     func updatePhrase(id: UUID, newTitle: String, newContent: String) {
         if let index = standardPhrases.firstIndex(where: { $0.id == id }) {
             var phrase = standardPhrases[index]
@@ -142,23 +142,23 @@ class StandardPhraseManager: ObservableObject {
             standardPhrases[index] = phrase
         }
     }
-
+    
     func deletePhrase(id: UUID) {
         standardPhrases.removeAll { $0.id == id }
     }
-
+    
     func deletePhrase(atOffsets offsets: IndexSet) {
         standardPhrases.remove(atOffsets: offsets)
     }
-
+    
     func movePhrase(from source: IndexSet, to destination: Int) {
         standardPhrases.move(fromOffsets: source, toOffset: destination)
     }
-
+    
     func deleteAllPhrases() {
         standardPhrases.removeAll()
     }
-
+    
     @MainActor func checkConflicts(with importedPhrases: [StandardPhrase], inPresetId presetId: UUID? = nil) -> (conflicts: [StandardPhraseDuplicate], nonConflicts: [StandardPhrase]) {
         var conflicts: [StandardPhraseDuplicate] = []
         var nonConflicts: [StandardPhrase] = []
@@ -166,7 +166,7 @@ class StandardPhraseManager: ObservableObject {
         // チェック対象の定型文リストを決定
         let targetPhrases: [StandardPhrase]
         if let presetId = presetId, 
-           let preset = StandardPhrasePresetManager.shared.presets.first(where: { $0.id == presetId }) {
+            let preset = StandardPhrasePresetManager.shared.presets.first(where: { $0.id == presetId }) {
             targetPhrases = preset.phrases
         } else {
             targetPhrases = standardPhrases
@@ -199,7 +199,7 @@ class StandardPhraseManager: ObservableObject {
         
         return (conflicts, nonConflicts)
     }
-
+    
     @MainActor func addImportedPhrases(_ phrasesToAdd: [StandardPhrase], toPresetId presetId: UUID? = nil) {
         if let presetId = presetId {
             // 指定されたプリセットに定型文を追加
@@ -254,7 +254,7 @@ class StandardPhraseManager: ObservableObject {
             }
             
             standardPhrases = updatedPhrases
-            print("インポートされたフレーズを追加しました。現在の定型文数: \(self.standardPhrases.count)")
+            print("Added imported phrases. Current standard phrases count: \(self.standardPhrases.count)")
         }
     }
 }

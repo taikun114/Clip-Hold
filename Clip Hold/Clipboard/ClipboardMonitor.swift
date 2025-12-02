@@ -14,10 +14,10 @@ extension ClipboardManager {
             self.pasteboardMonitorTimer = nil
             print("DEBUG: startMonitoringPasteboard: Invalidated old timer before starting new.")
         }
-
+        
         lastChangeCount = NSPasteboard.general.changeCount
         print("ClipboardManager: Monitoring started. Initial pasteboard change count: \(lastChangeCount)")
-
+        
         let newTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             guard let self = self else { 
                 print("DEBUG: Timer fired, but self is nil. Timer will invalidate itself.")
@@ -35,9 +35,9 @@ extension ClipboardManager {
         RunLoop.main.add(newTimer, forMode: .common) // メインRunLoopに明示的に追加
         self.pasteboardMonitorTimer = newTimer // 新しいタイマーをプロパティに保持
         isMonitoring = true
-        print("ClipboardManager: クリップボード監視を開始しました。isMonitoring: \(isMonitoring)")
+        print("ClipboardManager: Clipboard monitoring started. isMonitoring: \(isMonitoring)")
     }
-
+    
     public func stopMonitoringPasteboard() {
         if let timer = pasteboardMonitorTimer {
             timer.invalidate()
@@ -49,7 +49,7 @@ extension ClipboardManager {
         isMonitoring = false
         print("ClipboardManager: Monitoring stopped. isMonitoring: \(self.isMonitoring)")
     }
-
+    
     private func checkPasteboard() {
         guard isMonitoring else {
             print("DEBUG: checkPasteboard: isMonitoring is false, returning.")
@@ -60,7 +60,7 @@ extension ClipboardManager {
         if pasteboard.changeCount != lastChangeCount {
             lastChangeCount = pasteboard.changeCount
             print("DEBUG: checkPasteboard - Pasteboard change detected. New changeCount: \(lastChangeCount)")
-
+            
             // Check for standard phrase copy
             if self.ignoreStandardPhrases && isCopyingStandardPhrase {
                 isCopyingStandardPhrase = false // Reset the flag
@@ -72,7 +72,7 @@ extension ClipboardManager {
                 isCopyingStandardPhrase = false
                 print("DEBUG: checkPasteboard: Standard phrase copy detected, but will be added to history.")
             }
-
+            
             // 内部コピー操作中の場合は、この変更をスキップし、フラグをリセットする
             // isPerformingInternalCopy の状態をこのチェックの最初にキャプチャする
             let wasInternalCopyInitially = isPerformingInternalCopy
@@ -80,7 +80,7 @@ extension ClipboardManager {
                 print("DEBUG: checkPasteboard: Internal copy in progress. Will process content and reset flag at the end.")
                 // ここでは isPerformingInternalCopy をリセットしない
             }
-
+            
             if let activeAppBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier {
                 guard !excludedAppIdentifiers.contains(activeAppBundleIdentifier) else {
                     print("DEBUG: checkPasteboard - Excluded app detected: \(activeAppBundleIdentifier). Skipping.")
@@ -92,7 +92,7 @@ extension ClipboardManager {
                     return // 除外アプリからのコピーは無視
                 }
             }
-
+            
             // 非同期処理を開始 (リトライロジック付き)
             Task.detached { [weak self] in
                 guard let self = self else { return }
@@ -326,7 +326,7 @@ extension ClipboardManager {
                     if hasImageDataType {
                         var imageDataFromPasteboard: Data?
                         var imageFromPasteboard: NSImage?
-
+                        
                         if let tiffData = pasteboard.data(forType: .tiff) {
                             imageDataFromPasteboard = tiffData
                             imageFromPasteboard = NSImage(data: tiffData)
@@ -342,11 +342,11 @@ extension ClipboardManager {
                                 print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage).")
                             }
                         }
-
+                        
                         if let imageData = imageDataFromPasteboard, let image = imageFromPasteboard {
                             let qrCodeContent = self.decodeQRCode(from: image)
                             let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
-
+                            
                             if let newItem = await self.createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
                                 await MainActor.run {
                                     self.addAndSaveItem(newItem)
@@ -367,7 +367,7 @@ extension ClipboardManager {
                     if hasImageDataType {
                         var imageDataFromPasteboard: Data?
                         var imageFromPasteboard: NSImage?
-
+                        
                         if let tiffData = pasteboard.data(forType: .tiff) {
                             imageDataFromPasteboard = tiffData
                             imageFromPasteboard = NSImage(data: tiffData)
@@ -383,11 +383,11 @@ extension ClipboardManager {
                                 print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage).")
                             }
                         }
-
+                        
                         if let imageData = imageDataFromPasteboard, let image = imageFromPasteboard {
                             let qrCodeContent = self.decodeQRCode(from: image)
                             let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
-
+                            
                             if let newItem = await self.createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
                                 await MainActor.run {
                                     self.addAndSaveItem(newItem)
@@ -403,7 +403,7 @@ extension ClipboardManager {
                             return
                         }
                     }
-
+                    
                     // 5. リッチテキストデータをチェック (中間優先度)
                     if let rtfString = pasteboard.string(forType: .rtf) {
                         print("DEBUG: checkPasteboard - RTF String detected: \(rtfString.prefix(50))...")
@@ -463,17 +463,17 @@ extension ClipboardManager {
             }
         }
     }
-
+    
     // MARK: - QR Code Decoding
     public func decodeQRCode(from image: NSImage) -> String? {
         guard let ciImage = CIImage(data: image.tiffRepresentation!) else {
             print("Failed to convert NSImage to CIImage.")
             return nil
         }
-
+        
         let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
         let features = detector?.features(in: ciImage)
-
+        
         if let qrFeature = features?.first as? CIQRCodeFeature {
             return qrFeature.messageString
         }

@@ -7,21 +7,53 @@ import QuickLookThumbnailing
 
 class ClipboardManager: ObservableObject {
     static let shared = ClipboardManager()
-
+    
     @Published var clipboardHistory: [ClipboardItem] = []
     @Published var filteredHistoryForShortcuts: [ClipboardItem]? = nil
-
+    
+    // アプリケーション名のキャッシュ
+    @Published var localizedAppNames: [String: String] = [:]
+    
     // History Window States
     @Published var historySelectedFilter: ItemFilter = .all
     @Published var historySelectedSort: ItemSort = .newest
     @Published var historySelectedApp: String? = nil
-
+    
+    // キャッシュを利用してローカライズされたアプリ名を取得するメソッド
+    func getLocalizedName(for sourceAppPath: String?) -> String? {
+        guard let sourceAppPath = sourceAppPath else { return nil }
+        
+        // 1. キャッシュを確認
+        if let cachedName = localizedAppNames[sourceAppPath] {
+            return cachedName
+        }
+        
+        // 2. キャッシュにない場合はファイルシステムから取得
+        let appURL = URL(fileURLWithPath: sourceAppPath)
+        let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
+        
+        var finalName = nonLocalizedName
+        if let appBundle = Bundle(url: appURL) {
+            finalName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ??
+            appBundle.localizedInfoDictionary?["CFBundleName"] as? String ??
+            appBundle.infoDictionary?["CFBundleName"] as? String ??
+            nonLocalizedName
+        }
+        
+        // 3. 取得した名前をキャッシュに保存
+        DispatchQueue.main.async {
+            self.localizedAppNames[sourceAppPath] = finalName
+        }
+        
+        return finalName
+    }
+    
     func resetHistoryViewFilters() {
         historySelectedFilter = .all
         historySelectedSort = .newest
         historySelectedApp = nil
     }
-
+    
     // MARK: - Properties that need to remain in the main class
     var saveTask: Task<Void, Never>?
     var temporaryFileUrls: Set<URL> = []
@@ -37,7 +69,7 @@ class ClipboardManager: ObservableObject {
     @Published var isMonitoring: Bool = false
     @Published var isPerformingInternalCopy: Bool = false
     @Published var isCopyingStandardPhrase: Bool = false
-
+    
     var isClipboardMonitoringPausedObserver: NSKeyValueObservation?
     @Published var showingLargeFileAlert: Bool = false {
         didSet {
@@ -54,12 +86,12 @@ class ClipboardManager: ObservableObject {
     
     // 新しく追加: ファイルサイズ情報を含む新しいプロパティ
     var pendingLargeFileItemsWithSize: [(fileURL: URL, qrCodeContent: String?, fileSize: UInt64?)]?
-
+    
     // MARK: - Initialization
     private init() {
         // ファイル保存ディレクトリの準備
         _ = createClipboardFilesDirectoryIfNeeded()
-
+        
         // マイグレーションが必要かどうかを確認し、必要であれば実行
         let migrationPerformed = ChunkedHistoryManager.shared.migrateIfNeeded()
         
@@ -79,22 +111,22 @@ class ClipboardManager: ObservableObject {
         calculateMissingFileHashesInHistory()
         
         loadClipboardHistory()
-
+        
         print("ClipboardManager: Initialized with history count: \(clipboardHistory.count)")
-
+        
         // 既存の除外アプリ識別子をロード（UserDefaultsから）
         if let data = UserDefaults.standard.data(forKey: "excludedAppIdentifiersData"),
            let identifiers = try? JSONDecoder().decode([String].self, from: data) {
             self.excludedAppIdentifiers = identifiers
         }
-
+        
         isClipboardMonitoringPausedObserver = UserDefaults.standard.observe(\.isClipboardMonitoringPaused, options: [.initial, .new]) { [weak self] defaults, change in
             guard let self = self else { return }
             let isPaused = defaults.isClipboardMonitoringPaused
-
+            
             // @Published isMonitoring の状態を更新
             self.isMonitoring = !isPaused // isPausedがtrueならisMonitoringはfalse
-
+            
             // 監視状態に応じてタイマーを制御
             if isPaused {
                 self.stopMonitoringPasteboard() // UserDefaultsが停止状態ならタイマーを停止
@@ -104,7 +136,7 @@ class ClipboardManager: ObservableObject {
             print("DEBUG: ClipboardManager: UserDefaults.isClipboardMonitoringPaused changed to \(isPaused). isMonitoring set to \(self.isMonitoring).")
         }
     }
-
+    
     // オブジェクト破棄時に監視を停止する
     deinit {
         isClipboardMonitoringPausedObserver?.invalidate()
@@ -115,11 +147,11 @@ class ClipboardManager: ObservableObject {
     var appUsageHistory: [String: String] {
         let appPaths = Set(clipboardHistory.compactMap { $0.sourceAppPath })
         var appNames = [String: String]()
-
+        
         for path in appPaths {
             let appURL = URL(fileURLWithPath: path)
             let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
-
+            
             if let appBundle = Bundle(url: appURL) {
                 let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? appBundle.infoDictionary?["CFBundleName"] as? String ?? nonLocalizedName
                 appNames[path] = appName

@@ -99,7 +99,11 @@ private struct PresetSettingsSection: View {
                     Button {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             editingPreset = preset
-                            newPresetName = preset.name
+                            if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+                                newPresetName = preset.displayName
+                            } else {
+                                newPresetName = preset.name
+                            }
                             newPresetIcon = preset.icon
                             newPresetColor = preset.color
                         }
@@ -121,7 +125,11 @@ private struct PresetSettingsSection: View {
                 if let selectedId = selection.first {
                     if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
-                        newPresetName = preset.name
+                        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+                            newPresetName = preset.displayName
+                        } else {
+                            newPresetName = preset.name
+                        }
                         newPresetIcon = preset.icon
                         newPresetColor = preset.color
                     }
@@ -213,7 +221,11 @@ private struct PresetSettingsSection: View {
                 Button(action: {
                     if let selectedId = selectedPresetId, let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
-                        newPresetName = preset.name
+                        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
+                            newPresetName = preset.displayName
+                        } else {
+                            newPresetName = preset.name
+                        }
                         newPresetIcon = preset.icon
                         newPresetColor = preset.color
                     }
@@ -259,9 +271,9 @@ private struct PresetSettingsSection: View {
         }
     }
     
-
     
-
+    
+    
     
     private func isDefaultPreset(id: UUID?) -> Bool {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
@@ -1302,7 +1314,9 @@ struct PresetNameSheet: View {
                 VStack(alignment: .leading, spacing: 10) {
                     // アイコン選択ボタンと入力フィールド
                     HStack {
-                        SFSymbolsPicker(selection: $icon, prompt: String(localized: "シンボルを検索")) {
+                        Button(action: {
+                            showingIconPicker = true
+                        }) {
                             ZStack {
                                 Circle()
                                     .fill(color == "custom" ? customBackgroundColor : getColor(from: color))
@@ -1310,13 +1324,18 @@ struct PresetNameSheet: View {
                                 Image(systemName: icon.isEmpty ? previousIcon : icon)
                                     .foregroundColor(
                                         color == "accent"
-                                            ? (NSColor.controlAccentColor.isAccentColorYellowOrGreen ? Color.black : Color.white)
-                                            : getSymbolColor(forPresetColor: color)
+                                        ? (NSColor.controlAccentColor.isAccentColorYellowOrGreen ? Color.black : Color.white)
+                                        : getSymbolColor(forPresetColor: color)
                                     )
                                     .font(.system(size: 14, weight: .bold))
                             }
                         }
                         .buttonStyle(.plain)
+                        .sfSymbolsPicker(
+                            isPresented: $showingIconPicker,
+                            selection: $icon,
+                            prompt: String(localized: "シンボルを検索")
+                        )
                         .onChange(of: icon) { oldValue, newValue in
                             if newValue.isEmpty {
                                 icon = previousIcon

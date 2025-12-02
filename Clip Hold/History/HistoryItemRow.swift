@@ -9,7 +9,7 @@ import QuickLookThumbnailing
 private struct IconViewAccessor: NSViewRepresentable {
     let id: UUID
     @Binding var store: [UUID: NSView]
-
+    
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
@@ -17,26 +17,8 @@ private struct IconViewAccessor: NSViewRepresentable {
         }
         return view
     }
-
-    func updateNSView(_ nsView: NSView, context: Context) {}
-}
-
-// sourceAppPathからローカライズされたアプリ名を取得するヘルパー関数
-private func getLocalizedName(for sourceAppPath: String?) -> String? {
-    guard let sourceAppPath = sourceAppPath else { return nil }
     
-    let appURL = URL(fileURLWithPath: sourceAppPath)
-    let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
-
-    if let appBundle = Bundle(url: appURL) {
-        let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? 
-                     appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? 
-                     appBundle.infoDictionary?["CFBundleName"] as? String ?? 
-                     nonLocalizedName
-        return appName
-    } else {
-        return nonLocalizedName
-    }
+    func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
 private let itemDateFormatter: DateFormatter = {
@@ -67,10 +49,10 @@ struct HistoryItemRow: View {
     @Binding var selectedItemID: UUID?
     var dismissAction: () -> Void
     @AppStorage("closeWindowOnDoubleClick") var closeWindowOnDoubleClick: Bool = false
-
+    
     @Environment(\.colorScheme) var colorScheme
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
-
+    
     @Binding var showCopyConfirmation: Bool
     @Binding var showQRCodeSheet: Bool
     @Binding var selectedItemForQRCode: ClipboardItem?
@@ -81,18 +63,20 @@ struct HistoryItemRow: View {
     @Binding var rowIconViews: [UUID: NSView]
     
     let showCharacterCount: Bool
+    @EnvironmentObject var dateReloader: DateReloader
+    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
     @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
-
+    
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
-
+    
     @State private var iconLoadTask: Task<Void, Never>?
     @State private var showingExcludeAppAlert = false
     @State private var appToExclude: String?
     @State private var showingEditSheet = false
     @State private var showingDeleteAllFromAppAlert = false
     @State private var appToDeleteFrom: String?
-
+    
     init(item: ClipboardItem,
          index: Int,
          hideNumbers: Bool,
@@ -107,8 +91,8 @@ struct HistoryItemRow: View {
          lineNumberTextWidth: CGFloat?,
          trailingPaddingForLineNumber: CGFloat,
          rowIconViews: Binding<[UUID: NSView]>,
-         showCharacterCount: Bool) { // initにBindingを追加
-            
+         showCharacterCount: Bool) {
+        
         self.item = item
         self.index = index
         self.hideNumbers = hideNumbers
@@ -122,10 +106,10 @@ struct HistoryItemRow: View {
         _itemForNewPhrase = itemForNewPhrase
         self.lineNumberTextWidth = lineNumberTextWidth
         self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
-        self._rowIconViews = rowIconViews // Bindingを初期化
+        self._rowIconViews = rowIconViews
         self.showCharacterCount = showCharacterCount
     }
-
+    
     private var itemDisplayText: Text {
         if item.text == "Image File" {
             return Text("Image File")
@@ -135,7 +119,7 @@ struct HistoryItemRow: View {
             return Text(verbatim: item.text)
         }
     }
-
+    
     private var actionMenuItems: some View {
         Group {
             Button {
@@ -156,7 +140,6 @@ struct HistoryItemRow: View {
                     Text("標準テキストとしてコピー")
                 }
                 Button {
-                    // 変更してコピーのアクションをここに実装
                     showingEditSheet = true
                 } label: {
                     Text("変更してコピー...")
@@ -246,7 +229,7 @@ struct HistoryItemRow: View {
             }
         }
     }
-
+    
     var body: some View {
         HStack(spacing: 8) {
             if !hideNumbers {
@@ -266,7 +249,7 @@ struct HistoryItemRow: View {
                     
                     // カラーアイコンにもアプリアイコンを表示する (showAppIconOverlayがtrueの場合のみ)
                     if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
-                        let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
+                        let appName = clipboardManager.getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView
                                 .overlay(
@@ -284,9 +267,9 @@ struct HistoryItemRow: View {
                                                 .fontWeight(.bold)
                                         }
                                     }
-                                    .alignmentGuide(.leading) { _ in 4 }
-                                    .alignmentGuide(.top) { _ in 22.5 }
-                                    .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
+                                        .alignmentGuide(.leading) { _ in 4 }
+                                        .alignmentGuide(.top) { _ in 22.5 }
+                                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
@@ -300,56 +283,56 @@ struct HistoryItemRow: View {
                     let baseIconView: some View = {
                         if item.isURL { // URLの場合
                             return AnyView(Image(systemName: "paperclip")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .padding(4)
-                                            .frame(width: 30, height: 30)
-                                            .foregroundStyle(.secondary))
+                                .resizable()
+                                .scaledToFit()
+                                .padding(4)
+                                .frame(width: 30, height: 30)
+                                .foregroundStyle(.secondary))
                         } else if let cachedIcon = item.cachedThumbnailImage {
                             return AnyView(Image(nsImage: cachedIcon)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 30, height: 30))
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 30, height: 30))
                         } else if let filePath = item.filePath {
                             return AnyView(Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 30, height: 30))
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 30, height: 30))
                         } else {
                             // テキストアイコン (リッチテキストかどうかで分岐)
                             if item.richText != nil {
                                 // リッチテキストの場合、richtext.pageアイコンを使用 (macOSバージョンによる分岐)
                                 if #available(macOS 15.0, *) {
                                     return AnyView(Image(systemName: "richtext.page")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .padding(4)
-                                                    .frame(width: 30, height: 30)
-                                                    .foregroundStyle(.secondary))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(4)
+                                        .frame(width: 30, height: 30)
+                                        .foregroundStyle(.secondary))
                                 } else {
                                     return AnyView(Image(systemName: "doc.richtext")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .padding(4)
-                                                    .frame(width: 30, height: 30)
-                                                    .foregroundStyle(.secondary))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(4)
+                                        .frame(width: 30, height: 30)
+                                        .foregroundStyle(.secondary))
                                 }
                             } else {
                                 // 標準テキストの場合、text.pageアイコンを使用 (macOSバージョンによる分岐)
                                 if #available(macOS 15.0, *) {
                                     return AnyView(Image(systemName: "text.page")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .padding(4)
-                                                    .frame(width: 30, height: 30)
-                                                    .foregroundStyle(.secondary))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(4)
+                                        .frame(width: 30, height: 30)
+                                        .foregroundStyle(.secondary))
                                 } else {
                                     return AnyView(Image(systemName: "doc.plaintext")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .padding(4)
-                                                    .frame(width: 30, height: 30)
-                                                    .foregroundStyle(.secondary))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(4)
+                                        .frame(width: 30, height: 30)
+                                        .foregroundStyle(.secondary))
                                 }
                             }
                         }
@@ -357,7 +340,7 @@ struct HistoryItemRow: View {
                     
                     // アプリアイコンをオーバーレイ表示 (showAppIconOverlayがtrueの場合のみ)
                     if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
-                        let appName = getLocalizedName(for: sourceAppPath) ?? "Unknown App"
+                        let appName = clipboardManager.getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                         return AnyView(
                             baseIconView
                                 .overlay(
@@ -375,9 +358,9 @@ struct HistoryItemRow: View {
                                                 .fontWeight(.bold)
                                         }
                                     }
-                                    .alignmentGuide(.leading) { _ in 4 }
-                                    .alignmentGuide(.top) { _ in 22.5 }
-                                    .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
+                                        .alignmentGuide(.leading) { _ in 4 }
+                                        .alignmentGuide(.top) { _ in 22.5 }
+                                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
                                     alignment: .bottomLeading
                                 )
                                 .background(IconViewAccessor(id: item.id, store: $rowIconViews))
@@ -399,7 +382,7 @@ struct HistoryItemRow: View {
                     }
                 }
                 .contentShape(Rectangle())
-
+            
             VStack(alignment: .leading) {
                 itemDisplayText
                     .lineLimit(1)
@@ -407,7 +390,7 @@ struct HistoryItemRow: View {
                     .truncationMode(.tail)
                     .foregroundStyle(.primary)
                 HStack(spacing: 4) {
-                    Text(item.date, formatter: itemDateFormatter)
+                    Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
                     
                     if showCharacterCount {
                         Text("-")
@@ -423,9 +406,9 @@ struct HistoryItemRow: View {
                 .foregroundStyle(.secondary)
             }
             .help(item.text) // コンテンツテキスト部分にツールチップを追加
-
+            
             Spacer()
-
+            
             Menu {
                 actionMenuItems
             } label: {
@@ -442,7 +425,7 @@ struct HistoryItemRow: View {
         .onAppear {
             if item.cachedThumbnailImage == nil, let filePath = item.filePath {
                 iconLoadTask?.cancel() // 既存のタスクをキャンセル
-
+                
                 iconLoadTask = Task {
                     let thumbnailSize = CGSize(width: 60, height: 60)
                     let request = QLThumbnailGenerator.Request(fileAt: filePath, size: thumbnailSize, scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
@@ -489,7 +472,7 @@ struct HistoryItemRow: View {
             }
         } message: {
             if let appPath = appToExclude {
-                let appName = getLocalizedName(for: appPath) ?? appPath
+                let appName = clipboardManager.getLocalizedName(for: appPath) ?? appPath
                 Text("「\(appName)」を除外するアプリに追加しますか？除外するアプリは「プライバシー」設定から変更することができます。")
             }
         }
@@ -512,7 +495,7 @@ struct HistoryItemRow: View {
             Button("キャンセル", role: .cancel) { }
         } message: {
             if let appPath = appToDeleteFrom {
-                let appName = getLocalizedName(for: appPath) ?? appPath
+                let appName = clipboardManager.getLocalizedName(for: appPath) ?? appPath
                 let count = clipboardManager.countHistoryFromApp(sourceAppPath: appPath)
                 Text("「\(appName)」からのすべての履歴を削除してもよろしいですか？\(count)個の履歴が削除されます。この操作は元に戻せません。")
             }
