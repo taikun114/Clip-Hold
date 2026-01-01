@@ -450,9 +450,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Clip-Hold-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Clip Hold";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright ©︎ 2025 今浦大雅";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright ©︎ 2026 今浦大雅";
 				INFOPLIST_PREPROCESS = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -509,9 +510,10 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Clip-Hold-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Clip Hold";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright ©︎ 2025 今浦大雅";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright ©︎ 2026 今浦大雅";
 				INFOPLIST_PREPROCESS = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

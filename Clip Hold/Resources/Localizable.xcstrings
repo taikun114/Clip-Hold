@@ -2488,37 +2488,37 @@
         }
       }
     },
-    "Copyright ©︎ 2025 今浦大雅" : {
+    "Copyright ©︎ 2026 今浦大雅" : {
       "comment" : "このアプリ(Clip Hold)の著作権情報を表すテキスト。日本語以外では「Taiga Imaura」を使用する。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 Taiga Imaura"
+            "value" : "Copyright ©︎ 2026 Taiga Imaura"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copyright ©︎ 2025 今浦大雅"
+            "value" : "Copyright ©︎ 2026 今浦大雅"
           }
         }
       }
