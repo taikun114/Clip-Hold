@@ -1,4 +1,7 @@
 {
+  "features" : [
+    "refractivity"
+  ],
   "fill" : {
     "linear-gradient" : [
       "srgb:0.55907,0.67282,0.91445,1.00000",
@@ -21,6 +24,7 @@
       "layers" : [
         {
           "glass" : false,
+          "hidden" : false,
           "image-name" : "Shardow.png",
           "name" : "Shardow"
         }
@@ -71,6 +75,7 @@
             }
           ],
           "glass" : false,
+          "hidden" : false,
           "image-name" : "h_Top_Shadow.png",
           "name" : "h_Top_Shadow"
         },
@@ -84,8 +89,16 @@
             }
           ],
           "glass" : true,
+          "hidden" : false,
           "image-name" : "h_Top.png",
-          "name" : "h_Top"
+          "name" : "h_Top",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              -17
+            ]
+          }
         }
       ],
       "position" : {
@@ -132,6 +145,9 @@
         {
           "fill-specializations" : [
             {
+              "value" : "automatic"
+            },
+            {
               "appearance" : "dark",
               "value" : {
                 "linear-gradient" : [
@@ -141,16 +157,24 @@
               }
             }
           ],
+          "glass" : true,
+          "hidden" : false,
           "image-name" : "Clip.png",
           "name" : "Clip"
         }
       ],
+      "lighting" : "individual",
       "position" : {
         "scale" : 0.5,
         "translation-in-points" : [
           -8,
           0
         ]
+      },
+      "refractivity" : {
+        "depth" : 0.1,
+        "enabled" : true,
+        "strength" : 0.05
       },
       "shadow-specializations" : [
         {
@@ -167,6 +191,7 @@
           }
         }
       ],
+      "specular" : true,
       "translucency-specializations" : [
         {
           "value" : {
@@ -205,6 +230,7 @@
               "value" : "automatic"
             }
           ],
+          "hidden" : false,
           "image-name" : "h_Bottom.png",
           "name" : "h_Bottom"
         }
