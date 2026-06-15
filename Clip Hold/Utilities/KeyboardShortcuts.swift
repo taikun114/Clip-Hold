@@ -2,27 +2,27 @@ import Foundation
 import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {
-    static let showAllStandardPhrases = Self("showAllStandardPhrases", default: .init(.v, modifiers: [.control, .command]))
-    static let showAllCopyHistory = Self("showAllCopyHistory", default: .init(.v, modifiers: [.option, .command]))
+    static let showAllStandardPhrases = Self("showAllStandardPhrases", initial: .init(.v, modifiers: [.control, .command]))
+    static let showAllCopyHistory = Self("showAllCopyHistory", initial: .init(.v, modifiers: [.option, .command]))
     
-    static let addSNewtandardPhrase = Self("addSNewtandardPhrase", default: .init(.a, modifiers: [.control, .command]))
-    static let addStandardPhraseFromClipboard = Self("addStandardPhraseFromClipboard", default: .init(.c, modifiers: [.control, .command]))
-    static let addNewPreset = Self("addNewPreset", default: .init(.n, modifiers: [.control, .command]))
-    static let nextPreset = Self("nextPreset", default: .init(.p, modifiers: [.control, .command]))
-    static let previousPreset = Self("previousPreset", default: .init(.p, modifiers: [.shift, .control, .command]))
+    static let addSNewtandardPhrase = Self("addSNewtandardPhrase", initial: .init(.a, modifiers: [.control, .command]))
+    static let addStandardPhraseFromClipboard = Self("addStandardPhraseFromClipboard", initial: .init(.c, modifiers: [.control, .command]))
+    static let addNewPreset = Self("addNewPreset", initial: .init(.n, modifiers: [.control, .command]))
+    static let nextPreset = Self("nextPreset", initial: .init(.p, modifiers: [.control, .command]))
+    static let previousPreset = Self("previousPreset", initial: .init(.p, modifiers: [.shift, .control, .command]))
     
-    static let toggleClipboardMonitoring = Self("toggleClipboardMonitoring", default: .init(.m, modifiers: [.option, .command]))
+    static let toggleClipboardMonitoring = Self("toggleClipboardMonitoring", initial: .init(.m, modifiers: [.option, .command]))
     
-    static let copyStandardPhrase1 = Self("copyStandardPhrase1", default: .init(.one, modifiers: [.control, .command]))
-    static let copyStandardPhrase2 = Self("copyStandardPhrase2", default: .init(.two, modifiers: [.control, .command]))
-    static let copyStandardPhrase3 = Self("copyStandardPhrase3", default: .init(.three, modifiers: [.control, .command]))
-    static let copyStandardPhrase4 = Self("copyStandardPhrase4", default: .init(.four, modifiers: [.control, .command]))
-    static let copyStandardPhrase5 = Self("copyStandardPhrase5", default: .init(.five, modifiers: [.control, .command]))
-    static let copyStandardPhrase6 = Self("copyStandardPhrase6", default: .init(.six, modifiers: [.control, .command]))
-    static let copyStandardPhrase7 = Self("copyStandardPhrase7", default: .init(.seven, modifiers: [.control, .command]))
-    static let copyStandardPhrase8 = Self("copyStandardPhrase8", default: .init(.eight, modifiers: [.control, .command]))
-    static let copyStandardPhrase9 = Self("copyStandardPhrase9", default: .init(.nine, modifiers: [.control, .command]))
-    static let copyStandardPhrase10 = Self("copyStandardPhrase10", default: .init(.zero, modifiers: [.control, .command]))
+    static let copyStandardPhrase1 = Self("copyStandardPhrase1", initial: .init(.one, modifiers: [.control, .command]))
+    static let copyStandardPhrase2 = Self("copyStandardPhrase2", initial: .init(.two, modifiers: [.control, .command]))
+    static let copyStandardPhrase3 = Self("copyStandardPhrase3", initial: .init(.three, modifiers: [.control, .command]))
+    static let copyStandardPhrase4 = Self("copyStandardPhrase4", initial: .init(.four, modifiers: [.control, .command]))
+    static let copyStandardPhrase5 = Self("copyStandardPhrase5", initial: .init(.five, modifiers: [.control, .command]))
+    static let copyStandardPhrase6 = Self("copyStandardPhrase6", initial: .init(.six, modifiers: [.control, .command]))
+    static let copyStandardPhrase7 = Self("copyStandardPhrase7", initial: .init(.seven, modifiers: [.control, .command]))
+    static let copyStandardPhrase8 = Self("copyStandardPhrase8", initial: .init(.eight, modifiers: [.control, .command]))
+    static let copyStandardPhrase9 = Self("copyStandardPhrase9", initial: .init(.nine, modifiers: [.control, .command]))
+    static let copyStandardPhrase10 = Self("copyStandardPhrase10", initial: .init(.zero, modifiers: [.control, .command]))
     
     static var allStandardPhraseCopyShortcuts: [KeyboardShortcuts.Name] {
         return [
@@ -33,17 +33,17 @@ extension KeyboardShortcuts.Name {
         ]
     }
     
-    static let copyClipboardHistory1 = Self("copyClipboardHistory1", default: .init(.one, modifiers: [.option, .command]))
-    static let copyClipboardHistory2 = Self("copyClipboardHistory2", default: .init(.two, modifiers: [.option, .command]))
-    static let copyClipboardHistory3 = Self("copyClipboardHistory3", default: .init(.three, modifiers: [.option, .command]))
-    static let copyClipboardHistory4 = Self("copyClipboardHistory4", default: .init(.four, modifiers: [.option, .command]))
-    static let copyClipboardHistory5 = Self("copyClipboardHistory5", default: .init(.five, modifiers: [.option, .command]))
-    static let copyClipboardHistory6 = Self("copyClipboardHistory6", default: .init(.six, modifiers: [.option, .command]))
-    static let copyClipboardHistory7 = Self("copyClipboardHistory7", default: .init(.seven, modifiers: [.option, .command]))
-    static let copyClipboardHistory8 = Self("copyClipboardHistory8", default: .init(.eight, modifiers: [.option, .command]))
-    static let copyClipboardHistory9 = Self("copyClipboardHistory9", default: .init(.nine, modifiers: [.option, .command]))
-    static let copyClipboardHistory10 = Self("copyClipboardHistory10", default: .init(.zero, modifiers: [.option, .command]))
-    static let editAndCopyLatestHistory = Self("editAndCopyLatestHistory", default: .init(.e, modifiers: [.option, .command]))
+    static let copyClipboardHistory1 = Self("copyClipboardHistory1", initial: .init(.one, modifiers: [.option, .command]))
+    static let copyClipboardHistory2 = Self("copyClipboardHistory2", initial: .init(.two, modifiers: [.option, .command]))
+    static let copyClipboardHistory3 = Self("copyClipboardHistory3", initial: .init(.three, modifiers: [.option, .command]))
+    static let copyClipboardHistory4 = Self("copyClipboardHistory4", initial: .init(.four, modifiers: [.option, .command]))
+    static let copyClipboardHistory5 = Self("copyClipboardHistory5", initial: .init(.five, modifiers: [.option, .command]))
+    static let copyClipboardHistory6 = Self("copyClipboardHistory6", initial: .init(.six, modifiers: [.option, .command]))
+    static let copyClipboardHistory7 = Self("copyClipboardHistory7", initial: .init(.seven, modifiers: [.option, .command]))
+    static let copyClipboardHistory8 = Self("copyClipboardHistory8", initial: .init(.eight, modifiers: [.option, .command]))
+    static let copyClipboardHistory9 = Self("copyClipboardHistory9", initial: .init(.nine, modifiers: [.option, .command]))
+    static let copyClipboardHistory10 = Self("copyClipboardHistory10", initial: .init(.zero, modifiers: [.option, .command]))
+    static let editAndCopyLatestHistory = Self("editAndCopyLatestHistory", initial: .init(.e, modifiers: [.option, .command]))
     
     static var allClipboardHistoryCopyShortcuts: [KeyboardShortcuts.Name] {
         return [
