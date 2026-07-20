@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6D18390E2E1165B0008540BC /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 6D18390D2E1165B0008540BC /* KeyboardShortcuts */; };
-		6D594B082E8543D8006B7724 /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6D594B072E8543D8006B7724 /* SFSymbolsPicker */; };
+		6D345F0B300E5DD500DDC67E /* UniversalSFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6D345F0A300E5DD500DDC67E /* UniversalSFSymbolsPicker */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,7 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D18390E2E1165B0008540BC /* KeyboardShortcuts in Frameworks */,
-				6D594B082E8543D8006B7724 /* SFSymbolsPicker in Frameworks */,
+				6D345F0B300E5DD500DDC67E /* UniversalSFSymbolsPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,7 +120,7 @@
 			name = "Clip Hold";
 			packageProductDependencies = (
 				6D18390D2E1165B0008540BC /* KeyboardShortcuts */,
-				6D594B072E8543D8006B7724 /* SFSymbolsPicker */,
+				6D345F0A300E5DD500DDC67E /* UniversalSFSymbolsPicker */,
 			);
 			productName = "Clip Hold";
 			productReference = 6D244A112E03FA9F008A66F6 /* Clip Hold.app */;
@@ -210,7 +210,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				6D18390B2E1165A2008540BC /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
-				6D594B062E8543D8006B7724 /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */,
+				6D345F09300E5DD500DDC67E /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6D244A122E03FA9F008A66F6 /* Products */;
@@ -428,7 +428,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 202607202238;
+				CURRENT_PROJECT_VERSION = 202607202316;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -488,7 +488,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CREATE_INFOPLIST_SECTION_IN_BINARY = NO;
-				CURRENT_PROJECT_VERSION = 202607202238;
+				CURRENT_PROJECT_VERSION = 202607202316;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				ENABLE_APP_SANDBOX = YES;
@@ -541,7 +541,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202607202238;
+				CURRENT_PROJECT_VERSION = 202607202316;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -560,7 +560,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202607202238;
+				CURRENT_PROJECT_VERSION = 202607202316;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -578,7 +578,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202607202238;
+				CURRENT_PROJECT_VERSION = 202607202316;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -595,7 +595,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 202607202238;
+				CURRENT_PROJECT_VERSION = 202607202316;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5U7H2X2X96;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -658,12 +658,12 @@
 				version = 3.0.1;
 			};
 		};
-		6D594B062E8543D8006B7724 /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */ = {
+		6D345F09300E5DD500DDC67E /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/jaywcjlove/SFSymbolsPicker";
+			repositoryURL = "https://github.com/taikun114/UniversalSFSymbolsPicker.git";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.6;
+				version = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -674,10 +674,10 @@
 			package = 6D18390B2E1165A2008540BC /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
 		};
-		6D594B072E8543D8006B7724 /* SFSymbolsPicker */ = {
+		6D345F0A300E5DD500DDC67E /* UniversalSFSymbolsPicker */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 6D594B062E8543D8006B7724 /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */;
-			productName = SFSymbolsPicker;
+			package = 6D345F09300E5DD500DDC67E /* XCRemoteSwiftPackageReference "UniversalSFSymbolsPicker" */;
+			productName = UniversalSFSymbolsPicker;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

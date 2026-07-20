@@ -3780,75 +3780,75 @@
         }
       }
     },
-    "SFSymbolsPicker by Kenny Wang" : {
+    "UniversalSFSymbolsPicker by Taiga Imaura" : {
       "shouldTranslate" : false
     },
-    "SFSymbolsPickerのGitHubページへのリンクを開きます。" : {
-      "comment" : "SFSymbolsPickerのGitHubページへのリンクを開くボタンのツールチップテキスト。",
+    "UniversalSFSymbolsPickerのGitHubページへのリンクを開きます。" : {
+      "comment" : "UniversalSFSymbolsPickerのGitHubページへのリンクを開くボタンのツールチップテキスト。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Link zur SFSymbolsPicker GitHub-Seite öffnen."
+            "value" : "Link zur UniversalSFSymbolsPicker GitHub-Seite öffnen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open link to the SFSymbolsPicker GitHub page."
+            "value" : "Open link to the UniversalSFSymbolsPicker GitHub page."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abrir enlace a la página de GitHub de SFSymbolsPicker."
+            "value" : "Abrir enlace a la página de GitHub de UniversalSFSymbolsPicker."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouvrir le lien vers la page GitHub de SFSymbolsPicker."
+            "value" : "Ouvrir le lien vers la page GitHub de UniversalSFSymbolsPicker."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SFSymbolsPickerのGitHubページへのリンクを開きます。"
+            "value" : "UniversalSFSymbolsPickerのGitHubページへのリンクを開きます。"
           }
         }
       }
     },
-    "SFSymbolsPickerのGitHubページを開いてもよろしいですか？" : {
-      "comment" : "ユーザに、Qwen CodeのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
+    "UniversalSFSymbolsPickerのGitHubページを開いてもよろしいですか？" : {
+      "comment" : "ユーザに、UniversalSFSymbolsPickerのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Möchten Sie die SFSymbolsPicker GitHub-Seite wirklich öffnen?"
+            "value" : "Möchten Sie die UniversalSFSymbolsPicker GitHub-Seite wirklich öffnen?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Are you sure you want to open the SFSymbolsPicker GitHub page?"
+            "value" : "Are you sure you want to open the UniversalSFSymbolsPicker GitHub page?"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Está seguro de que quiere abrir la página de GitHub de SFSymbolsPicker?"
+            "value" : "¿Está seguro de que quiere abrir la página de GitHub de UniversalSFSymbolsPicker?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voulez-vous vraiment ouvrir la page GitHub de SFSymbolsPicker ?"
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub de UniversalSFSymbolsPicker ?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SFSymbolsPickerのGitHubページを開いてもよろしいですか？"
+            "value" : "UniversalSFSymbolsPickerのGitHubページを開いてもよろしいですか？"
           }
         }
       }
@@ -7250,6 +7250,7 @@
     },
     "シンボルを検索" : {
       "comment" : "プリセットアイコンを選択する画面にある検索ボックスのサンフルテキスト。",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

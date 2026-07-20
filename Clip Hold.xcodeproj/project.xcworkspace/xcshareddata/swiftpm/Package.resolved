@@ -1,5 +1,5 @@
 {
-  "originHash" : "0aa51088f03d554487f6eedbba68d7ef83320a8d1f39060dd0594aa5d5f1759d",
+  "originHash" : "5b15bc95df2a2354bb47365be1ad5ca60529176d16679b001f971f5c6bf8139f",
   "pins" : [
     {
       "identity" : "keyboardshortcuts",
@@ -11,12 +11,12 @@
       }
     },
     {
-      "identity" : "sfsymbolspicker",
+      "identity" : "universalsfsymbolspicker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jaywcjlove/SFSymbolsPicker",
+      "location" : "https://github.com/taikun114/UniversalSFSymbolsPicker.git",
       "state" : {
-        "revision" : "a28f7a3b089c9b86d1dcc4b63817bfdf17b5bdef",
-        "version" : "1.0.6"
+        "revision" : "97ba1d4e00e05b05c1b3254df37371cd5d7ba8d2",
+        "version" : "1.0.0"
       }
     }
   ],

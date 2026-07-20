@@ -16,8 +16,8 @@ struct LicenseInfoModalView: View {
     @State private var showingQwenCodeLinkAlert = false
     @State private var isQwenCodeLinkHovered: Bool = false
     
-    @State private var showingSFSymbolsPickerLinkAlert = false
-    @State private var isSFSymbolsPickerLinkHovered: Bool = false
+    @State private var showingUniversalSFSymbolsPickerLinkAlert = false
+    @State private var isUniversalSFSymbolsPickerLinkHovered: Bool = false
     
     private var appVersionString: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
@@ -33,11 +33,11 @@ struct LicenseInfoModalView: View {
     // Qwen Codeの使用バージョン
     private let qwenCodeVersionString: String = "0.2.3"
     
-    // SFSymbolsPickerの使用バージョン
-    private let sfSymbolsPickerVersionString: String = "1.0.4"
+    // UniversalSFSymbolsPickerの使用バージョン
+    private let universalSFSymbolsPickerVersionString: String = "1.0.0"
     
     // KeyboardShortcutsの使用バージョン
-    private let keyboardShortcutsVersionString: String = "2.4.0"
+    private let keyboardShortcutsVersionString: String = "3.0.1"
     
     // create-dmgの使用バージョン
     private let createDmgVersionString: String = "1.2.2"
@@ -134,25 +134,25 @@ struct LicenseInfoModalView: View {
                         .padding(.horizontal)
                         .padding(.vertical, 1)
                     
-                    // MARK: - SFSymbolsPicker by Kenny Wang
+                    // MARK: - UniversalSFSymbolsPicker by Taiga Imaura
                     VStack(alignment: .leading) {
                         Button(action: {
-                            showingSFSymbolsPickerLinkAlert = true
+                            showingUniversalSFSymbolsPickerLinkAlert = true
                         }) {
-                            Text("SFSymbolsPicker by Kenny Wang")
+                            Text("UniversalSFSymbolsPicker by Taiga Imaura")
                                 .font(.title2)
                                 .fontWeight(.bold)
                                 .foregroundStyle(Color.accentColor)
-                                .underline(isSFSymbolsPickerLinkHovered)
+                                .underline(isUniversalSFSymbolsPickerLinkHovered)
                         }
                         .buttonStyle(.plain)
-                        .help("SFSymbolsPickerのGitHubページへのリンクを開きます。")
+                        .help("UniversalSFSymbolsPickerのGitHubページへのリンクを開きます。")
                         .padding(.bottom, 1)
                         .onHover { hovered in
-                            isSFSymbolsPickerLinkHovered = hovered
+                            isUniversalSFSymbolsPickerLinkHovered = hovered
                         }
                         
-                        Text("バージョン: \(sfSymbolsPickerVersionString)")
+                        Text("バージョン: \(universalSFSymbolsPickerVersionString)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                             .padding(.bottom, 1)
@@ -164,9 +164,9 @@ struct LicenseInfoModalView: View {
                     .padding(.top, 10)
                     .padding(.horizontal)
                     
-                    .alert("リンクを開きますか？", isPresented: $showingSFSymbolsPickerLinkAlert) {
+                    .alert("リンクを開きますか？", isPresented: $showingUniversalSFSymbolsPickerLinkAlert) {
                         Button("開く") {
-                            if let url = URL(string: "https://github.com/jaywcjlove/SFSymbolsPicker") {
+                            if let url = URL(string: "https://github.com/taikun114/UniversalSFSymbolsPicker") {
                                 openURL(url)
                             }
                         }
@@ -174,10 +174,10 @@ struct LicenseInfoModalView: View {
                             // 何もしない
                         }
                     } message: {
-                        Text("SFSymbolsPickerのGitHubページを開いてもよろしいですか？")
+                        Text("UniversalSFSymbolsPickerのGitHubページを開いてもよろしいですか？")
                     }
                     
-                    Text(verbatim: "MIT License\n\nCopyright (c) 2025 Kenny Wang(小弟调调™) <kennyiseeyou@gmail.com> (https://github.com/jaywcjlove)\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
+                    Text(verbatim: "MIT License\n\nCopyright (c) 2026 Taiga Imaura\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
                         .font(.callout.monospaced())
                         .padding(.horizontal)
                         .padding(.vertical, 1)

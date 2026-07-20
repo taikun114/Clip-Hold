@@ -1,6 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
-import SFSymbolsPicker
+import UniversalSFSymbolsPicker
 
 
 // MARK: - StandardPhraseSettingsView
@@ -1269,10 +1269,12 @@ struct PresetNameSheet: View {
     var editingPreset: StandardPhrasePreset? = nil
     
     @State private var showingIconPicker = false
+    @State private var selectedIcon: String?
     @State private var previousIcon: String = ""
     @State private var showingColorPicker = false
     @State private var customBackgroundColor: Color
     @State private var customIconColor: Color
+    @State private var searchText = ""
     var title: String
     var onSave: (PresetCustomColor?) -> Void
     var onCancel: () -> Void
@@ -1288,6 +1290,7 @@ struct PresetNameSheet: View {
     ) {
         self._name = name
         self._icon = icon
+        self._selectedIcon = State(initialValue: icon.wrappedValue)
         self._color = color
         self.editingPreset = editingPreset
         self.title = title
@@ -1331,16 +1334,24 @@ struct PresetNameSheet: View {
                             }
                         }
                         .buttonStyle(.plain)
-                        .sfSymbolsPicker(
-                            isPresented: $showingIconPicker,
-                            selection: $icon,
-                            prompt: String(localized: "シンボルを検索")
-                        )
-                        .onChange(of: icon) { oldValue, newValue in
-                            if newValue.isEmpty {
-                                icon = previousIcon
+                        .popover(isPresented: $showingIconPicker) {
+                            SFSymbolPicker(
+                                isPresented: $showingIconPicker,
+                                selection: $selectedIcon,
+                                showAs: .popover,
+                                controlBarPosition: .top,
+                                searchText: $searchText,
+                                iconScale: 4,
+                                iconSpacing: 3
+                            )
+                            .frame(width: 300, height: 400)
+                        }
+                        .onChange(of: selectedIcon) { oldValue, newValue in
+                            if let newIcon = newValue, !newIcon.isEmpty {
+                                icon = newIcon
+                                previousIcon = newIcon
                             } else {
-                                previousIcon = newValue
+                                selectedIcon = previousIcon
                             }
                         }
                         
