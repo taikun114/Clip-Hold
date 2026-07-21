@@ -21,6 +21,11 @@ Notes
 - When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
 
+## 1.7.0
+### Bug Fixes and Improvements
+- **Changes to the preset icon picker package**
+  - Icon names are now displayed, and you can filter by specific categories using the category picker.
+
 ## 1.6.3
 ### New Features
 - **Add French (`fr`), German (`de`), Spanish (`es`) localization by generative AI**
