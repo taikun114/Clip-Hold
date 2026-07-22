@@ -161,8 +161,14 @@ struct HistoryWindowView: View {
                 }
             }
             
-            self.filteredHistory = sorted
-            clipboardManager.filteredHistoryForShortcuts = sorted
+            var finalHistory = sorted
+            if let pinnedID = clipboardManager.pinnedItemID,
+               let pinnedItem = sorted.first(where: { $0.id == pinnedID }) {
+                finalHistory.insert(pinnedItem.createPinnedDuplicate(), at: 0)
+            }
+            
+            self.filteredHistory = finalHistory
+            clipboardManager.filteredHistoryForShortcuts = finalHistory
             isLoading = false
         }
     }
@@ -233,6 +239,7 @@ struct HistoryWindowView: View {
         .onChange(of: clipboardManager.historySelectedFilter) { _, _ in performUpdate() }
         .onChange(of: clipboardManager.historySelectedSort) { _, _ in performUpdate() }
         .onChange(of: clipboardManager.historySelectedApp) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.pinnedItemID) { _, _ in performUpdate(isIncrementalUpdate: true) }
         .onChange(of: frontmostAppMonitor.frontmostAppBundleIdentifier) { _, _ in
             if clipboardManager.historySelectedApp == "auto_filter_mode" {
                 performUpdate()

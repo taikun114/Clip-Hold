@@ -33,6 +33,7 @@ extension KeyboardShortcuts.Name {
         ]
     }
     
+    static let copyPinnedHistoryItem = Self("copyPinnedHistoryItem", initial: .init(.p, modifiers: [.option, .command]))
     static let copyClipboardHistory1 = Self("copyClipboardHistory1", initial: .init(.one, modifiers: [.option, .command]))
     static let copyClipboardHistory2 = Self("copyClipboardHistory2", initial: .init(.two, modifiers: [.option, .command]))
     static let copyClipboardHistory3 = Self("copyClipboardHistory3", initial: .init(.three, modifiers: [.option, .command]))

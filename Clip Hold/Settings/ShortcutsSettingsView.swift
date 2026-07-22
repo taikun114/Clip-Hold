@@ -195,6 +195,32 @@ struct ShortcutsSettingsView: View {
                         .labelsHidden()
                 }
                 
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("ピン留めされた項目をコピーする")
+                        if let pinnedItem = clipboardManager.pinnedItem {
+                            Text("「\(pinnedItem.text.replacingOccurrences(of: "\n", with: " "))」")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        } else {
+                            Text("ピン留めされた項目はありません")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .copyPinnedHistoryItem)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.copyPinnedHistoryItem)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+                
                 ForEach(0..<10, id: \.self) { index in
                     HStack {
                         Text("\(index + 1)\((index + 1).ordinalSuffixForHistory)履歴をコピーする")

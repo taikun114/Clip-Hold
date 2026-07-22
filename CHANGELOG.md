@@ -22,6 +22,10 @@ Notes
 -->
 
 ## 1.7.0
+### New Features
+- **Add a pin feature to the copy history**
+  - Only one item can be pinned at a time. By default, you can copy or Quick Paste the pinned item by pressing `⌥ (Option)` + `⌘ (Command)` + `P`.
+
 ### Bug Fixes and Improvements
 - **Changes to the preset icon picker package**
   - Icon names are now displayed, and you can filter by specific categories using the category picker.

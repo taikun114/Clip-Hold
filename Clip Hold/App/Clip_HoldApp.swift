@@ -200,7 +200,7 @@ struct ClipHoldApp: App {
                         }
                         return presetManager.selectedPresetId
                     },
-                    set: { newValue in
+                    set: { (newValue: UUID?) in
                         // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
                         if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
                             // プリセットがない場合は何もしない
@@ -274,9 +274,18 @@ struct ClipHoldApp: App {
             if clipboardManager.clipboardHistory.isEmpty {
                 Text("履歴はありません")
             } else {
-                // clipboardHistoryを日付の新しい順にソート
-                let sortedHistory = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
-                let displayLimit = min(sortedHistory.count, maxHistoryInMenu)
+                let sortedHistory: [ClipboardItem] = {
+                    var items = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+                    if let pinnedID = clipboardManager.pinnedItemID,
+                       let pinnedItem = items.first(where: { $0.id == pinnedID }) {
+                        items.insert(pinnedItem.createPinnedDuplicate(), at: 0)
+                    }
+                    return items
+                }()
+                
+                let hasPinnedItem = clipboardManager.pinnedItemID != nil && sortedHistory.first?.originalPinnedItemID != nil
+                let effectiveMaxHistory = maxHistoryInMenu + (hasPinnedItem ? 1 : 0)
+                let displayLimit = min(sortedHistory.count, effectiveMaxHistory)
                 ForEach(sortedHistory.prefix(displayLimit)) {
                     item in
                     
@@ -327,8 +336,14 @@ struct ClipHoldApp: App {
                         }
                     } label: {
                         HStack(spacing: 8) {
-                            // カラーコードアイコンの表示条件をチェック
-                            if showColorCodeIcon, item.filePath == nil, let color = ColorCodeParser.parseColor(from: item.text) {
+                            if item.originalPinnedItemID != nil {
+                                Image(systemName: "pin.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(2)
+                                    .frame(width: 16, height: 16)
+                                    .foregroundStyle(.secondary)
+                            } else if showColorCodeIcon, item.filePath == nil, let color = ColorCodeParser.parseColor(from: item.text) {
                                 Image(nsImage: clipboardManager.createColorIcon(color: color, size: CGSize(width: 16, height: 16)))
                             } else if item.isURL { // URLの場合
                                 Image(systemName: "paperclip")
@@ -607,6 +622,35 @@ struct ClipHoldApp: App {
             }
         }
         
+        // ピン留め履歴項目のコピーショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .copyPinnedHistoryItem) {
+            let clipboardManager = ClipboardManager.shared
+            if let pinnedItem = clipboardManager.pinnedItem {
+                NSPasteboard.general.clearContents()
+                clipboardManager.isPerformingInternalCopy = true
+                clipboardManager.copyItemToClipboard(pinnedItem)
+                
+                let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                let currentTextOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
+                
+                if currentQuickPaste {
+                    if currentTextOnlyQuickPaste {
+                        if pinnedItem.filePath == nil && !pinnedItem.isImage {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                performPaste()
+                            }
+                        }
+                    } else {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            performPaste()
+                        }
+                    }
+                }
+            } else {
+                print("Pinned history shortcut pressed, but no item is pinned.")
+            }
+        }
+        
         // コピー履歴コピーショートカットの登録
         for i in 0..<KeyboardShortcuts.Name.allClipboardHistoryCopyShortcuts.count {
             let shortcutName = KeyboardShortcuts.Name.allClipboardHistoryCopyShortcuts[i]
@@ -615,12 +659,13 @@ struct ClipHoldApp: App {
                 let clipboardManager = ClipboardManager.shared
                 let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
                 
-                let historySource: [ClipboardItem]
+                let rawHistorySource: [ClipboardItem]
                 if useFiltered, let filteredList = clipboardManager.filteredHistoryForShortcuts {
-                    historySource = filteredList
+                    rawHistorySource = filteredList
                 } else {
-                    historySource = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+                    rawHistorySource = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
                 }
+                let historySource = rawHistorySource.filter { $0.originalPinnedItemID == nil }
                 
                 // 並び替えた配列に対してインデックスを適用
                 if historySource.indices.contains(i) {

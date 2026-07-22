@@ -36,6 +36,26 @@ struct HistoryContentList: View {
     @State private var showingEditSheet = false
     @State private var itemToEdit: ClipboardItem?
     
+    // ピン留め置き換えアラート用State
+    @State private var itemToReplacePin: ClipboardItem? = nil
+    @State private var showingReplacePinConfirmation = false
+    
+    private var pinnedItemToShow: ClipboardItem? {
+        guard let pinnedItem = clipboardManager.pinnedItem else { return nil }
+        if searchText.isEmpty {
+            return pinnedItem
+        } else {
+            return pinnedItem.text.localizedCaseInsensitiveContains(searchText) ? pinnedItem : nil
+        }
+    }
+    
+    private var unpinnedFilteredHistory: [ClipboardItem] {
+        if let pinnedID = clipboardManager.pinnedItemID {
+            return filteredHistory.filter { $0.id != pinnedID }
+        }
+        return filteredHistory
+    }
+    
     let hideNumbersInHistoryWindow: Bool
     let closeWindowOnDoubleClickInHistoryWindow: Bool
     let scrollToTopOnUpdate: Bool
@@ -91,10 +111,12 @@ struct HistoryContentList: View {
                                 showQRCodeSheet: $showQRCodeSheet,
                                 selectedItemForQRCode: $selectedItemForQRCode,
                                 itemForNewPhrase: $itemForNewPhrase,
+                                itemToReplacePin: $itemToReplacePin,
+                                showingReplacePinConfirmation: $showingReplacePinConfirmation,
                                 lineNumberTextWidth: lineNumberTextWidth,
                                 trailingPaddingForLineNumber: trailingPaddingForLineNumber,
-                                rowIconViews: $rowIconViews, // アイコンビュー辞書へのBindingを渡す
-                                showCharacterCount: showCharacterCount // showCharacterCountを渡す
+                                rowIconViews: $rowIconViews,
+                                showCharacterCount: showCharacterCount
                             )
                             .environmentObject(clipboardManager)
                             .environmentObject(standardPhraseManager)
@@ -247,6 +269,29 @@ struct HistoryContentList: View {
                                     }
                                 } label: {
                                     Label("クイックルック", systemImage: "eye")
+                                }
+                            }
+                            let targetID = currentItem.originalPinnedItemID ?? currentItem.id
+                            if clipboardManager.pinnedItemID == targetID {
+                                Button {
+                                    clipboardManager.unpinItem()
+                                } label: {
+                                    Label("ピン留めを解除", systemImage: "pin.slash")
+                                }
+                            } else {
+                                Button {
+                                    if clipboardManager.pinnedItemID != nil {
+                                        itemToReplacePin = currentItem
+                                        showingReplacePinConfirmation = true
+                                    } else {
+                                        if let originalItem = clipboardManager.clipboardHistory.first(where: { $0.id == targetID }) {
+                                            clipboardManager.pinItem(originalItem)
+                                        } else {
+                                            clipboardManager.pinItem(currentItem)
+                                        }
+                                    }
+                                } label: {
+                                    Label("ピン留め", systemImage: "pin")
                                 }
                             }
                             Button {
@@ -437,6 +482,19 @@ struct HistoryContentList: View {
                             let count = clipboardManager.countHistoryFromApp(sourceAppPath: appPath)
                             Text("「\(appName)」からのすべての履歴を削除してもよろしいですか？\(count)個の履歴が削除されます。この操作は元に戻せません。")
                         }
+                    }
+                    .alert("ピン留めを置き換え", isPresented: $showingReplacePinConfirmation) {
+                        Button("置き換え", role: .destructive) {
+                            if let itemToPin = itemToReplacePin {
+                                clipboardManager.pinItem(itemToPin)
+                            }
+                            itemToReplacePin = nil
+                        }
+                        Button("キャンセル", role: .cancel) {
+                            itemToReplacePin = nil
+                        }
+                    } message: {
+                        Text("この項目をピン留めすると、現在ピン留めされている項目が置き換えられます。よろしいですか？")
                     }
                 } // ScrollViewReaderの終わり
             }

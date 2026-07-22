@@ -59,6 +59,10 @@ struct HistoryItemRow: View {
     
     @Binding var itemForNewPhrase: ClipboardItem?
     
+    // ピン留め置き換え確認アラート用Binding
+    @Binding var itemToReplacePin: ClipboardItem?
+    @Binding var showingReplacePinConfirmation: Bool
+    
     // アイコンビューの参照を格納する辞書へのBinding
     @Binding var rowIconViews: [UUID: NSView]
     
@@ -88,6 +92,8 @@ struct HistoryItemRow: View {
          showQRCodeSheet: Binding<Bool>,
          selectedItemForQRCode: Binding<ClipboardItem?>,
          itemForNewPhrase: Binding<ClipboardItem?>,
+         itemToReplacePin: Binding<ClipboardItem?> = .constant(nil),
+         showingReplacePinConfirmation: Binding<Bool> = .constant(false),
          lineNumberTextWidth: CGFloat?,
          trailingPaddingForLineNumber: CGFloat,
          rowIconViews: Binding<[UUID: NSView]>,
@@ -104,6 +110,8 @@ struct HistoryItemRow: View {
         _showQRCodeSheet = showQRCodeSheet
         _selectedItemForQRCode = selectedItemForQRCode
         _itemForNewPhrase = itemForNewPhrase
+        _itemToReplacePin = itemToReplacePin
+        _showingReplacePinConfirmation = showingReplacePinConfirmation
         self.lineNumberTextWidth = lineNumberTextWidth
         self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
         self._rowIconViews = rowIconViews
@@ -188,6 +196,30 @@ struct HistoryItemRow: View {
                     Label("クイックルック", systemImage: "eye")
                 }
             }
+            let targetID = item.originalPinnedItemID ?? item.id
+            if clipboardManager.pinnedItemID == targetID {
+                Button {
+                    clipboardManager.unpinItem()
+                } label: {
+                    Label("ピン留めを解除", systemImage: "pin.slash")
+                }
+            } else {
+                Button {
+                    if clipboardManager.pinnedItemID != nil {
+                        itemToReplacePin = item
+                        showingReplacePinConfirmation = true
+                    } else {
+                        // 本来のアイテムをピン留めする
+                        if let originalItem = clipboardManager.clipboardHistory.first(where: { $0.id == targetID }) {
+                            clipboardManager.pinItem(originalItem)
+                        } else {
+                            clipboardManager.pinItem(item)
+                        }
+                    }
+                } label: {
+                    Label("ピン留め", systemImage: "pin")
+                }
+            }
             Button {
                 itemForNewPhrase = item
             } label: {
@@ -233,11 +265,21 @@ struct HistoryItemRow: View {
     var body: some View {
         HStack(spacing: 8) {
             if !hideNumbers {
-                Text("\(index + 1).")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
-                    .frame(width: lineNumberTextWidth, alignment: .trailing)
-                    .padding(.trailing, trailingPaddingForLineNumber)
+                if item.originalPinnedItemID != nil {
+                    Image(systemName: "pin.fill")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(width: lineNumberTextWidth, alignment: .trailing)
+                        .padding(.trailing, trailingPaddingForLineNumber)
+                } else {
+                    let hasPinnedHeader = (clipboardManager.filteredHistoryForShortcuts?.first?.originalPinnedItemID != nil)
+                    let displayNumber = hasPinnedHeader ? index : (index + 1)
+                    Text("\(displayNumber).")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                        .frame(width: lineNumberTextWidth, alignment: .trailing)
+                        .padding(.trailing, trailingPaddingForLineNumber)
+                }
             }
             
             // アイコン部分 (アプリアイコンをオーバーレイ表示するかどうかで分岐)
@@ -422,6 +464,9 @@ struct HistoryItemRow: View {
         .contentShape(Rectangle())
         .padding(.vertical, 4)
         .padding(.leading, 2)
+        .contextMenu {
+            actionMenuItems
+        }
         .onAppear {
             if item.cachedThumbnailImage == nil, let filePath = item.filePath {
                 iconLoadTask?.cancel() // 既存のタスクをキャンセル
