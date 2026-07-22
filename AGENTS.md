@@ -12,7 +12,7 @@
 
 - **KeyboardShortcuts**
   - グローバルショートカットキーを設定・管理するためのライブラリ。定型文やコピー履歴アイテムの呼び出しショートカットや、ウィンドウを開くショートカット等に使用している。
-- **SFSymbolsPicker**
+- **UniversalSFSymbolsPicker**
   - SwiftUI用のSF Symbols選択ピッカー。プリセット用のアイコン選択機能に使用している。
 
 ### プロジェクト概要

@@ -27,6 +27,7 @@ Notes
   - Only one item can be pinned at a time. By default, you can copy or Quick Paste the pinned item by pressing `⌥ (Option)` + `⌘ (Command)` + `P`.
 
 ### Bug Fixes and Improvements
+- **Fix issue where the copy notification would not disappear when copying from the menu in the Standard Phrase window**
 - **Changes to the preset icon picker package**
   - Icon names are now displayed, and you can filter by specific categories using the category picker.
 

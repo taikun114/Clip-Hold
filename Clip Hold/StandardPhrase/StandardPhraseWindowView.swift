@@ -16,35 +16,16 @@ private func truncateString(_ text: String?, maxLength: Int) -> String {
     return text
 }
 
-struct StandardPhraseItemRow: View {
-    @EnvironmentObject var standardPhraseManager: StandardPhraseManager
-    @EnvironmentObject var presetManager: StandardPhrasePresetManager
-    @EnvironmentObject var clipboardManager: ClipboardManager
-    @Environment(\.dismiss) var dismiss
-    
+struct StandardPhraseItemRow<MenuContent: View>: View {
     let phrase: StandardPhrase
     let index: Int
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
-    @Binding var phraseToDelete: StandardPhrase?
-    @Binding var showingDeleteConfirmation: Bool
-    @Binding var selectedPhraseID: UUID?
-    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
-    
-    @Environment(\.colorScheme) var colorScheme
-    
-    @Binding var showCopyConfirmation: Bool
-    @Binding var showQRCodeSheet: Bool
-    @Binding var selectedPhraseForQRCode: StandardPhrase?
-    @Binding var phraseToEdit: StandardPhrase?
-    @Binding var phraseToEditAndCopy: StandardPhrase?
-    @Binding var showingEditAndCopySheet: Bool
-    
-    @Binding var showingMoveSheet: Bool
-    @Binding var phraseToMove: StandardPhrase?
     
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
+    
+    @ViewBuilder let menuItems: () -> MenuContent
     
     var body: some View {
         // isURLをbodyのトップレベルで定義
@@ -93,58 +74,7 @@ struct StandardPhraseItemRow: View {
             Spacer()
             
             Menu {
-                Button {
-                    copyToClipboard(phrase.content, clipboardManager: clipboardManager)
-                    showCopyConfirmation = true
-                } label: {
-                    Label("コピー", systemImage: "document.on.document")
-                }
-                Button {
-                    phraseToEditAndCopy = phrase
-                    showingEditAndCopySheet = true
-                } label: {
-                    Text("変更してコピー...")
-                }
-                // 定型文がURLの場合、「リンクを開く」メニューを表示
-                if isURL, let url = URL(string: phrase.content) {
-                    Button {
-                        NSWorkspace.shared.open(url)
-                    } label: {
-                        Label("リンクを開く", systemImage: "paperclip")
-                    }
-                }
-                Divider()
-                Button {
-                    phraseToEdit = phrase // 編集対象のフレーズをセット
-                } label: {
-                    Label("編集...", systemImage: "pencil")
-                }
-                Button {
-                    phraseToMove = phrase
-                    showingMoveSheet = true
-                } label: {
-                    Label("別のプリセットに移動...", systemImage: "folder")
-                }
-                Button {
-                    if let selectedPreset = presetManager.selectedPreset {
-                        presetManager.duplicate(phrase: phrase, in: selectedPreset)
-                    }
-                } label: {
-                    Label("複製", systemImage: "plus.square.on.square")
-                }
-                Button {
-                    selectedPhraseForQRCode = phrase
-                    showQRCodeSheet = true
-                } label: {
-                    Label("QRコードを表示...", systemImage: "qrcode")
-                }
-                Divider()
-                Button(role: .destructive) {
-                    phraseToDelete = phrase
-                    showingDeleteConfirmation = true
-                } label: {
-                    Label("削除...", systemImage: "trash")
-                }
+                menuItems()
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .imageScale(.large)
@@ -168,6 +98,74 @@ struct StandardPhraseWindowView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
+    
+    @ViewBuilder
+    private func standardPhraseMenuItems(for currentPhrase: StandardPhrase) -> some View {
+        let isURL: Bool = {
+            guard !currentPhrase.content.isEmpty,
+                  let url = URL(string: currentPhrase.content) else {
+                return false
+            }
+            return url.scheme == "http" || url.scheme == "https"
+        }()
+        
+        SharedCopyMenuItem {
+            copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
+            showCopyConfirmation = true
+            currentCopyConfirmationTask?.cancel()
+            currentCopyConfirmationTask = Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                guard !Task.isCancelled else { return }
+                withAnimation {
+                    showCopyConfirmation = false
+                }
+            }
+        }
+        
+        SharedEditAndCopyMenuItem {
+            phraseToEditAndCopy = currentPhrase
+            showingEditAndCopySheet = true
+        }
+        
+        if isURL {
+            SharedOpenLinkMenuItem(urlString: currentPhrase.content)
+        }
+        
+        Divider()
+        
+        Button {
+            phraseToEdit = currentPhrase
+        } label: {
+            Label("編集...", systemImage: "pencil")
+        }
+        
+        Button {
+            phraseToMove = currentPhrase
+            showingMoveSheet = true
+        } label: {
+            Label("別のプリセットに移動...", systemImage: "folder")
+        }
+        
+        Button {
+            if let selectedPreset = presetManager.selectedPreset {
+                presetManager.duplicate(phrase: currentPhrase, in: selectedPreset)
+            }
+        } label: {
+            Label("複製", systemImage: "plus.square.on.square")
+        }
+        
+        SharedShowQRCodeMenuItem {
+            selectedPhraseForQRCode = currentPhrase
+            showQRCodeSheet = true
+        }
+        
+        Divider()
+        
+        SharedDeleteMenuItem {
+            phraseToDelete = currentPhrase
+            showingDeleteConfirmation = true
+        }
+    }
     
     @StateObject var iconGenerator = PresetIconGenerator.shared
     
@@ -432,20 +430,11 @@ struct StandardPhraseWindowView: View {
                                             StandardPhraseItemRow(
                                                 phrase: phrase,
                                                 index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                                hideNumbers: hideNumbers,
-                                                phraseToDelete: $phraseToDelete,
-                                                showingDeleteConfirmation: $showingDeleteConfirmation,
-                                                selectedPhraseID: $selectedPhraseID,
-                                                showCopyConfirmation: $showCopyConfirmation,
-                                                showQRCodeSheet: $showQRCodeSheet,
-                                                selectedPhraseForQRCode: $selectedPhraseForQRCode,
-                                                phraseToEdit: $phraseToEdit,
-                                                phraseToEditAndCopy: $phraseToEditAndCopy,
-                                                showingEditAndCopySheet: $showingEditAndCopySheet,
-                                                showingMoveSheet: $showingMoveSheet,
-                                                phraseToMove: $phraseToMove,
                                                 lineNumberTextWidth: lineNumberTextWidth,
-                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber,
+                                                menuItems: {
+                                                    standardPhraseMenuItems(for: phrase)
+                                                }
                                             )
                                             .tag(phrase.id)
                                             .listRowBackground(Color.clear)
@@ -457,20 +446,11 @@ struct StandardPhraseWindowView: View {
                                             StandardPhraseItemRow(
                                                 phrase: phrase,
                                                 index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                                hideNumbers: hideNumbers,
-                                                phraseToDelete: $phraseToDelete,
-                                                showingDeleteConfirmation: $showingDeleteConfirmation,
-                                                selectedPhraseID: $selectedPhraseID,
-                                                showCopyConfirmation: $showCopyConfirmation,
-                                                showQRCodeSheet: $showQRCodeSheet,
-                                                selectedPhraseForQRCode: $selectedPhraseForQRCode,
-                                                phraseToEdit: $phraseToEdit,
-                                                phraseToEditAndCopy: $phraseToEditAndCopy,
-                                                showingEditAndCopySheet: $showingEditAndCopySheet,
-                                                showingMoveSheet: $showingMoveSheet,
-                                                phraseToMove: $phraseToMove,
                                                 lineNumberTextWidth: lineNumberTextWidth,
-                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber,
+                                                menuItems: {
+                                                    standardPhraseMenuItems(for: phrase)
+                                                }
                                             )
                                             .tag(phrase.id)
                                             .listRowBackground(Color.clear)
@@ -500,76 +480,7 @@ struct StandardPhraseWindowView: View {
                             .animation(.easeOut(duration: 0.1), value: isLoading)
                             .contextMenu(forSelectionType: StandardPhrase.ID.self, menu: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
-                                    // 定型文がURLかどうかを判定
-                                    let isURL: Bool = {
-                                        guard !currentPhrase.content.isEmpty,
-                                              let url = URL(string: currentPhrase.content) else {
-                                            return false
-                                        }
-                                        // URLスキームがhttpまたはhttpsであることを確認
-                                        return url.scheme == "http" || url.scheme == "https"
-                                    }()
-                                    
-                                    Button {
-                                        copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
-                                        showCopyConfirmation = true
-                                        currentCopyConfirmationTask?.cancel()
-                                        currentCopyConfirmationTask = Task { @MainActor in
-                                            try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                            guard !Task.isCancelled else { return }
-                                            withAnimation {
-                                                showCopyConfirmation = false
-                                            }
-                                        }
-                                    } label: {
-                                        Label("コピー", systemImage: "document.on.document")
-                                    }
-                                    Button {
-                                        phraseToEditAndCopy = currentPhrase
-                                        showingEditAndCopySheet = true
-                                    } label: {
-                                        Text("変更してコピー...")
-                                    }
-                                    // 定型文がURLの場合、「リンクを開く」メニューを表示
-                                    if isURL, let url = URL(string: currentPhrase.content) {
-                                        Button {
-                                            NSWorkspace.shared.open(url)
-                                        } label: {
-                                            Label("リンクを開く", systemImage: "paperclip")
-                                        }
-                                    }
-                                    Divider()
-                                    Button {
-                                        phraseToEdit = currentPhrase // 編集対象のフレーズをセット
-                                    } label: {
-                                        Label("編集...", systemImage: "pencil")
-                                    }
-                                    Button {
-                                        phraseToMove = currentPhrase
-                                        showingMoveSheet = true
-                                    } label: {
-                                        Label("別のプリセットに移動...", systemImage: "folder")
-                                    }
-                                    Button {
-                                        if let selectedPreset = presetManager.selectedPreset {
-                                            presetManager.duplicate(phrase: currentPhrase, in: selectedPreset)
-                                        }
-                                    } label: {
-                                        Label("複製", systemImage: "plus.square.on.square")
-                                    }
-                                    Button {
-                                        selectedPhraseForQRCode = currentPhrase
-                                        showQRCodeSheet = true
-                                    } label: {
-                                        Label("QRコードを表示...", systemImage: "qrcode")
-                                    }
-                                    Divider()
-                                    Button(role: .destructive) {
-                                        phraseToDelete = currentPhrase
-                                        showingDeleteConfirmation = true
-                                    } label: {
-                                        Label("削除...", systemImage: "trash")
-                                    }
+                                    standardPhraseMenuItems(for: currentPhrase)
                                 }
                             }, primaryAction: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
