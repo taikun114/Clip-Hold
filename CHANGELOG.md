@@ -25,6 +25,8 @@ Notes
 ### New Features
 - **Add a pin feature to the copy history**
   - Only one item can be pinned at a time. By default, you can copy or Quick Paste the pinned item by pressing `⌥ (Option)` + `⌘ (Command)` + `P`.
+- **Add a "Show Current Preset Icon" option to the "Menu" section of the General settings**
+  - When enabled, the currently selected preset icon will be displayed in the menu bar.
 
 ### Bug Fixes and Improvements
 - **Fix issue where the copy notification would not disappear when copying from the menu in the Standard Phrase window**

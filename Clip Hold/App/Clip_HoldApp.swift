@@ -72,6 +72,7 @@ struct ClipHoldApp: App {
     let dateReloader = DateReloader.shared
     
     @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
+    @AppStorage("showCurrentPresetIcon") private var showCurrentPresetIcon = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
     
     init() {
@@ -119,11 +120,7 @@ struct ClipHoldApp: App {
     
     
     var body: some Scene {
-        MenuBarExtra(
-            "Clip Hold", // <- titleKey
-            image: isClipboardMonitoringPaused ? "Menubar Icon Dimmed" : "Menubar Icon",
-            isInserted: menuBarExtraInsertionBinding
-        ) {
+        MenuBarExtra(isInserted: menuBarExtraInsertionBinding) {
             // --- 定型文セクション ---
             HStack {
                 Label("よく使う定型文", systemImage: "star")
@@ -440,6 +437,15 @@ struct ClipHoldApp: App {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q", modifiers: .command)
+        } label: {
+            if showCurrentPresetIcon,
+               !presetManager.presets.isEmpty,
+               let preset = presetManager.selectedPreset,
+               let iconImage = isClipboardMonitoringPaused ? iconGenerator.dimmedMiniIconCache[preset.id] : iconGenerator.miniIconCache[preset.id] {
+                Image(nsImage: iconImage)
+            } else {
+                Image(isClipboardMonitoringPaused ? "Menubar Icon Dimmed" : "Menubar Icon")
+            }
         }
         .environmentObject(clipboardManager)
         .environmentObject(standardPhraseManager)

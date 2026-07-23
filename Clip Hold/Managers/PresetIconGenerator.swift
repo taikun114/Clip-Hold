@@ -7,6 +7,7 @@ class PresetIconGenerator: ObservableObject {
     
     @Published private(set) var iconCache: [UUID: NSImage] = [:]
     @Published private(set) var miniIconCache: [UUID: NSImage] = [:]
+    @Published private(set) var dimmedMiniIconCache: [UUID: NSImage] = [:]
     @Published private(set) var bigIconCache: [UUID: NSImage] = [:] // New cache for big icons
     
     private var appearanceObserver: NSKeyValueObservation?
@@ -33,6 +34,9 @@ class PresetIconGenerator: ObservableObject {
             let miniImage = createMiniImage(for: preset)
             miniIconCache[preset.id] = miniImage
             
+            let dimmedMiniImage = createDimmedImage(from: miniImage)
+            dimmedMiniIconCache[preset.id] = dimmedMiniImage
+            
             let bigImage = createBigImage(for: preset)
             bigIconCache[preset.id] = bigImage
         }
@@ -52,6 +56,9 @@ class PresetIconGenerator: ObservableObject {
                 let bigImage = createBigImage(for: preset)
                 bigIconCache[preset.id] = bigImage
             }
+            if dimmedMiniIconCache[preset.id] == nil, let mini = miniIconCache[preset.id] {
+                dimmedMiniIconCache[preset.id] = createDimmedImage(from: mini)
+            }
             return cachedIcon
         }
         
@@ -60,6 +67,9 @@ class PresetIconGenerator: ObservableObject {
         
         let miniImage = createMiniImage(for: preset)
         miniIconCache[preset.id] = miniImage
+        
+        let dimmedMiniImage = createDimmedImage(from: miniImage)
+        dimmedMiniIconCache[preset.id] = dimmedMiniImage
         
         let bigImage = createBigImage(for: preset)
         bigIconCache[preset.id] = bigImage
@@ -74,6 +84,9 @@ class PresetIconGenerator: ObservableObject {
         let miniImage = createMiniImage(for: preset)
         miniIconCache[preset.id] = miniImage
         
+        let dimmedMiniImage = createDimmedImage(from: miniImage)
+        dimmedMiniIconCache[preset.id] = dimmedMiniImage
+        
         let bigImage = createBigImage(for: preset)
         bigIconCache[preset.id] = bigImage
         
@@ -83,6 +96,7 @@ class PresetIconGenerator: ObservableObject {
     func removeIcon(for presetId: UUID) {
         iconCache.removeValue(forKey: presetId)
         miniIconCache.removeValue(forKey: presetId)
+        dimmedMiniIconCache.removeValue(forKey: presetId)
         bigIconCache.removeValue(forKey: presetId) // Remove from big cache as well
         objectWillChange.send()
     }
@@ -90,6 +104,7 @@ class PresetIconGenerator: ObservableObject {
     func clearCache() {
         iconCache.removeAll()
         miniIconCache.removeAll()
+        dimmedMiniIconCache.removeAll()
         bigIconCache.removeAll() // Clear big cache as well
         objectWillChange.send()
     }
@@ -135,6 +150,15 @@ class PresetIconGenerator: ObservableObject {
             }
         }
         
+        image.unlockFocus()
+        return image
+    }
+    
+    private func createDimmedImage(from source: NSImage) -> NSImage {
+        let size = source.size
+        let image = NSImage(size: size)
+        image.lockFocus()
+        source.draw(in: NSRect(origin: .zero, size: size), from: .zero, operation: .sourceOver, fraction: 0.5)
         image.unlockFocus()
         return image
     }
