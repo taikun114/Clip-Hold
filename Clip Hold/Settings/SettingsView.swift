@@ -31,7 +31,29 @@ struct SettingsView: View {
                     .tag("developer")
             }
             .safeAreaInset(edge: .bottom) {
-                if #available(macOS 26, *) {
+                if #available(macOS 27, *) {
+                    Button(action: {
+                        selectedSection = "info"
+                    }) {
+                        HStack {
+                            Image(systemName: "info.circle")
+                                .font(.title3.weight(.semibold))
+                                .foregroundStyle(isWindowFocused ? (selectedSection == "info" ? Color.white : Color.accentColor) : Color.secondary.opacity(0.3))
+                            Text("情報")
+                                .fontWeight(.medium)
+                                .foregroundStyle(isWindowFocused ? (selectedSection == "info" ? Color.white : Color.primary) : Color.secondary.opacity(0.9))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(4)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(selectedSection == "info" ? (isWindowFocused ? Color.accentColor : Color.gray.opacity(0.1)) : Color.clear)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .padding(10)
+                } else if #available(macOS 26, *) {
                     Button(action: {
                         selectedSection = "info"
                     }) {
