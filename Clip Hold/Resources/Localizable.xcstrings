@@ -6758,6 +6758,40 @@
         }
       }
     },
+    "この項目をピン留めすると、現在ピン留めされている項目が置き換えられます。よろしいですか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie dieses Element anheften, wird das aktuell angeheftete Element ersetzt. Möchten Sie fortfahren?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinning this item will replace the currently pinned item. Are you sure you want to proceed?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al fijar este elemento se reemplazará el elemento fijado actualmente. ¿Estás seguro de que deseas continuar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'épinglage de cet élément remplacera l'élément actuellement épinglé. Voulez-vous vraiment continuer ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この項目をピン留めすると、現在ピン留めされている項目が置き換えられます。よろしいですか？"
+          }
+        }
+      }
+    },
     "コピー" : {
       "comment" : "コピーボタン。",
       "localizations" : {
@@ -9104,6 +9138,176 @@
         }
       }
     },
+    "ピン留め" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anheften"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fijar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Épingler"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピン留め"
+          }
+        }
+      }
+    },
+    "ピン留めされた項目はありません" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine angehefteten Elemente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pinned items"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay elementos fijados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun élément épinglé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピン留めされた項目はありません"
+          }
+        }
+      }
+    },
+    "ピン留めされた項目をコピーする" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angeheftetes Element kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy pinned item"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar elemento fijado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier l'élément épinglé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピン留めされた項目をコピーする"
+          }
+        }
+      }
+    },
+    "ピン留めを置き換え" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angeheftetes Element ersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace Pinned Item"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reemplazar elemento fijado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer l'élément épinglé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピン留めを置き換え"
+          }
+        }
+      }
+    },
+    "ピン留めを解除" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lösen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unpin"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desfijar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désépingler"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピン留めを解除"
+          }
+        }
+      }
+    },
     "ファイル1つあたりの最大容量を設定" : {
       "comment" : "コピー履歴設定の「各ファイルの最大容量」オプションでカスタムオプションを設定する画面に表示されるタイトルテキスト。",
       "localizations" : {
@@ -10395,6 +10599,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "メニューバーアイコンを隠す"
+          }
+        }
+      }
+    },
+    "メニューバーに、Clip Holdアイコンの代わりに現在選択されているプリセットのアイコンを表示します。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt anstelle des Clip Hold-Symbols das aktuell ausgewählte Voreinstellungssymbol in der Menüleiste an."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shows the currently selected preset icon in the menu bar instead of the Clip Hold icon."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra el icono del preajuste actualmente seleccionado en la barra de menú en lugar del icono de Clip Hold."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affiche l'icône du préréglage actuellement sélectionné dans la barre de menus au lieu de l'icône Clip Hold."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニューバーに、Clip Holdアイコンの代わりに現在選択されているプリセットのアイコンを表示します。"
           }
         }
       }
@@ -15334,6 +15572,40 @@
         }
       }
     },
+    "現在のプリセットアイコンを表示する" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelles Voreinstellungssymbol anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Current Preset Icon"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar icono del preajuste actual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher l'icône du préréglage actuel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のプリセットアイコンを表示する"
+          }
+        }
+      }
+    },
     "生成AIと開発" : {
       "comment" : "生成AIを使って開発したことを表すテキスト。",
       "localizations" : {
@@ -15855,6 +16127,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "編集…"
+          }
+        }
+      }
+    },
+    "置き換え" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reemplazar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "置き換え"
           }
         }
       }

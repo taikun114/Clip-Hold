@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/taikun114/UniversalSFSymbolsPicker.git",
       "state" : {
-        "revision" : "97ba1d4e00e05b05c1b3254df37371cd5d7ba8d2",
-        "version" : "1.0.0"
+        "revision" : "dc2d9d59c3f8ddf988a0482e323c7b95a1c2001c",
+        "version" : "1.0.1"
       }
     }
   ],

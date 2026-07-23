@@ -12,6 +12,26 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     @Published var qrCodeContent: String?
     @Published var sourceAppPath: String?
     
+    // ピン留め表示用の複製アイテムの場合、元のアイテムIDを保持
+    var originalPinnedItemID: UUID? = nil
+    
+    // ピン留めリスト最先頭表示用の複製アイテムを生成するメソッド
+    func createPinnedDuplicate() -> ClipboardItem {
+        let copy = ClipboardItem(
+            text: self.text,
+            date: self.date,
+            filePath: self.filePath,
+            fileSize: self.fileSize,
+            fileHash: self.fileHash,
+            qrCodeContent: self.qrCodeContent,
+            sourceAppPath: self.sourceAppPath
+        )
+        copy.richText = self.richText
+        copy.cachedThumbnailImage = self.cachedThumbnailImage
+        copy.originalPinnedItemID = self.id
+        return copy
+    }
+    
     // ファイルが画像かどうかを判断するヘルパープロパティ
     var isImage: Bool {
         guard let filePath = filePath else { return false }

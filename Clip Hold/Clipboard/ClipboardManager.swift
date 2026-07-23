@@ -14,6 +14,33 @@ class ClipboardManager: ObservableObject {
     // アプリケーション名のキャッシュ
     @Published var localizedAppNames: [String: String] = [:]
     
+    // ピン留めされた履歴アイテムのID
+    @Published var pinnedItemID: UUID? {
+        didSet {
+            if let pinnedItemID = pinnedItemID {
+                UserDefaults.standard.set(pinnedItemID.uuidString, forKey: "pinnedItemID")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "pinnedItemID")
+            }
+        }
+    }
+    
+    // ピン留めされた ClipboardItem オブジェクトを取得する算出プロパティ
+    var pinnedItem: ClipboardItem? {
+        guard let pinnedItemID = pinnedItemID else { return nil }
+        return clipboardHistory.first { $0.id == pinnedItemID }
+    }
+    
+    // アイテムをピン留めする
+    func pinItem(_ item: ClipboardItem) {
+        pinnedItemID = item.id
+    }
+    
+    // ピン留めを解除する
+    func unpinItem() {
+        pinnedItemID = nil
+    }
+    
     // History Window States
     @Published var historySelectedFilter: ItemFilter = .all
     @Published var historySelectedSort: ItemSort = .newest
@@ -109,6 +136,12 @@ class ClipboardManager: ObservableObject {
         
         // アプリ起動時にファイルハッシュが存在しない履歴アイテムに対してハッシュを計算
         calculateMissingFileHashesInHistory()
+        
+        // 保存されたピン留めアイテムIDをロード
+        if let pinnedIDString = UserDefaults.standard.string(forKey: "pinnedItemID"),
+           let pinnedUUID = UUID(uuidString: pinnedIDString) {
+            self.pinnedItemID = pinnedUUID
+        }
         
         loadClipboardHistory()
         
@@ -249,6 +282,9 @@ class ClipboardManager: ObservableObject {
             ChunkedHistoryManager.shared.deleteAllHistoryFromApp(sourceAppPath: sourceAppPath)
             
             // メモリ上の履歴から対象アイテムを一括削除
+            if let pinnedID = pinnedItemID, itemsToDelete.contains(where: { $0.id == pinnedID }) {
+                unpinItem()
+            }
             clipboardHistory.removeAll { $0.sourceAppPath == sourceAppPath }
             
             // UI更新のための通知

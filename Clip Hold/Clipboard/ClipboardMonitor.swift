@@ -113,7 +113,8 @@ extension ClipboardManager {
                     let hasRTFType = availableTypes.contains(.rtf) // RTFタイプのチェックを追加
                     let hasHTMLType = availableTypes.contains(.html) || availableTypes.contains(NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type"))
                     let hasPDFType = availableTypes.contains(.pdf) || availableTypes.contains(NSPasteboard.PasteboardType(rawValue: "Apple PDF pasteboard type"))
-                    let hasImageDataType = availableTypes.contains(.tiff) || availableTypes.contains(.png) || (pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage) != nil
+                    let imageUTIs = Set(NSImage.imageTypes)
+                    let hasImageDataType = availableTypes.contains(.tiff) || availableTypes.contains(.png) || !Set(availableTypes.map { $0.rawValue }).isDisjoint(with: imageUTIs)
                     let hasURLType = availableTypes.contains(.URL) || pasteboard.canReadItem(withDataConformingToTypes: [NSPasteboard.PasteboardType.URL.rawValue])
                     
                     // 2. 処理ロジックの決定
@@ -251,6 +252,7 @@ extension ClipboardManager {
                     // 4. リッチテキストデータをチェック (中高優先度)
                     if hasRTFType, let rtfString = pasteboard.string(forType: .rtf) {
                         print("DEBUG: checkPasteboard - RTF String detected: \(rtfString.prefix(50))...")
+                        
                         // RTFのプレーンテキスト表現も取得 (表示用)
                         let plainText = pasteboard.string(forType: .string) ?? rtfString // RTFからプレーンテキストを抽出できない場合は、RTF自体をプレーンテキストとして使用
                         

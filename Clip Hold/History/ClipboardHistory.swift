@@ -84,6 +84,9 @@ extension ClipboardManager {
     }
     
     func clearAllHistory() {
+        // ピン留めを解除
+        unpinItem()
+        
         // 関連するファイルをすべて削除
         for item in clipboardHistory {
             if let filePath = item.filePath {
@@ -102,6 +105,9 @@ extension ClipboardManager {
     }
     
     func deleteItem(id: UUID) {
+        if id == pinnedItemID {
+            unpinItem()
+        }
         if let index = clipboardHistory.firstIndex(where: { $0.id == id }) {
             let itemToDelete = clipboardHistory[index]
             if let filePath = itemToDelete.filePath {

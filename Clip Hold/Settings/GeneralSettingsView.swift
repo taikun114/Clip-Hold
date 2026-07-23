@@ -100,6 +100,7 @@ struct GeneralSettingsView: View {
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
     
+    @AppStorage("showCurrentPresetIcon") var showCurrentPresetIcon: Bool = false
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
     
     @State private var showingCustomMenuHistorySheet = false
@@ -371,6 +372,23 @@ struct GeneralSettingsView: View {
                     .pickerStyle(.menu)
                 }
                 .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("現在のプリセットアイコンを表示する")
+                        Text("メニューバーに、Clip Holdアイコンの代わりに現在選択されているプリセットのアイコンを表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $showCurrentPresetIcon) {
+                        Text("現在のプリセットアイコンを表示する")
+                        Text("メニューバーに、Clip Holdアイコンの代わりに現在選択されているプリセットのアイコンを表示します。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
                 HStack {
                     VStack(alignment: .leading) {
