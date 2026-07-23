@@ -33,9 +33,7 @@ struct HistoryWindowView: View {
     
     @State private var itemForNewPhrase: ClipboardItem? = nil
     
-    @State private var previousClipboardHistoryCount: Int = 0
-    
-    
+    @State private var displayLimit: Int = 100
     
     @State private var searchDebounceTask: Task<Void, Never>? = nil
     
@@ -75,19 +73,12 @@ struct HistoryWindowView: View {
     private func performUpdate(isIncrementalUpdate: Bool = false) {
         if !isIncrementalUpdate {
             isLoading = true
+            displayLimit = 100 // 新しい検索やフィルタの時は100件にリセット
             self.filteredHistory = []
             clipboardManager.filteredHistoryForShortcuts = []
         }
         
-        historyUpdateTask?.cancel()
-        
-        historyUpdateTask = Task { @MainActor in
-            guard !Task.isCancelled else {
-                isLoading = false
-                return
-            }
-            
-            let historyCopy = clipboardManager.clipboardHistory
+        let historyCopy = clipboardManager.clipboardHistory
             
             let filtered = historyCopy.filter { item in
                 // App filter
@@ -161,16 +152,22 @@ struct HistoryWindowView: View {
                 }
             }
             
-            var finalHistory = sorted
+            // パフォーマンスのため、UIに表示するアイテム数を制限し、ページネーションを行う
+            var finalHistory = Array(sorted.prefix(displayLimit))
             if let pinnedID = clipboardManager.pinnedItemID,
                let pinnedItem = sorted.first(where: { $0.id == pinnedID }) {
                 finalHistory.insert(pinnedItem.createPinnedDuplicate(), at: 0)
             }
             
-            self.filteredHistory = finalHistory
+            if reduceMotion {
+                self.filteredHistory = finalHistory
+            } else {
+                withAnimation {
+                    self.filteredHistory = finalHistory
+                }
+            }
             clipboardManager.filteredHistoryForShortcuts = finalHistory
             isLoading = false
-        }
     }
     
     var body: some View {
@@ -202,7 +199,6 @@ struct HistoryWindowView: View {
                         showQRCodeSheet: $showQRCodeSheet,
                         selectedItemForQRCode: $selectedItemForQRCode,
                         itemForNewPhrase: $itemForNewPhrase,
-                        previousClipboardHistoryCount: $previousClipboardHistoryCount,
                         hideNumbersInHistoryWindow: hideNumbersInHistoryWindow,
                         closeWindowOnDoubleClickInHistoryWindow: closeWindowOnDoubleClickInHistoryWindow,
                         scrollToTopOnUpdate: scrollToTopOnUpdate,
@@ -214,6 +210,12 @@ struct HistoryWindowView: View {
                             // 内部コピーフラグをtrueに設定
                             clipboardManager.isPerformingInternalCopy = true
                             ClipboardManager.shared.copyItemToClipboard(item)
+                        },
+                        onLoadMore: {
+                            if displayLimit < clipboardManager.clipboardHistory.count {
+                                displayLimit += 100
+                                performUpdate(isIncrementalUpdate: true)
+                            }
                         }
                     )
                 }
@@ -226,6 +228,14 @@ struct HistoryWindowView: View {
                 .onDisappear {
                     currentCopyConfirmationTask?.cancel()
                 }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willCloseNotification)) { notification in
+            // ウィンドウが閉じられたときに表示上限をリセットしてメモリを解放
+            // 右クリックメニューなどが閉じられた時にも発火してしまうため、識別子を確認する
+            if let window = notification.object as? NSWindow, window.identifier?.rawValue == "HistoryWindow" {
+                displayLimit = 100
+                performUpdate(isIncrementalUpdate: true)
+            }
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
         .onChange(of: searchText) { _, _ in
@@ -246,15 +256,6 @@ struct HistoryWindowView: View {
             }
         }
         .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
-        .onChange(of: clipboardManager.filteredHistoryForShortcuts) { _, newValue in
-            if reduceMotion {
-                filteredHistory = newValue ?? []
-            } else {
-                withAnimation {
-                    filteredHistory = newValue ?? []
-                }
-            }
-        }
         .onAppear {
             clipboardManager.filteredHistoryForShortcuts = []
             performUpdate()

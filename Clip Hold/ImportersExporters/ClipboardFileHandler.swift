@@ -432,6 +432,7 @@ extension ClipboardManager {
         else if newItem.filePath == nil && existingItem.filePath == nil {
             // 両方ともリッチテキストの場合、リッチテキストの内容で比較
             if let newRichText = newItem.richText, let existingRichText = existingItem.richText {
+                if newRichText.utf8.count != existingRichText.utf8.count { return false }
                 return newRichText == existingRichText
             }
             // 片方だけがリッチテキストの場合、重複ではない
@@ -440,6 +441,7 @@ extension ClipboardManager {
             }
             // 両方ともリッチテキストでない（標準テキスト）場合、標準テキストの内容で比較
             else {
+                if newItem.text.utf8.count != existingItem.text.utf8.count { return false }
                 return newItem.text == existingItem.text
             }
         }

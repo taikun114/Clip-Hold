@@ -5,15 +5,19 @@ import UniformTypeIdentifiers
 import Quartz
 import QuickLookThumbnailing
 
+class RowIconStore {
+    var views: [UUID: NSView] = [:]
+}
+
 // アイコンのNSViewへの参照を親に渡すためのヘルパー
 private struct IconViewAccessor: NSViewRepresentable {
     let id: UUID
-    @Binding var store: [UUID: NSView]
+    let store: RowIconStore
     
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
-            self.store[id] = view
+            self.store.views[id] = view
         }
         return view
     }
@@ -48,8 +52,8 @@ struct HistoryItemRow<MenuContent: View>: View {
     @Environment(\.colorScheme) var colorScheme
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     
-    // アイコンビューの参照を格納する辞書へのBinding
-    @Binding var rowIconViews: [UUID: NSView]
+    // アイコンビューの参照を格納するクラス
+    let rowIconStore: RowIconStore
     
     let showCharacterCount: Bool
     @EnvironmentObject var dateReloader: DateReloader
@@ -66,7 +70,7 @@ struct HistoryItemRow<MenuContent: View>: View {
     init(item: ClipboardItem,
          index: Int,
          hideNumbers: Bool,
-         rowIconViews: Binding<[UUID: NSView]>,
+         rowIconStore: RowIconStore,
          showCharacterCount: Bool,
          lineNumberTextWidth: CGFloat?,
          trailingPaddingForLineNumber: CGFloat,
@@ -77,7 +81,7 @@ struct HistoryItemRow<MenuContent: View>: View {
         self.hideNumbers = hideNumbers
         self.lineNumberTextWidth = lineNumberTextWidth
         self.trailingPaddingForLineNumber = trailingPaddingForLineNumber
-        self._rowIconViews = rowIconViews
+        self.rowIconStore = rowIconStore
         self.showCharacterCount = showCharacterCount
         self.menuItems = menuItems
     }
@@ -144,11 +148,11 @@ struct HistoryItemRow<MenuContent: View>: View {
                                         .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
                                     alignment: .bottomLeading
                                 )
-                                .background(IconViewAccessor(id: item.id, store: $rowIconViews))
+                                .background(IconViewAccessor(id: item.id, store: rowIconStore))
                                 .help(appName) // ツールチップを追加
                         )
                     } else {
-                        return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: $rowIconViews)))
+                        return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: rowIconStore)))
                     }
                 } else {
                     // 既存のアイコン
@@ -235,11 +239,11 @@ struct HistoryItemRow<MenuContent: View>: View {
                                         .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
                                     alignment: .bottomLeading
                                 )
-                                .background(IconViewAccessor(id: item.id, store: $rowIconViews))
+                                .background(IconViewAccessor(id: item.id, store: rowIconStore))
                                 .help(appName) // ツールチップを追加
                         )
                     } else {
-                        return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: $rowIconViews)))
+                        return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: rowIconStore)))
                     }
                 }
             }()

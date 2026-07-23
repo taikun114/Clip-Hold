@@ -28,6 +28,8 @@ Notes
 
 ### Bug Fixes and Improvements
 - **Fix issue where the copy notification would not disappear when copying from the menu in the Standard Phrase window**
+- **Improve the performance of the History window**
+  - Implemented pagination, limiting the initial display to 100 items and loading additional history items as you scroll.
 - **Changes to the preset icon picker package**
   - Icon names are now displayed, and you can filter by specific categories using the category picker.
 

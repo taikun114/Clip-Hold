@@ -19,7 +19,9 @@ struct HistoryContentList: View {
     @Binding var showQRCodeSheet: Bool
     @Binding var selectedItemForQRCode: ClipboardItem?
     @Binding var itemForNewPhrase: ClipboardItem?
-    @Binding var previousClipboardHistoryCount: Int
+    
+    @State private var previousNewestItemID: UUID?
+    @State private var previousPinnedItemID: UUID?
     
     // State variables for the exclude app alert
     @State private var showingExcludeAppAlert = false
@@ -30,7 +32,7 @@ struct HistoryContentList: View {
     @State private var appToDeleteFrom: String?
     
     // 各行のアイコンのNSView参照を保存するためのState
-    @State private var rowIconViews: [UUID: NSView] = [:]
+    @State private var rowIconStore = RowIconStore()
     
     // State variable for the edit sheet
     @State private var showingEditSheet = false
@@ -68,6 +70,7 @@ struct HistoryContentList: View {
 
     
     var onCopyAction: (ClipboardItem) -> Void
+    var onLoadMore: () -> Void
     
     
     private func parseQRCode(from image: NSImage) -> String? {
@@ -167,7 +170,7 @@ struct HistoryContentList: View {
         if let filePath = currentItem.filePath {
             Button {
                 if let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController,
-                   let sourceView = rowIconViews[currentItem.id] {
+                   let sourceView = rowIconStore.views[currentItem.id] {
                     controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
                 }
             } label: {
@@ -257,7 +260,7 @@ struct HistoryContentList: View {
                                 item: item,
                                 index: filteredHistory.firstIndex(where: { $0.id == item.id }) ?? 0,
                                 hideNumbers: hideNumbersInHistoryWindow,
-                                rowIconViews: $rowIconViews,
+                                rowIconStore: rowIconStore,
                                 showCharacterCount: showCharacterCount,
                                 lineNumberTextWidth: lineNumberTextWidth,
                                 trailingPaddingForLineNumber: trailingPaddingForLineNumber,
@@ -265,6 +268,11 @@ struct HistoryContentList: View {
                                     historyMenuItems(for: item)
                                 }
                             )
+                            .onAppear {
+                                if let index = filteredHistory.firstIndex(where: { $0.id == item.id }), index == filteredHistory.count - 1 {
+                                    onLoadMore()
+                                }
+                            }
                             .environmentObject(clipboardManager)
                             .environmentObject(standardPhraseManager)
                             .environmentObject(presetManager)
@@ -286,7 +294,7 @@ struct HistoryContentList: View {
                         
                         // 保存しておいたアイコンのビューをアニメーションの開始点として指定する
                         if let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController,
-                           let sourceView = rowIconViews[selectedID] {
+                           let sourceView = rowIconStore.views[selectedID] {
                             controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
                         }
                         
@@ -310,7 +318,7 @@ struct HistoryContentList: View {
                         
                         // 選択が変更された場合も、正しいアイコンビューから再表示する
                         if let filePath = selectedItem.filePath,
-                           let sourceView = rowIconViews[newID] {
+                           let sourceView = rowIconStore.views[newID] {
                             controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
                         } else {
                             controller.hideQuickLook()
@@ -410,28 +418,35 @@ struct HistoryContentList: View {
                         return true
                     }
                     .onChange(of: filteredHistory) { _, newValue in
-                        // 不要になったrowIconViewsのエントリをクリーンアップする
-                        let newIDs = Set(newValue.map { $0.id })
-                        let oldIDs = Set(rowIconViews.keys)
-                        let unusedIDs = oldIDs.subtracting(newIDs)
-                        for id in unusedIDs {
-                            rowIconViews.removeValue(forKey: id)
+                        // 不要になったrowIconStore.viewsのエントリをクリーンアップする
+                        let currentIDs = Set(clipboardManager.clipboardHistory.map { $0.id })
+                        let oldIDs = Set(rowIconStore.views.keys)
+                        let idsToRemove = oldIDs.subtracting(currentIDs)
+                        for id in idsToRemove {
+                            rowIconStore.views.removeValue(forKey: id)
                         }
                         
                         // filteredHistory が更新され、かつscrollToTopOnUpdateがtrue、かつ検索中でない場合
-                        // さらに、元の履歴の数が変わった場合のみに限定する
-                        if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && newValue.count > previousClipboardHistoryCount {
+                        // さらに、履歴内で一番新しいアイテムのIDが変わった場合（＝新しくコピーされた場合）、
+                        // またはピン留めされたアイテムが変わった場合に限定する
+                        let newestItem = clipboardManager.clipboardHistory.max { $0.date < $1.date }
+                        let pinnedItemChanged = clipboardManager.pinnedItemID != previousPinnedItemID
+                        
+                        if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && (newestItem?.id != previousNewestItemID || pinnedItemChanged) {
                             if let firstId = newValue.first?.id {
-                                if reduceMotion {
-                                    scrollViewProxy.scrollTo(firstId, anchor: .top)
-                                } else {
-                                    withAnimation {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    if reduceMotion {
                                         scrollViewProxy.scrollTo(firstId, anchor: .top)
+                                    } else {
+                                        withAnimation {
+                                            scrollViewProxy.scrollTo(firstId, anchor: .top)
+                                        }
                                     }
                                 }
                             }
                         }
-                        previousClipboardHistoryCount = newValue.count // 現在の履歴数を保存
+                        previousNewestItemID = newestItem?.id // 現在の最新アイテムのIDを保存
+                        previousPinnedItemID = clipboardManager.pinnedItemID // 現在のピン留めアイテムのIDを保存
                     }
                     .alert(String(localized: "除外するアプリに追加"), isPresented: $showingExcludeAppAlert) {
                         Button("キャンセル", role: .cancel) { }
