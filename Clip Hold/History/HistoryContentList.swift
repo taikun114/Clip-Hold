@@ -183,7 +183,7 @@ struct HistoryContentList: View {
             Button {
                 clipboardManager.unpinItem()
             } label: {
-                Label("ピン留めを解除", systemImage: "pin.slash")
+                Label("ピン留めを解除", systemImage: "pin.slash").forceIconOnMacOS27()
             }
         } else {
             Button {
@@ -198,7 +198,7 @@ struct HistoryContentList: View {
                     }
                 }
             } label: {
-                Label("ピン留め", systemImage: "pin")
+                Label("ピン留め", systemImage: "pin").forceIconOnMacOS27()
             }
         }
         

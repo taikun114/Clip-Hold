@@ -122,11 +122,9 @@ struct ClipHoldApp: App {
     var body: some Scene {
         MenuBarExtra(isInserted: menuBarExtraInsertionBinding) {
             // --- 定型文セクション ---
-            HStack {
-                Label("よく使う定型文", systemImage: "star")
-                    .font(.headline)
-            }
-            .padding(.bottom, 5)
+            Label("よく使う定型文", systemImage: "star")
+                .font(.headline)
+                .labelStyle(.titleAndIcon)
             
             let phrasesToShow = presetManager.selectedPreset?.phrases ?? []
             if phrasesToShow.isEmpty {
@@ -155,7 +153,12 @@ struct ClipHoldApp: App {
                             }
                         }
                     } label: {
-                        HStack(spacing: 8) {
+                        Label {
+                            Text(displayText)
+                                .font(.body)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        } icon: {
                             // カラーコードアイコンの表示条件をチェック
                             if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
                                 Image(nsImage: clipboardManager.createColorIcon(color: color, size: CGSize(width: 16, height: 16)))
@@ -171,16 +174,9 @@ struct ClipHoldApp: App {
                                 }()
                                 
                                 Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 16, height: 16)
-                                    .foregroundStyle(.secondary)
                             }
-                            Text(displayText)
-                                .font(.body)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
                         }
+                        .labelStyle(.titleAndIcon)
                     }
                 }
             }
@@ -268,6 +264,7 @@ struct ClipHoldApp: App {
             // --- コピー履歴セクション ---
             Label("コピー履歴", systemImage: "clock")
                 .font(.headline)
+                .labelStyle(.titleAndIcon)
             if clipboardManager.clipboardHistory.isEmpty {
                 Text("履歴はありません")
             } else {
@@ -332,23 +329,18 @@ struct ClipHoldApp: App {
                             }
                         }
                     } label: {
-                        HStack(spacing: 8) {
+                        Label {
+                            Text(displayText)
+                                .font(.body)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        } icon: {
                             if item.originalPinnedItemID != nil {
                                 Image(systemName: "pin.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .padding(2)
-                                    .frame(width: 16, height: 16)
-                                    .foregroundStyle(.secondary)
                             } else if showColorCodeIcon, item.filePath == nil, let color = ColorCodeParser.parseColor(from: item.text) {
                                 Image(nsImage: clipboardManager.createColorIcon(color: color, size: CGSize(width: 16, height: 16)))
                             } else if item.isURL { // URLの場合
                                 Image(systemName: "paperclip")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .padding(4)
-                                    .frame(width: 16, height: 16)
-                                    .foregroundStyle(.secondary)
                             } else if let cachedImage = item.cachedThumbnailImage {
                                 Image(nsImage: cachedImage)
                                     .resizable()
@@ -369,44 +361,20 @@ struct ClipHoldApp: App {
                                     // リッチテキストの場合、richtext.pageアイコンを使用 (macOSバージョンによる分岐)
                                     if #available(macOS 15.0, *) {
                                         Image(systemName: "richtext.page")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .padding(4)
-                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                            .foregroundStyle(.secondary)
                                     } else {
                                         Image(systemName: "doc.richtext")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .padding(4)
-                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                            .foregroundStyle(.secondary)
                                     }
                                 } else {
                                     // 標準テキストの場合、text.pageアイコンを使用 (macOSバージョンによる分岐)
                                     if #available(macOS 15.0, *) {
                                         Image(systemName: "text.page")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .padding(4)
-                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                            .foregroundStyle(.secondary)
                                     } else {
                                         Image(systemName: "doc.plaintext")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .padding(4)
-                                            .frame(width: 16, height: 16) // メニューバーのアイコンサイズに合わせる
-                                            .foregroundStyle(.secondary)
                                     }
                                 }
                             }
-                            
-                            Text(displayText)
-                                .font(.body)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
                         }
+                        .labelStyle(.titleAndIcon)
                     }
                 }
             }

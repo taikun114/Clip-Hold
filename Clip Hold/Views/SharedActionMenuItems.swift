@@ -9,7 +9,7 @@ struct SharedCopyMenuItem: View {
     
     var body: some View {
         Button(action: action) {
-            Label("コピー", systemImage: "document.on.document")
+            Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
         }
     }
 }
@@ -34,7 +34,7 @@ struct SharedOpenLinkMenuItem: View {
             Button {
                 NSWorkspace.shared.open(url)
             } label: {
-                Label("リンクを開く", systemImage: "paperclip")
+                Label("リンクを開く", systemImage: "paperclip").forceIconOnMacOS27()
             }
         }
     }
@@ -46,7 +46,7 @@ struct SharedShowQRCodeMenuItem: View {
     
     var body: some View {
         Button(action: action) {
-            Label("QRコードを表示...", systemImage: "qrcode")
+            Label("QRコードを表示...", systemImage: "qrcode").forceIconOnMacOS27()
         }
     }
 }
@@ -57,7 +57,7 @@ struct SharedDeleteMenuItem: View {
     
     var body: some View {
         Button(role: .destructive, action: action) {
-            Label("削除...", systemImage: "trash")
+            Label("削除...", systemImage: "trash").forceIconOnMacOS27()
         }
     }
 }
