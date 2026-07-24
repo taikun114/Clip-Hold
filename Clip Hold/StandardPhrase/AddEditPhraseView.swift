@@ -165,40 +165,14 @@ struct AddEditPhraseView: View {
             
             // プリセット選択ピッカー (追加モードでのみ表示)
             if case .add = mode {
-                Picker("保存先のプリセット:", selection: $selectedPresetId) {
-                    if presetManager.presets.isEmpty {
-                        Text("プリセットがありません").tag(noPresetsUUID as UUID?)
-                    }
-                    ForEach(presetManager.presets) { preset in
-                        Label {
-                            Text(preset.truncatedDisplayName(maxLength: 50))
-                        } icon: {
-                            if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
-                                Image(nsImage: iconImage)
-                            } else {
-                                Image(systemName: "star.fill") // Fallback
-                            }
-                        }
-                        .tag(preset.id as UUID?)
-                    }
-                    Divider()
-                    Text("新規プリセット...").tag(newPresetUUID as UUID?)
-                }
-                .pickerStyle(.menu)
-                .labelStyle(.titleAndIcon)
-                .onChange(of: selectedPresetId) { _, newValue in
-                    // 新規プリセット...が選択された場合、シートを表示
-                    if newValue == newPresetUUID {
+                SharedPresetPicker(
+                    title: "保存先のプリセット:",
+                    selectedPresetId: $selectedPresetId,
+                    onNewPresetSelected: {
                         focusedField = nil
                         showingAddPresetSheet = true
-                        // ピッカーの選択を元に戻す
-                        if presetManager.presets.isEmpty {
-                            selectedPresetId = noPresetsUUID
-                        } else {
-                            selectedPresetId = presetManager.selectedPresetId
-                        }
                     }
-                }
+                )
                 .padding(.top, 10)
             }
             

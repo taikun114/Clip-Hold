@@ -97,9 +97,7 @@ struct HistoryContentList: View {
             currentCopyConfirmationTask = Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                 guard !Task.isCancelled else { return }
-                withAnimation {
-                    showCopyConfirmation = false
-                }
+                showCopyConfirmation = false
             }
         }
         
@@ -112,13 +110,7 @@ struct HistoryContentList: View {
                 currentCopyConfirmationTask = Task { @MainActor in
                     try? await Task.sleep(nanoseconds: 2_000_000_000)
                     guard !Task.isCancelled else { return }
-                    if reduceMotion {
-                        showCopyConfirmation = false
-                    } else {
-                        withAnimation {
-                            showCopyConfirmation = false
-                        }
-                    }
+                    showCopyConfirmation = false
                 }
             } label: {
                 Text("標準テキストとしてコピー")
@@ -140,13 +132,7 @@ struct HistoryContentList: View {
                 currentCopyConfirmationTask = Task { @MainActor in
                     try? await Task.sleep(nanoseconds: 2_000_000_000)
                     guard !Task.isCancelled else { return }
-                    if reduceMotion {
-                        showCopyConfirmation = false
-                    } else {
-                        withAnimation {
-                            showCopyConfirmation = false
-                        }
-                    }
+                    showCopyConfirmation = false
                 }
             } label: {
                 Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
@@ -244,14 +230,7 @@ struct HistoryContentList: View {
     var body: some View {
         ZStack {
             if filteredHistory.isEmpty && !isLoading {
-                VStack {
-                    Spacer()
-                    Text("履歴はありません")
-                        .foregroundStyle(.secondary)
-                        .font(.title2)
-                        .padding(.bottom, 20)
-                    Spacer()
-                }
+                SharedEmptyListView(message: "履歴はありません")
             } else {
                 ScrollViewReader { scrollViewProxy in
                     Table(filteredHistory, selection: $selectedItemID) {
@@ -344,13 +323,7 @@ struct HistoryContentList: View {
                             currentCopyConfirmationTask = Task { @MainActor in
                                 try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
                                 guard !Task.isCancelled else { return }
-                                if reduceMotion {
-                                    showCopyConfirmation = false
-                                } else {
-                                    withAnimation {
-                                        showCopyConfirmation = false
-                                    }
-                                }
+                                showCopyConfirmation = false
                             }
                             if closeWindowOnDoubleClickInHistoryWindow {
                                 dismiss()
@@ -370,13 +343,7 @@ struct HistoryContentList: View {
                                 currentCopyConfirmationTask = Task { @MainActor in
                                     try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
                                     guard !Task.isCancelled else { return }
-                                    if reduceMotion {
-                                        showCopyConfirmation = false
-                                    } else {
-                                        withAnimation {
-                                            showCopyConfirmation = false
-                                        }
-                                    }
+                                    showCopyConfirmation = false
                                 }
                             }, isSheet: true)
                         }
@@ -399,13 +366,7 @@ struct HistoryContentList: View {
                                         currentCopyConfirmationTask = Task { @MainActor in
                                             try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒後に非表示
                                             guard !Task.isCancelled else { return }
-                                            if reduceMotion {
-                                                showCopyConfirmation = false
-                                            } else {
-                                                withAnimation {
-                                                    showCopyConfirmation = false
-                                                }
-                                            }
+                                            showCopyConfirmation = false
                                         }
                                     } else {
                                         print("QR code not found.")
@@ -506,11 +467,7 @@ struct HistoryContentList: View {
                 } // ScrollViewReaderの終わり
             }
             if isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .scaleEffect(1.5)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.clear)
+                SharedLoadingView()
             }
         }
     }

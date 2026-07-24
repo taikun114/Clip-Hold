@@ -7282,42 +7282,6 @@
         }
       }
     },
-    "シンボルを検索" : {
-      "comment" : "プリセットアイコンを選択する画面にある検索ボックスのサンフルテキスト。",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Symbole suchen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search Symbols"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Buscar símbolos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rechercher des symboles"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "シンボルを検索"
-          }
-        }
-      }
-    },
     "スキップ" : {
       "comment" : "プリセットと定型文のインポート時に、既に登録されたものと同じ項目があった場合に、追加をスキップするオプション名。",
       "localizations" : {
@@ -10249,76 +10213,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "プリセット名"
-          }
-        }
-      }
-    },
-    "プリセット名を入力" : {
-      "comment" : "プリセットの追加編集画面にあるプリセット名入力欄のサンプルテキスト。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preset-Namen eingeben"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter Preset Name"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Introducir nombre del preajuste"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entrez le nom du préréglage"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プリセット名を入力"
-          }
-        }
-      }
-    },
-    "プリセット名を編集" : {
-      "comment" : "プリセットの編集画面に表示されるタイトルテキスト。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Preset-Namen bearbeiten"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Preset Name"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editar nombre del preajuste"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifier le nom du préréglage"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プリセット名を編集"
           }
         }
       }
@@ -14938,41 +14832,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新規プリセットの作成"
-          }
-        }
-      }
-    },
-    "新規プリセットを作成" : {
-      "comment" : "プリセットインポート画面で新たなプリセットを追加するボタン名。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein neues Preset erstellen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Create a New Preset"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Crear un nuevo preajuste"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Créer un nouveau préréglage"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "新規プリセットを作成"
           }
         }
       }

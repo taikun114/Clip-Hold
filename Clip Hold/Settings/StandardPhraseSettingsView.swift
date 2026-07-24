@@ -32,9 +32,6 @@ private struct PresetSettingsSection: View {
     
     @State private var selectedPresetId: UUID? = nil
     @State private var showingAddPresetSheet = false
-    @State private var newPresetName = ""
-    @State private var newPresetIcon = "list.bullet.rectangle.portrait"
-    @State private var newPresetColor = "accent"
     @State private var editingPreset: StandardPhrasePreset?
     @State private var presetToDelete: StandardPhrasePreset?
     @State private var showingDeletePresetConfirmation = false
@@ -96,67 +93,38 @@ private struct PresetSettingsSection: View {
             .padding(.bottom, 24)
             .contextMenu(forSelectionType: UUID.self) { selection in
                 if let selectedId = selection.first {
-                    Button {
+                    SharedEditMenuItem {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             editingPreset = preset
-                            if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
-                                newPresetName = preset.displayName
-                            } else {
-                                newPresetName = preset.name
-                            }
-                            newPresetIcon = preset.icon
-                            newPresetColor = preset.color
                         }
-                    } label: { Label("編集...", systemImage: "pencil") }
-                    Button {
+                    }
+                    SharedDuplicateMenuItem {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             presetManager.duplicatePreset(preset)
                         }
-                    } label: { Label("複製", systemImage: "plus.square.on.square") }
+                    }
                     Divider()
-                    Button(role: .destructive) {
+                    SharedDeleteMenuItem {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             presetToDelete = preset
                             showingDeletePresetConfirmation = true
                         }
-                    } label: { Label("削除...", systemImage: "trash") }
+                    }
                 }
             } primaryAction: { selection in
                 if let selectedId = selection.first {
                     if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
-                        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
-                            newPresetName = preset.displayName
-                        } else {
-                            newPresetName = preset.name
-                        }
-                        newPresetIcon = preset.icon
-                        newPresetColor = preset.color
                     }
                 }
             }
             .overlay(alignment: .bottom) { bottomToolbar }
         }
-        .sheet(isPresented: $showingAddPresetSheet) { addPresetSheet }
+        .sheet(isPresented: $showingAddPresetSheet) {
+            AddEditPresetView(isSheet: true, editingPreset: nil)
+        }
         .sheet(item: $editingPreset) { preset in
-            PresetNameSheet(
-                name: $newPresetName,
-                icon: $newPresetIcon,
-                color: $newPresetColor,
-                editingPreset: preset,
-                title: String(localized: "プリセット名を編集")
-            ) { customColor in
-                updatePreset(preset, newName: newPresetName, newIcon: newPresetIcon, newColor: newPresetColor, customColor: customColor)
-                newPresetName = ""
-                newPresetIcon = "list.bullet.rectangle.portrait"
-                newPresetColor = "accent"
-                editingPreset = nil // シートを閉じる
-            } onCancel: {
-                newPresetName = ""
-                newPresetIcon = "list.bullet.rectangle.portrait"
-                newPresetColor = "accent"
-                editingPreset = nil // シートを閉じる
-            }
+            AddEditPresetView(isSheet: true, editingPreset: preset)
         }
         .alert("プリセットの削除", isPresented: $showingDeletePresetConfirmation) {
             Button("削除", role: .destructive) {
@@ -221,13 +189,6 @@ private struct PresetSettingsSection: View {
                 Button(action: {
                     if let selectedId = selectedPresetId, let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
-                        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
-                            newPresetName = preset.displayName
-                        } else {
-                            newPresetName = preset.name
-                        }
-                        newPresetIcon = preset.icon
-                        newPresetColor = preset.color
                     }
                 }) {
                     Image(systemName: "pencil")
@@ -251,45 +212,8 @@ private struct PresetSettingsSection: View {
             .padding(.horizontal, 4)
     }
     
-    private var addPresetSheet: some View {
-        PresetNameSheet(
-            name: $newPresetName,
-            icon: $newPresetIcon,
-            color: $newPresetColor,
-            title: String(localized: "プリセット名を入力")
-        ) { customColor in
-            addPreset(name: newPresetName, icon: newPresetIcon, color: newPresetColor, customColor: customColor)
-            newPresetName = ""
-            newPresetIcon = "list.bullet.rectangle.portrait"
-            newPresetColor = "accent"
-            showingAddPresetSheet = false
-        } onCancel: {
-            showingAddPresetSheet = false
-            newPresetName = ""
-            newPresetIcon = "list.bullet.rectangle.portrait"
-            newPresetColor = "accent"
-        }
-    }
-    
-    
-    
-    
-    
     private func isDefaultPreset(id: UUID?) -> Bool {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
-    }
-    
-    private func addPreset(name: String, icon: String, color: String, customColor: PresetCustomColor?) {
-        presetManager.addPreset(name: name, icon: icon, color: color, customColor: customColor)
-    }
-    
-    private func updatePreset(_ preset: StandardPhrasePreset, newName: String, newIcon: String, newColor: String, customColor: PresetCustomColor?) {
-        var updatedPreset = preset
-        updatedPreset.name = newName
-        updatedPreset.icon = newIcon
-        updatedPreset.color = newColor
-        updatedPreset.customColor = customColor
-        presetManager.updatePreset(updatedPreset)
     }
     
     private func deletePreset(id: UUID) {
@@ -698,9 +622,6 @@ private struct PhraseSettingsSection: View {
     @State private var showingDeleteConfirmation = false
     @State private var showingClearAllPhrasesConfirmation = false
     @State private var showingAddPresetSheet = false
-    @State private var newPresetName = ""
-    @State private var newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
-    @State private var newPresetColorForPhraseSection = "accent"
     @State private var showingMoveSheet = false
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
@@ -763,7 +684,7 @@ private struct PhraseSettingsSection: View {
         }
         .sheet(isPresented: $showingAddPhraseSheet) { addSheet }
         .sheet(item: $selectedPhrase) { phrase in editSheet(for: phrase) }
-        .sheet(isPresented: $showingAddPresetSheet) { addPresetSheet }
+        .sheet(isPresented: $showingAddPresetSheet) { AddEditPresetView(isSheet: true, editingPreset: nil) }
         .sheet(isPresented: $showingMoveSheet) {
             if let sourceId = presetManager.selectedPresetId {
                 MovePhrasePresetSelectionSheet(presetManager: StandardPhrasePresetManager.shared, sourcePresetId: sourceId, selectedPresetId: $destinationPresetId) {
@@ -794,80 +715,26 @@ private struct PhraseSettingsSection: View {
     }
     
     private var presetPicker: some View {
-        Picker("", selection: Binding(
-            get: {
-                // プリセットが空の場合、特別なUUIDを返す
-                if presetManager.presets.isEmpty {
-                    return UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
-                }
-                return presetManager.selectedPresetId ?? UUID()
-            },
-            set: { newValue in
-                let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-                
-                // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
-                if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
-                    // プリセットがない場合は何もしない
-                    // 選択を元に戻す
-                    if let firstPreset = presetManager.presets.first {
-                        presetManager.selectedPresetId = firstPreset.id
-                    } else {
-                        // まだプリセットがない場合はnilのまま
-                        presetManager.selectedPresetId = nil
-                    }
-                } else if newValue == newPresetUUID {
-                    showingAddPresetSheet = true
-                } else if presetManager.presets.contains(where: { $0.id == newValue }) {
-                    presetManager.selectedPresetId = newValue
-                    presetManager.saveSelectedPresetId()
-                }
-            }
-        )) {
-            ForEach(presetManager.presets) { preset in
-                Label {
-                    Text(preset.truncatedDisplayName(maxLength: 50))
-                } icon: {
-                    if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
-                        Image(nsImage: iconImage)
-                    } else {
-                        Image(systemName: "star.fill") // Fallback
+        SharedPresetPicker(
+            title: "",
+            selectedPresetId: Binding(
+                get: { presetManager.selectedPresetId },
+                set: { newValue in
+                    if let newValue = newValue {
+                        presetManager.selectedPresetId = newValue
+                        presetManager.saveSelectedPresetId()
                     }
                 }
-                .tag(preset.id)
+            ),
+            onNewPresetSelected: {
+                showingAddPresetSheet = true
             }
-            
-            // プリセットがない場合の項目
-            if presetManager.presets.isEmpty {
-                Text("プリセットがありません")
-                    .tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!)
-            }
-            
-            Divider()
-            Text("新規プリセット...").tag(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!)
-        }
+        )
         .pickerStyle(.menu)
-        .labelStyle(.titleAndIcon)
+        .labelsHidden()
     }
     
-    private var addPresetSheet: some View {
-        PresetNameSheet(
-            name: $newPresetName,
-            icon: $newPresetIconForPhraseSection,
-            color: $newPresetColorForPhraseSection,
-            title: String(localized: "プリセット名を入力")
-        ) { customColor in
-            addPreset(name: newPresetName, icon: newPresetIconForPhraseSection, color: newPresetColorForPhraseSection, customColor: customColor)
-            newPresetName = ""
-            newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
-            newPresetColorForPhraseSection = "accent"
-            showingAddPresetSheet = false
-        } onCancel: {
-            showingAddPresetSheet = false
-            newPresetName = ""
-            newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
-            newPresetColorForPhraseSection = "accent"
-        }
-    }
+
     
     private var bottomToolbar: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -943,38 +810,30 @@ private struct PhraseSettingsSection: View {
     @ViewBuilder
     private func contextMenuItems(for selection: Set<UUID>) -> some View {
         if !selection.isEmpty {
-            Button {
+            SharedEditMenuItem {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     selectedPhrase = phrase
                 }
-            } label: {
-                Label("編集...", systemImage: "pencil")
             }
-            Button {
+            SharedMoveMenuItem {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     phraseToMove = phrase
                     showingMoveSheet = true
                 }
-            } label: {
-                Label("別のプリセットに移動...", systemImage: "folder")
             }
-            Button {
+            SharedDuplicateMenuItem {
                 if let id = selection.first,
                    let phrase = currentPhrases.first(where: { $0.id == id }),
                    let selectedPreset = presetManager.selectedPreset {
                     presetManager.duplicate(phrase: phrase, in: selectedPreset)
                 }
-            } label: {
-                Label("複製", systemImage: "plus.square.on.square")
             }
             Divider()
-            Button(role: .destructive) {
+            SharedDeleteMenuItem {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     phraseToDelete = phrase
                     showingDeleteConfirmation = true
                 }
-            } label: {
-                Label("削除...", systemImage: "trash")
             }
         }
     }
@@ -1046,9 +905,7 @@ private struct PhraseSettingsSection: View {
         presetManager.updatePreset(p)
     }
     
-    private func addPreset(name: String, icon: String, color: String, customColor: PresetCustomColor?) {
-        presetManager.addPreset(name: name, icon: icon, color: color, customColor: customColor)
-    }
+
 }
 
 // MARK: - PhraseManagementSection

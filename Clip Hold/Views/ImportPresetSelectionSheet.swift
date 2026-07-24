@@ -67,28 +67,18 @@ struct ImportPresetSelectionSheet: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     
-                    Picker("プリセットを選択", selection: $selectedPresetId) {
-                        ForEach(presetManager.presets) { preset in
-                            Label {
-                                Text(preset.truncatedDisplayName(maxLength: 50))
-                            } icon: {
-                                if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
-                                    Image(nsImage: iconImage)
-                                } else {
-                                    Image(systemName: "star.fill") // Fallback
-                                }
+                    SharedPresetPicker(
+                        title: "プリセットを選択",
+                        selectedPresetId: $selectedPresetId,
+                        onNewPresetSelected: {
+                            // 新規プリセット作成ビューに切り替え
+                            withAnimation {
+                                showCreatePresetView = true
                             }
-                            .tag(preset.id as UUID?)
                         }
-                        
-                        Divider()
-                        
-                        Text("新規プリセットを作成")
-                            .tag(nil as UUID?)
-                    }
+                    )
                     .pickerStyle(.menu)
                     .labelsHidden()
-                    .labelStyle(.titleAndIcon)
                     
                     Spacer()
                     
@@ -101,21 +91,14 @@ struct ImportPresetSelectionSheet: View {
                         
                         Spacer()
                         
-                        Button(selectedPresetId == nil ? "次へ" : "インポート") {
-                            // 新規プリセットを作成するかどうかを判断
-                            if selectedPresetId == nil {
-                                // 新規プリセット作成ビューに切り替え
-                                withAnimation {
-                                    showCreatePresetView = true
-                                }
-                            } else {
-                                // 既存のプリセットを使用
-                                onConfirm(false)
-                                dismiss()
-                            }
+                        Button("インポート") {
+                            // 既存のプリセットを使用
+                            onConfirm(false)
+                            dismiss()
                         }
                         .keyboardShortcut(.defaultAction)
                         .controlSize(.large)
+                        .disabled(selectedPresetId == nil || selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
                     }
                 }
                 .padding()

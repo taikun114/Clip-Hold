@@ -61,3 +61,36 @@ struct SharedDeleteMenuItem: View {
         }
     }
 }
+
+/// 項目を編集するメニュー項目
+struct SharedEditMenuItem: View {
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Label("編集...", systemImage: "pencil").forceIconOnMacOS27()
+        }
+    }
+}
+
+/// 項目を複製するメニュー項目
+struct SharedDuplicateMenuItem: View {
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Label("複製", systemImage: "plus.square.on.square").forceIconOnMacOS27()
+        }
+    }
+}
+
+/// 項目を別の場所に移動するメニュー項目
+struct SharedMoveMenuItem: View {
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Label("別のプリセットに移動...", systemImage: "folder").forceIconOnMacOS27()
+        }
+    }
+}

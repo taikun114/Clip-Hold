@@ -116,9 +116,7 @@ struct StandardPhraseWindowView: View {
             currentCopyConfirmationTask = Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                 guard !Task.isCancelled else { return }
-                withAnimation {
-                    showCopyConfirmation = false
-                }
+                showCopyConfirmation = false
             }
         }
         
@@ -133,25 +131,19 @@ struct StandardPhraseWindowView: View {
         
         Divider()
         
-        Button {
+        SharedEditMenuItem {
             phraseToEdit = currentPhrase
-        } label: {
-            Label("編集...", systemImage: "pencil")
         }
         
-        Button {
+        SharedMoveMenuItem {
             phraseToMove = currentPhrase
             showingMoveSheet = true
-        } label: {
-            Label("別のプリセットに移動...", systemImage: "folder")
         }
         
-        Button {
+        SharedDuplicateMenuItem {
             if let selectedPreset = presetManager.selectedPreset {
                 presetManager.duplicate(phrase: currentPhrase, in: selectedPreset)
             }
-        } label: {
-            Label("複製", systemImage: "plus.square.on.square")
         }
         
         SharedShowQRCodeMenuItem {
@@ -270,73 +262,29 @@ struct StandardPhraseWindowView: View {
             ZStack { // メインコンテンツを囲むZStack
                 VStack(spacing: 0) {
                     HStack {
-                        TextField(
-                            "定型文を検索",
-                            text: $searchText
-                        )
-                        .textFieldStyle(.plain)
-                        .font(.title3)
-                        .padding(.vertical, 8)
-                        .padding(.leading, 30)
-                        .padding(.trailing, 10)
-                        .background(Color.primary.opacity(colorSchemeContrast == .increased ? 0.05 : 0.1))
-                        .cornerRadius(10)
-                        .controlSize(.large)
-                        .focused($isSearchFieldFocused)
-                        .overlay(
-                            HStack {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundStyle(.secondary)
-                                    .padding(.leading, 8)
-                                    .offset(y: -1.0)
-                                Spacer()
-                                if !searchText.isEmpty {
-                                    Button(action: {
-                                        searchText = ""
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    .buttonStyle(BorderlessButtonStyle())
-                                    .padding(.trailing, 8)
-                                }
-                            }
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.primary, lineWidth: 1)
-                                .opacity(colorSchemeContrast == .increased ? 1 : 0)
+                        SharedSearchField(
+                            placeholder: "定型文を検索",
+                            searchText: $searchText,
+                            isSearchFieldFocused: $isSearchFieldFocused
                         )
                         
                         // プリセット選択メニューを追加
                         Menu {
-                            Picker("プリセット", selection: $presetManager.selectedPresetId) {
-                                ForEach(presetManager.presets) { preset in
-                                    Label {
-                                        Text(preset.truncatedDisplayName(maxLength: 50))
-                                    } icon: {
-                                        if let iconImage = iconGenerator.iconCache[preset.id] {
-                                            Image(nsImage: iconImage)
-                                        } else {
-                                            Image(systemName: "star.fill") // Fallback
+                            SharedPresetMenuContent(
+                                title: "プリセット",
+                                selectedPresetId: Binding(
+                                    get: { presetManager.selectedPresetId },
+                                    set: { newValue in
+                                        if let newValue = newValue {
+                                            presetManager.selectedPresetId = newValue
+                                            presetManager.saveSelectedPresetId()
                                         }
                                     }
-                                    .tag(preset.id as UUID?)
+                                ),
+                                onNewPresetAction: {
+                                    showingAddPresetSheet = true
                                 }
-                                
-                                // プリセットがない場合の項目
-                                if presetManager.presets.isEmpty {
-                                    Text(String(localized: "プリセットがありません")).tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
-                                }
-                            }
-                            .pickerStyle(.inline)
-                            .labelStyle(.titleAndIcon)
-                            
-                            Divider()
-                            
-                            Button("新規プリセット...") {
-                                showingAddPresetSheet = true
-                            }
+                            )
                         } label: {
                             if let selectedPreset = presetManager.selectedPreset,
                                let icon = iconGenerator.iconCache[selectedPreset.id] {
@@ -414,14 +362,7 @@ struct StandardPhraseWindowView: View {
                     
                     ZStack {
                         if filteredPhrases.isEmpty && !isLoading {
-                            VStack { // VStackで囲み、Spacerで中央に配置
-                                Spacer()
-                                Text("定型文はありません")
-                                    .foregroundStyle(.secondary)
-                                    .font(.title2)
-                                    .padding(.bottom, 20)
-                                Spacer()
-                            }
+                                SharedEmptyListView(message: "定型文はありません")
                         } else {
                             ScrollViewReader { proxy in
                                 List(selection: $selectedPhraseID) {
@@ -490,9 +431,7 @@ struct StandardPhraseWindowView: View {
                                     currentCopyConfirmationTask = Task { @MainActor in
                                         try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
                                         guard !Task.isCancelled else { return }
-                                        withAnimation {
-                                            showCopyConfirmation = false
-                                        }
+                                        showCopyConfirmation = false
                                     }
                                     if closeWindowOnDoubleClickInStandardPhrasesWindow {
                                         dismiss()
@@ -502,46 +441,14 @@ struct StandardPhraseWindowView: View {
                         }
                         
                         if isLoading {
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                                .scaleEffect(1.5)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(Color.clear)
+                            SharedLoadingView()
                         }
                     }
                 }
             } // メインコンテンツを囲むZStackの終わり
             
             // コピー確認メッセージ (元の場所で、このZStackの直下に配置)
-            VStack {
-                Spacer() // 下部に寄せる
-                if showCopyConfirmation {
-                    ZStack { // グラデーションとテキストを重ねるZStack
-                        LinearGradient(gradient: Gradient(colors: [Color.black.opacity(0.0), Color.black.opacity(0.25)]), startPoint: .top, endPoint: .bottom)
-                            .frame(height: 60)
-                            .frame(maxWidth: .infinity) // 横幅を最大に
-                        
-                        Text("コピーしました！")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 0)
-                            .padding(.top, 15)
-                    }
-                    .frame(maxWidth: .infinity) // ZStack自体も横幅を最大に
-                    .offset(y: 1) // 下にぴったりとくっつくように微調整
-                    .transition(.opacity) // フェードイン/アウト
-                    .onAppear {
-                        // onAppearからはタイマー設定ロジックを削除。
-                        // ここは単にビューの出現アニメーションに使用
-                    }
-                    .onDisappear {
-                        // ビューが非表示になる際にタスクをキャンセル (念のため)
-                        currentCopyConfirmationTask?.cancel()
-                    }
-                }
-            }
-            .animation(.easeOut(duration: 0.1), value: showCopyConfirmation)
-            .allowsHitTesting(false) // クリックイベントを透過させる
+            SharedCopyConfirmationView(showCopyConfirmation: showCopyConfirmation)
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation) {
@@ -583,9 +490,7 @@ struct StandardPhraseWindowView: View {
                     currentCopyConfirmationTask = Task { @MainActor in
                         try? await Task.sleep(nanoseconds: 2_000_000_000)
                         guard !Task.isCancelled else { return }
-                        withAnimation {
-                            showCopyConfirmation = false
-                        }
+                        showCopyConfirmation = false
                     }
                 }, isSheet: true)
             }

@@ -185,60 +185,23 @@ struct ClipHoldApp: App {
             
             // プリセット選択メニュー
             Menu {
-                Picker("プリセット", selection: Binding(
-                    get: {
-                        // プリセットが空の場合、特別なUUIDを返す
-                        if presetManager.presets.isEmpty {
-                            return UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
-                        }
-                        return presetManager.selectedPresetId
-                    },
-                    set: { (newValue: UUID?) in
-                        // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
-                        if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
-                            // プリセットがない場合は何もしない
-                            // 選択を元に戻す
-                            if let firstPreset = presetManager.presets.first {
-                                presetManager.selectedPresetId = firstPreset.id
-                            } else {
-                                // まだプリセットがない場合はnilのまま
-                                presetManager.selectedPresetId = nil
-                            }
-                        } else {
-                            presetManager.selectedPresetId = newValue
-                            presetManager.saveSelectedPresetId()
-                        }
-                    }
-                )) {
-                    ForEach(presetManager.presets) { preset in
-                        Label {
-                            Text(preset.truncatedDisplayName(maxLength: 50))
-                        } icon: {
-                            if let iconImage = iconGenerator.iconCache[preset.id] {
-                                Image(nsImage: iconImage)
-                            } else {
-                                Image(systemName: "star.fill") // Fallback
+                SharedPresetMenuContent(
+                    title: "プリセット",
+                    selectedPresetId: Binding(
+                        get: { presetManager.selectedPresetId },
+                        set: { newValue in
+                            if let newValue = newValue {
+                                presetManager.selectedPresetId = newValue
+                                presetManager.saveSelectedPresetId()
                             }
                         }
-                        .tag(preset.id as UUID?)
+                    ),
+                    onNewPresetAction: {
+                        if let delegate = NSApp.delegate as? AppDelegate {
+                            delegate.showAddPresetWindow()
+                        }
                     }
-                    
-                    // プリセットがない場合の項目
-                    if presetManager.presets.isEmpty {
-                        Text("プリセットがありません")
-                            .tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
-                    }
-                }
-                .pickerStyle(.inline)
-                .labelStyle(.titleAndIcon)
-                
-                Divider()
-                
-                Button("新規プリセット...") {
-                    if let delegate = NSApp.delegate as? AppDelegate {
-                        delegate.showAddPresetWindow()
-                    }
-                }
+                )
             } label: {
                 Label {
                     Text("プリセット: \(presetManager.selectedPreset?.truncatedDisplayName(maxLength: 43) ?? String(localized: "なし"))")

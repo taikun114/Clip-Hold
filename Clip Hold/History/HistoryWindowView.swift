@@ -221,10 +221,8 @@ struct HistoryWindowView: View {
                 }
             }
             
-            HistoryCopyConfirmation(showCopyConfirmation: $showCopyConfirmation)
-                .onAppear {
-                    currentCopyConfirmationTask?.cancel()
-                }
+            // コピー完了アニメーション
+            SharedCopyConfirmationView(showCopyConfirmation: showCopyConfirmation)
                 .onDisappear {
                     currentCopyConfirmationTask?.cancel()
                 }

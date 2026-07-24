@@ -1,7 +1,8 @@
 import SwiftUI
 
-struct HistoryCopyConfirmation: View {
-    @Binding var showCopyConfirmation: Bool
+struct SharedCopyConfirmationView: View {
+    let showCopyConfirmation: Bool
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     
     var body: some View {
         VStack {
@@ -23,7 +24,7 @@ struct HistoryCopyConfirmation: View {
                 .transition(.opacity) // フェードイン/アウト
             }
         }
-        .animation(.easeOut(duration: 0.1), value: showCopyConfirmation)
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: showCopyConfirmation)
         .allowsHitTesting(false) // クリックイベントを透過させる
     }
 }
