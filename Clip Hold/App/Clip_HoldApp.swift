@@ -367,8 +367,10 @@ struct ClipHoldApp: App {
             
             Divider()
             
-            Button("終了") {
+            Button {
                 NSApplication.shared.terminate(nil)
+            } label: {
+                Label("終了", systemImage: "xmark")
             }
             .keyboardShortcut("q", modifiers: .command)
         } label: {

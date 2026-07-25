@@ -26,16 +26,20 @@ struct QRCodeView: View {
                     .border(Color.gray, width: 1)
                     .layoutPriority(1) // QRコード画像に高いレイアウト優先度を設定
                     .contextMenu {
-                        Button("画像をコピー") {
+                        Button {
                             let pasteboard = NSPasteboard.general
                             pasteboard.clearContents()
                             pasteboard.writeObjects([qrCodeImage])
+                        } label: {
+                            Label("画像をコピー", systemImage: "document.on.document")
                         }
                         
-                        Button("画像を保存...") {
+                        Button {
                             self.imageToSave = qrCodeImage
                             self.suggestedFileName = createSafeFileName(from: text)
                             self.showingSavePanel = true
+                        } label: {
+                            Label("画像を保存...", systemImage: "square.and.arrow.down")
                         }
                     }
             } else {
