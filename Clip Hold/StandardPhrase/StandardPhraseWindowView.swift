@@ -471,29 +471,25 @@ struct StandardPhraseWindowView: View {
         } message: {
             Text("「\(truncateString(phraseToDelete?.title, maxLength: 50))」を本当に削除しますか？")
         }
-        .sheet(isPresented: $showQRCodeSheet) {
-            if let phrase = selectedPhraseForQRCode {
-                QRCodeView(text: phrase.content)
-            }
+        .sheet(item: $selectedPhraseForQRCode) { phrase in
+            QRCodeView(text: phrase.content)
         }
         .sheet(item: $phraseToEdit) { phrase in
             AddEditPhraseView(mode: .edit(phrase), presetManager: presetManager, isSheet: true)
                 .environmentObject(standardPhraseManager)
                 .environmentObject(presetManager)
         }
-        .sheet(isPresented: $showingEditAndCopySheet) {
-            if let phrase = phraseToEditAndCopy {
-                EditHistoryItemView(content: phrase.content, onCopy: { editedContent in
-                    copyToClipboard(editedContent, clipboardManager: clipboardManager)
-                    showCopyConfirmation = true
-                    currentCopyConfirmationTask?.cancel()
-                    currentCopyConfirmationTask = Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: 2_000_000_000)
-                        guard !Task.isCancelled else { return }
-                        showCopyConfirmation = false
-                    }
-                }, isSheet: true)
-            }
+        .sheet(item: $phraseToEditAndCopy) { phrase in
+            EditHistoryItemView(content: phrase.content, onCopy: { editedContent in
+                copyToClipboard(editedContent, clipboardManager: clipboardManager)
+                showCopyConfirmation = true
+                currentCopyConfirmationTask?.cancel()
+                currentCopyConfirmationTask = Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    guard !Task.isCancelled else { return }
+                    showCopyConfirmation = false
+                }
+            }, isSheet: true)
         }
         .sheet(isPresented: $showingAddPresetSheet) {
             AddEditPresetView(isSheet: true, editingPreset: nil)

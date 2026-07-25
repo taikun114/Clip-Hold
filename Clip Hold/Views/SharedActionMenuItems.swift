@@ -68,7 +68,7 @@ struct SharedEditMenuItem: View {
     
     var body: some View {
         Button(action: action) {
-            Label("編集...", systemImage: "pencil").forceIconOnMacOS27()
+            Label("編集...", systemImage: "pencil")
         }
     }
 }
@@ -79,7 +79,7 @@ struct SharedDuplicateMenuItem: View {
     
     var body: some View {
         Button(action: action) {
-            Label("複製", systemImage: "plus.square.on.square").forceIconOnMacOS27()
+            Label("複製", systemImage: "plus.square.on.square")
         }
     }
 }
@@ -90,7 +90,7 @@ struct SharedMoveMenuItem: View {
     
     var body: some View {
         Button(action: action) {
-            Label("別のプリセットに移動...", systemImage: "folder").forceIconOnMacOS27()
+            Label("別のプリセットに移動...", systemImage: "folder")
         }
     }
 }

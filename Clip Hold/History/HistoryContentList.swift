@@ -330,23 +330,21 @@ struct HistoryContentList: View {
                             }
                         }
                     })
-                    .sheet(isPresented: $showingEditSheet) {
-                        if let item = itemToEdit {
-                            EditHistoryItemView(content: item.text, onCopy: { editedContent in
-                                // コピー処理を実装
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(editedContent, forType: .string)
-                                
-                                // コピー確認を表示
-                                showCopyConfirmation = true
-                                currentCopyConfirmationTask?.cancel()
-                                currentCopyConfirmationTask = Task { @MainActor in
-                                    try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                    guard !Task.isCancelled else { return }
-                                    showCopyConfirmation = false
-                                }
-                            }, isSheet: true)
-                        }
+                    .sheet(item: $itemToEdit) { item in
+                        EditHistoryItemView(content: item.text, onCopy: { editedContent in
+                            // コピー処理を実装
+                            NSPasteboard.general.clearContents()
+                            NSPasteboard.general.setString(editedContent, forType: .string)
+                            
+                            // コピー確認を表示
+                            showCopyConfirmation = true
+                            currentCopyConfirmationTask?.cancel()
+                            currentCopyConfirmationTask = Task { @MainActor in
+                                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
+                                guard !Task.isCancelled else { return }
+                                showCopyConfirmation = false
+                            }
+                        }, isSheet: true)
                     }
                     .onDrop(of: [.image], isTargeted: nil) { providers in
                         guard let itemProvider = providers.first else { return false }

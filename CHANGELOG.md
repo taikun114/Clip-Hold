@@ -30,6 +30,7 @@ Notes
 
 ### Bug Fixes and Improvements
 - **Fix issue where the copy notification would not disappear when copying from the menu in the Standard Phrase window**
+- **Fix issue where some sheets were not displayed correctly on macOS Golden Gate**
 - **Improve the performance of the History window**
   - Implemented pagination, limiting the initial display to 100 items and loading additional history items as you scroll.
 - **Improve icon display on macOS Golden Gate**
