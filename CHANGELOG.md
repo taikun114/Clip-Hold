@@ -29,6 +29,8 @@ Notes
   - Only one item can be pinned at a time. By default, you can copy or Quick Paste the pinned item by pressing `⌥ (Option)` + `⌘ (Command)` + `P`.
 - **Add a "Show Other History from This App" feature to the History window**
   - You can now easily filter by app from the context menu of each history item.
+- **Add a "Clear All Filters" button to the filter menu in the History window**
+  - Displayed when any filter is applied, and clicking it will clear all filters.
 - **Add a "Show Current Preset Icon" option to the "Menu" section of the General settings**
   - When enabled, the currently selected preset icon will be displayed in the menu bar.
 

@@ -143,6 +143,16 @@ struct HistorySearchBar: View {
                     }
                 }
                 .pickerStyle(.inline)
+                
+                if selectedFilter != .all || selectedApp != nil {
+                    Divider()
+                    Button {
+                        selectedFilter = .all
+                        selectedApp = nil
+                    } label: {
+                        Label("すべてのフィルターを解除", systemImage: "xmark.circle")
+                    }
+                }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
                     .tint(selectedFilter != .all || selectedApp != nil ? .accentColor : .secondary)

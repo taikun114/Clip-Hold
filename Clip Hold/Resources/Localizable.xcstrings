@@ -7877,6 +7877,41 @@
         }
       }
     },
+    "すべてのフィルターを解除" : {
+      "comment" : "履歴ウィンドウのフィルターメニューで、適用されているすべてのフィルターを解除するオプション名。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Filter löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear All Filters"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar todos los filtros"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer tous les filtres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのフィルターを解除"
+          }
+        }
+      }
+    },
     "すべてのプリセットから定型文を削除しますか？この操作は元に戻せません。" : {
       "comment" : "すべての定型文を削除ボタンをクリックして、すべての定型文を削除しようとしている際に表示されるアラートテキスト。",
       "localizations" : {
