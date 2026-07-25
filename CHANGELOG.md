@@ -27,6 +27,8 @@ Notes
   - By default, you can press `⌥ (Option)` + `⌘ (Command)` + `A` to enter your favorite text and create a new copy. You no longer need to enter it into a note, etc. when you want to copy a specific string.
 - **Add a pin feature to the copy history**
   - Only one item can be pinned at a time. By default, you can copy or Quick Paste the pinned item by pressing `⌥ (Option)` + `⌘ (Command)` + `P`.
+- **Add a "Show Other History from This App" feature to the History window**
+  - You can now easily filter by app from the context menu of each history item.
 - **Add a "Show Current Preset Icon" option to the "Menu" section of the General settings**
   - When enabled, the currently selected preset icon will be displayed in the menu bar.
 

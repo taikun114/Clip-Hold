@@ -51,6 +51,17 @@ struct SharedShowQRCodeMenuItem: View {
     }
 }
 
+/// このアプリからの他の履歴を表示するメニュー項目
+struct SharedFilterByAppMenuItem: View {
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Label("このアプリからの他の履歴を表示", systemImage: "line.3.horizontal.decrease")
+        }
+    }
+}
+
 /// 項目を削除するメニュー項目
 struct SharedDeleteMenuItem: View {
     let action: () -> Void

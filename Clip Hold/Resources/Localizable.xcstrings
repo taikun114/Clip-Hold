@@ -6443,6 +6443,41 @@
         }
       }
     },
+    "このアプリからの他の履歴を表示" : {
+      "comment" : "履歴ウィンドウで、特定のアプリからコピーされた他の履歴を表示するオプション名。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere Verläufe aus dieser App anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Other History from This App"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar otro historial de esta aplicación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher un autre historique de cette application"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリからの他の履歴を表示"
+          }
+        }
+      }
+    },
     "このアプリケーションと使用されているライブラリのライセンス情報を表示します。" : {
       "comment" : "このアプリのライセンス情報を表示するボタンのツールチップに表示されるテキスト。",
       "localizations" : {

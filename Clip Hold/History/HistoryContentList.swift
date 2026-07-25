@@ -201,6 +201,12 @@ struct HistoryContentList: View {
             }
         }
         
+        if let sourceAppPath = currentItem.sourceAppPath {
+            SharedFilterByAppMenuItem {
+                clipboardManager.historySelectedApp = sourceAppPath
+            }
+        }
+        
         Divider()
         
         if let sourceAppPath = currentItem.sourceAppPath {
