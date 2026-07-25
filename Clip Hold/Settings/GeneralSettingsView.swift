@@ -459,7 +459,7 @@ struct GeneralSettingsView: View {
                             in: 20...80,
                             step: 10
                         )
-                        Text("\(Int(round((1 - standardPhraseWindowOverlayTransparency) * 100)))%")
+                        Text(1 - standardPhraseWindowOverlayTransparency, format: .percent.precision(.fractionLength(0)))
                             .foregroundStyle(standardPhraseWindowIsOverlay ? .secondary : .tertiary)
                     }
                 }
@@ -551,7 +551,7 @@ struct GeneralSettingsView: View {
                             in: 20...80,
                             step: 10
                         )
-                        Text("\(Int(round((1 - historyWindowOverlayTransparency) * 100)))%")
+                        Text(1 - historyWindowOverlayTransparency, format: .percent.precision(.fractionLength(0)))
                             .foregroundStyle(historyWindowIsOverlay ? .secondary : .tertiary)
                     }
                 }

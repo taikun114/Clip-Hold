@@ -167,15 +167,17 @@ struct HistoryWindowView: View {
                 finalHistory.insert(pinnedItem.createPinnedDuplicate(), at: 0)
             }
             
+            let finalHistoryToApply = finalHistory
+            
             await MainActor.run {
                 if isReduceMotion {
-                    self.filteredHistory = finalHistory
+                    self.filteredHistory = finalHistoryToApply
                 } else {
                     withAnimation {
-                        self.filteredHistory = finalHistory
+                        self.filteredHistory = finalHistoryToApply
                     }
                 }
-                self.clipboardManager.filteredHistoryForShortcuts = finalHistory
+                self.clipboardManager.filteredHistoryForShortcuts = finalHistoryToApply
                 self.isLoading = false
                 self.isPaginating = false
             }

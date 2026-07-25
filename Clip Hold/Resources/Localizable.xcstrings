@@ -917,9 +917,6 @@
         }
       }
     },
-    "%lld%%" : {
-      "shouldTranslate" : false
-    },
     "%lld個" : {
       "comment" : "項目の個数を数えるテキスト。項目の数によって「項目」のテキストが単数形または複数形に切り替えられる。",
       "localizations" : {
