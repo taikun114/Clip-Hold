@@ -4515,6 +4515,40 @@
         }
       }
     },
+    "インポート..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポート..."
+          }
+        }
+      }
+    },
     "インポートエラー" : {
       "comment" : "コピー履歴や定型文のインポートに失敗したときのエラーメッセージタイトル。",
       "localizations" : {
@@ -4651,6 +4685,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エクスポート"
+          }
+        }
+      }
+    },
+    "エクスポート..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportieren..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エクスポート..."
           }
         }
       }
@@ -7979,6 +8047,40 @@
         }
       }
     },
+    "すべてのプリセットを削除..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Presets löschen..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Presets..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todos los preajustes..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer tous les préréglages..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのプリセットを削除..."
+          }
+        }
+      }
+    },
     "すべてのプリセットを本当に削除しますか？この操作は元に戻せません。" : {
       "comment" : "すべてのプリセットを削除ボタンをクリックして、すべてのプリセットを削除しようとしている際に表示されるアラートテキスト。",
       "localizations" : {
@@ -8119,6 +8221,40 @@
         }
       }
     },
+    "すべての定型文を削除..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Standardphrasen löschen..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Standard Phrases..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar todas las frases estándar..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer toutes les phrases standard..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての定型文を削除..."
+          }
+        }
+      }
+    },
     "すべての定型文を表示..." : {
       "comment" : "メニューバーに表示される、定型文ウィンドウを開くためのボタン。",
       "localizations" : {
@@ -8154,37 +8290,36 @@
         }
       }
     },
-    "すべての履歴を削除" : {
-      "comment" : "すべてのクリップボード履歴を削除ボタンをクリックして、すべてのコピー履歴を削除しようとしている際に表示されるアラートタイトル。",
+    "すべての履歴を削除..." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gesamten Verlauf löschen"
+            "value" : "Gesamten Verlauf löschen..."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete All History"
+            "value" : "Delete All History..."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eliminar todo el historial"
+            "value" : "Eliminar todo el historial..."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Supprimer tout l'historique"
+            "value" : "Supprimer tout l'historique..."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべての履歴を削除"
+            "value" : "すべての履歴を削除..."
           }
         }
       }
@@ -11818,6 +11953,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存フォルダを空にする"
+          }
+        }
+      }
+    },
+    "保存フォルダを空にする..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gespeicherten Ordner leeren..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empty the Saved Folder..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaciar la carpeta guardada..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vider le dossier enregistré..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存フォルダを空にする..."
           }
         }
       }

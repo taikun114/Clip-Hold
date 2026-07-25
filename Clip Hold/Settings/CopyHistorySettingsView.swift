@@ -311,7 +311,7 @@ struct CopyHistorySettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "square.and.arrow.down")
-                            Text("インポート")
+                            Text("インポート...")
                         }
                     }
                     .buttonStyle(.bordered)
@@ -322,7 +322,7 @@ struct CopyHistorySettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "square.and.arrow.up")
-                            Text("エクスポート")
+                            Text("エクスポート...")
                         }
                     }
                     .buttonStyle(.bordered)
@@ -340,7 +340,7 @@ struct CopyHistorySettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "trash")
-                            Text("すべての履歴を削除")
+                            Text("すべての履歴を削除...")
                         }
                         .if(!clipboardManager.clipboardHistory.isEmpty) { view in
                             view.foregroundStyle(.red)
@@ -394,7 +394,7 @@ struct CopyHistorySettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "trash")
-                            Text("保存フォルダを空にする")
+                            Text("保存フォルダを空にする...")
                         }
                         .if(itemCount > 0) { view in
                             view.foregroundStyle(.red)

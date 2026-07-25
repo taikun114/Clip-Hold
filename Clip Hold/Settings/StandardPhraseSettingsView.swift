@@ -935,7 +935,7 @@ private struct PhraseManagementSection: View {
                 }) {
                     HStack {
                         Image(systemName: "trash")
-                        Text("すべての定型文を削除")
+                        Text("すべての定型文を削除...")
                     }
                     .if(allPhrasesCount > 0) { view in
                         view.foregroundStyle(.red)
@@ -954,7 +954,7 @@ private struct PhraseManagementSection: View {
                 }) {
                     HStack {
                         Image(systemName: "trash")
-                        Text("すべてのプリセットを削除")
+                        Text("すべてのプリセットを削除...")
                     }
                     .if(!presetManager.presets.isEmpty) { view in
                         view.foregroundStyle(.red)

@@ -143,7 +143,7 @@ struct StandardPhraseImportExportView: View {
             } label: {
                 HStack {
                     Image(systemName: "square.and.arrow.down")
-                    Text("インポート")
+                    Text("インポート...")
                 }
             }
             .buttonStyle(.bordered)
@@ -154,7 +154,7 @@ struct StandardPhraseImportExportView: View {
             } label: {
                 HStack {
                     Image(systemName: "square.and.arrow.up")
-                    Text("エクスポート")
+                    Text("エクスポート...")
                 }
             }
             .buttonStyle(.bordered)
