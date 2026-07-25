@@ -34,6 +34,7 @@ Notes
 - **Improve the performance of the History window**
   - Implemented pagination, limiting the initial display to 100 items and loading additional history items as you scroll.
 - **Improve icon display on macOS Golden Gate**
+- **Improve the add apps to exclude screen**
 - **Changes to the preset icon picker package**
   - Icon names are now displayed, and you can filter by specific categories using the category picker.
 

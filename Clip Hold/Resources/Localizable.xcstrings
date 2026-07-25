@@ -3497,6 +3497,76 @@
     "PID: %@" : {
       "shouldTranslate" : false
     },
+    "PID: %@, %@" : {
+      "comment" : "アプリ追加リストのツールチップ（バンドルIDあり）",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@"
+          }
+        }
+      }
+    },
+    "PID: %@, %@ (%@)" : {
+      "comment" : "アプリ追加リストのツールチップ（バンドルIDなし・パス表示）",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@ (%3$@)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@ (%3$@)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@ (%3$@)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@ (%3$@)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PID: %1$@, %2$@ (%3$@)"
+          }
+        }
+      }
+    },
     "QRコード" : {
       "comment" : "QRコード表示画面のタイトルテキスト。",
       "localizations" : {
@@ -16440,6 +16510,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "追加"
+          }
+        }
+      }
+    },
+    "追加できる実行中のアプリが見つかりません。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine laufenden Apps zum Hinzufügen gefunden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No running apps available to add."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se encontraron aplicaciones en ejecución para agregar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune application en cours d'exécution à ajouter."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "追加できる実行中のアプリが見つかりません。"
           }
         }
       }

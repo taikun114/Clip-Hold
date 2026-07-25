@@ -16,4 +16,16 @@ extension View {
     func forceIconOnMacOS27() -> some View {
         self.modifier(MacOS27TitleAndIconModifier())
     }
+
+    /// アダプティブスクロールエッジエフェクト
+    @ViewBuilder
+    func adaptiveScrollEdgeEffect() -> some View {
+        if #available(macOS 27.0, *) {
+            self.scrollEdgeEffectStyle(.hard, for: .all)
+        } else if #available(macOS 26.0, *) {
+            self.scrollEdgeEffectStyle(.soft, for: .all)
+        } else {
+            self
+        }
+    }
 }
