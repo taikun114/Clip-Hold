@@ -148,7 +148,8 @@ struct ClipHoldApp: App {
                         
                         // オプションキーが押されていない場合のみクイックペーストを実行
                         if quickPaste && !NSEvent.modifierFlags.contains(.option) {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            Task { @MainActor in
+                                try? await Task.sleep(nanoseconds: 50_000_000)
                                 ClipHoldApp.performPaste()
                             }
                         }
@@ -279,14 +280,16 @@ struct ClipHoldApp: App {
                             if textOnlyQuickPaste {
                                 // ファイルパスがなく、かつ画像でもない場合にのみペーストを実行
                                 if item.filePath == nil && !item.isImage {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    Task { @MainActor in
+                                        try? await Task.sleep(nanoseconds: 50_000_000)
                                         ClipHoldApp.performPaste()
                                     }
                                 } else {
                                     print("textOnlyQuickPaste is on, so non-text content will not be pasted.")
                                 }
                             } else {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 50_000_000)
                                     ClipHoldApp.performPaste()
                                 }
                             }
@@ -535,7 +538,8 @@ struct ClipHoldApp: App {
                     
                     let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                     if currentQuickPaste {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 50_000_000)
                             performPaste() // static メソッドとして呼び出し
                             print("performPaste")
                         }
@@ -573,12 +577,14 @@ struct ClipHoldApp: App {
                 if currentQuickPaste {
                     if currentTextOnlyQuickPaste {
                         if pinnedItem.filePath == nil && !pinnedItem.isImage {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            Task { @MainActor in
+                                try? await Task.sleep(nanoseconds: 50_000_000)
                                 performPaste()
                             }
                         }
                     } else {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 50_000_000)
                             performPaste()
                         }
                     }
@@ -621,7 +627,8 @@ struct ClipHoldApp: App {
                     if currentQuickPaste {
                         if currentTextOnlyQuickPaste {
                             if historyItem.filePath == nil && !historyItem.isImage {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 50_000_000)
                                     performPaste()
                                     print("performPaste")
                                 }
@@ -629,7 +636,8 @@ struct ClipHoldApp: App {
                                 print("textOnlyQuickPaste is on, so non-text content will not be pasted.")
                             }
                         } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            Task { @MainActor in
+                                try? await Task.sleep(nanoseconds: 50_000_000)
                                 performPaste()
                                 print("performPaste")
                             }
@@ -656,7 +664,7 @@ struct ClipHoldApp: App {
             // 最新の履歴アイテムを取得
             if let latestItem = historySource.first {
                 // ウィンドウとして表示する処理をここに実装
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     if let delegate = NSApp.delegate as? AppDelegate {
                         delegate.showEditHistoryWindow(withContent: latestItem.text)
                     }
@@ -666,7 +674,7 @@ struct ClipHoldApp: App {
         
         // テキストを入力してコピーするショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .newCopy) {
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showNewCopyWindow()
                 }

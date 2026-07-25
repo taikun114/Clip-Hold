@@ -27,7 +27,7 @@ class LoginItemManager: ObservableObject {
             } catch {
                 print("ERROR: Failed to register app as login item: \(error.localizedDescription)")
                 // 登録に失敗した場合、UIの状態を元に戻すか、ユーザーに通知する
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.launchAtLogin = false // UIを元の状態に戻す
                 }
             }
@@ -39,7 +39,7 @@ class LoginItemManager: ObservableObject {
             } catch {
                 print("ERROR: Failed to unregister app from login items: \(error.localizedDescription)")
                 // 登録解除に失敗した場合、UIの状態を元に戻すか、ユーザーに通知する
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.launchAtLogin = true // UIを元の状態に戻す
                 }
             }
@@ -49,7 +49,7 @@ class LoginItemManager: ObservableObject {
     // ログイン項目の状態を強制的に更新し、UIに反映させるメソッド
     // アプリがフォアグラウンドになった時などに呼び出すと良い
     func refreshLoginItemStatus() {
-        DispatchQueue.main.async {
+        Task { @MainActor in
             let newStatus = SMAppService.mainApp.status == .enabled
             if self.launchAtLogin != newStatus {
                 self.launchAtLogin = newStatus

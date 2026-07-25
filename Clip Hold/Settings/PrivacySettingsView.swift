@@ -312,7 +312,7 @@ struct PrivacySettingsView: View {
                                     return
                                 }
                                 
-                                DispatchQueue.main.async {
+                                Task { @MainActor in
                                     if !excludedAppIdentifiers.contains(bundleIdentifier) {
                                         excludedAppIdentifiers.append(bundleIdentifier)
                                         print("Excluded app added via drag and drop: \(bundleIdentifier)")

@@ -26,7 +26,7 @@ class ClipboardHistoryImporterExporter: ObservableObject {
         switch result {
         case .success(let urls):
             guard let url = urls.first else {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.currentAlert = .error(Text("選択されたファイルがありません。"))
                 }
                 print("No file selected.")
@@ -42,7 +42,7 @@ class ClipboardHistoryImporterExporter: ObservableObject {
             }
             
             if !accessed {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.currentAlert = .error(Text("ファイルへのアクセス権限がありません。ファイルパス: \(url.lastPathComponent)"))
                 }
                 print("DEBUG: Security-scoped resource access failed for URL: \(url.path)")
@@ -59,20 +59,20 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                 // 履歴を古い順に並べ替え
                 importedHistory.sort { $0.date < $1.date }
                 
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     clipboardManager.importHistory(from: importedHistory)
                     self.currentAlert = .success(Text("クリップボード履歴が正常にインポートされました。"))
                     print("Clipboard history imported successfully: \(url.path)")
                 }
                 
             } catch {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.currentAlert = .error(Text("履歴ファイルの読み込みまたは解析に失敗しました: \(error.localizedDescription)"))
                 }
                 print("History file read or parse error: \(error.localizedDescription)")
             }
         case .failure(let error):
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.currentAlert = .error(Text("ファイルの選択に失敗しました: \(error.localizedDescription)"))
             }
             print("File selection error: \(error.localizedDescription)")
@@ -94,18 +94,18 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                 let data = try encoder.encode(historyToExport)
                 try data.write(to: url)
                 
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.currentAlert = .success(Text("クリップボード履歴が正常にエクスポートされました。"))
                 }
                 print("Clipboard history exported successfully: \(url.path)")
             } catch {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.currentAlert = .error(Text("履歴のエクスポートに失敗しました: \(error.localizedDescription)"))
                 }
                 print("History export error: \(error.localizedDescription)")
             }
         case .failure(let error):
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.currentAlert = .error(Text("ファイルの選択に失敗しました: \(error.localizedDescription)"))
             }
             print("File selection error: \(error.localizedDescription)")

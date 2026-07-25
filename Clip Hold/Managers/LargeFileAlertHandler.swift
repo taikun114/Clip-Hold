@@ -6,7 +6,7 @@ extension ClipboardManager {
     // MARK: - Large File Alert Handling
     // Method to directly display NSAlert
     func presentLargeFileConfirmationAlert() { // private から internal に変更
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor [weak self] in
             guard let self = self else { return }
             
             let alert = NSAlert()

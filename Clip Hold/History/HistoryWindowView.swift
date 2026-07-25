@@ -257,7 +257,7 @@ struct HistoryWindowView: View {
         .onAppear {
             clipboardManager.filteredHistoryForShortcuts = []
             performUpdate()
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 isSearchFieldFocused = true
             }
         }

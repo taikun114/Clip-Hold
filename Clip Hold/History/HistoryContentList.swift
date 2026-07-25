@@ -350,7 +350,7 @@ struct HistoryContentList: View {
                         guard let itemProvider = providers.first else { return false }
                         let manager = clipboardManager
                         itemProvider.loadObject(ofClass: NSImage.self) { (image, error) in
-                            DispatchQueue.main.async {
+                            Task { @MainActor in
                                 if let nsImage = image as? NSImage {
                                     if let qrCodeContent = manager.decodeQRCode(from: nsImage) {
                                         manager.addTextItem(text: qrCodeContent)
@@ -393,7 +393,8 @@ struct HistoryContentList: View {
                         
                         if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && (newestItem?.id != previousNewestItemID || pinnedItemChanged) {
                             if let firstId = newValue.first?.id {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 100_000_000)
                                     if reduceMotion {
                                         scrollViewProxy.scrollTo(firstId, anchor: .top)
                                     } else {

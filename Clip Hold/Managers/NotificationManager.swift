@@ -15,7 +15,7 @@ class NotificationManager {
     
     func getNotificationAuthorizationStatus(completion: @escaping (UNAuthorizationStatus) -> Void) {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 completion(settings.authorizationStatus)
             }
         }
@@ -190,7 +190,8 @@ class NotificationManager {
                 print("Silent notification sent (ID: \(identifier)).")
                 
                 // 5秒後に通知を削除
-                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                Task {
+                    try? await Task.sleep(nanoseconds: 5_000_000_000)
                     UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])
                     print("Removed silent notification (ID: \(identifier)) after 5 seconds.")
                 }

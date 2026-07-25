@@ -19,7 +19,7 @@ class PresetIconGenerator: ObservableObject {
             return
         }
         appearanceObserver = app.observe(\.effectiveAppearance) { [weak self] app, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.regenerateAllIcons()
             }
         }

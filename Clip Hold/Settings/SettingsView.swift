@@ -184,7 +184,8 @@ struct SettingsView: View {
         }
         .onAppear {
             // ビューが表示されたときにリストにフォーカスを当てる
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 100_000_000)
                 isListFocused = true
             }
         }
@@ -204,7 +205,7 @@ struct SettingsView: View {
             isProgrammaticSelection = true
             selectedSection = navigationHistory[historyIndex]
             // フラグをリセット
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 isProgrammaticSelection = false
             }
         }
@@ -216,7 +217,7 @@ struct SettingsView: View {
             isProgrammaticSelection = true
             selectedSection = navigationHistory[historyIndex]
             // フラグをリセット
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 isProgrammaticSelection = false
             }
         }

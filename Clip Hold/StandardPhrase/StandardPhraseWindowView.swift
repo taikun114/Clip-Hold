@@ -505,7 +505,7 @@ struct StandardPhraseWindowView: View {
         }
         .onAppear {
             performSearch(searchTerm: searchText)
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 isSearchFieldFocused = true
             }
         }

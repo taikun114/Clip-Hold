@@ -16,7 +16,7 @@ private struct IconViewAccessor: NSViewRepresentable {
     
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
-        DispatchQueue.main.async {
+        Task { @MainActor in
             self.store.views[id] = view
         }
         return view

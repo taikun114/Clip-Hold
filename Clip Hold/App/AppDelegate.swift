@@ -70,7 +70,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
         
         historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 guard let self = self, let alwaysOnTop = change.newValue else { return }
                 if let historyWindow = self.historyWindowController?.window {
                     historyWindow.level = alwaysOnTop ? .floating : .normal
@@ -79,7 +79,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
         
         standardPhraseWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.standardPhraseWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 guard let self = self, let alwaysOnTop = change.newValue else { return }
                 if let standardPhraseWindow = self.standardPhraseWindowController?.window {
                     standardPhraseWindow.level = alwaysOnTop ? .floating : .normal
@@ -88,25 +88,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
         
         historyWindowOverlayTransparencyObserver = UserDefaults.standard.observe(\.historyWindowOverlayTransparency, options: [.new]) { [weak self] _, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.historyWindowController?.updateOverlay()
             }
         }
         
         standardPhraseWindowOverlayTransparencyObserver = UserDefaults.standard.observe(\.standardPhraseWindowOverlayTransparency, options: [.new]) { [weak self] _, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.standardPhraseWindowController?.updateOverlay()
             }
         }
         
         historyWindowIsOverlayObserver = UserDefaults.standard.observe(\.historyWindowIsOverlay, options: [.new]) { [weak self] _, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.historyWindowController?.updateOverlay()
             }
         }
         
         standardPhraseWindowIsOverlayObserver = UserDefaults.standard.observe(\.standardPhraseWindowIsOverlay, options: [.new]) { [weak self] _, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.standardPhraseWindowController?.updateOverlay()
             }
         }
@@ -181,7 +181,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let window = historyWindowController?.window {
             window.level = UserDefaults.standard.bool(forKey: "historyWindowAlwaysOnTop") ? .floating : .normal
             // ウィンドウがキー状態になった後にupdateOverlayを呼び出す
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.historyWindowController?.updateOverlay()
             }
         }
@@ -227,7 +227,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let window = standardPhraseWindowController?.window {
             window.level = UserDefaults.standard.bool(forKey: "standardPhraseWindowAlwaysOnTop") ? .floating : .normal
             // ウィンドウがキー状態になった後にupdateOverlayを呼び出す
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.standardPhraseWindowController?.updateOverlay()
             }
         }
@@ -276,7 +276,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         let contentView = AddEditPresetView(isSheet: false, onDismiss: { [weak self] in
             // ウィンドウを閉じたときの後処理
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 if let controller = self.windowControllers[windowType] {
                     controller.close()
@@ -349,7 +349,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             // クイックペーストの処理
             let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
             if currentQuickPaste {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 50_000_000)
                     ClipHoldApp.performPaste()
                 }
             }
@@ -402,7 +403,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             NotificationManager.shared.resumeClipboardMonitoringAndSendNotification()
             
             // アプリをフォアグラウンドに表示
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 NSApp.activate(ignoringOtherApps: true)
             }
         } else if actionID == "OPEN_DOCUMENTATION_ACTION" && notificationCategory == "MIGRATION_FAILURE_CATEGORY" {
@@ -422,7 +423,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
             
             // アプリをフォアグラウンドに表示
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 NSApp.activate(ignoringOtherApps: true)
             }
         }

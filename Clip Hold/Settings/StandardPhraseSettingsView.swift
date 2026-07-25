@@ -394,7 +394,7 @@ private struct PresetAssignmentSection: View {
                                 return
                             }
                             
-                            DispatchQueue.main.async {
+                            Task { @MainActor in
                                 handleAppAssignment(for: selectedPresetId, bundleIdentifier: bundleIdentifier)
                             }
                         } else {

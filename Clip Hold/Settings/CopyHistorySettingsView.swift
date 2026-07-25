@@ -661,7 +661,7 @@ struct CopyHistorySettingsView: View {
     
     private func clearAllSavedFiles() {
         // バックグラウンドスレッドで処理を実行
-        DispatchQueue.global(qos: .background).async {
+        Task.detached(priority: .background) {
             let fileManager = FileManager.default
             
             guard let appSpecificDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("ClipHold") else {
@@ -681,7 +681,7 @@ struct CopyHistorySettingsView: View {
                 }
                 
                 // メインスレッドでUIを更新
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.clipboardManager.loadClipboardHistory()
                     self.calculateStatistics()
                     print("DEBUG: All saved files cleared and clipboard history reloaded.")
@@ -694,7 +694,7 @@ struct CopyHistorySettingsView: View {
     
     private func calculateStatistics() {
         // バックグラウンドスレッドで処理を実行
-        DispatchQueue.global(qos: .background).async {
+        Task.detached(priority: .background) {
             var itemCount: Int = 0
             var totalFolderSize: UInt64 = 0
             
@@ -706,7 +706,7 @@ struct CopyHistorySettingsView: View {
             let filesDirectory = appSpecificDirectory.appendingPathComponent("ClipboardFiles", isDirectory: true)
             
             guard fileManager.fileExists(atPath: filesDirectory.path) else {
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.itemCount = 0
                     self.totalFolderSize = 0
                 }
@@ -727,7 +727,7 @@ struct CopyHistorySettingsView: View {
                     }
                 }
                 
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.itemCount = itemCount
                     self.totalFolderSize = totalFolderSize
                 }
