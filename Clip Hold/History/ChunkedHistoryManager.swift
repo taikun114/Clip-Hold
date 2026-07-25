@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 import Combine
 
-class ChunkedHistoryManager: ObservableObject {
+actor ChunkedHistoryManager {
     static let shared = ChunkedHistoryManager()
     
     private let historyDataDirectoryName = "historyData"
@@ -12,8 +12,7 @@ class ChunkedHistoryManager: ObservableObject {
     private let fileExtension = "json"
     private let itemsPerChunk = 100
     
-    // シリアルキューを追加してファイル操作を直列化し、スレッドセーフにする
-    private let saveQueue = DispatchQueue(label: "design.taikun.Clip-Hold.historySaveQueue", qos: .background)
+    // actorによりファイル操作は直列化されスレッドセーフになります
     
     private let historyFileName = "clipboardHistory.json"
     private let oldHistoryFileName = "oldClipboardHistory.json"
@@ -116,7 +115,7 @@ class ChunkedHistoryManager: ObservableObject {
         return dir
     }
     
-    func getHistoryFileURL(for chunkIndex: Int) -> URL? { // private から internal に変更
+    func getHistoryFileURL(for chunkIndex: Int) -> URL? {
         guard let dataDir = getOrCreateDirectory(historyDataDirectory) else { return nil }
         return dataDir.appendingPathComponent("\(historyFilePrefix)\(chunkIndex).\(fileExtension)")
     }
@@ -128,33 +127,32 @@ class ChunkedHistoryManager: ObservableObject {
     
     // MARK: - Save Operations
     func saveHistoryItem(_ item: ClipboardItem) {
-        saveQueue.async {
-            do {
-                // 最新のチャンクを取得
-                let (chunkIndex, items) = try self.loadLatestChunk()
+        do {
+            // 最新のチャンクを取得
+            let (chunkIndex, items) = try self.loadLatestChunk()
+            
+            // 新しいアイテムを追加
+            var updatedItems = items
+            updatedItems.append(item)
+            
+            // チャンクが満杯になった場合、新しいチャンクを作成
+            if updatedItems.count >= itemsPerChunk {
+                // 現在のチャンクを保存
+                try self.saveChunk(updatedItems, at: chunkIndex)
                 
-                // 新しいアイテムを追加
-                var updatedItems = items
-                updatedItems.append(item)
-                
-                // チャンクが満杯になった場合、新しいチャンクを作成
-                if updatedItems.count > self.itemsPerChunk {
-                    // 現在のチャンクを保存
-                    try self.saveHistoryItems(updatedItems.dropLast(), to: chunkIndex)
-                    
-                    // 新しいチャンクに最新のアイテムのみを保存
-                    try self.saveHistoryItems([item], to: chunkIndex + 1)
-                } else {
-                    // 現在のチャンクを更新
-                    try self.saveHistoryItems(updatedItems, to: chunkIndex)
-                }
-            } catch {
-                print("ChunkedHistoryManager: Error saving history item: \(error.localizedDescription)")
+                // 次のチャンクを初期化して保存
+                let nextChunkIndex = chunkIndex + 1
+                try self.saveChunk([], at: nextChunkIndex)
+            } else {
+                // 現在のチャンクを更新して保存
+                try self.saveChunk(updatedItems, at: chunkIndex)
             }
+        } catch {
+            print("ChunkedHistoryManager: Error saving history item: \(error.localizedDescription)")
         }
     }
     
-    func saveHistoryItems(_ items: [ClipboardItem], to chunkIndex: Int) throws { // private から internal に変更
+    func saveChunk(_ items: [ClipboardItem], at chunkIndex: Int) throws {
         guard let historyFileURL = getHistoryFileURL(for: chunkIndex) else { return }
         
         let encoder = JSONEncoder()
@@ -202,7 +200,7 @@ class ChunkedHistoryManager: ObservableObject {
         }
         
         for (index, chunk) in chunks.enumerated() {
-            try saveHistoryItems(chunk, to: index)
+            try saveChunk(chunk, at: index)
         }
     }
     
@@ -243,7 +241,7 @@ class ChunkedHistoryManager: ObservableObject {
         }
     }
     
-    func loadLatestChunk() throws -> (Int, [ClipboardItem]) { // private から internal に変更
+    func loadLatestChunk() throws -> (Int, [ClipboardItem]) {
         let chunkCount = try getChunkCount()
         
         if chunkCount == 0 {
@@ -255,7 +253,7 @@ class ChunkedHistoryManager: ObservableObject {
         return (latestChunkIndex, items)
     }
     
-    func loadHistoryChunk(at chunkIndex: Int) throws -> [ClipboardItem] { // private から internal に変更
+    func loadHistoryChunk(at chunkIndex: Int) throws -> [ClipboardItem] {
         guard let historyFileURL = getHistoryFileURL(for: chunkIndex) else {
             return []
         }
@@ -271,7 +269,7 @@ class ChunkedHistoryManager: ObservableObject {
         return try decoder.decode([ClipboardItem].self, from: data)
     }
     
-    func getChunkCount() throws -> Int { // private から internal に変更
+    func getChunkCount() throws -> Int {
         guard let dataDir = historyDataDirectory else { return 0 }
         
         guard FileManager.default.fileExists(atPath: dataDir.path) else {
@@ -290,73 +288,63 @@ class ChunkedHistoryManager: ObservableObject {
     
     // MARK: - Delete Operations
     func deleteHistoryItem(id: UUID) {
-        saveQueue.async {
-            do {
-                let chunkCount = try self.getChunkCount()
+        do {
+            let chunkCount = try self.getChunkCount()
+            
+            for index in 0..<chunkCount {
+                var items = try self.loadHistoryChunk(at: index)
+                let initialCount = items.count
                 
-                for index in 0..<chunkCount {
-                    var items = try self.loadHistoryChunk(at: index)
-                    let initialCount = items.count
-                    
-                    items.removeAll { $0.id == id }
-                    
-                    // アイテムが削除された場合のみファイルを更新
-                    if items.count != initialCount {
-                        // アイテム数が0でもファイルは削除しない
-                        try self.saveHistoryItems(items, to: index)
-                        print("ChunkedHistoryManager: Deleted item with id \(id) from chunk \(index).")
-                        return
-                    }
+                items.removeAll { $0.id == id }
+                
+                if items.count < initialCount {
+                    // アイテムが削除されたチャンクを保存
+                    try self.saveChunk(items, at: index)
+                    print("ChunkedHistoryManager: Deleted item with id \(id) from chunk \(index).")
+                    return // 1つのアイテムを削除したら終了
                 }
-                
-                print("ChunkedHistoryManager: Item with id \(id) not found for deletion.")
-                
-            } catch {
-                print("ChunkedHistoryManager: Error deleting history item: \(error.localizedDescription)")
             }
+            print("ChunkedHistoryManager: Item with id \(id) not found for deletion.")
+        } catch {
+            print("ChunkedHistoryManager: Error deleting history item: \(error.localizedDescription)")
         }
     }
     
     // 特定のアプリからの履歴を一括削除するメソッド
     func deleteAllHistoryFromApp(sourceAppPath: String) {
-        saveQueue.async {
-            do {
-                let chunkCount = try self.getChunkCount()
+        do {
+            let chunkCount = try self.getChunkCount()
+            
+            for index in 0..<chunkCount {
+                var items = try self.loadHistoryChunk(at: index)
+                let initialCount = items.count
                 
-                for index in 0..<chunkCount {
-                    var items = try self.loadHistoryChunk(at: index)
-                    let initialCount = items.count
-                    
-                    // 特定のアプリからの履歴を削除
-                    items.removeAll { $0.sourceAppPath == sourceAppPath }
-                    
-                    // アイテムが削除された場合のみファイルを更新
-                    if items.count != initialCount {
-                        try self.saveHistoryItems(items, to: index)
-                        print("ChunkedHistoryManager: Deleted \(initialCount - items.count) items from app \(sourceAppPath) in chunk \(index).")
-                    }
+                // 特定のアプリからの履歴を削除
+                items.removeAll { $0.sourceAppPath == sourceAppPath }
+                
+                // 削除が行われた場合のみ保存
+                if items.count < initialCount {
+                    try self.saveChunk(items, at: index)
+                    print("ChunkedHistoryManager: Deleted \(initialCount - items.count) items from app \(sourceAppPath) in chunk \(index).")
                 }
-                
-            } catch {
-                print("ChunkedHistoryManager: Error deleting all history from app: \(error.localizedDescription)")
             }
+        } catch {
+            print("ChunkedHistoryManager: Error deleting all history from app: \(error.localizedDescription)")
         }
     }
     
     func clearAllHistory() {
-        saveQueue.async {
-            do {
-                // 履歴データディレクトリを削除
-                if let dataDir = self.historyDataDirectory, FileManager.default.fileExists(atPath: dataDir.path) {
-                    try FileManager.default.removeItem(at: dataDir)
-                    print("ChunkedHistoryManager: Cleared all history data.")
-                }
-                
-                // ディレクトリを再作成
-                _ = self.getOrCreateDirectory(self.historyDataDirectory)
-            } catch {
-                print("ChunkedHistoryManager: Error clearing all history: \(error.localizedDescription)")
+        do {
+            // 履歴データディレクトリを削除
+            if let dataDir = self.historyDataDirectory, FileManager.default.fileExists(atPath: dataDir.path) {
+                try FileManager.default.removeItem(at: dataDir)
+                print("ChunkedHistoryManager: Cleared all history data.")
             }
+            
+            // ディレクトリを再作成
+            _ = self.getOrCreateDirectory(self.historyDataDirectory)
+        } catch {
+            print("ChunkedHistoryManager: Error clearing all history: \(error.localizedDescription)")
         }
     }
 }

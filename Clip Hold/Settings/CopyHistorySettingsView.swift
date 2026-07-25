@@ -680,9 +680,10 @@ struct CopyHistorySettingsView: View {
                     try fileManager.removeItem(at: fileURL)
                 }
                 
+                await self.clipboardManager.loadClipboardHistory()
+                
                 // メインスレッドでUIを更新
                 await MainActor.run {
-                    self.clipboardManager.loadClipboardHistory()
                     self.calculateStatistics()
                     print("DEBUG: All saved files cleared and clipboard history reloaded.")
                 }
@@ -720,16 +721,18 @@ struct CopyHistorySettingsView: View {
                 
                 // フォルダ全体のサイズを再帰的に計算
                 if let enumerator = fileManager.enumerator(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) {
-                    for case let fileURL as URL in enumerator {
+                    while let fileURL = enumerator.nextObject() as? URL {
                         if let fileSize = (try? fileURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
                             totalFolderSize += UInt64(fileSize)
                         }
                     }
                 }
                 
+                let finalItemCount = itemCount
+                let finalTotalSize = totalFolderSize
                 await MainActor.run {
-                    self.itemCount = itemCount
-                    self.totalFolderSize = totalFolderSize
+                    self.itemCount = finalItemCount
+                    self.totalFolderSize = finalTotalSize
                 }
             } catch {
                 print("Error calculating clipboard file statistics: \(error.localizedDescription)")

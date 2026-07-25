@@ -2,17 +2,17 @@ import Foundation
 
 extension ClipboardManager {
     // MARK: - ファイルハッシュの計算（起動時）
-    func calculateMissingFileHashesInHistory() {
+    func calculateMissingFileHashesInHistory() async {
         // チャンクされた履歴ファイルを一括で読み込む
         let chunkedHistoryManager = ChunkedHistoryManager.shared
         var allHistoryItems: [ClipboardItem] = []
         var updatedChunks: [(index: Int, items: [ClipboardItem])] = []
         
         do {
-            let chunkCount = try chunkedHistoryManager.getChunkCount()
+            let chunkCount = try await chunkedHistoryManager.getChunkCount()
             
             for index in 0..<chunkCount {
-                let items = try chunkedHistoryManager.loadHistoryChunk(at: index)
+                let items = try await chunkedHistoryManager.loadHistoryChunk(at: index)
                 var itemsUpdated = false
                 
                 // 各アイテムに対して、ファイルハッシュが存在しない場合に計算
@@ -39,7 +39,7 @@ extension ClipboardManager {
             
             // 更新されたチャンクを一括で保存
             for chunk in updatedChunks {
-                try chunkedHistoryManager.saveHistoryItems(chunk.items, to: chunk.index)
+                try await chunkedHistoryManager.saveChunk(chunk.items, at: chunk.index)
                 print("ClipboardManager: Saved updated chunk \(chunk.index) with calculated hashes.")
             }
             

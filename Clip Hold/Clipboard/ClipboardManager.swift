@@ -68,8 +68,8 @@ class ClipboardManager: ObservableObject {
         }
         
         // 3. 取得した名前をキャッシュに保存
-        DispatchQueue.main.async {
-            self.localizedAppNames[sourceAppPath] = finalName
+        Task { @MainActor [weak self] in
+            self?.localizedAppNames[sourceAppPath] = finalName
         }
         
         return finalName
@@ -119,33 +119,36 @@ class ClipboardManager: ObservableObject {
         // ファイル保存ディレクトリの準備
         _ = createClipboardFilesDirectoryIfNeeded()
         
-        // マイグレーションが必要かどうかを確認し、必要であれば実行
-        let migrationPerformed = ChunkedHistoryManager.shared.migrateIfNeeded()
-        
-        // マイグレーションが成功した場合、通知を表示
-        if migrationPerformed {
-            DispatchQueue.main.async {
-                NotificationManager.shared.sendMigrationSuccessNotification()
+        // マイグレーションと履歴のロードを非同期で実行
+        Task {
+            let migrationPerformed = await ChunkedHistoryManager.shared.migrateIfNeeded()
+            
+            // マイグレーションが成功した場合、通知を表示
+            if migrationPerformed {
+                await MainActor.run {
+                    NotificationManager.shared.sendMigrationSuccessNotification()
+                }
+            } else if !migrationPerformed && FileManager.default.fileExists(atPath: (self.getAppSpecificDirectory()?.appendingPathComponent(self.historyFileName).path ?? "")) {
+                // マイグレーションが失敗した場合、失敗通知を表示
+                await MainActor.run {
+                    NotificationManager.shared.sendMigrationFailureNotification()
+                }
             }
-        } else if !migrationPerformed && FileManager.default.fileExists(atPath: (getAppSpecificDirectory()?.appendingPathComponent(historyFileName).path ?? "")) {
-            // マイグレーションが失敗した場合、失敗通知を表示
-            DispatchQueue.main.async {
-                NotificationManager.shared.sendMigrationFailureNotification()
+            
+            // アプリ起動時にファイルハッシュが存在しない履歴アイテムに対してハッシュを計算
+            await self.calculateMissingFileHashesInHistory()
+            
+            // 保存されたピン留めアイテムIDをロード
+            if let pinnedIDString = UserDefaults.standard.string(forKey: "pinnedItemID"),
+               let pinnedUUID = UUID(uuidString: pinnedIDString) {
+                await MainActor.run {
+                    self.pinnedItemID = pinnedUUID
+                }
             }
+            
+            await self.loadClipboardHistory()
+            print("ClipboardManager: Initialized with history count: \(self.clipboardHistory.count)")
         }
-        
-        // アプリ起動時にファイルハッシュが存在しない履歴アイテムに対してハッシュを計算
-        calculateMissingFileHashesInHistory()
-        
-        // 保存されたピン留めアイテムIDをロード
-        if let pinnedIDString = UserDefaults.standard.string(forKey: "pinnedItemID"),
-           let pinnedUUID = UUID(uuidString: pinnedIDString) {
-            self.pinnedItemID = pinnedUUID
-        }
-        
-        loadClipboardHistory()
-        
-        print("ClipboardManager: Initialized with history count: \(clipboardHistory.count)")
         
         // 既存の除外アプリ識別子をロード（UserDefaultsから）
         if let data = UserDefaults.standard.data(forKey: "excludedAppIdentifiersData"),
@@ -279,7 +282,9 @@ class ClipboardManager: ObservableObject {
             }
             
             // ChunkedHistoryManagerからも一括削除（チャンク単位で効率的に削除）
-            ChunkedHistoryManager.shared.deleteAllHistoryFromApp(sourceAppPath: sourceAppPath)
+            Task {
+                await ChunkedHistoryManager.shared.deleteAllHistoryFromApp(sourceAppPath: sourceAppPath)
+            }
             
             // メモリ上の履歴から対象アイテムを一括削除
             if let pinnedID = pinnedItemID, itemsToDelete.contains(where: { $0.id == pinnedID }) {

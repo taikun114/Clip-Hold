@@ -78,7 +78,9 @@ extension ClipboardManager {
         enforceMaxHistoryCount()
         
         // 履歴を保存 (新しいシステムを使用)
-        ChunkedHistoryManager.shared.saveHistoryItem(newItem)
+        Task {
+            await ChunkedHistoryManager.shared.saveHistoryItem(newItem)
+        }
         // 既存のスケジューリングは削除
         // scheduleSaveClipboardHistory()
     }
@@ -101,7 +103,9 @@ extension ClipboardManager {
         cleanUpTemporaryFiles()
         
         // 新しい履歴管理システムもクリア
-        ChunkedHistoryManager.shared.clearAllHistory()
+        Task {
+            await ChunkedHistoryManager.shared.clearAllHistory()
+        }
     }
     
     func deleteItem(id: UUID) {
@@ -119,7 +123,9 @@ extension ClipboardManager {
             print("ClipboardManager: Item deleted. Total history: \(clipboardHistory.count)")
             
             // 新しい履歴管理システムからも削除
-            ChunkedHistoryManager.shared.deleteHistoryItem(id: id)
+            Task {
+                await ChunkedHistoryManager.shared.deleteHistoryItem(id: id)
+            }
         }
     }
     
@@ -149,7 +155,7 @@ extension ClipboardManager {
             }
             
             // 2. 既存の履歴に新しいアイテムを追加 (メインスレッドでPublishedプロパティを更新)
-            await MainActor.run {
+            let updatedHistory: [ClipboardItem] = await MainActor.run {
                 // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
                 self.objectWillChange.send()
                 self.clipboardHistory.append(contentsOf: newItems)
@@ -163,10 +169,12 @@ extension ClipboardManager {
                 
                 print("ClipboardManager: History imported. Added \(newItems.count) items, total history count: \(self.clipboardHistory.count)")
                 
-                // 新しい履歴管理システムに一括で保存
-                ChunkedHistoryManager.shared.clearAllHistory()
-                try? ChunkedHistoryManager.shared.saveHistoryItems(self.clipboardHistory)
+                return self.clipboardHistory
             }
+            
+            // 新しい履歴管理システムに一括で保存
+            await ChunkedHistoryManager.shared.clearAllHistory()
+            try? await ChunkedHistoryManager.shared.saveHistoryItems(updatedHistory)
         }
     }
     
@@ -204,33 +212,36 @@ extension ClipboardManager {
     }
     
     // MARK: - History Loading (ファイルシステムからロード)
-    public func loadClipboardHistory() {
+    public func loadClipboardHistory() async {
         // 新しい履歴管理システムから履歴をロード
-        let loadedHistory = ChunkedHistoryManager.shared.loadHistory()
+        let loadedHistory = await ChunkedHistoryManager.shared.loadHistory()
         
-        // ロードした履歴アイテムのfilePathが指すファイルが実際に存在するかを確認し、存在しない場合は削除
-        var validHistory = loadedHistory.filter { item in
-            if let filePath = item.filePath {
-                return FileManager.default.fileExists(atPath: filePath.path)
+        // メインスレッドでUI更新を行う
+        await MainActor.run {
+            // ロードした履歴アイテムのfilePathが指すファイルが実際に存在するかを確認し、存在しない場合は削除
+            var validHistory = loadedHistory.filter { item in
+                if let filePath = item.filePath {
+                    return FileManager.default.fileExists(atPath: filePath.path)
+                }
+                return true // ファイルパスがない場合は常に有効とみなす
             }
-            return true // ファイルパスがない場合は常に有効とみなす
+            
+            // 履歴を日付の新しい順に並べ替える（メモリ内でのみ）
+            validHistory.sort { $0.date > $1.date }
+            
+            // 最大履歴数を超過した場合の処理を適用
+            if self.maxHistoryToSave > 0 && validHistory.count > self.maxHistoryToSave {
+                // 古いアイテムを削除
+                validHistory = Array(validHistory.prefix(self.maxHistoryToSave))
+            }
+            
+            self.clipboardHistory = validHistory
+            
+            for item in self.clipboardHistory where item.filePath != nil {
+                generateThumbnail(for: item, at: item.filePath!)
+            }
+            
+            print("ClipboardManager: Clipboard history loaded from new system. Count: \(self.clipboardHistory.count)")
         }
-        
-        // 履歴を日付の新しい順に並べ替える（メモリ内でのみ）
-        validHistory.sort { $0.date > $1.date }
-        
-        // 最大履歴数を超過した場合の処理を適用
-        if self.maxHistoryToSave > 0 && validHistory.count > self.maxHistoryToSave {
-            // 古いアイテムを削除
-            validHistory = Array(validHistory.prefix(self.maxHistoryToSave))
-        }
-        
-        self.clipboardHistory = validHistory
-        
-        for item in self.clipboardHistory where item.filePath != nil {
-            generateThumbnail(for: item, at: item.filePath!)
-        }
-        
-        print("ClipboardManager: Clipboard history loaded from new system. Count: \(clipboardHistory.count)")
     }
 }
