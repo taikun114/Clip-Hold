@@ -22,6 +22,7 @@ struct HistoryWindowView: View {
     @State private var itemToDelete: ClipboardItem?
     @State private var selectedItemID: UUID?
     @State private var isLoading: Bool = false
+    @State private var isPaginating: Bool = false
     @State private var showCopyConfirmation: Bool = false
     @State private var currentCopyConfirmationTask: Task<Void, Never>?
     
@@ -69,22 +70,35 @@ struct HistoryWindowView: View {
         return text
     }
     
-    // 検索、フィルタリング、並び替えを統合したタスク実行関数
-    private func performUpdate(isIncrementalUpdate: Bool = false) {
-        if !isIncrementalUpdate {
+    private func performUpdate(isPagination: Bool = false, isBackground: Bool = false) {
+        if isPagination {
+            isPaginating = true
+        } else if isBackground {
+            // バックグラウンドでの更新のためスピナーを表示しない
+        } else {
             isLoading = true
+            isPaginating = false
             displayLimit = 100 // 新しい検索やフィルタの時は100件にリセット
             self.filteredHistory = []
             clipboardManager.filteredHistoryForShortcuts = []
         }
         
         let historyCopy = clipboardManager.clipboardHistory
-            
+        let currentFilter = clipboardManager.historySelectedFilter
+        let currentSort = clipboardManager.historySelectedSort
+        let currentApp = clipboardManager.historySelectedApp
+        let currentSearchText = searchText
+        let currentDisplayLimit = displayLimit
+        let currentPinnedID = clipboardManager.pinnedItemID
+        let frontmostID = frontmostAppMonitor.frontmostAppBundleIdentifier
+        let isReduceMotion = reduceMotion
+        
+        Task.detached(priority: .userInitiated) {
             let filtered = historyCopy.filter { item in
                 // App filter
                 let matchesApp: Bool
-                if clipboardManager.historySelectedApp == "auto_filter_mode" {
-                    if let frontmostID = frontmostAppMonitor.frontmostAppBundleIdentifier {
+                if currentApp == "auto_filter_mode" {
+                    if let frontmostID = frontmostID {
                         if let path = item.sourceAppPath, let itemBundle = Bundle(path: path) {
                             matchesApp = itemBundle.bundleIdentifier == frontmostID
                         } else {
@@ -93,27 +107,25 @@ struct HistoryWindowView: View {
                     } else {
                         matchesApp = false
                     }
-                } else if clipboardManager.historySelectedApp == nil {
+                } else if currentApp == nil {
                     matchesApp = true
                 } else {
-                    matchesApp = item.sourceAppPath == clipboardManager.historySelectedApp
+                    matchesApp = item.sourceAppPath == currentApp
                 }
                 
                 // Search text filter
-                let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
+                let matchesSearchText = currentSearchText.isEmpty || item.text.localizedCaseInsensitiveContains(currentSearchText)
                 
                 // Item type filter
                 let matchesFilter: Bool
-                switch clipboardManager.historySelectedFilter {
+                switch currentFilter {
                 case .all:
                     matchesFilter = true
                 case .textAll:
                     matchesFilter = item.filePath == nil
                 case .textRich:
-                    // リッチテキストの判定（richTextプロパティがnilでない場合）
                     matchesFilter = item.filePath == nil && item.richText != nil
                 case .textPlain:
-                    // 標準テキストのみ（richTextプロパティがnilの場合）
                     matchesFilter = item.filePath == nil && item.richText == nil
                 case .linkOnly:
                     matchesFilter = item.isURL
@@ -124,13 +136,10 @@ struct HistoryWindowView: View {
                 case .imageOnly:
                     matchesFilter = item.isImage
                 case .videoOnly:
-                    // 動画ファイルの判定（isVideoプロパティを使用）
                     matchesFilter = item.isVideo
                 case .otherFiles:
-                    // その他のファイルの判定（画像、動画、PDF、フォルダではないファイル）
                     matchesFilter = item.filePath != nil && !item.isImage && !item.isVideo && !item.isPDF && !item.isFolder
                 case .pdfOnly:
-                    // PDFファイルの判定（isPDFプロパティを使用）
                     matchesFilter = item.isPDF
                 case .colorCodeOnly:
                     matchesFilter = item.filePath == nil && ColorCodeParser.parseColor(from: item.text) != nil
@@ -140,7 +149,7 @@ struct HistoryWindowView: View {
             }
             
             let sorted = filtered.sorted { item1, item2 in
-                switch clipboardManager.historySelectedSort {
+                switch currentSort {
                 case .newest:
                     return item1.date > item2.date
                 case .oldest:
@@ -152,22 +161,25 @@ struct HistoryWindowView: View {
                 }
             }
             
-            // パフォーマンスのため、UIに表示するアイテム数を制限し、ページネーションを行う
-            var finalHistory = Array(sorted.prefix(displayLimit))
-            if let pinnedID = clipboardManager.pinnedItemID,
+            var finalHistory = Array(sorted.prefix(currentDisplayLimit))
+            if let pinnedID = currentPinnedID,
                let pinnedItem = sorted.first(where: { $0.id == pinnedID }) {
                 finalHistory.insert(pinnedItem.createPinnedDuplicate(), at: 0)
             }
             
-            if reduceMotion {
-                self.filteredHistory = finalHistory
-            } else {
-                withAnimation {
+            await MainActor.run {
+                if isReduceMotion {
                     self.filteredHistory = finalHistory
+                } else {
+                    withAnimation {
+                        self.filteredHistory = finalHistory
+                    }
                 }
+                self.clipboardManager.filteredHistoryForShortcuts = finalHistory
+                self.isLoading = false
+                self.isPaginating = false
             }
-            clipboardManager.filteredHistoryForShortcuts = finalHistory
-            isLoading = false
+        }
     }
     
     var body: some View {
@@ -191,6 +203,7 @@ struct HistoryWindowView: View {
                     HistoryContentList(
                         filteredHistory: $filteredHistory,
                         isLoading: $isLoading,
+                        isPaginating: $isPaginating,
                         showingDeleteConfirmation: $showingDeleteConfirmation,
                         itemToDelete: $itemToDelete,
                         selectedItemID: $selectedItemID,
@@ -214,7 +227,7 @@ struct HistoryWindowView: View {
                         onLoadMore: {
                             if displayLimit < clipboardManager.clipboardHistory.count {
                                 displayLimit += 100
-                                performUpdate(isIncrementalUpdate: true)
+                                performUpdate(isPagination: true)
                             }
                         }
                     )
@@ -232,7 +245,7 @@ struct HistoryWindowView: View {
             // 右クリックメニューなどが閉じられた時にも発火してしまうため、識別子を確認する
             if let window = notification.object as? NSWindow, window.identifier?.rawValue == "HistoryWindow" {
                 displayLimit = 100
-                performUpdate(isIncrementalUpdate: true)
+                performUpdate(isBackground: true)
             }
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
@@ -247,13 +260,13 @@ struct HistoryWindowView: View {
         .onChange(of: clipboardManager.historySelectedFilter) { _, _ in performUpdate() }
         .onChange(of: clipboardManager.historySelectedSort) { _, _ in performUpdate() }
         .onChange(of: clipboardManager.historySelectedApp) { _, _ in performUpdate() }
-        .onChange(of: clipboardManager.pinnedItemID) { _, _ in performUpdate(isIncrementalUpdate: true) }
+        .onChange(of: clipboardManager.pinnedItemID) { _, _ in performUpdate(isBackground: true) }
         .onChange(of: frontmostAppMonitor.frontmostAppBundleIdentifier) { _, _ in
             if clipboardManager.historySelectedApp == "auto_filter_mode" {
                 performUpdate()
             }
         }
-        .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
+        .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isBackground: true) }
         .onAppear {
             clipboardManager.filteredHistoryForShortcuts = []
             performUpdate()

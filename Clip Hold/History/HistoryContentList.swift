@@ -11,6 +11,7 @@ struct HistoryContentList: View {
     
     @Binding var filteredHistory: [ClipboardItem]
     @Binding var isLoading: Bool
+    @Binding var isPaginating: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var itemToDelete: ClipboardItem?
     @Binding var selectedItemID: UUID?
@@ -471,8 +472,21 @@ struct HistoryContentList: View {
                     }
                 } // ScrollViewReaderの終わり
             }
-            if isLoading {
+            // 初回読み込みや検索時のスピナー（中央）
+            if isLoading && !isPaginating {
                 SharedLoadingView()
+            }
+            
+            // ページネーション（追加読み込み）時のスピナー（下部）
+            if isPaginating {
+                VStack {
+                    Spacer()
+                    ProgressView()
+                        .controlSize(.regular)
+                        .padding(10)
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                        .padding(.bottom, 20)
+                }
             }
         }
     }
