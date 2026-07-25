@@ -254,6 +254,19 @@ struct ShortcutsSettingsView: View {
                     }
                 }
                 HStack {
+                    Text("新規コピー画面を開く")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .newCopy)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.newCopy)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+                HStack {
                     Text("最新の履歴を変更してコピーする")
                     Spacer()
                     KeyboardShortcuts.Recorder(for: .editAndCopyLatestHistory)

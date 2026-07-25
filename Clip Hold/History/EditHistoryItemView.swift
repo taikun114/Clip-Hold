@@ -4,6 +4,7 @@ struct EditHistoryItemView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @State var content: String
+    var title: String = String(localized: "項目を変更してコピー")
     var onCopy: (String) -> Void
     var isSheet: Bool = false
     
@@ -12,7 +13,7 @@ struct EditHistoryItemView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("項目を変更してコピー")
+                Text(title)
                     .font(.headline)
                     .fontWeight(.bold)
                 Spacer()

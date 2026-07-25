@@ -328,6 +328,44 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
     }
     
+    @MainActor
+    func showNewCopyWindow() {
+        let windowType: WindowType = .newCopy
+        let title = String(localized: "テキストを入力して新規コピー")
+        
+        // 既存のウィンドウコントローラーがあればそれを最前面に表示
+        if let existingController = windowControllers[windowType] {
+            existingController.showWindowAndCenter(false)
+            NSApp.activate(ignoringOtherApps: true)
+            print("AppDelegate: Reusing existing \(windowType) window.")
+            return
+        }
+        
+        let editView = EditHistoryItemView(content: "", title: title, onCopy: { editedContent in
+            // コピー処理を実装
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(editedContent, forType: .string)
+            
+            // クイックペーストの処理
+            let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+            if currentQuickPaste {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    ClipHoldApp.performPaste()
+                }
+            }
+        }, isSheet: false)
+        
+        // 新しいウィンドウコントローラーを作成
+        let windowController = ClipHoldStandardWindowController(rootView: editView, title: title, windowType: windowType)
+        windowControllers[windowType] = windowController
+        
+        // ウィンドウを表示し、アプリをアクティブにする
+        windowController.showWindowAndCenter(true)
+        NSApp.activate(ignoringOtherApps: true)
+        
+        print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+    }
+    
     // MARK: - NSWindowDelegate
     func windowWillClose(_ notification: Notification) {
         guard let closedWindow = notification.object as? NSWindow else { return }

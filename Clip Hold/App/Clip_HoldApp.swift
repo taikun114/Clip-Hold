@@ -663,5 +663,14 @@ struct ClipHoldApp: App {
                 }
             }
         }
+        
+        // テキストを入力してコピーするショートカットの登録
+        KeyboardShortcuts.onKeyDown(for: .newCopy) {
+            DispatchQueue.main.async {
+                if let delegate = NSApp.delegate as? AppDelegate {
+                    delegate.showNewCopyWindow()
+                }
+            }
+        }
     }
 }

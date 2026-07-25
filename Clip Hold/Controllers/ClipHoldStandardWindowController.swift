@@ -6,6 +6,7 @@ enum WindowType: String, CaseIterable {
     case addPhrase = "AddPhrase"
     case addPreset = "AddPreset"
     case editHistory = "EditHistory"
+    case newCopy = "NewCopy"
 }
 
 class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
