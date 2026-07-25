@@ -57,5 +57,6 @@ struct SharedPresetPicker: View {
                 .tag(newPresetUUID as UUID?)
         }
         .labelStyle(.titleAndIcon)
+        .flexiblePickerSizing()
     }
 }

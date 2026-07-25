@@ -35,6 +35,7 @@ struct MovePhrasePresetSelectionSheet: View {
             .pickerStyle(.menu)
             .labelsHidden()
             .labelStyle(.titleAndIcon)
+            .flexiblePickerSizing()
             
             Spacer()
             

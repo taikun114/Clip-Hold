@@ -28,4 +28,14 @@ extension View {
             self
         }
     }
+    
+    /// macOS 26以降でのみ、ボタンやピッカーのサイズを横に広げるモディファイア
+    @ViewBuilder
+    func flexiblePickerSizing() -> some View {
+        if #available(macOS 26.0, *) {
+            self.buttonSizing(.flexible)
+        } else {
+            self
+        }
+    }
 }

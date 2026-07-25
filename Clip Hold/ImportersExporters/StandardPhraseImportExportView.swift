@@ -196,6 +196,7 @@ struct StandardPhraseImportExportView: View {
                 .pickerStyle(.menu)
                 .labelsHidden()
                 .labelStyle(.titleAndIcon)
+                .flexiblePickerSizing()
                 
                 Toggle("旧バージョンで使用できるようにする", isOn: $useLegacyFormat)
                     .help("有効にすると、プリセット情報なしで定型文のみをエクスポートします。")
