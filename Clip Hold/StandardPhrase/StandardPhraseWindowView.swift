@@ -137,7 +137,6 @@ struct StandardPhraseWindowView: View {
         
         SharedMoveMenuItem {
             phraseToMove = currentPhrase
-            showingMoveSheet = true
         }
         
         SharedDuplicateMenuItem {
@@ -175,7 +174,7 @@ struct StandardPhraseWindowView: View {
     @State private var phraseToEdit: StandardPhrase? = nil
     @State private var phraseToEditAndCopy: StandardPhrase?
     @State private var showingEditAndCopySheet = false
-    @State private var showingMoveSheet = false
+
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
     
@@ -494,8 +493,8 @@ struct StandardPhraseWindowView: View {
         .sheet(isPresented: $showingAddPresetSheet) {
             AddEditPresetView(isSheet: true, editingPreset: nil)
         }
-        .sheet(isPresented: $showingMoveSheet) {
-            if let phrase = phraseToMove, let sourceId = presetManager.selectedPresetId {
+        .sheet(item: $phraseToMove) { phrase in
+            if let sourceId = presetManager.selectedPresetId {
                 MovePhrasePresetSelectionSheet(presetManager: presetManager, sourcePresetId: sourceId, selectedPresetId: $destinationPresetId) {
                     if let destinationId = destinationPresetId {
                         presetManager.move(phrase: phrase, to: destinationId)

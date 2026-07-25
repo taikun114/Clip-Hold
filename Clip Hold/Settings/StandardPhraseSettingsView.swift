@@ -622,7 +622,7 @@ private struct PhraseSettingsSection: View {
     @State private var showingDeleteConfirmation = false
     @State private var showingClearAllPhrasesConfirmation = false
     @State private var showingAddPresetSheet = false
-    @State private var showingMoveSheet = false
+
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
     
@@ -685,10 +685,10 @@ private struct PhraseSettingsSection: View {
         .sheet(isPresented: $showingAddPhraseSheet) { addSheet }
         .sheet(item: $selectedPhrase) { phrase in editSheet(for: phrase) }
         .sheet(isPresented: $showingAddPresetSheet) { AddEditPresetView(isSheet: true, editingPreset: nil) }
-        .sheet(isPresented: $showingMoveSheet) {
+        .sheet(item: $phraseToMove) { phrase in
             if let sourceId = presetManager.selectedPresetId {
                 MovePhrasePresetSelectionSheet(presetManager: StandardPhrasePresetManager.shared, sourcePresetId: sourceId, selectedPresetId: $destinationPresetId) {
-                    if let phrase = phraseToMove, let destinationId = destinationPresetId {
+                    if let destinationId = destinationPresetId {
                         presetManager.move(phrase: phrase, to: destinationId)
                     }
                 }
@@ -818,7 +818,6 @@ private struct PhraseSettingsSection: View {
             SharedMoveMenuItem {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     phraseToMove = phrase
-                    showingMoveSheet = true
                 }
             }
             SharedDuplicateMenuItem {
