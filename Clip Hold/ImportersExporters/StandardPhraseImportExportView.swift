@@ -132,8 +132,6 @@ struct StandardPhraseImportExportView: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
     
-    
-    
     var body: some View {
         HStack {
             Text("定型文")

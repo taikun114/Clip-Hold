@@ -61,27 +61,28 @@ extension ClipboardManager {
             lastChangeCount = pasteboard.changeCount
             print("DEBUG: checkPasteboard - Pasteboard change detected. New changeCount: \(lastChangeCount)")
             
+            let wasStandardPhraseCopy = isCopyingStandardPhrase
             // Check for standard phrase copy
-            if self.ignoreStandardPhrases && isCopyingStandardPhrase {
+            if self.ignoreStandardPhrases && wasStandardPhraseCopy {
                 isCopyingStandardPhrase = false // Reset the flag
                 print("DEBUG: checkPasteboard: Standard phrase copy detected and ignored.")
                 return // Skip adding to history
             }
             // It's important to reset the flag even if ignoreStandardPhrases is false
-            if isCopyingStandardPhrase {
+            if wasStandardPhraseCopy {
                 isCopyingStandardPhrase = false
                 print("DEBUG: checkPasteboard: Standard phrase copy detected, but will be added to history.")
             }
             
             // 内部コピー操作中の場合は、この変更をスキップし、フラグをリセットする
             // isPerformingInternalCopy の状態をこのチェックの最初にキャプチャする
-            let wasInternalCopyInitially = isPerformingInternalCopy
+            let wasInternalCopyInitially = isPerformingInternalCopy || wasStandardPhraseCopy
             if wasInternalCopyInitially {
                 print("DEBUG: checkPasteboard: Internal copy in progress. Will process content and reset flag at the end.")
                 // ここでは isPerformingInternalCopy をリセットしない
             }
             
-            if let activeAppBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier {
+            if let activeAppBundleIdentifier = ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleIdentifier {
                 guard !excludedAppIdentifiers.contains(activeAppBundleIdentifier) else {
                     print("DEBUG: checkPasteboard - Excluded app detected: \(activeAppBundleIdentifier). Skipping.")
                     // 内部コピーフラグが設定されていた場合、ここでリセット
@@ -137,7 +138,7 @@ extension ClipboardManager {
                             
                             // 有効なローカルファイルURLが存在する場合 -> ファイルとして処理
                             if !validLocalFileURLs.isEmpty {
-                                let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                                let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                                 await self.handleMultipleFilesChange(fileURLs: validLocalFileURLs, sourceAppPath: sourceAppPath)
                                 if wasInternalCopyInitially {
                                     await MainActor.run {
@@ -153,17 +154,9 @@ extension ClipboardManager {
                             if !webURLStrings.isEmpty && validLocalFileURLs.isEmpty && !hasImageDataType {
                                 let urlString = webURLStrings.first ?? ""
                                 print("DEBUG: checkPasteboard - Web URL detected as file URL string (no image data): \(urlString.prefix(50))...")
-                                let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                                let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                                 let newItem = ClipboardItem(text: urlString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                                await MainActor.run {
-                                    self.addAndSaveItem(newItem)
-                                }
-                                if wasInternalCopyInitially {
-                                    await MainActor.run {
-                                        self.isPerformingInternalCopy = false
-                                        print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after web URL (as file URL string) processing.")
-                                    }
-                                }
+                                await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "web URL (as file URL string)")
                                 success = true
                                 return
                             }
@@ -179,34 +172,18 @@ extension ClipboardManager {
                                     }
                                 }
                                 
-                                let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                                let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                                 if let newItem = await self.createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
-                                    await MainActor.run {
-                                        self.addAndSaveItem(newItem)
-                                    }
-                                }
-                                if wasInternalCopyInitially {
-                                    await MainActor.run {
-                                        self.isPerformingInternalCopy = false
-                                        print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after file URL (string) processing.")
-                                    }
+                                    await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "file URL (string)")
                                 }
                                 success = true
                                 return
                             } else if !url.isFileURL && !hasImageDataType {
                                 // file:// 以外のスキーム (http, httpsなど) は文字列として扱う (ただし、画像データがなければ)
                                 print("DEBUG: checkPasteboard - Web URL detected as file URL string (no image data): \(url.absoluteString.prefix(50))...")
-                                let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                                let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                                 let newItem = ClipboardItem(text: url.absoluteString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                                await MainActor.run {
-                                    self.addAndSaveItem(newItem)
-                                }
-                                if wasInternalCopyInitially {
-                                    await MainActor.run {
-                                        self.isPerformingInternalCopy = false
-                                        print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after web URL (as file URL string) processing.")
-                                    }
-                                }
+                                await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "web URL (as file URL string)")
                                 success = true
                                 return
                             }
@@ -218,32 +195,16 @@ extension ClipboardManager {
                     if hasURLType && !hasImageDataType {
                         if let url = pasteboard.readObjects(forClasses: [NSURL.self], options: nil)?.first as? URL {
                             print("DEBUG: checkPasteboard - URL object detected (no image data): \(url.absoluteString.prefix(50))...")
-                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                             let newItem = ClipboardItem(text: url.absoluteString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                            await MainActor.run {
-                                self.addAndSaveItem(newItem)
-                            }
-                            if wasInternalCopyInitially {
-                                await MainActor.run {
-                                    self.isPerformingInternalCopy = false
-                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after URL object processing.")
-                                }
-                            }
+                            await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "URL object")
                             success = true
                             return
                         } else if let urlString = pasteboard.string(forType: .URL) {
                             print("DEBUG: checkPasteboard - URL string detected (no image data): \(urlString.prefix(50))...")
-                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                             let newItem = ClipboardItem(text: urlString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                            await MainActor.run {
-                                self.addAndSaveItem(newItem)
-                            }
-                            if wasInternalCopyInitially {
-                                await MainActor.run {
-                                    self.isPerformingInternalCopy = false
-                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after URL string processing.")
-                                }
-                            }
+                            await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "URL string")
                             success = true
                             return
                         }
@@ -256,17 +217,9 @@ extension ClipboardManager {
                         // RTFのプレーンテキスト表現も取得 (表示用)
                         let plainText = pasteboard.string(forType: .string) ?? rtfString // RTFからプレーンテキストを抽出できない場合は、RTF自体をプレーンテキストとして使用
                         
-                        let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                        let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                         let newItem = ClipboardItem(richText: rtfString, text: plainText, date: Date(), qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                        await MainActor.run {
-                            self.addAndSaveItem(newItem)
-                        }
-                        if wasInternalCopyInitially {
-                            await MainActor.run {
-                                self.isPerformingInternalCopy = false
-                                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after RTF string processing.")
-                            }
-                        }
+                        await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "RTF string")
                         success = true
                         return
                     }
@@ -287,17 +240,9 @@ extension ClipboardManager {
                             // HTMLのプレーンテキスト表現も取得 (表示用)
                             let plainText = pasteboard.string(forType: .string) ?? htmlString // HTMLからプレーンテキストを抽出できない場合は、HTML自体をプレーンテキストとして使用
                             
-                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                             let newItem = ClipboardItem(richText: htmlString, text: plainText, date: Date(), qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                            await MainActor.run {
-                                self.addAndSaveItem(newItem)
-                            }
-                            if wasInternalCopyInitially {
-                                await MainActor.run {
-                                    self.isPerformingInternalCopy = false
-                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after HTML string processing.")
-                                }
-                            }
+                            await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "HTML string")
                             success = true
                             return
                         }
@@ -307,17 +252,9 @@ extension ClipboardManager {
                     if hasPDFType {
                         if let pdfData = pasteboard.data(forType: .pdf) ?? pasteboard.data(forType: NSPasteboard.PasteboardType(rawValue: "Apple PDF pasteboard type")) {
                             print("DEBUG: checkPasteboard - PDF data detected.")
-                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                             if let newItem = await self.createClipboardItemFromPDFData(pdfData, sourceAppPath: sourceAppPath) {
-                                await MainActor.run {
-                                    self.addAndSaveItem(newItem)
-                                }
-                            }
-                            if wasInternalCopyInitially {
-                                await MainActor.run {
-                                    self.isPerformingInternalCopy = false
-                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after PDF data processing.")
-                                }
+                                await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "PDF data")
                             }
                             success = true
                             return
@@ -347,18 +284,10 @@ extension ClipboardManager {
                         
                         if let imageData = imageDataFromPasteboard, let image = imageFromPasteboard {
                             let qrCodeContent = self.decodeQRCode(from: image)
-                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                             
                             if let newItem = await self.createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
-                                await MainActor.run {
-                                    self.addAndSaveItem(newItem)
-                                }
-                            }
-                            if wasInternalCopyInitially {
-                                await MainActor.run {
-                                    self.isPerformingInternalCopy = false
-                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after image data processing.")
-                                }
+                                await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "image data")
                             }
                             success = true
                             return
@@ -388,18 +317,10 @@ extension ClipboardManager {
                         
                         if let imageData = imageDataFromPasteboard, let image = imageFromPasteboard {
                             let qrCodeContent = self.decodeQRCode(from: image)
-                            let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                            let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                             
                             if let newItem = await self.createClipboardItemFromImageData(imageData, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
-                                await MainActor.run {
-                                    self.addAndSaveItem(newItem)
-                                }
-                            }
-                            if wasInternalCopyInitially {
-                                await MainActor.run {
-                                    self.isPerformingInternalCopy = false
-                                    print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after image data processing.")
-                                }
+                                await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "image data")
                             }
                             success = true
                             return
@@ -412,17 +333,9 @@ extension ClipboardManager {
                         // RTFのプレーンテキスト表現も取得 (表示用)
                         let plainText = pasteboard.string(forType: .string) ?? rtfString // RTFからプレーンテキストを抽出できない場合は、RTF自体をプレーンテキストとして使用
                         
-                        let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                        let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                         let newItem = ClipboardItem(richText: rtfString, text: plainText, date: Date(), qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                        await MainActor.run {
-                            self.addAndSaveItem(newItem)
-                        }
-                        if wasInternalCopyInitially {
-                            await MainActor.run {
-                                self.isPerformingInternalCopy = false
-                                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after RTF string processing.")
-                            }
-                        }
+                        await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "RTF string")
                         success = true
                         return
                     }
@@ -430,17 +343,9 @@ extension ClipboardManager {
                     // 6. 最後に、テキストデータをチェック (低優先度)
                     if let newString = pasteboard.string(forType: .string) {
                         print("DEBUG: checkPasteboard - String detected: \(newString.prefix(50))...")
-                        let sourceAppPath = NSWorkspace.shared.frontmostApplication?.bundleURL?.path
+                        let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                         let newItem = ClipboardItem(text: newString, date: Date(), filePath: nil, fileSize: nil, qrCodeContent: nil, sourceAppPath: sourceAppPath)
-                        await MainActor.run {
-                            self.addAndSaveItem(newItem)
-                        }
-                        if wasInternalCopyInitially {
-                            await MainActor.run {
-                                self.isPerformingInternalCopy = false
-                                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after string processing.")
-                            }
-                        }
+                        await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "string")
                         success = true
                         return
                     }
@@ -462,6 +367,17 @@ extension ClipboardManager {
                         }
                     }
                 }
+            }
+        }
+    }
+    
+    /// クリップボードアイテムを保存し、必要に応じて内部コピーフラグをリセットする共通関数
+    private func processAndSaveItem(_ item: ClipboardItem, wasInternalCopy: Bool, description: String) async {
+        await MainActor.run {
+            self.addAndSaveItem(item)
+            if wasInternalCopy {
+                self.isPerformingInternalCopy = false
+                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after \(description) processing.")
             }
         }
     }
