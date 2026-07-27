@@ -41,6 +41,7 @@ Notes
   - Implemented pagination, limiting the initial display to 100 items and loading additional history items as you scroll.
 - **Improve history addition performance when copying files**
 - **Improve icon display on macOS Golden Gate**
+- **Improve the display of History and Standard Phrase windows on macOS Golden Gate**
 - **Improve the add apps to exclude screen**
 - **Improve the preset picker display on macOS Tahoe or later**
 - **Improve accuracy of detecting the source application of copied items**

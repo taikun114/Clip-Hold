@@ -186,7 +186,7 @@ struct HistoryWindowView: View {
     
     var body: some View {
         ZStack {
-            HistoryWindowBackground()
+            SharedWindowBackground()
             
             ZStack {
                 VStack(spacing: 0) {
