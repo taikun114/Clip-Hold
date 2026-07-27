@@ -313,8 +313,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         let editView = EditHistoryItemView(content: content, onCopy: { editedContent in
             // コピー処理を実装
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(editedContent, forType: .string)
+            let clipboardManager = ClipboardManager.shared
+            clipboardManager.isPerformingInternalCopy = true
+            clipboardManager.copyItemToClipboard(ClipboardItem(text: editedContent))
         }, isSheet: false)
         
         // 新しいウィンドウコントローラーを作成
@@ -343,8 +344,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         let editView = EditHistoryItemView(content: "", title: title, onCopy: { editedContent in
             // コピー処理を実装
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(editedContent, forType: .string)
+            let clipboardManager = ClipboardManager.shared
+            clipboardManager.isPerformingInternalCopy = true
+            clipboardManager.copyItemToClipboard(ClipboardItem(text: editedContent))
             
             // クイックペーストの処理
             let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")

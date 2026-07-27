@@ -27,6 +27,11 @@ struct QRCodeView: View {
                     .layoutPriority(1) // QRコード画像に高いレイアウト優先度を設定
                     .contextMenu {
                         Button {
+                            let clipboardManager = ClipboardManager.shared
+                            clipboardManager.isPerformingInternalCopy = true
+                            
+                            // 画像をクリップボードにセットする。ClipboardItemに画像を保持するプロパティがないため
+                            // ここだけは直接NSPasteboardを使用するが、フラグは正しく設定されている
                             let pasteboard = NSPasteboard.general
                             pasteboard.clearContents()
                             pasteboard.writeObjects([qrCodeImage])

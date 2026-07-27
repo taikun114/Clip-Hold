@@ -104,8 +104,8 @@ struct HistoryContentList: View {
         
         if currentItem.richText != nil {
             Button {
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString(currentItem.text, forType: .string)
+                let newItemToCopy = ClipboardItem(text: currentItem.text)
+                onCopyAction(newItemToCopy)
                 showCopyConfirmation = true
                 currentCopyConfirmationTask?.cancel()
                 currentCopyConfirmationTask = Task { @MainActor in
@@ -340,8 +340,8 @@ struct HistoryContentList: View {
                     .sheet(item: $itemToEdit) { item in
                         EditHistoryItemView(content: item.text, onCopy: { editedContent in
                             // コピー処理を実装
-                            NSPasteboard.general.clearContents()
-                            NSPasteboard.general.setString(editedContent, forType: .string)
+                            let newItemToCopy = ClipboardItem(text: editedContent)
+                            onCopyAction(newItemToCopy)
                             
                             // コピー確認を表示
                             showCopyConfirmation = true

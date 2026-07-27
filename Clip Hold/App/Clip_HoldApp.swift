@@ -603,7 +603,6 @@ struct ClipHoldApp: App {
         KeyboardShortcuts.onKeyDown(for: .copyPinnedHistoryItem) {
             let clipboardManager = ClipboardManager.shared
             if let pinnedItem = clipboardManager.pinnedItem {
-                NSPasteboard.general.clearContents()
                 clipboardManager.isPerformingInternalCopy = true
                 clipboardManager.copyItemToClipboard(pinnedItem)
                 
@@ -649,7 +648,6 @@ struct ClipHoldApp: App {
                 // 並び替えた配列に対してインデックスを適用
                 if historySource.indices.contains(i) {
                     let historyItem = historySource[i]
-                    NSPasteboard.general.clearContents()
                     
                     // 内部コピーフラグをtrueに設定
                     clipboardManager.isPerformingInternalCopy = true
