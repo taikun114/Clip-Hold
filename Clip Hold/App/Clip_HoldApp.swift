@@ -117,8 +117,6 @@ struct ClipHoldApp: App {
         )
     }
     
-    
-    
     var body: some Scene {
         MenuBarExtra(isInserted: menuBarExtraInsertionBinding) {
             // --- 定型文セクション ---
@@ -131,8 +129,19 @@ struct ClipHoldApp: App {
                 Text("定型文はありません")
             } else {
                 let displayLimit = min(phrasesToShow.count, maxPhrasesInMenu)
-                ForEach(phrasesToShow.prefix(displayLimit)) {
-                    phrase in
+                let phrasesWithIndex: [(phrase: StandardPhrase, shortcutName: KeyboardShortcuts.Name?)] = {
+                    var result: [(phrase: StandardPhrase, shortcutName: KeyboardShortcuts.Name?)] = []
+                    for (index, phrase) in phrasesToShow.prefix(displayLimit).enumerated() {
+                        let shortcut: KeyboardShortcuts.Name? = (index < KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts.count) ? KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts[index] : nil
+                        result.append((phrase, shortcut))
+                    }
+                    return result
+                }()
+                
+                ForEach(phrasesWithIndex, id: \.phrase.id) { element in
+                    let phrase = element.phrase
+                    let shortcutName = element.shortcutName
+                    
                     let displayText: String = {
                         let displayContent = phrase.title.replacingOccurrences(of: "\n", with: " ")
                         if displayContent.count > 40 {
@@ -179,6 +188,7 @@ struct ClipHoldApp: App {
                         }
                         .labelStyle(.titleAndIcon)
                     }
+                    .applyKeyboardShortcut(for: shortcutName)
                 }
             }
             
@@ -223,6 +233,7 @@ struct ClipHoldApp: App {
             } label: {
                 Label("すべての定型文を表示...", systemImage: "pencil.and.list.clipboard")
             }
+            .applyKeyboardShortcut(for: .showAllStandardPhrases)
             Divider()
             
             // --- コピー履歴セクション ---
@@ -244,8 +255,28 @@ struct ClipHoldApp: App {
                 let hasPinnedItem = clipboardManager.pinnedItemID != nil && sortedHistory.first?.originalPinnedItemID != nil
                 let effectiveMaxHistory = maxHistoryInMenu + (hasPinnedItem ? 1 : 0)
                 let displayLimit = min(sortedHistory.count, effectiveMaxHistory)
-                ForEach(sortedHistory.prefix(displayLimit)) {
-                    item in
+                
+                let historyItemsWithIndex: [(item: ClipboardItem, shortcutName: KeyboardShortcuts.Name?)] = {
+                    var result: [(item: ClipboardItem, shortcutName: KeyboardShortcuts.Name?)] = []
+                    var normalIndex = 0
+                    for item in sortedHistory.prefix(displayLimit) {
+                        var shortcut: KeyboardShortcuts.Name? = nil
+                        if item.originalPinnedItemID != nil {
+                            shortcut = .copyPinnedHistoryItem
+                        } else {
+                            if normalIndex < KeyboardShortcuts.Name.allClipboardHistoryCopyShortcuts.count {
+                                shortcut = KeyboardShortcuts.Name.allClipboardHistoryCopyShortcuts[normalIndex]
+                            }
+                            normalIndex += 1
+                        }
+                        result.append((item, shortcut))
+                    }
+                    return result
+                }()
+                
+                ForEach(historyItemsWithIndex, id: \.item.id) { element in
+                    let item = element.item
+                    let shortcutName = element.shortcutName
                     
                     let displayText: String = {
                         let content: String
@@ -342,6 +373,7 @@ struct ClipHoldApp: App {
                         }
                         .labelStyle(.titleAndIcon)
                     }
+                    .applyKeyboardShortcut(for: shortcutName)
                 }
             }
             
@@ -354,6 +386,7 @@ struct ClipHoldApp: App {
             } label: {
                 Label("すべてのコピー履歴を表示...", systemImage: "list.clipboard")
             }
+            .applyKeyboardShortcut(for: .showAllCopyHistory)
             
             Divider()
             
@@ -364,6 +397,7 @@ struct ClipHoldApp: App {
             }) {
                 Label("設定...", systemImage: "gear")
             }
+            .keyboardShortcut(",", modifiers: .command)
             
             Divider()
             

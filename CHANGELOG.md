@@ -46,6 +46,7 @@ Notes
 - **Improve the preset picker display on macOS Tahoe or later**
 - **Improve accuracy of detecting the source application of copied items**
   - A more accurate app is now detected when copying from a background window (e.g., via right-click) while another app is focused. Note that due to system limitations, if you copy text from a context menu on the Clip Hold window (such as in an alert or sheet), another frontmost app will be detected. (Don't worry, copying from the copy history or standard phrases will be recognized correctly.)
+- **Improve to display currently configured shortcut keys in the menu**
 - **Changes to the preset icon picker package**
   - Icon names are now displayed, and you can filter by specific categories using the category picker.
 

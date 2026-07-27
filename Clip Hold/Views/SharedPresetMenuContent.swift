@@ -54,5 +54,6 @@ struct SharedPresetMenuContent: View {
             Label("新規プリセット...", systemImage: "plus")
                 .forceIconOnMacOS27()
         }
+        .applyKeyboardShortcut(for: .addNewPreset)
     }
 }
