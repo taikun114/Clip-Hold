@@ -11,6 +11,22 @@ class ClipboardManager: ObservableObject {
     @Published var clipboardHistory: [ClipboardItem] = []
     @Published var filteredHistoryForShortcuts: [ClipboardItem]? = nil
     
+    // サンドボックスファイルURLからハッシュを引くためのキャッシュ
+    private var fileHashCache: [URL: String] = [:]
+    
+    func updateFileHashCache(url: URL, hash: String) {
+        fileHashCache[url] = hash
+    }
+    
+    func getCachedFileHash(for url: URL) -> String? {
+        return fileHashCache[url]
+    }
+    
+    // ハッシュからキャッシュ内のファイルURLを検索する
+    func getFileURL(forHash hash: String) -> URL? {
+        return fileHashCache.first(where: { $1 == hash })?.key
+    }
+    
     // アプリケーション名のキャッシュ
     @Published var localizedAppNames: [String: String] = [:]
     

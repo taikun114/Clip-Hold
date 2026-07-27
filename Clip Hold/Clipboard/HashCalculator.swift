@@ -4,6 +4,16 @@ import CryptoKit
 class HashCalculator {
     // ファイルのSHA256ハッシュを計算する
     static func calculateFileHash(at url: URL) -> String? {
+        var isDirectory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) else {
+            return nil
+        }
+        
+        if isDirectory.boolValue {
+            // ディレクトリの場合はハッシュ計算を行わず、nilを返す（同じ名前のフォルダが重複判定されないようにするため）
+            return nil
+        }
+        
         do {
             let fileHandle = try FileHandle(forReadingFrom: url)
             defer { try? fileHandle.close() }

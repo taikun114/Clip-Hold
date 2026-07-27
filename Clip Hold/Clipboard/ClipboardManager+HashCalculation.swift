@@ -15,15 +15,27 @@ extension ClipboardManager {
                 let items = try await chunkedHistoryManager.loadHistoryChunk(at: index)
                 var itemsUpdated = false
                 
-                // 各アイテムに対して、ファイルハッシュが存在しない場合に計算
+                // 各アイテムに対して、ファイルハッシュが存在しない場合に計算、存在する場合はキャッシュに保存
                 for (itemIndex, item) in items.enumerated() {
-                    if let filePath = item.filePath, item.fileHash == nil {
-                        // ファイルが存在する場合のみハッシュを計算
-                        if FileManager.default.fileExists(atPath: filePath.path) {
-                            let fileHash = HashCalculator.calculateFileHash(at: filePath)
-                            items[itemIndex].fileHash = fileHash
-                            itemsUpdated = true
-                            print("ClipboardManager: Calculated missing hash for file item at chunk \(index), item index \(itemIndex).")
+                    if let filePath = item.filePath {
+                        if let existingHash = item.fileHash {
+                            // 既にハッシュが存在する場合はキャッシュに保存
+                            Task { @MainActor in
+                                self.updateFileHashCache(url: filePath, hash: existingHash)
+                            }
+                        } else {
+                            // ファイルが存在する場合のみハッシュを計算
+                            if FileManager.default.fileExists(atPath: filePath.path) {
+                                let fileHash = HashCalculator.calculateFileHash(at: filePath)
+                                items[itemIndex].fileHash = fileHash
+                                itemsUpdated = true
+                                if let fileHash = fileHash {
+                                    Task { @MainActor in
+                                        self.updateFileHashCache(url: filePath, hash: fileHash)
+                                    }
+                                }
+                                print("ClipboardManager: Calculated missing hash for file item at chunk \(index), item index \(itemIndex).")
+                            }
                         }
                     }
                 }

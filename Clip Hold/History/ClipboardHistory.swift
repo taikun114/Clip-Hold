@@ -37,6 +37,7 @@ extension ClipboardManager {
             let lastItemType = lastItem.filePath != nil ? "File" : "Text"
             let newItemType = newItem.filePath != nil ? "File" : "Text"
             print("ClipboardManager: Checking duplicate. Last item type: \(lastItemType) (filePath: \(String(describing: lastItem.filePath))), New item type: \(newItemType) (filePath: \(String(describing: newItem.filePath)))")
+            
             // newItemがテキストアイテムで、最後のアイテムもテキストの場合
             if newItem.filePath == nil && lastItem.filePath == nil {
                 print("ClipboardManager: Both items are text. Checking for duplication...")
@@ -112,17 +113,35 @@ extension ClipboardManager {
         if id == pinnedItemID {
             unpinItem()
         }
-        if let index = clipboardHistory.firstIndex(where: { $0.id == id }) {
-            let itemToDelete = clipboardHistory[index]
-            if let filePath = itemToDelete.filePath {
-                deleteFileFromSandbox(at: filePath)
+        
+        guard let index = clipboardHistory.firstIndex(where: { $0.id == id }) else { return }
+        let itemToDelete = clipboardHistory[index]
+        
+        self.objectWillChange.send()
+        
+        // ファイルアイテムの場合、同じファイルを参照している他の履歴もまとめて削除する
+        if let filePath = itemToDelete.filePath {
+            // 同じfilePathを持つアイテムを全て見つける
+            let duplicatedItems = clipboardHistory.filter { $0.filePath == filePath }
+            
+            // メモリ上の履歴から全て削除
+            clipboardHistory.removeAll(where: { $0.filePath == filePath })
+            
+            // ファイル実体を削除
+            deleteFileFromSandbox(at: filePath)
+            
+            // ChunkedHistoryManager からも全て削除
+            for duplicate in duplicatedItems {
+                Task {
+                    await ChunkedHistoryManager.shared.deleteHistoryItem(id: duplicate.id)
+                }
             }
-            // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
-            self.objectWillChange.send()
+            print("ClipboardManager: Item and its duplicates deleted. Total history: \(clipboardHistory.count)")
+        } else {
+            // テキストアイテムの場合は単体削除
             clipboardHistory.remove(at: index)
             print("ClipboardManager: Item deleted. Total history: \(clipboardHistory.count)")
             
-            // 新しい履歴管理システムからも削除
             Task {
                 await ChunkedHistoryManager.shared.deleteHistoryItem(id: id)
             }

@@ -39,6 +39,7 @@ Notes
 - **Fix issue where some sheets were not displayed correctly on macOS Golden Gate**
 - **Improve the performance of the History window**
   - Implemented pagination, limiting the initial display to 100 items and loading additional history items as you scroll.
+- **Improve history addition performance when copying files**
 - **Improve icon display on macOS Golden Gate**
 - **Improve the add apps to exclude screen**
 - **Improve the preset picker display on macOS Tahoe or later**
