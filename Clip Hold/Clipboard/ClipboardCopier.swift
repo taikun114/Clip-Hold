@@ -20,6 +20,7 @@ extension ClipboardManager {
                 if let tempURL = await self.createTemporaryCopy(for: item) {
                     // 一時的なファイルリンクのURLをクリップボードに書き込む
                     await MainActor.run {
+                        self.isPerformingInternalCopy = true // タイムアウトを延長
                         if NSPasteboard.general.writeObjects([tempURL as NSURL]) {
                             print("File copied to clipboard (original filename): \(tempURL.lastPathComponent)")
                             // success = true // 非同期タスク内なので直接UI更新はしない
@@ -40,6 +41,7 @@ extension ClipboardManager {
             // ファイルパスがない場合、テキストをコピー
             // item.text は非オプショナルなので、直接使用する
             await MainActor.run {
+                self.isPerformingInternalCopy = true // タイムアウトを延長
                 let pasteboard = NSPasteboard.general
                 pasteboard.clearContents()
                 

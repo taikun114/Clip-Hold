@@ -110,8 +110,38 @@ class ClipboardManager: ObservableObject {
     let historyFileName = "clipboardHistory.json"
     let filesDirectoryName = "ClipboardFiles"
     @Published var isMonitoring: Bool = false
-    @Published var isPerformingInternalCopy: Bool = false
-    @Published var isCopyingStandardPhrase: Bool = false
+    
+    private var internalCopyTimeoutTask: Task<Void, Never>?
+    @Published var isPerformingInternalCopy: Bool = false {
+        didSet {
+            if isPerformingInternalCopy {
+                internalCopyTimeoutTask?.cancel()
+                internalCopyTimeoutTask = Task { @MainActor [weak self] in
+                    try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
+                    if !Task.isCancelled {
+                        self?.isPerformingInternalCopy = false
+                        print("DEBUG: isPerformingInternalCopy auto-reset to false")
+                    }
+                }
+            }
+        }
+    }
+    
+    private var standardPhraseCopyTimeoutTask: Task<Void, Never>?
+    @Published var isCopyingStandardPhrase: Bool = false {
+        didSet {
+            if isCopyingStandardPhrase {
+                standardPhraseCopyTimeoutTask?.cancel()
+                standardPhraseCopyTimeoutTask = Task { @MainActor [weak self] in
+                    try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
+                    if !Task.isCancelled {
+                        self?.isCopyingStandardPhrase = false
+                        print("DEBUG: isCopyingStandardPhrase auto-reset to false")
+                    }
+                }
+            }
+        }
+    }
     
     var isClipboardMonitoringPausedObserver: NSKeyValueObservation?
     @Published var showingLargeFileAlert: Bool = false {

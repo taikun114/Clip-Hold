@@ -64,32 +64,28 @@ extension ClipboardManager {
             let wasStandardPhraseCopy = isCopyingStandardPhrase
             // Check for standard phrase copy
             if self.ignoreStandardPhrases && wasStandardPhraseCopy {
-                isCopyingStandardPhrase = false // Reset the flag
                 print("DEBUG: checkPasteboard: Standard phrase copy detected and ignored.")
                 return // Skip adding to history
             }
-            // It's important to reset the flag even if ignoreStandardPhrases is false
             if wasStandardPhraseCopy {
-                isCopyingStandardPhrase = false
                 print("DEBUG: checkPasteboard: Standard phrase copy detected, but will be added to history.")
             }
             
             // 内部コピー操作中の場合は、この変更をスキップし、フラグをリセットする
             // isPerformingInternalCopy の状態をこのチェックの最初にキャプチャする
             let wasInternalCopyInitially = isPerformingInternalCopy || wasStandardPhraseCopy
+            
             if wasInternalCopyInitially {
                 print("DEBUG: checkPasteboard: Internal copy in progress. Will process content and reset flag at the end.")
                 // ここでは isPerformingInternalCopy をリセットしない
             }
             
-            if let activeAppBundleIdentifier = ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleIdentifier {
+            // sourceAppPathをセットする処理と同様に、内部コピーの場合はClip Hold自身のBundle Identifierを除外判定の対象とする
+            let activeAppBundleIdentifier = wasInternalCopyInitially ? Bundle.main.bundleIdentifier : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleIdentifier
+            
+            if let activeAppBundleIdentifier = activeAppBundleIdentifier {
                 guard !excludedAppIdentifiers.contains(activeAppBundleIdentifier) else {
                     print("DEBUG: checkPasteboard - Excluded app detected: \(activeAppBundleIdentifier). Skipping.")
-                    // 内部コピーフラグが設定されていた場合、ここでリセット
-                    if wasInternalCopyInitially {
-                        isPerformingInternalCopy = false
-                        print("DEBUG: checkPasteboard: Excluded app detected during internal copy. isPerformingInternalCopy reset to false.")
-                    }
                     return // 除外アプリからのコピーは無視
                 }
             }
@@ -359,13 +355,6 @@ extension ClipboardManager {
                 
                 if !success {
                     print("ClipboardManager: No supported item type found on pasteboard after \(maxAttempts) attempts.")
-                    // どのタイプも処理されなかった場合でも、内部コピーフラグをリセット
-                    if wasInternalCopyInitially {
-                        await MainActor.run {
-                            self.isPerformingInternalCopy = false
-                            print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false as no supported item type found.")
-                        }
-                    }
                 }
             }
         }
@@ -375,10 +364,6 @@ extension ClipboardManager {
     private func processAndSaveItem(_ item: ClipboardItem, wasInternalCopy: Bool, description: String) async {
         await MainActor.run {
             self.addAndSaveItem(item)
-            if wasInternalCopy {
-                self.isPerformingInternalCopy = false
-                print("DEBUG: checkPasteboard: isPerformingInternalCopy reset to false after \(description) processing.")
-            }
         }
     }
     
