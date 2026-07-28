@@ -80,6 +80,32 @@ class SpotlightManager: ObservableObject {
         }
     }
     
+    // 定型文のCSSearchableItemを生成するヘルパー
+    // アイコン画像（thumbnailData）は事前にMainActorで生成しておく必要がある
+    private func createPhraseSearchableItem(
+        for phrase: StandardPhrase,
+        presetName: String,
+        thumbnailData: Data?
+    ) -> CSSearchableItem {
+        let cleanPhraseContent = phrase.content.replacingOccurrences(of: "\n", with: " ").replacingOccurrences(of: "\r", with: "")
+        let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
+        
+        let truncatedTitle = phrase.title.count > 150 ? "\(phrase.title.prefix(150))…" : phrase.title
+        attributeSet.title = String(localized: "定型文をコピー: \(truncatedTitle)")
+        
+        let truncatedContent = cleanPhraseContent.count > 200 ? "\(cleanPhraseContent.prefix(200))…" : cleanPhraseContent
+        attributeSet.contentDescription = "\(presetName): \(truncatedContent)"
+        attributeSet.textContent = phrase.content
+        attributeSet.setValue(["copyAction"], forKey: "actionIdentifiers")
+        attributeSet.thumbnailData = thumbnailData
+        
+        return CSSearchableItem(
+            uniqueIdentifier: "phrase_\(phrase.id.uuidString)",
+            domainIdentifier: domainIdentifierStandardPhrase,
+            attributeSet: attributeSet
+        )
+    }
+    
     private func createSearchableItem(for item: ClipboardItem) -> CSSearchableItem {
         let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
         
@@ -168,7 +194,42 @@ class SpotlightManager: ObservableObject {
         }
     }
     
-    private func _indexHistoryItemsQuietly(_ items: [ClipboardItem]) async {
+    // 定型文を100件ずつバッチ処理でインデックスするヘルパー
+    // phraseBuildDataはMainActorで事前に収集したデータ（プリセット名・アイコンデータを含む）
+    private func _indexStandardPhrasesInBatch(
+        _ phraseBuildData: [(phrase: StandardPhrase, presetName: String, thumbnailData: Data?)],
+        onProgress: ((Int) async -> Void)? = nil
+    ) async {
+        let chunkSize = 100
+        for i in stride(from: 0, to: phraseBuildData.count, by: chunkSize) {
+            if Task.isCancelled { return }
+            let end = min(i + chunkSize, phraseBuildData.count)
+            let chunk = Array(phraseBuildData[i..<end])
+            
+            var searchableItems: [CSSearchableItem] = []
+            for data in chunk {
+                autoreleasepool {
+                    searchableItems.append(createPhraseSearchableItem(
+                        for: data.phrase,
+                        presetName: data.presetName,
+                        thumbnailData: data.thumbnailData
+                    ))
+                }
+            }
+            
+            do {
+                try await CSSearchableIndex.default().indexSearchableItems(searchableItems)
+                await onProgress?(chunk.count)
+            } catch {
+                print("Spotlight phrase batch indexing error: \(error.localizedDescription)")
+            }
+            
+            // 1チャンク100件は履歴と同じため、待機時間も合わせて0.1秒
+            try? await Task.sleep(nanoseconds: 100_000_000)
+        }
+    }
+    
+    private func _indexHistoryItemsQuietly(_ items: [ClipboardItem], onProgress: ((Int) async -> Void)? = nil) async {
         let chunkSize = 100
         for i in stride(from: 0, to: items.count, by: chunkSize) {
             if Task.isCancelled { return }
@@ -184,6 +245,7 @@ class SpotlightManager: ObservableObject {
             
             do {
                 try await CSSearchableIndex.default().indexSearchableItems(searchableItems)
+                await onProgress?(chunk.count)
             } catch {
                 print("Spotlight batch indexing error: \(error.localizedDescription)")
             }
@@ -206,12 +268,51 @@ class SpotlightManager: ObservableObject {
             }
         }
         
-        await _indexHistoryItemsQuietly(items)
+        await _indexHistoryItemsQuietly(items) { processedCount in
+            await MainActor.run {
+                self.indexedCount += processedCount
+            }
+        }
         
         await MainActor.run {
-            self.indexedCount += count
             if self.indexedCount >= self.totalCount {
                 self.isIndexing = false
+            }
+        }
+    }
+    
+    // インポート時など、複数の定型文をまとめてSpotlightに登録するためのメソッド
+    // presetにはそれらの定型文が属するプリセットを渡す（nilの場合はアイコンなしで登録）
+    func indexStandardPhrases(_ phrases: [StandardPhrase], inPreset preset: StandardPhrasePreset?) async {
+        guard !phrases.isEmpty else { return }
+        
+        // MainActorでアイコン画像を生成してビルドデータを収集
+        let phraseBuildData: [(phrase: StandardPhrase, presetName: String, thumbnailData: Data?)] = await MainActor.run {
+            let presetName = preset?.name ?? "Default"
+            let thumbnailData: Data? = preset.flatMap { p in
+                PresetIconGenerator.shared.generateSpotlightIcon(for: p).tiffRepresentation
+            }
+            return phrases.map { (phrase: $0, presetName: presetName, thumbnailData: thumbnailData) }
+        }
+        
+        let count = phrases.count
+        await MainActor.run {
+            if !self.isIndexing {
+                self.isIndexing = true
+                self.totalCount = count
+                self.indexedCount = 0
+                self.resetID = UUID()
+            } else {
+                self.totalCount += count
+            }
+        }
+        
+        await _indexStandardPhrasesInBatch(phraseBuildData) { processedCount in
+            await MainActor.run {
+                self.indexedCount += processedCount
+                if self.indexedCount >= self.totalCount {
+                    self.isIndexing = false
+                }
             }
         }
     }
@@ -361,10 +462,34 @@ class SpotlightManager: ObservableObject {
         
         indexingTask = Task.detached {
             // 定型文のインデックス (全プリセット)
+            // MainActorでプリセット情報とアイコン画像を収集してから、バックグラウンドでバッチ処理する
             let allPresets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
-            for preset in allPresets {
-                for phrase in preset.phrases {
-                    self.indexStandardPhrase(phrase, presetName: preset.name)
+            let phraseBuildData: [(phrase: StandardPhrase, presetName: String, thumbnailData: Data?)] = await MainActor.run {
+                allPresets.flatMap { preset in
+                    let icon = PresetIconGenerator.shared.generateSpotlightIcon(for: preset)
+                    let thumbnailData = icon.tiffRepresentation
+                    return preset.phrases.map { phrase in
+                        (phrase: phrase, presetName: preset.name, thumbnailData: thumbnailData)
+                    }
+                }
+            }
+            
+            let phraseCount = phraseBuildData.count
+            if phraseCount > 0 {
+                await MainActor.run {
+                    self.isIndexing = true
+                    self.totalCount = phraseCount
+                    self.indexedCount = 0
+                    self.resetID = UUID()
+                }
+                
+                await self._indexStandardPhrasesInBatch(phraseBuildData) { processedCount in
+                    await MainActor.run {
+                        self.indexedCount += processedCount
+                        if self.indexedCount >= self.totalCount {
+                            self.isIndexing = false
+                        }
+                    }
                 }
             }
             

@@ -213,6 +213,7 @@ class StandardPhraseManager: ObservableObject {
             // 指定されたプリセットに定型文を追加
             if var preset = StandardPhrasePresetManager.shared.presets.first(where: { $0.id == presetId }) {
                 var updatedPhrases = preset.phrases
+                var addedPhrases: [StandardPhrase] = []
                 
                 for newPhrase in phrasesToAdd {
                     // 同じIDの定型文が既に存在するかチェック
@@ -227,19 +228,31 @@ class StandardPhraseManager: ObservableObject {
                             // IDが一致するがコンテンツが異なる場合は、新しいUUIDを割り当てて追加
                             let phraseWithNewId = StandardPhrase(id: UUID(), title: newPhrase.title, content: newPhrase.content)
                             updatedPhrases.append(phraseWithNewId)
+                            addedPhrases.append(phraseWithNewId)
                         }
                     } else {
                         // 同じIDの定型文が存在しない場合は追加
                         updatedPhrases.append(newPhrase)
+                        addedPhrases.append(newPhrase)
                     }
                 }
                 
                 preset.phrases = updatedPhrases
                 StandardPhrasePresetManager.shared.updatePreset(preset)
+                
+                // 新しく追加された定型文をSpotlightにインデックス登録
+                if !addedPhrases.isEmpty {
+                    let capturedPreset = preset
+                    let capturedPhrases = addedPhrases
+                    Task {
+                        await SpotlightManager.shared.indexStandardPhrases(capturedPhrases, inPreset: capturedPreset)
+                    }
+                }
             }
         } else {
             // デフォルトの動作: 全定型文リストに追加
             var updatedPhrases = standardPhrases
+            var addedPhrases: [StandardPhrase] = []
             
             for newPhrase in phrasesToAdd {
                 // 同じIDの定型文が既に存在するかチェック
@@ -254,15 +267,25 @@ class StandardPhraseManager: ObservableObject {
                         // IDが一致するがコンテンツが異なる場合は、新しいUUIDを割り当てて追加
                         let phraseWithNewId = StandardPhrase(id: UUID(), title: newPhrase.title, content: newPhrase.content)
                         updatedPhrases.append(phraseWithNewId)
+                        addedPhrases.append(phraseWithNewId)
                     }
                 } else {
                     // 同じIDの定型文が存在しない場合は追加
                     updatedPhrases.append(newPhrase)
+                    addedPhrases.append(newPhrase)
                 }
             }
             
             standardPhrases = updatedPhrases
             print("Added imported phrases. Current standard phrases count: \(self.standardPhrases.count)")
+            
+            // 新しく追加された定型文をSpotlightにインデックス登録（プリセットなしのためアイコンはnil）
+            if !addedPhrases.isEmpty {
+                let capturedPhrases = addedPhrases
+                Task {
+                    await SpotlightManager.shared.indexStandardPhrases(capturedPhrases, inPreset: nil)
+                }
+            }
         }
     }
 }
