@@ -391,6 +391,11 @@ class StandardPhrasePresetManager: ObservableObject {
             savePresetIndex()
             presetAddedSubject.send()
             PresetIconGenerator.shared.updateIcon(for: presetWithValidIcon)
+            
+            // Spotlightのインデックス（画像キャッシュ）を更新するために再登録
+            for phrase in presetWithValidIcon.phrases {
+                SpotlightManager.shared.indexStandardPhrase(phrase, presetName: presetWithValidIcon.name)
+            }
         }
     }
     

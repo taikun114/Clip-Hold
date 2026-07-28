@@ -30,6 +30,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         frontmostAppMonitor.startMonitoring()
         print("AppDelegate: finished launching.")
         
+        // Spotlightインデックスの初期化（既存のアイテムをすべてインデックス化）
+        SpotlightManager.shared.indexAllExistingItems()
+        
+        // App Intents (Shortcuts) の登録更新
+        if #available(macOS 14.0, *) {
+            ClipHoldAppShortcuts.updateAppShortcutParameters()
+        }
+        
         NSApp.setActivationPolicy(.accessory)
         NSApp.delegate = self
         
@@ -392,6 +400,49 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         NSApp.activate(ignoringOtherApps: true)
         
         return true
+    }
+    
+    // MARK: - CoreSpotlight Handling
+    func application(_ application: NSApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([NSUserActivityRestoring]) -> Void) -> Bool {
+        if userActivity.activityType == "com.apple.corespotlightitem" {
+            if let identifier = userActivity.userInfo?["kCSSearchableItemActivityIdentifier"] as? String {
+                if identifier.hasPrefix("phrase_") {
+                    let idString = identifier.replacingOccurrences(of: "phrase_", with: "")
+                    if let id = UUID(uuidString: idString) {
+                        Task { @MainActor in
+                            let presetManager = StandardPhrasePresetManager.shared
+                            var foundPhrase: StandardPhrase? = nil
+                            for preset in presetManager.presets {
+                                if let phrase = preset.phrases.first(where: { $0.id == id }) {
+                                    foundPhrase = phrase
+                                    break
+                                }
+                            }
+                            if let phrase = foundPhrase {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(phrase.content, forType: .string)
+                                NotificationManager.shared.sendStandardNotification(title: "コピーしました", subtitle: phrase.title)
+                            }
+                        }
+                    }
+                } else if identifier.hasPrefix("history_") {
+                    let idString = identifier.replacingOccurrences(of: "history_", with: "")
+                    if let id = UUID(uuidString: idString) {
+                        Task {
+                            let history = await ChunkedHistoryManager.shared.loadHistory()
+                            if let item = history.first(where: { $0.id == id }) {
+                                await MainActor.run {
+                                    ClipboardManager.shared.copyItemToClipboard(item)
+                                    NotificationManager.shared.sendStandardNotification(title: "コピーしました", subtitle: item.text.prefix(20) + "...")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true
+        }
+        return false
     }
     
     // MARK: - UNUserNotificationCenterDelegate (通知アクションのハンドリング)

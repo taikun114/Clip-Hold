@@ -132,6 +132,7 @@ class StandardPhraseManager: ObservableObject {
     func addPhrase(title: String, content: String) {
         let newPhrase = StandardPhrase(title: title, content: content)
         standardPhrases.append(newPhrase)
+        SpotlightManager.shared.indexStandardPhrase(newPhrase)
     }
     
     func updatePhrase(id: UUID, newTitle: String, newContent: String) {
@@ -140,14 +141,21 @@ class StandardPhraseManager: ObservableObject {
             phrase.title = newTitle
             phrase.content = newContent
             standardPhrases[index] = phrase
+            SpotlightManager.shared.indexStandardPhrase(phrase)
         }
     }
     
     func deletePhrase(id: UUID) {
         standardPhrases.removeAll { $0.id == id }
+        SpotlightManager.shared.removeStandardPhrase(id: id)
     }
     
     func deletePhrase(atOffsets offsets: IndexSet) {
+        // Spotlightから削除
+        for index in offsets {
+            let phrase = standardPhrases[index]
+            SpotlightManager.shared.removeStandardPhrase(id: phrase.id)
+        }
         standardPhrases.remove(atOffsets: offsets)
     }
     

@@ -36,7 +36,11 @@ struct QRCodeView: View {
                             pasteboard.clearContents()
                             pasteboard.writeObjects([qrCodeImage])
                         } label: {
-                            Label("画像をコピー", systemImage: "document.on.document")
+                            if #available(macOS 15.0, *) {
+                                Label("画像をコピー", systemImage: "document.on.document")
+                            } else {
+                                Label("画像をコピー", systemImage: "doc.on.doc")
+                            }
                         }
                         
                         Button {

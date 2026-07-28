@@ -23,6 +23,8 @@ Notes
 
 ## 1.7.0
 ### New Features
+- **Support for Spotlight search and Shortcuts actions**
+  - You can search and copy history and standard phrases from Spotlight, or use Shortcuts actions to copy specific history and standard phrases.
 - **Add the New Copy feature**
   - By default, you can press `⌥ (Option)` + `⌘ (Command)` + `A` to enter your favorite text and create a new copy. You no longer need to enter it into a note, etc. when you want to copy a specific string.
 - **Add a pin feature to the copy history**

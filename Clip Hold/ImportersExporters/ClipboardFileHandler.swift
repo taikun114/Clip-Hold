@@ -182,7 +182,7 @@ extension ClipboardManager {
     
     // ヘルパー関数: ファイルURLからClipboardItemを作成（物理的な重複コピー防止ロジックを含む）
     func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false) async -> ClipboardItem? { // private から internal に変更
-        let filesDirectory = createClipboardFilesDirectoryIfNeeded()
+        _ = createClipboardFilesDirectoryIfNeeded()
         
         // 外部ファイルの属性を取得
         let externalFileAttributes = getFileAttributes(fileURL)

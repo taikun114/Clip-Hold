@@ -147,6 +147,9 @@ actor ChunkedHistoryManager {
                 // 現在のチャンクを更新して保存
                 try self.saveChunk(updatedItems, at: chunkIndex)
             }
+            
+            // Spotlightのインデックスに追加
+            SpotlightManager.shared.indexHistoryItem(item)
         } catch {
             print("ChunkedHistoryManager: Error saving history item: \(error.localizedDescription)")
         }
@@ -301,6 +304,9 @@ actor ChunkedHistoryManager {
                     // アイテムが削除されたチャンクを保存
                     try self.saveChunk(items, at: index)
                     print("ChunkedHistoryManager: Deleted item with id \(id) from chunk \(index).")
+                    
+                    // Spotlightから削除
+                    SpotlightManager.shared.removeHistoryItem(id: id)
                     return // 1つのアイテムを削除したら終了
                 }
             }
@@ -343,6 +349,9 @@ actor ChunkedHistoryManager {
             
             // ディレクトリを再作成
             _ = self.getOrCreateDirectory(self.historyDataDirectory)
+            
+            // Spotlightからすべての履歴アイテムを削除
+            SpotlightManager.shared.removeAllHistoryItems()
         } catch {
             print("ChunkedHistoryManager: Error clearing all history: \(error.localizedDescription)")
         }

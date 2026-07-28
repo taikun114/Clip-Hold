@@ -92,6 +92,21 @@ class NotificationManager {
         }
     }
     
+    func sendStandardNotification(title: String, subtitle: String) {
+        let identifier = UUID().uuidString
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = subtitle
+        content.sound = nil
+        
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Standard notification send error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     func sendTestNotification() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [testNotificationID])
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [testNotificationID])

@@ -77,6 +77,51 @@ class PresetIconGenerator: ObservableObject {
         return image
     }
     
+    func generateSpotlightIcon(for preset: StandardPhrasePreset) -> NSImage {
+        let size = CGSize(width: 64, height: 64)
+        let image = NSImage(size: size)
+        
+        image.lockFocus()
+        
+        let rect = NSRect(origin: .zero, size: size)
+        let nsColor = getColor(from: preset.color, with: preset.customColor)
+        
+        // 1. Draw the background circle
+        let path = NSBezierPath(ovalIn: rect)
+        nsColor.setFill()
+        path.fill()
+        
+        // 2. Prepare the symbol image
+        if let symbolImage = NSImage(systemSymbolName: preset.icon, accessibilityDescription: nil) {
+            let symbolConfig = NSImage.SymbolConfiguration(pointSize: 32, weight: .bold)
+            if let configuredSymbol = symbolImage.withSymbolConfiguration(symbolConfig) {
+                
+                // Determine symbol color based on preset color
+                let symbolForegroundColor = getSymbolColor(for: preset.color, with: preset.customColor, on: nsColor)
+                
+                // 3. Create a tinted version of the symbol
+                let tintedSymbol = NSImage(size: configuredSymbol.size, flipped: false) { (dstRect) -> Bool in
+                    // Draw the tint color
+                    symbolForegroundColor.drawSwatch(in: dstRect)
+                    // Draw the symbol image over it using destinationIn to mask
+                    configuredSymbol.draw(in: dstRect, from: .zero, operation: .destinationIn, fraction: 1.0)
+                    return true
+                }
+                
+                // 4. Draw the tinted symbol onto our main image
+                let symbolRect = NSRect(x: (size.width - tintedSymbol.size.width) / 2,
+                                        y: (size.height - tintedSymbol.size.height) / 2,
+                                        width: tintedSymbol.size.width,
+                                        height: tintedSymbol.size.height)
+                
+                tintedSymbol.draw(in: symbolRect)
+            }
+        }
+        
+        image.unlockFocus()
+        return image
+    }
+    
     func updateIcon(for preset: StandardPhrasePreset) {
         let image = createImage(for: preset)
         iconCache[preset.id] = image
