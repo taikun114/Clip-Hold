@@ -87,6 +87,10 @@ extension ClipboardManager {
     }
     
     func clearAllHistory() {
+        // インポートタスクが実行中の場合はキャンセル
+        activeImportTask?.cancel()
+        activeImportTask = nil
+        
         // ピン留めを解除
         unpinItem()
         
@@ -99,6 +103,7 @@ extension ClipboardManager {
         // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
         self.objectWillChange.send()
         clipboardHistory = []
+        filteredHistoryForShortcuts = nil // UI用のキャッシュもクリアしてメモリを解放
         print("ClipboardManager: All history cleared.")
         // 履歴をクリアした際に、一時ファイルもクリーンアップ
         cleanUpTemporaryFiles()
@@ -150,9 +155,14 @@ extension ClipboardManager {
     
     // MARK: - History Import/Export (ClipboardHistoryImporterExporterが使うメソッドを定義)
     func importHistory(from items: [ClipboardItem]) {
+        // 既存のインポートタスクがあればキャンセル
+        activeImportTask?.cancel()
+        
         // バックグラウンドで処理することでUIのブロックを防ぐ
-        Task.detached { [weak self] in
+        activeImportTask = Task.detached { [weak self] in
             guard let self = self else { return }
+            
+            if Task.isCancelled { return }
             
             // インポートされたアイテムのファイルパスが指すファイルが実際に存在するかを確認し、存在しない場合は削除
             let validItems = items.filter { item in
@@ -163,7 +173,7 @@ extension ClipboardManager {
             }
             
             // 1. 重複を避けて新しいアイテムを結合
-            let existingItemsSet = Set(self.clipboardHistory.map {
+            let existingItemsSet = Set(await MainActor.run { self.clipboardHistory }.map {
                 let pathComponent = $0.filePath?.lastPathComponent ?? "nil"
                 return "\($0.text)-\(pathComponent)"
             })
@@ -171,6 +181,11 @@ extension ClipboardManager {
             let newItems = validItems.filter { item in
                 let pathComponent = item.filePath?.lastPathComponent ?? "nil"
                 return !existingItemsSet.contains("\(item.text)-\(pathComponent)")
+            }
+            
+            if newItems.isEmpty || Task.isCancelled {
+                print("ClipboardManager: No new items to import or task cancelled. Skipping update.")
+                return
             }
             
             // 2. 既存の履歴に新しいアイテムを追加 (メインスレッドでPublishedプロパティを更新)
@@ -182,21 +197,49 @@ extension ClipboardManager {
                 // 3. 最大履歴数を超過した場合の処理
                 self.enforceMaxHistoryCount()
                 
-                for item in self.clipboardHistory where item.filePath != nil {
-                    self.generateThumbnail(for: item, at: item.filePath!)
-                }
-                
                 print("ClipboardManager: History imported. Added \(newItems.count) items, total history count: \(self.clipboardHistory.count)")
                 
                 return self.clipboardHistory
             }
             
+            if Task.isCancelled { return }
+            
+            // メモリ負荷を軽減するため、サムネイル生成を100件ずつのバッチ処理で行う
+            // 対象は新しく追加されたアイテム(newItems)のみとする
+            let newItemsWithFiles = newItems.filter { $0.filePath != nil }
+            let chunkSize = 100
+            for i in stride(from: 0, to: newItemsWithFiles.count, by: chunkSize) {
+                if Task.isCancelled { return }
+                
+                let end = min(i + chunkSize, newItemsWithFiles.count)
+                let chunk = Array(newItemsWithFiles[i..<end])
+                
+                await MainActor.run {
+                    for item in chunk {
+                        if let filePath = item.filePath {
+                            self.generateThumbnail(for: item, at: filePath)
+                        }
+                    }
+                }
+                
+                // チャンクごとに待機してメモリ（autoreleasepoolなど）の解放を促す
+                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1秒
+            }
+            
+            if Task.isCancelled { return }
+            
             // 新しい履歴管理システムに一括で保存
+            // 削除されたアイテムを反映するため、一度クリアして最新の履歴を保存する
             await ChunkedHistoryManager.shared.clearAllHistory()
+            
+            if Task.isCancelled { return }
             try? await ChunkedHistoryManager.shared.saveHistoryItems(updatedHistory)
             
+            if Task.isCancelled { return }
+            
             // Spotlightのインデックスも一括更新（UIにも進捗が表示される）
-            await SpotlightManager.shared.indexHistoryItems(updatedHistory)
+            // 既存の履歴はすでにインデックス済みのため、新規追加分のみを登録する
+            await SpotlightManager.shared.indexHistoryItems(newItems)
         }
     }
     

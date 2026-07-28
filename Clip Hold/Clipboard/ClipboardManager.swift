@@ -11,6 +11,9 @@ class ClipboardManager: ObservableObject {
     @Published var clipboardHistory: [ClipboardItem] = []
     @Published var filteredHistoryForShortcuts: [ClipboardItem]? = nil
     
+    // 進行中のインポートタスクを保持し、クリア時にキャンセル可能にする
+    var activeImportTask: Task<Void, Never>?
+    
     // サンドボックスファイルURLからハッシュを引くためのキャッシュ
     private var fileHashCache: [URL: String] = [:]
     

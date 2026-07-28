@@ -50,14 +50,17 @@ class ClipboardHistoryImporterExporter: ObservableObject {
             }
             
             do {
-                let data = try Data(contentsOf: url)
-                let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .iso8601
-                
-                var importedHistory = try decoder.decode([ClipboardItem].self, from: data)
-                
-                // 履歴を古い順に並べ替え
-                importedHistory.sort { $0.date < $1.date }
+                var importedHistory: [ClipboardItem] = []
+                try autoreleasepool {
+                    let data = try Data(contentsOf: url)
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .iso8601
+                    
+                    importedHistory = try decoder.decode([ClipboardItem].self, from: data)
+                    
+                    // 履歴を古い順に並べ替え
+                    importedHistory.sort { $0.date < $1.date }
+                }
                 
                 Task { @MainActor in
                     clipboardManager.importHistory(from: importedHistory)

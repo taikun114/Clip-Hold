@@ -169,17 +169,27 @@ class SpotlightManager: ObservableObject {
     }
     
     private func _indexHistoryItemsQuietly(_ items: [ClipboardItem]) async {
-        var searchableItems: [CSSearchableItem] = []
-        for item in items {
-            autoreleasepool {
-                searchableItems.append(createSearchableItem(for: item))
+        let chunkSize = 100
+        for i in stride(from: 0, to: items.count, by: chunkSize) {
+            if Task.isCancelled { return }
+            let end = min(i + chunkSize, items.count)
+            let chunk = Array(items[i..<end])
+            
+            var searchableItems: [CSSearchableItem] = []
+            for item in chunk {
+                autoreleasepool {
+                    searchableItems.append(createSearchableItem(for: item))
+                }
             }
-        }
-        
-        do {
-            try await CSSearchableIndex.default().indexSearchableItems(searchableItems)
-        } catch {
-            print("Spotlight batch indexing error: \(error.localizedDescription)")
+            
+            do {
+                try await CSSearchableIndex.default().indexSearchableItems(searchableItems)
+            } catch {
+                print("Spotlight batch indexing error: \(error.localizedDescription)")
+            }
+            
+            // チャンクごとに少し待機してメモリのスパイクを防ぐ
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1秒
         }
     }
     
