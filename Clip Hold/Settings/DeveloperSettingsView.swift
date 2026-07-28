@@ -7,6 +7,9 @@ struct DeveloperSettingsView: View {
     
     @State private var showingResetConfirmation = false
     @State private var showingResetComplete = false
+    @State private var showingSpotlightResetConfirmation = false
+    
+    @ObservedObject var spotlightManager = SpotlightManager.shared
     
     var body: some View {
         Form {
@@ -68,6 +71,54 @@ struct DeveloperSettingsView: View {
             
             // MARK: - デバッグ
             Section(header: Text("デバッグ").font(.headline)) {
+                
+                // Spotlight Index Status
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("Spotlightインデックス状況")
+                        Spacer()
+                        Text(spotlightManager.isIndexing ? "インデックス中..." : "インデックス済み")
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    if spotlightManager.isIndexing {
+                        ProgressView(
+                            value: spotlightManager.totalCount > 0 ? Double(spotlightManager.indexedCount) : nil,
+                            total: Double(max(1, spotlightManager.totalCount))
+                        ) {
+                            EmptyView()
+                        } currentValueLabel: {
+                            if spotlightManager.totalCount > 0 {
+                                HStack {
+                                    let fraction = Double(spotlightManager.indexedCount) / Double(max(1, spotlightManager.totalCount))
+                                    Text(fraction, format: .percent.precision(.fractionLength(0)))
+                                    Spacer()
+                                    Text("\(spotlightManager.indexedCount) / \(spotlightManager.totalCount)個")
+                                }
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            }
+                        }
+                        .progressViewStyle(.linear)
+                        .id(spotlightManager.resetID)
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("Spotlightインデックスをリセット")
+                        Text("Clip Holdによってインデックスされたすべての履歴と定型文をリセットして再インデックスを行います。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("リセット...") {
+                        showingSpotlightResetConfirmation = true
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
                 HStack {
                     VStack(alignment: .leading) {
                         Text("すべての設定をリセット")
@@ -97,6 +148,14 @@ struct DeveloperSettingsView: View {
             Button("完了") {}
         } message: {
             Text("すべての設定が初期状態に戻りました。変更を完全に適用するにはアプリを再起動してください。")
+        }
+        .alert("インデックスをリセット", isPresented: $showingSpotlightResetConfirmation) {
+            Button("リセット", role: .destructive) {
+                SpotlightManager.shared.resetAndReindexAll()
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("履歴や定型文の数によっては、再インデックスが完全に終わるまでに時間がかかる事があります。よろしいですか？")
         }
     }
     

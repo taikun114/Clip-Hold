@@ -194,6 +194,9 @@ extension ClipboardManager {
             // 新しい履歴管理システムに一括で保存
             await ChunkedHistoryManager.shared.clearAllHistory()
             try? await ChunkedHistoryManager.shared.saveHistoryItems(updatedHistory)
+            
+            // Spotlightのインデックスも一括更新（UIにも進捗が表示される）
+            await SpotlightManager.shared.indexHistoryItems(updatedHistory)
         }
     }
     

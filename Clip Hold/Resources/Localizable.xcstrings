@@ -839,6 +839,40 @@
     "%lld" : {
       "shouldTranslate" : false
     },
+    "%lld / %lld個" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld Elemente"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld items"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld elementos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld éléments"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld個"
+          }
+        }
+      }
+    },
     "%lld %@" : {
       "localizations" : {
         "en" : {
@@ -2277,6 +2311,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clip Holdについて"
+          }
+        }
+      }
+    },
+    "Clip Holdによってインデックスされたすべての履歴と定型文をリセットして再インデックスを行います。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle durch Clip Hold indizierten Verläufe und Standardphrasen zurücksetzen und neu indizieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset and reindex all history and Standard Phrases indexed by Clip Hold."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer y reindexar todo el historial y las Frases estándar indizadas por Clip Hold."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser et réindexer tout l'historique et les Phrases standard indexés par Clip Hold."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Holdによってインデックスされたすべての履歴と定型文をリセットして再インデックスを行います。"
           }
         }
       }
@@ -4295,6 +4363,74 @@
         }
       }
     },
+    "Spotlightインデックスをリセット" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight-Index zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Spotlight Index"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer índice de Spotlight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser l'index Spotlight"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlightインデックスをリセット"
+          }
+        }
+      }
+    },
+    "Spotlightインデックス状況" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight-Index-Status"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight Index Status"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado del índice de Spotlight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statut de l'index Spotlight"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlightインデックス状況"
+          }
+        }
+      }
+    },
     "Standard Phrase" : {
       "localizations" : {
         "de" : {
@@ -4958,6 +5094,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "イエロー"
+          }
+        }
+      }
+    },
+    "インデックスをリセット" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Index"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer índice"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser l'index"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インデックスをリセット"
+          }
+        }
+      }
+    },
+    "インデックス中..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird indiziert..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indexing..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indizando..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indexation en cours..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インデックス中..."
+          }
+        }
+      }
+    },
+    "インデックス済み" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indiziert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indexed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indizado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indexé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インデックス済み"
           }
         }
       }
@@ -15020,6 +15258,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ファイルの読み込みまたは解析に失敗しました: %@"
+          }
+        }
+      }
+    },
+    "履歴や定型文の数によっては、再インデックスが完全に終わるまでに時間がかかる事があります。よろしいですか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je nach Anzahl der Verläufe und Standardphrasen kann die Neuindizierung einige Zeit in Anspruch nehmen. Möchten Sie fortfahren?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depending on the number of history items and Standard Phrases, reindexing may take some time to complete. Are you sure?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dependiendo de la cantidad de elementos en el historial y Frases estándar, la reindexación puede tardar en completarse. ¿Está seguro?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selon le nombre d'éléments dans l'historique et de Phrases standard, la réindexation peut prendre un certain temps. Êtes-vous sûr ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴や定型文の数によっては、再インデックスが完全に終わるまでに時間がかかる事があります。よろしいですか？"
           }
         }
       }
