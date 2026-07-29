@@ -3,13 +3,13 @@ import AppIntents
 
 @available(macOS 14.0, *)
 struct ClipHoldAppShortcuts: AppShortcutsProvider {
+    static var shortcutTileColor: ShortcutTileColor { .navy }
     static var appShortcuts: [AppShortcut] {
         return [
             AppShortcut(
                 intent: CopyStandardPhraseIntent(),
                 phrases: [
-                    "Copy standard phrase in \(.applicationName)",
-                    "\(.applicationName)で定型文をコピー"
+                    "Copy standard phrase in \(.applicationName)"
                 ],
                 shortTitle: "Copy Standard Phrase",
                 systemImageName: "text.quote"
@@ -18,7 +18,7 @@ struct ClipHoldAppShortcuts: AppShortcutsProvider {
                 intent: CopyClipboardItemIntent(),
                 phrases: [
                     "Copy history item in \(.applicationName)",
-                    "\(.applicationName)で履歴項目をコピー"
+                    "Copy history in \(.applicationName)"
                 ],
                 shortTitle: "Copy History Item",
                 systemImageName: "doc.on.doc"
@@ -27,7 +27,7 @@ struct ClipHoldAppShortcuts: AppShortcutsProvider {
                 intent: CopyStandardPhraseByIndexIntent(),
                 phrases: [
                     "Copy standard phrase by index in \(.applicationName)",
-                    "\(.applicationName)で番号を指定して定型文をコピー"
+                    "Copy \(\.$index) standard phrase in \(.applicationName)"
                 ],
                 shortTitle: "Copy Standard Phrase by Index",
                 systemImageName: "text.quote"
@@ -36,10 +36,26 @@ struct ClipHoldAppShortcuts: AppShortcutsProvider {
                 intent: CopyClipboardItemByIndexIntent(),
                 phrases: [
                     "Copy history item by index in \(.applicationName)",
-                    "\(.applicationName)で番号を指定して履歴項目をコピー"
+                    "Copy \(\.$index) history item in \(.applicationName)",
+                    "Copy \(\.$index) history in \(.applicationName)"
                 ],
                 shortTitle: "Copy History Item by Index",
                 systemImageName: "doc.on.doc"
+            ),
+            AppShortcut(
+                intent: AddStandardPhraseIntent(),
+                phrases: [
+                    "Add standard phrase in \(.applicationName)",
+                    "Add new standard phrase in \(.applicationName)",
+                    "Create standard phrase in \(.applicationName)",
+                    "Create new standard phrase in \(.applicationName)",
+                    "Add standard phrase to \(\.$preset) in \(.applicationName)",
+                    "Add new standard phrase to \(\.$preset) in \(.applicationName)",
+                    "Create standard phrase in \(\.$preset) in \(.applicationName)",
+                    "Create new standard phrase in \(\.$preset) in \(.applicationName)"
+                ],
+                shortTitle: "Add Standard Phrase",
+                systemImageName: "plus.rectangle.on.rectangle"
             )
         ]
     }

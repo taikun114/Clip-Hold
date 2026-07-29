@@ -18,6 +18,10 @@ class StandardPhraseManager: ObservableObject {
         migrateToPresetDirectory()
         loadStandardPhrases()
         print("StandardPhraseManager: Initialized with phrase count: \(standardPhrases.count)")
+        
+        DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("ClipHoldDidAddPhraseInBackground"), object: nil, queue: .main) { [weak self] _ in
+            self?.loadStandardPhrases()
+        }
     }
     
     // MARK: - Migration to Preset Directory
@@ -89,7 +93,7 @@ class StandardPhraseManager: ObservableObject {
     }
     
     // MARK: - Loading (ファイルシステムからロード)
-    private func loadStandardPhrases() {
+    func loadStandardPhrases() {
         guard let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             print("StandardPhraseManager: Could not find Application Support directory (load).")
             return

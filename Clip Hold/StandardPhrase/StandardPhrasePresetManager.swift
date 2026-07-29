@@ -27,6 +27,12 @@ class StandardPhrasePresetManager: ObservableObject {
     
     private init() {
         loadPresetsFromFileSystem()
+        
+        DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("ClipHoldDidAddPhraseInBackground"), object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in
+                self?.loadPresetsFromFileSystem()
+            }
+        }
     }
     
     private func didUserDeleteDefaultPreset() -> Bool {
@@ -67,7 +73,7 @@ class StandardPhrasePresetManager: ObservableObject {
         let _ = PresetIconGenerator.shared.generateIcon(for: defaultPreset)
     }
     
-    private func loadPresetsFromFileSystem() {
+    func loadPresetsFromFileSystem() {
         // アイコンキャッシュをクリア
         PresetIconGenerator.shared.clearCache()
         
