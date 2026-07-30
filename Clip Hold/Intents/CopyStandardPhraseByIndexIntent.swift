@@ -9,8 +9,8 @@ struct CopyStandardPhraseByIndexIntent: AppIntent {
     
     static let openAppWhenRun: Bool = false
     
-    @Parameter(title: "Index (1-10)", default: .first)
-    var index: ItemIndexEnum
+    @Parameter(title: "Number", description: "The number of the item to copy (1 or greater)")
+    var index: Int
     
     @Parameter(title: "プリセット")
     var preset: StandardPhrasePresetEntity
@@ -29,7 +29,7 @@ struct CopyStandardPhraseByIndexIntent: AppIntent {
             }
         }
         
-        let zeroBasedIndex = index.rawValue - 1
+        let zeroBasedIndex = index - 1
         guard zeroBasedIndex >= 0 && zeroBasedIndex < phrases.count else {
             return .result(dialog: "指定された番号の定型文が見つかりませんでした")
         }

@@ -9,13 +9,13 @@ struct CopyClipboardItemByIndexIntent: AppIntent {
     
     static let openAppWhenRun: Bool = false
     
-    @Parameter(title: "Index (1-10)", default: .first)
-    var index: ItemIndexEnum
+    @Parameter(title: "Number", description: "The number of the item to copy (1 or greater)")
+    var index: Int
     
     func perform() async throws -> some IntentResult {
         let history = await ChunkedHistoryManager.shared.loadHistory()
         
-        let zeroBasedIndex = index.rawValue - 1
+        let zeroBasedIndex = index - 1
         guard zeroBasedIndex >= 0 && zeroBasedIndex < history.count else {
             return .result(dialog: "指定された番号の履歴が見つかりませんでした")
         }

@@ -28,7 +28,7 @@ class StandardPhrasePresetManager: ObservableObject {
     private init() {
         loadPresetsFromFileSystem()
         
-        DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("ClipHoldDidAddPhraseInBackground"), object: nil, queue: .main) { [weak self] _ in
+        DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("ClipHoldDidUpdatePhrasesInBackground"), object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in
                 self?.loadPresetsFromFileSystem()
             }

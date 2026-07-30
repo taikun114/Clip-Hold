@@ -836,9 +836,6 @@
         }
       }
     },
-    "%lld" : {
-      "shouldTranslate" : false
-    },
     "%lld / %lld個" : {
       "localizations" : {
         "de" : {
@@ -3077,6 +3074,74 @@
         }
       }
     },
+    "Delete Standard Phrase" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardtext löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Standard Phrase"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar frase estándar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la phrase standard"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文を削除"
+          }
+        }
+      }
+    },
+    "Deletes a specific standard phrase based on its text." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löscht einen bestimmten Standardtext basierend auf seinem Text."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deletes a specific standard phrase based on its text."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina una frase estándar específica según su texto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprime une phrase standard spécifique en fonction de son texte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストに基づいて特定の定型文を削除します。"
+          }
+        }
+      }
+    },
     "Finderで選択..." : {
       "comment" : "除外するアプリやプリセットの自動切り替えに割り当てたアプリを、ユーザにFinderで選択させる画面を開くためのボタン。",
       "localizations" : {
@@ -3181,6 +3246,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gemini CLIのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "Get History Item Count" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl der Verlaufselemente abrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get History Item Count"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener recuento de elementos del historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir le nombre d'éléments de l'historique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の総数を取得"
+          }
+        }
+      }
+    },
+    "Get Standard Phrase Count" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl der Standardtexte abrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Standard Phrase Count"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener recuento de frases estándar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir le nombre de phrases types"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文の個数を取得"
           }
         }
       }
@@ -3500,6 +3633,40 @@
         }
       }
     },
+    "IDまたは内容が一致する定型文を重複とみなし、1つとしてカウントします。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardtexte mit derselben ID oder demselben Inhalt werden als Duplikate betrachtet und als einer gezählt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard phrases with the same ID or content are considered duplicates and counted as one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las frases estándar con el mismo ID o contenido se consideran duplicadas y se cuentan como una sola."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les phrases types avec le même ID ou contenu sont considérées comme des doublons et comptées pour une."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IDまたは内容が一致する定型文を重複とみなし、1つとしてカウントします。"
+          }
+        }
+      }
+    },
     "Image File" : {
       "comment" : "画像ファイルをコピーした際、その画像のファイル名を取得することができなかったときに表示される汎用項目名。",
       "localizations" : {
@@ -3535,40 +3702,6 @@
         }
       }
     },
-    "Index (1-10)" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Index (1-10)"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Index (1-10)"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Índice (1-10)"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Index (1-10)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "番号 (1〜10)"
-          }
-        }
-      }
-    },
     "Item" : {
       "localizations" : {
         "de" : {
@@ -3599,40 +3732,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "項目"
-          }
-        }
-      }
-    },
-    "Item Index" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Element-Index"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Item Index"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Índice del elemento"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Index de l'élément"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "項目番号"
           }
         }
       }
@@ -3811,6 +3910,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "MB"
+          }
+        }
+      }
+    },
+    "Number" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Number"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Número"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numéro"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "番号"
           }
         }
       }
@@ -4636,6 +4769,40 @@
         }
       }
     },
+    "The number of the item to copy (1 or greater)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Nummer des zu kopierenden Elements (1 oder größer)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The number of the item to copy (1 or greater)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El número del elemento a copiar (1 o mayor)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le numéro de l'élément à copier (1 ou plus)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーする項目の番号（1以上の整数）"
+          }
+        }
+      }
+    },
     "The preset to add the phrase to" : {
       "localizations" : {
         "de" : {
@@ -4666,6 +4833,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文を追加するプリセット"
+          }
+        }
+      }
+    },
+    "The preset to copy the phrase from" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Voreinstellung, aus der der Text kopiert werden soll"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The preset to copy the phrase from"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ajuste preestablecido del cual copiar la frase"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le préréglage à partir duquel copier la phrase"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文をコピーするプリセット"
+          }
+        }
+      }
+    },
+    "The preset to delete the phrase from" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Voreinstellung, aus der der Text gelöscht werden soll"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The preset to delete the phrase from"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ajuste preestablecido del cual eliminar la frase"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le préréglage à partir duquel supprimer la phrase"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文を削除するプリセット"
+          }
+        }
+      }
+    },
+    "The standard phrase to copy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der zu kopierende Standardtext"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The standard phrase to copy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La frase estándar a copiar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La phrase standard à copier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーする定型文"
+          }
+        }
+      }
+    },
+    "The standard phrase to delete" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der zu löschende Standardtext"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The standard phrase to delete"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La frase estándar a eliminar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La phrase standard à supprimer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除する定型文"
           }
         }
       }
@@ -10087,6 +10390,40 @@
         }
       }
     },
+    "どのプリセットから削除しますか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus welcher Voreinstellung möchten Sie löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From which preset do you want to delete?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿De qué ajuste preestablecido deseas eliminar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À partir de quel préréglage souhaitez-vous supprimer ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "どのプリセットから削除しますか？"
+          }
+        }
+      }
+    },
     "どのプリセットに追加しますか？" : {
       "localizations" : {
         "de" : {
@@ -10117,6 +10454,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "どのプリセットに追加しますか？"
+          }
+        }
+      }
+    },
+    "どのプリセットの定型文をコピーしますか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus welcher Voreinstellung möchten Sie den Text kopieren?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From which preset do you want to copy the phrase?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿De qué ajuste preestablecido deseas copiar la frase?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À partir de quel préréglage souhaitez-vous copier la phrase ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "どのプリセットの定型文をコピーしますか？"
+          }
+        }
+      }
+    },
+    "どのプリセットを選択しますか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welche Voreinstellung möchten Sie auswählen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which preset do you want to select?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué ajuste preestablecido deseas seleccionar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quel préréglage souhaitez-vous sélectionner ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "どのプリセットを選択しますか？"
+          }
+        }
+      }
+    },
+    "どの定型文をコピーしますか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welchen Standardtext möchten Sie kopieren?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which standard phrase do you want to copy?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué frase estándar deseas copiar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quelle phrase standard souhaitez-vous copier ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "どの定型文をコピーしますか？"
+          }
+        }
+      }
+    },
+    "どの定型文を削除しますか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welchen Standardtext möchten Sie löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which standard phrase do you want to delete?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué frase estándar deseas eliminar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quelle phrase standard souhaitez-vous supprimer ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "どの定型文を削除しますか？"
           }
         }
       }
@@ -12775,6 +13248,40 @@
         }
       }
     },
+    "保存されているコピー履歴の総数を取得します。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruft die Gesamtzahl der gespeicherten Elemente im Verlauf ab."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gets the total number of saved clipboard history items."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtiene el número total de elementos guardados en el historial del portapapeles."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtient le nombre total d'éléments enregistrés dans l'historique du presse-papiers."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存されているコピー履歴の総数を取得します。"
+          }
+        }
+      }
+    },
     "保存されている履歴の数より少ない値を設定すると、設定値を超えた分は、クリップボード履歴の次回更新時に削除されます。" : {
       "comment" : "コピー履歴設定の「履歴の最大保存数」オプションでカスタム値を設定する画面に表示される注意書きテキスト。",
       "localizations" : {
@@ -13050,6 +13557,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存先のプリセット:"
+          }
+        }
+      }
+    },
+    "個数を取得するプリセット" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Voreinstellung, für die die Anzahl abgerufen werden soll"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The preset to get the count for"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ajuste preestablecido para el cual obtener el recuento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le préréglage pour lequel obtenir le nombre"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "個数を取得するプリセット"
           }
         }
       }
@@ -14243,6 +14784,40 @@
         }
       }
     },
+    "定型文の個数を取得" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl der Standardtexte abrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Standard Phrase Count"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener recuento de frases estándar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir le nombre de phrases types"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文の個数を取得"
+          }
+        }
+      }
+    },
     "定型文の最大表示数" : {
       "comment" : "定型文をメニューに表示する最大数を設定するオプション名。ユーザは数字を選択できる。",
       "localizations" : {
@@ -15287,6 +15862,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の管理"
+          }
+        }
+      }
+    },
+    "履歴の総数を取得" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzahl der Verlaufselemente abrufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get History Item Count"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtener recuento de elementos del historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir le nombre d'éléments de l'historique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の総数を取得"
           }
         }
       }
@@ -18397,6 +19006,40 @@
         }
       }
     },
+    "選択したプリセット内の定型文の個数を取得します。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ruft die Anzahl der Standardtexte in der ausgewählten Voreinstellung ab."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gets the count of standard phrases in the selected preset."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtiene el recuento de frases estándar en el ajuste preestablecido seleccionado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtient le nombre de phrases types dans le préréglage sélectionné."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択したプリセット内の定型文の個数を取得します。"
+          }
+        }
+      }
+    },
     "選択した定型文をリストから削除します。" : {
       "comment" : "定型文設定の定型文リストから選択された定型文を削除するボタンのツールチップテキスト",
       "localizations" : {
@@ -18498,6 +19141,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重複したプリセット"
+          }
+        }
+      }
+    },
+    "重複をカウントしない" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Duplikate ignorieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignore duplicates"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorar duplicados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorer les doublons"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重複をカウントしない"
           }
         }
       }

@@ -48,144 +48,6 @@
         }
       }
     },
-    "Copy ${index} history in ${applicationName}" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "${index}. Verlauf in ${applicationName} kopieren"
-            ]
-          }
-        },
-        "en" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "Copy ${index} history in ${applicationName}"
-            ]
-          }
-        },
-        "es" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "Copiar ${index} historial en ${applicationName}"
-            ]
-          }
-        },
-        "fr" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "Copier le ${index} historique dans ${applicationName}"
-            ]
-          }
-        },
-        "ja" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "${applicationName}で${index}番目の履歴をコピー",
-              "${applicationName}で${index}個目の履歴をコピー"
-            ]
-          }
-        }
-      }
-    },
-    "Copy ${index} history item in ${applicationName}" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "${index}. Verlaufselement in ${applicationName} kopieren"
-            ]
-          }
-        },
-        "en" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "Copy ${index} history item in ${applicationName}"
-            ]
-          }
-        },
-        "es" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "Copiar ${index} elemento del historial en ${applicationName}"
-            ]
-          }
-        },
-        "fr" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "Copier le ${index} élément de l'historique dans ${applicationName}"
-            ]
-          }
-        },
-        "ja" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "${applicationName}で${index}番目の履歴項目をコピー",
-              "${applicationName}で${index}個目の履歴項目をコピー"
-            ]
-          }
-        }
-      }
-    },
-    "Copy ${index} standard phrase in ${applicationName}" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "${index}. Standardphrase in ${applicationName} kopieren"
-            ]
-          }
-        },
-        "en" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "Copy ${index} standard phrase in ${applicationName}"
-            ]
-          }
-        },
-        "es" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "Copiar ${index} frase estándar en ${applicationName}"
-            ]
-          }
-        },
-        "fr" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "Copier la ${index} phrase type dans ${applicationName}"
-            ]
-          }
-        },
-        "ja" : {
-          "stringSet" : {
-            "state" : "translated",
-            "values" : [
-              "${applicationName}で${index}番目の定型文をコピー",
-              "${applicationName}で${index}個目の定型文をコピー"
-            ]
-          }
-        }
-      }
-    },
     "Copy history item by index in ${applicationName}" : {
       "localizations" : {
         "de" : {
@@ -324,12 +186,14 @@
       }
     },
     "Copy standard phrase in ${applicationName}" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringSet" : {
             "state" : "translated",
             "values" : [
-              "Standardphrase in ${applicationName} kopieren"
+              "Standardphrase in ${applicationName} kopieren",
+              "Standardphrase aus ${preset} in ${applicationName} kopieren"
             ]
           }
         },
@@ -337,7 +201,8 @@
           "stringSet" : {
             "state" : "translated",
             "values" : [
-              "Copy standard phrase in ${applicationName}"
+              "Copy standard phrase in ${applicationName}",
+              "Copy standard phrase from ${preset} in ${applicationName}"
             ]
           }
         },
@@ -345,7 +210,8 @@
           "stringSet" : {
             "state" : "translated",
             "values" : [
-              "Copiar frase estándar en ${applicationName}"
+              "Copiar frase estándar en ${applicationName}",
+              "Copiar frase estándar de ${preset} en ${applicationName}"
             ]
           }
         },
@@ -353,7 +219,8 @@
           "stringSet" : {
             "state" : "translated",
             "values" : [
-              "Copier la phrase type dans ${applicationName}"
+              "Copier la phrase type dans ${applicationName}",
+              "Copier la phrase type de ${preset} dans ${applicationName}"
             ]
           }
         },
@@ -361,7 +228,277 @@
           "stringSet" : {
             "state" : "translated",
             "values" : [
-              "${applicationName}で定型文をコピー"
+              "${applicationName}で定型文をコピー",
+              "${applicationName}の${preset}から定型文をコピー"
+            ]
+          }
+        }
+      }
+    },
+    "Count history item in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Verlaufselement in ${applicationName} zählen",
+              "Verlauf in ${applicationName} zählen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Count history item in ${applicationName}",
+              "Count history in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Contar elemento del historial en ${applicationName}",
+              "Contar historial en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Compter l'élément de l'historique dans ${applicationName}",
+              "Compter l'historique dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で履歴をカウント",
+              "${applicationName}で履歴アイテムをカウント"
+            ]
+          }
+        }
+      }
+    },
+    "Count standard phrase in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Standardtext in ${applicationName} zählen",
+              "Standardtext aus ${preset} in ${applicationName} zählen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Count standard phrase in ${applicationName}",
+              "Count standard phrase from ${preset} in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Contar frase estándar en ${applicationName}",
+              "Contar frase estándar de ${preset} en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Compter la phrase type dans ${applicationName}",
+              "Compter la phrase type de ${preset} dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で定型文をカウント",
+              "${applicationName}の${preset}から定型文をカウント"
+            ]
+          }
+        }
+      }
+    },
+    "Delete standard phrase in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Standardphrase in ${applicationName} löschen",
+              "Standardtext in ${applicationName} entfernen",
+              "Standardphrase aus ${preset} in ${applicationName} löschen",
+              "Standardtext aus ${preset} in ${applicationName} entfernen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Delete standard phrase in ${applicationName}",
+              "Remove standard phrase in ${applicationName}",
+              "Delete standard phrase from ${preset} in ${applicationName}",
+              "Remove standard phrase from ${preset} in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Eliminar frase estándar en ${applicationName}",
+              "Borrar frase estándar en ${applicationName}",
+              "Eliminar frase estándar de ${preset} en ${applicationName}",
+              "Borrar frase estándar de ${preset} en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Supprimer la phrase type dans ${applicationName}",
+              "Enlever la phrase type dans ${applicationName}",
+              "Supprimer la phrase type de ${preset} dans ${applicationName}",
+              "Enlever la phrase type de ${preset} dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で定型文を削除",
+              "${applicationName}で定型文を消去",
+              "${applicationName}の${preset}から定型文を削除",
+              "${applicationName}の${preset}から定型文を消去"
+            ]
+          }
+        }
+      }
+    },
+    "Get history item count in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Anzahl der Verlaufselemente in ${applicationName} abrufen",
+              "Verlaufsanzahl in ${applicationName} abrufen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Get history item count in ${applicationName}",
+              "Get history count in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Obtener el recuento de elementos del historial en ${applicationName}",
+              "Obtener el recuento del historial en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Obtenir le nombre d'éléments de l'historique dans ${applicationName}",
+              "Obtenir le nombre de l'historique dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で履歴の個数を取得",
+              "${applicationName}で履歴アイテムの個数を取得"
+            ]
+          }
+        }
+      }
+    },
+    "Get standard phrase count in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Anzahl der Standardtexte in ${applicationName} abrufen",
+              "Anzahl der Standardtexte von ${preset} in ${applicationName} abrufen",
+              "Standardtexte in ${applicationName} zählen",
+              "Standardtexte von ${preset} in ${applicationName} zählen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Get standard phrase count in ${applicationName}",
+              "Get standard phrase count from ${preset} in ${applicationName}",
+              "Count standard phrase in ${applicationName}",
+              "Count standard phrase from ${preset} in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Obtener el recuento de frases estándar en ${applicationName}",
+              "Obtener el recuento de frases estándar de ${preset} en ${applicationName}",
+              "Contar frases estándar en ${applicationName}",
+              "Contar frases estándar de ${preset} en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Obtenir le nombre de phrases types dans ${applicationName}",
+              "Obtenir le nombre de phrases types depuis ${preset} dans ${applicationName}",
+              "Compter les phrases types dans ${applicationName}",
+              "Compter les phrases types depuis ${preset} dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で定型文の個数を取得",
+              "${applicationName}で${preset}から定型文の個数を取得",
+              "${applicationName}で定型文をカウント",
+              "${applicationName}で${preset}の定型文をカウント"
             ]
           }
         }

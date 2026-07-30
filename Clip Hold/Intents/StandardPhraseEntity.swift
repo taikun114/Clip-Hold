@@ -24,9 +24,17 @@ struct StandardPhraseEntity: AppEntity, IndexedEntity {
 @available(macOS 14.0, *)
 struct StandardPhraseEntityQuery: EntityQuery {
     func entities(for identifiers: [UUID]) async throws -> [StandardPhraseEntity] {
-        // StandardPhraseManagerからIDに合致するアイテムを取得
-        let manager = StandardPhraseManager.shared
-        return manager.standardPhrases.filter { identifiers.contains($0.id) }.map { phrase in
+        let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
+        let currentPhrases = await MainActor.run { StandardPhraseManager.shared.standardPhrases }
+        let allPhrases = presets.flatMap { $0.phrases } + currentPhrases
+        
+        // Remove duplicates by ID in case currentPhrases overlaps with presets
+        var uniquePhrases = [UUID: StandardPhrase]()
+        for phrase in allPhrases {
+            uniquePhrases[phrase.id] = phrase
+        }
+        
+        return uniquePhrases.values.filter { identifiers.contains($0.id) }.map { phrase in
             StandardPhraseEntity(
                 id: phrase.id,
                 title: phrase.title,

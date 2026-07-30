@@ -19,7 +19,7 @@ class StandardPhraseManager: ObservableObject {
         loadStandardPhrases()
         print("StandardPhraseManager: Initialized with phrase count: \(standardPhrases.count)")
         
-        DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("ClipHoldDidAddPhraseInBackground"), object: nil, queue: .main) { [weak self] _ in
+        DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("ClipHoldDidUpdatePhrasesInBackground"), object: nil, queue: .main) { [weak self] _ in
             self?.loadStandardPhrases()
         }
     }

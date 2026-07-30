@@ -42,7 +42,7 @@ struct AddStandardPhraseIntent: AppIntent {
             }
         }
         // 別のプロセス（Siriバックグラウンド）で追加されたことをメインアプリに通知する
-        DistributedNotificationCenter.default().postNotificationName(NSNotification.Name("ClipHoldDidAddPhraseInBackground"), object: nil, userInfo: nil, deliverImmediately: true)
+        DistributedNotificationCenter.default().postNotificationName(NSNotification.Name("ClipHoldDidUpdatePhrasesInBackground"), object: nil, userInfo: nil, deliverImmediately: true)
         
         let presetName = preset?.name ?? "現在のプリセット"
         let dialogString = "\(presetName)に定型文「\(text)」を追加しました。"

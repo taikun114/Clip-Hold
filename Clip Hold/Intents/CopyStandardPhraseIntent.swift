@@ -10,13 +10,23 @@ struct CopyStandardPhraseIntent: AppIntent {
     // Spotlightで開いたときのデフォルトアクションにするため
     static let openAppWhenRun: Bool = false
     
-    @Parameter(title: "Phrase")
+    @Parameter(title: "Preset", description: "The preset to copy the phrase from", default: nil, requestValueDialog: IntentDialog("どのプリセットの定型文をコピーしますか？"))
+    var preset: StandardPhrasePresetEntity?
+    
+    @Parameter(title: "Phrase", description: "The standard phrase to copy", requestValueDialog: IntentDialog("どの定型文をコピーしますか？"), optionsProvider: CopyPhraseOptionsProvider())
     var phrase: StandardPhraseEntity
     
     func perform() async throws -> some IntentResult {
         // IDからアイテムを取得
-        let manager = StandardPhraseManager.shared
-        if let originalPhrase = manager.standardPhrases.first(where: { $0.id == phrase.id }) {
+        let targetPhrases: [StandardPhrase]
+        let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
+        if let presetEntity = preset, presetEntity.id != currentPresetDummyId {
+            targetPhrases = presets.first(where: { $0.id == presetEntity.id })?.phrases ?? []
+        } else {
+            targetPhrases = await MainActor.run { StandardPhraseManager.shared.standardPhrases }
+        }
+        
+        if let originalPhrase = targetPhrases.first(where: { $0.id == phrase.id }) {
             await MainActor.run {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(originalPhrase.content, forType: .string)

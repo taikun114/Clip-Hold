@@ -2,6 +2,7 @@ import Foundation
 import AppIntents
 
 let currentPresetDummyId = UUID(uuidString: "99999999-9999-9999-9999-999999999999")!
+let allPresetsDummyId = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
 
 @available(macOS 14.0, *)
 struct StandardPhrasePresetEntity: AppEntity {
@@ -24,6 +25,9 @@ struct StandardPhrasePresetEntityQuery: EntityQuery {
         
         if identifiers.contains(currentPresetDummyId) {
             result.append(StandardPhrasePresetEntity(id: currentPresetDummyId, name: "現在のプリセット"))
+        }
+        if identifiers.contains(allPresetsDummyId) {
+            result.append(StandardPhrasePresetEntity(id: allPresetsDummyId, name: "すべてのプリセット"))
         }
         
         let matchedPresets = presets
