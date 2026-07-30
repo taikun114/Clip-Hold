@@ -13,7 +13,14 @@ struct SetClipboardMonitoringStateIntent: AppIntent {
     var state: MonitoringStateEnum
     
     static var parameterSummary: some ParameterSummary {
-        Summary("Set clipboard monitoring to \(\.$state)")
+        Switch(\.$state) {
+            Case(.toggle) {
+                Summary("\(\.$state) Clipboard Monitoring")
+            }
+            DefaultCase {
+                Summary("Set Clipboard Monitoring to \(\.$state)")
+            }
+        }
     }
     
     func perform() async throws -> some IntentResult {
