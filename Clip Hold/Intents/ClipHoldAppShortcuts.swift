@@ -25,22 +25,6 @@ struct ClipHoldAppShortcuts: AppShortcutsProvider {
                 systemImageName: "doc.on.doc"
             ),
             AppShortcut(
-                intent: CopyStandardPhraseByIndexIntent(),
-                phrases: [
-                    "Copy standard phrase by index in \(.applicationName)"
-                ],
-                shortTitle: "Copy Standard Phrase by Index",
-                systemImageName: "text.quote"
-            ),
-            AppShortcut(
-                intent: CopyClipboardItemByIndexIntent(),
-                phrases: [
-                    "Copy history item by index in \(.applicationName)"
-                ],
-                shortTitle: "Copy History Item by Index",
-                systemImageName: "doc.on.doc"
-            ),
-            AppShortcut(
                 intent: AddStandardPhraseIntent(),
                 phrases: [
                     "Add standard phrase in \(.applicationName)",
@@ -55,38 +39,6 @@ struct ClipHoldAppShortcuts: AppShortcutsProvider {
                 shortTitle: "Add Standard Phrase",
                 systemImageName: "plus.rectangle.on.rectangle"
             ),
-            AppShortcut(
-                intent: DeleteStandardPhraseIntent(),
-                phrases: [
-                    "Delete standard phrase in \(.applicationName)",
-                    "Remove standard phrase in \(.applicationName)",
-                    "Delete standard phrase from \(\.$preset) in \(.applicationName)",
-                    "Remove standard phrase from \(\.$preset) in \(.applicationName)"
-                ],
-                shortTitle: "Delete Standard Phrase",
-                systemImageName: "trash"
-            ),
-            AppShortcut(
-                intent: GetStandardPhraseCountIntent(),
-                phrases: [
-                    "Get standard phrase count in \(.applicationName)",
-                    "Get standard phrase count from \(\.$preset) in \(.applicationName)",
-                    "Count standard phrase in \(.applicationName)",
-                    "Count standard phrase from \(\.$preset) in \(.applicationName)"
-                ],
-                shortTitle: "Get Standard Phrase Count",
-                systemImageName: "number"
-            ),
-            AppShortcut(
-                intent: GetClipboardItemCountIntent(),
-                phrases: [
-                    "Get history item count in \(.applicationName)",
-                    "Count history item in \(.applicationName)"
-                ],
-                shortTitle: "Get History Item Count",
-                systemImageName: "number"
-            ),
-
             AppShortcut(
                 intent: SetClipboardMonitoringStateIntent(),
                 phrases: [
@@ -103,6 +55,33 @@ struct ClipHoldAppShortcuts: AppShortcutsProvider {
                 ],
                 shortTitle: "Set Active Preset",
                 systemImageName: "rectangle.stack"
+            ),
+            AppShortcut(
+                intent: ShowHistoryWindowIntent(),
+                phrases: [
+                    "Show history window in \(.applicationName)",
+                    "Open history window in \(.applicationName)"
+                ],
+                shortTitle: "Show History Window",
+                systemImageName: "clock.arrow.circlepath"
+            ),
+            AppShortcut(
+                intent: ShowStandardPhraseWindowIntent(),
+                phrases: [
+                    "Show standard phrase window in \(.applicationName)",
+                    "Open standard phrase window in \(.applicationName)"
+                ],
+                shortTitle: "Show Standard Phrase Window",
+                systemImageName: "text.quote"
+            ),
+            AppShortcut(
+                intent: SetQuickPasteStateIntent(),
+                phrases: [
+                    "Set quick paste state in \(.applicationName)",
+                    "Toggle quick paste in \(.applicationName)"
+                ],
+                shortTitle: "Set Quick Paste State",
+                systemImageName: "bolt.fill"
             )
         ]
     }
