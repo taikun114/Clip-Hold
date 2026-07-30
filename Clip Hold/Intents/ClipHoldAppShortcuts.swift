@@ -85,6 +85,24 @@ struct ClipHoldAppShortcuts: AppShortcutsProvider {
                 ],
                 shortTitle: "Get History Item Count",
                 systemImageName: "number"
+            ),
+
+            AppShortcut(
+                intent: SetClipboardMonitoringStateIntent(),
+                phrases: [
+                    "Set monitoring state in \(.applicationName)",
+                    "Toggle monitoring state in \(.applicationName)"
+                ],
+                shortTitle: "Set Monitoring State",
+                systemImageName: "playpause"
+            ),
+            AppShortcut(
+                intent: SetActivePresetIntent(),
+                phrases: [
+                    "Set active preset to \(\.$preset) in \(.applicationName)"
+                ],
+                shortTitle: "Set Active Preset",
+                systemImageName: "rectangle.stack"
             )
         ]
     }

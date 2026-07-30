@@ -279,7 +279,7 @@
             "state" : "translated",
             "values" : [
               "${applicationName}で履歴をカウント",
-              "${applicationName}で履歴アイテムをカウント"
+              "${applicationName}で履歴項目をカウント"
             ]
           }
         }
@@ -439,7 +439,7 @@
             "state" : "translated",
             "values" : [
               "${applicationName}で履歴の個数を取得",
-              "${applicationName}で履歴アイテムの個数を取得"
+              "${applicationName}で履歴項目の個数を取得"
             ]
           }
         }
@@ -499,6 +499,99 @@
               "${applicationName}で${preset}から定型文の個数を取得",
               "${applicationName}で定型文をカウント",
               "${applicationName}で${preset}の定型文をカウント"
+            ]
+          }
+        }
+      }
+    },
+    "Set active preset to ${preset} in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Aktives Preset in ${applicationName} auf ${preset} setzen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Set active preset to ${preset} in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Establecer preset activo a ${preset} en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Définir le préréglage actif sur ${preset} dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}でプリセットを${preset}に設定"
+            ]
+          }
+        }
+      }
+    },
+    "Set monitoring state in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Überwachungsstatus in ${applicationName} festlegen",
+              "Überwachungsstatus in ${applicationName} umschalten"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Set monitoring state in ${applicationName}",
+              "Toggle monitoring state in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Establecer estado de supervisión en ${applicationName}",
+              "Alternar estado de supervisión en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Définir l'état de surveillance dans ${applicationName}",
+              "Basculer l'état de surveillance dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で監視状態を設定",
+              "${applicationName}で監視状態を切り替え"
             ]
           }
         }
