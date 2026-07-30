@@ -9,8 +9,18 @@ struct StandardPhraseEntity: AppEntity, IndexedEntity {
     static let defaultQuery = StandardPhraseEntityQuery()
     
     let id: UUID
-    let title: String
-    let content: String
+    
+    @Property(title: "Title")
+    var title: String
+    
+    @Property(title: "Content")
+    var content: String
+    
+    init(id: UUID, title: String, content: String) {
+        self.id = id
+        self.title = title
+        self.content = content
+    }
     
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(

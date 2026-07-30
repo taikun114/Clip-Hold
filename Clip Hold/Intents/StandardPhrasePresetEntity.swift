@@ -7,12 +7,19 @@ let nextPresetDummyId = UUID(uuidString: "22222222-2222-2222-2222-222222222222")
 let previousPresetDummyId = UUID(uuidString: "33333333-3333-3333-3333-333333333333")!
 
 @available(macOS 14.0, *)
-struct StandardPhrasePresetEntity: AppEntity {
+struct StandardPhrasePresetEntity: AppEntity, IndexedEntity {
     static let typeDisplayRepresentation: TypeDisplayRepresentation = "定型文プリセット"
     static let defaultQuery = StandardPhrasePresetEntityQuery()
     
     let id: UUID
-    let name: String
+    
+    @Property(title: "Name")
+    var name: String
+    
+    init(id: UUID, name: String) {
+        self.id = id
+        self.name = name
+    }
     
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(title: "\(name)")

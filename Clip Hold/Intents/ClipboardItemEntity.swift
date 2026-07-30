@@ -9,10 +9,26 @@ struct ClipboardItemEntity: AppEntity, IndexedEntity {
     static let defaultQuery = ClipboardItemEntityQuery()
     
     let id: UUID
-    let contentText: String
-    let date: Date
-    let isFile: Bool
-    let filename: String?
+    
+    @Property(title: "Content Text")
+    var contentText: String
+    
+    @Property(title: "Date")
+    var date: Date
+    
+    @Property(title: "Is File")
+    var isFile: Bool
+    
+    @Property(title: "Filename")
+    var filename: String?
+    
+    init(id: UUID, contentText: String, date: Date, isFile: Bool, filename: String?) {
+        self.id = id
+        self.contentText = contentText
+        self.date = date
+        self.isFile = isFile
+        self.filename = filename
+    }
     
     var displayRepresentation: DisplayRepresentation {
         let dateFormatter = DateFormatter()
