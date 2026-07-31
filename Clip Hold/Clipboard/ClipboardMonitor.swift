@@ -364,6 +364,10 @@ extension ClipboardManager {
     private func processAndSaveItem(_ item: ClipboardItem, wasInternalCopy: Bool, description: String) async {
         await MainActor.run {
             self.addAndSaveItem(item)
+            if wasInternalCopy {
+                self.isPerformingInternalCopy = false
+                print("DEBUG: processAndSaveItem: isPerformingInternalCopy reset to false after processing \(description).")
+            }
         }
     }
     

@@ -92,7 +92,8 @@ struct HistoryItemRow<MenuContent: View>: View {
         } else if item.text == "PDF File" {
             return Text("PDF File")
         } else {
-            return Text(verbatim: item.text)
+            let truncatedText = item.text.count > 1000 ? String(item.text.prefix(1000)) + "..." : item.text
+            return Text(verbatim: truncatedText)
         }
     }
     

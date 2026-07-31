@@ -450,7 +450,18 @@ extension ClipboardManager {
         
         let originalFileName = extractOriginalFileName(from: originalFilePath.lastPathComponent)
         
-        let tempDirectoryURL = FileManager.default.temporaryDirectory
+        // 専用の一時ディレクトリを作成
+        let tempDirectoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("ClipHoldTemp", isDirectory: true)
+        
+        // ディレクトリが存在しない場合は作成
+        if !FileManager.default.fileExists(atPath: tempDirectoryURL.path) {
+            do {
+                try FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print("ClipboardManager: Error creating ClipHoldTemp directory: \(error.localizedDescription)")
+            }
+        }
+        
         let tempFileURL = tempDirectoryURL.appendingPathComponent(originalFileName)
         
         // 既存のファイルがあれば削除
@@ -477,22 +488,24 @@ extension ClipboardManager {
     // MARK: - 一時ファイルクリーンアップ
     func cleanUpTemporaryFiles() { // private から internal に変更
         let fileManager = FileManager.default
-        let tempDirectoryURL = fileManager.temporaryDirectory
+        let tempDirectoryURL = fileManager.temporaryDirectory.appendingPathComponent("ClipHoldTemp", isDirectory: true)
         print("ClipboardManager: Attempting to clean up temporary files in \(tempDirectoryURL.path)")
         
         do {
-            let tempContents = try fileManager.contentsOfDirectory(at: tempDirectoryURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-            var cleanedCount = 0
-            for fileURL in tempContents {
-                do {
-                    try fileManager.removeItem(at: fileURL)
-                    print("ClipboardManager: Removed temporary file: \(fileURL.lastPathComponent)")
-                    cleanedCount += 1
-                } catch {
-                    print("ClipboardManager: Error removing temporary file \(fileURL.lastPathComponent): \(error.localizedDescription)")
+            if fileManager.fileExists(atPath: tempDirectoryURL.path) {
+                let tempContents = try fileManager.contentsOfDirectory(at: tempDirectoryURL, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+                var cleanedCount = 0
+                for fileURL in tempContents {
+                    do {
+                        try fileManager.removeItem(at: fileURL)
+                        print("ClipboardManager: Removed temporary file: \(fileURL.lastPathComponent)")
+                        cleanedCount += 1
+                    } catch {
+                        print("ClipboardManager: Error removing temporary file \(fileURL.lastPathComponent): \(error.localizedDescription)")
+                    }
                 }
+                print("ClipboardManager: Cleaned up \(cleanedCount) temporary files.")
             }
-            print("ClipboardManager: Cleaned up \(cleanedCount) temporary files.")
         } catch {
             print("ClipboardManager: Error getting contents of temporary directory: \(error.localizedDescription)")
         }

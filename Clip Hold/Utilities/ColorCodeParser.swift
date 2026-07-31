@@ -17,7 +17,10 @@ struct ColorCodeParser {
     /// - Parameter text: 解析する文字列
     /// - Returns: 解析されたColorオブジェクト。解析できない場合はnil
     static func parseColor(from text: String) -> Color? {
-        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        // テキストが異常に長い場合、パフォーマンス低下を防ぐために先頭の100文字のみを処理対象とする
+        // (カラーコードは100文字以上になることはないため安全)
+        let processedText = text.count > 100 ? String(text.prefix(100)) : text
+        let trimmedText = processedText.trimmingCharacters(in: .whitespacesAndNewlines)
         
         // HEX形式 (例: #FFFFFF, #FFFFFFFF, FFFFFF, FFFFFFFF)
         if let hexColor = parseHex(trimmedText) {
