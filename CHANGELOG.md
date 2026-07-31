@@ -37,6 +37,7 @@ Notes
   - When enabled, the currently selected preset icon will be displayed in the menu bar.
 
 ### Bug Fixes and Improvements
+- **Fix issue where the app might crash during Quick Paste**
 - **Fix issue where the copy notification would not disappear when copying from the menu in the Standard Phrase window**
 - **Fix issue where some sheets were not displayed correctly on macOS Golden Gate**
 - **Improve the performance of the History window**

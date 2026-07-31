@@ -90,22 +90,26 @@ struct ClipHoldApp: App {
             return
         }
         
-        let commandDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: true)!
+        guard let commandDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: true),
+              let vDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: true),
+              let vUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: false),
+              let commandUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: false) else {
+            print("Failed to create CGEvent for paste")
+            return
+        }
+        
         commandDown.flags = .maskCommand
         commandDown.post(tap: .cgSessionEventTap)
         Thread.sleep(forTimeInterval: delay)
         
-        let vDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: true)!
         vDown.flags = .maskCommand
         vDown.post(tap: .cgSessionEventTap)
         Thread.sleep(forTimeInterval: delay)
         
-        let vUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: false)!
         vUp.flags = .maskCommand
         vUp.post(tap: .cgSessionEventTap)
         Thread.sleep(forTimeInterval: delay)
         
-        let commandUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: false)!
         commandUp.flags = []
         commandUp.post(tap: .cgSessionEventTap)
     }
