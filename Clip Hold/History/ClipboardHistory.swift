@@ -28,6 +28,12 @@ extension ClipboardManager {
     
     // MARK: - Helper function to add and save a new item
     func addAndSaveItem(_ newItem: ClipboardItem) { // private から internal に変更
+        // 万が一既存の履歴と同じIDが生成されていた場合は新しく生成し直す（念のためのエラーハンドリング）
+        while clipboardHistory.contains(where: { $0.id == newItem.id }) {
+            print("ClipboardManager: ID collision detected for \(newItem.id). Regenerating UUID...")
+            newItem.id = UUID()
+        }
+        
         // 日付が最も新しいアイテムを「最後のアイテム」として取得
         let lastItem = clipboardHistory.max { $0.date < $1.date }
         
