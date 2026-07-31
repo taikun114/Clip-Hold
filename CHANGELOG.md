@@ -35,6 +35,9 @@ Notes
   - Displayed when any filter is applied, and clicking it will clear all filters.
 - **Add a "Show Current Preset Icon" option to the "Menu" section of the General settings**
   - When enabled, the currently selected preset icon will be displayed in the menu bar.
+- **Add a "Quick Paste to Previous Text Field" option to the General settings**
+  - When this setting is used, when you copy, copy as plain text, or edit and copy from the History or Standard Phrase window, the focus is returned to the previously focused app before executing Quick Paste. If you are focused on a text field, you can easily copy and paste into the previous text field.
+  - You can temporarily disable Quick Paste by holding down the `⌥ (Option)` key.
 
 ### Bug Fixes and Improvements
 - **Fix issue where copying a history with extremely long text from the History window could cause freezes or increased memory usage**

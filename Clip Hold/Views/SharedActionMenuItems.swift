@@ -1,21 +1,65 @@
 import SwiftUI
 import AppKit
 
+// MARK: - Shared Copy Routine
+
+@MainActor
+func performSharedCopyRoutine(
+    preventQuickPaste: Bool,
+    quickPaste: Bool,
+    quickPasteToPreviousApp: Bool,
+    showCopyConfirmation: Binding<Bool>,
+    currentCopyConfirmationTask: Binding<Task<Void, Never>?>,
+    copyBlock: () -> Void
+) {
+    copyBlock()
+    
+    showCopyConfirmation.wrappedValue = true
+    currentCopyConfirmationTask.wrappedValue?.cancel()
+    currentCopyConfirmationTask.wrappedValue = Task { @MainActor in
+        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        guard !Task.isCancelled else { return }
+        showCopyConfirmation.wrappedValue = false
+    }
+    
+    if quickPaste && quickPasteToPreviousApp && !preventQuickPaste {
+        ClipHoldApp.performPasteToPreviousApp()
+    }
+}
+
 // MARK: - Shared Action Menu Items
 
 /// クリップボードへのコピーを行うメニュー項目
 struct SharedCopyMenuItem: View {
     let action: () -> Void
+    var alternateAction: (() -> Void)? = nil
     @ObservedObject var modifierMonitor = ModifierKeyMonitor.shared
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
     
     var body: some View {
-        Button(action: action) {
-            if quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed {
-                Label("クイックペーストせずにコピー", systemImage: "document.on.document").forceIconOnMacOS27()
+        if #available(macOS 15.0, *) {
+            if quickPaste && quickPasteToPreviousApp {
+                Button(action: action) {
+                    Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
+                }
+                .modifierKeyAlternate(.option) {
+                    Button(action: alternateAction ?? action) {
+                        Label("クイックペーストせずにコピー", systemImage: "document.on.document").forceIconOnMacOS27()
+                    }
+                }
             } else {
-                Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
+                Button(action: action) {
+                    Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
+                }
+            }
+        } else {
+            Button(action: action) {
+                if quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed {
+                    Label("クイックペーストせずにコピー", systemImage: "document.on.document").forceIconOnMacOS27()
+                } else {
+                    Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
+                }
             }
         }
     }

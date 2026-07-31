@@ -94,41 +94,57 @@ struct HistoryContentList: View {
     
     @ViewBuilder
     private func historyMenuItems(for currentItem: ClipboardItem) -> some View {
-        SharedCopyMenuItem {
-            clipboardManager.isPerformingInternalCopy = true
-            onCopyAction(currentItem)
-            
-            if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
-                ClipHoldApp.performPasteToPreviousApp()
-            }
-            
-            showCopyConfirmation = true
-            currentCopyConfirmationTask?.cancel()
-            currentCopyConfirmationTask = Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 2_000_000_000)
-                guard !Task.isCancelled else { return }
-                showCopyConfirmation = false
+        let performCopy = { (preventQuickPaste: Bool) in
+            performSharedCopyRoutine(
+                preventQuickPaste: preventQuickPaste,
+                quickPaste: quickPaste,
+                quickPasteToPreviousApp: quickPasteToPreviousApp,
+                showCopyConfirmation: $showCopyConfirmation,
+                currentCopyConfirmationTask: $currentCopyConfirmationTask
+            ) {
+                clipboardManager.isPerformingInternalCopy = true
+                onCopyAction(currentItem)
             }
         }
         
+        SharedCopyMenuItem(
+            action: { performCopy(modifierMonitor.isOptionKeyPressed) },
+            alternateAction: { performCopy(true) }
+        )
+        
         if currentItem.richText != nil {
-            Button {
-                let newItemToCopy = ClipboardItem(text: currentItem.text)
-                onCopyAction(newItemToCopy)
-                
-                if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
-                    ClipHoldApp.performPasteToPreviousApp()
+            let plainTextCopyAction: (Bool) -> Void = { preventQuickPaste in
+                performSharedCopyRoutine(
+                    preventQuickPaste: preventQuickPaste,
+                    quickPaste: quickPaste,
+                    quickPasteToPreviousApp: quickPasteToPreviousApp,
+                    showCopyConfirmation: $showCopyConfirmation,
+                    currentCopyConfirmationTask: $currentCopyConfirmationTask
+                ) {
+                    let newItemToCopy = ClipboardItem(text: currentItem.text)
+                    onCopyAction(newItemToCopy)
                 }
-                
-                showCopyConfirmation = true
-                currentCopyConfirmationTask?.cancel()
-                currentCopyConfirmationTask = Task { @MainActor in
-                    try? await Task.sleep(nanoseconds: 2_000_000_000)
-                    guard !Task.isCancelled else { return }
-                    showCopyConfirmation = false
+            }
+
+            if #available(macOS 15.0, *) {
+                if quickPaste && quickPasteToPreviousApp {
+                    Button { plainTextCopyAction(false) } label: {
+                        Text("標準テキストとしてコピー")
+                    }
+                    .modifierKeyAlternate(.option) {
+                        Button { plainTextCopyAction(true) } label: {
+                            Text("クイックペーストせずに標準テキストとしてコピー")
+                        }
+                    }
+                } else {
+                    Button { plainTextCopyAction(false) } label: {
+                        Text("標準テキストとしてコピー")
+                    }
                 }
-            } label: {
-                Text(quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed ? "クイックペーストせずに標準テキストとしてコピー" : "標準テキストとしてコピー")
+            } else {
+                Button { plainTextCopyAction(modifierMonitor.isOptionKeyPressed) } label: {
+                    Text(quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed ? "クイックペーストせずに標準テキストとしてコピー" : "標準テキストとしてコピー")
+                }
             }
         }
         
@@ -336,21 +352,18 @@ struct HistoryContentList: View {
                         }
                     }, primaryAction: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
-                            // 内部コピーフラグをtrueに設定
-                            clipboardManager.isPerformingInternalCopy = true
-                            onCopyAction(currentItem)
-                            
-                            if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
-                                ClipHoldApp.performPasteToPreviousApp()
+                            performSharedCopyRoutine(
+                                preventQuickPaste: modifierMonitor.isOptionKeyPressed,
+                                quickPaste: quickPaste,
+                                quickPasteToPreviousApp: quickPasteToPreviousApp,
+                                showCopyConfirmation: $showCopyConfirmation,
+                                currentCopyConfirmationTask: $currentCopyConfirmationTask
+                            ) {
+                                // 内部コピーフラグをtrueに設定
+                                clipboardManager.isPerformingInternalCopy = true
+                                onCopyAction(currentItem)
                             }
                             
-                            showCopyConfirmation = true
-                            currentCopyConfirmationTask?.cancel()
-                            currentCopyConfirmationTask = Task { @MainActor in
-                                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                guard !Task.isCancelled else { return }
-                                showCopyConfirmation = false
-                            }
                             if closeWindowOnDoubleClickInHistoryWindow {
                                 dismiss()
                             }
@@ -358,34 +371,19 @@ struct HistoryContentList: View {
                     })
                     .sheet(item: $itemToEdit) { item in
                         EditHistoryItemView(content: item.text, onCopy: { editedContent in
-                            // コピー処理を実装
-                            let newItemToCopy = ClipboardItem(text: editedContent)
-                            onCopyAction(newItemToCopy)
-                            
-                            // クイックペーストの処理
                             let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                             let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
                             
-                            if currentQuickPaste {
-                                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.isOptionKeyPressed {
-                                    // オプションキーが押されている場合はスキップ
-                                } else if currentQuickPasteToPreviousApp {
-                                    ClipHoldApp.performPasteToPreviousApp()
-                                } else {
-                                    Task { @MainActor in
-                                        try? await Task.sleep(nanoseconds: 50_000_000)
-                                        ClipHoldApp.performPaste()
-                                    }
-                                }
-                            }
-                            
-                            // コピー確認を表示
-                            showCopyConfirmation = true
-                            currentCopyConfirmationTask?.cancel()
-                            currentCopyConfirmationTask = Task { @MainActor in
-                                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                guard !Task.isCancelled else { return }
-                                showCopyConfirmation = false
+                            performSharedCopyRoutine(
+                                preventQuickPaste: ModifierKeyMonitor.shared.isOptionKeyPressed,
+                                quickPaste: currentQuickPaste,
+                                quickPasteToPreviousApp: currentQuickPasteToPreviousApp,
+                                showCopyConfirmation: $showCopyConfirmation,
+                                currentCopyConfirmationTask: $currentCopyConfirmationTask
+                            ) {
+                                // コピー処理を実装
+                                let newItemToCopy = ClipboardItem(text: editedContent)
+                                onCopyAction(newItemToCopy)
                             }
                         }, isSheet: true)
                     }

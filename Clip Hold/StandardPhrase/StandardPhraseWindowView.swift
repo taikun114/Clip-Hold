@@ -109,21 +109,22 @@ struct StandardPhraseWindowView: View {
             return url.scheme == "http" || url.scheme == "https"
         }()
         
-        SharedCopyMenuItem {
-            copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
-            
-            if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
-                ClipHoldApp.performPasteToPreviousApp()
-            }
-            
-            showCopyConfirmation = true
-            currentCopyConfirmationTask?.cancel()
-            currentCopyConfirmationTask = Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 2_000_000_000)
-                guard !Task.isCancelled else { return }
-                showCopyConfirmation = false
+        let performCopy = { (preventQuickPaste: Bool) in
+            performSharedCopyRoutine(
+                preventQuickPaste: preventQuickPaste,
+                quickPaste: quickPaste,
+                quickPasteToPreviousApp: quickPasteToPreviousApp,
+                showCopyConfirmation: $showCopyConfirmation,
+                currentCopyConfirmationTask: $currentCopyConfirmationTask
+            ) {
+                copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
             }
         }
+        
+        SharedCopyMenuItem(
+            action: { performCopy(modifierMonitor.isOptionKeyPressed) },
+            alternateAction: { performCopy(true) }
+        )
         
         SharedEditAndCopyMenuItem {
             phraseToEditAndCopy = currentPhrase
@@ -569,31 +570,17 @@ struct StandardPhraseWindowView: View {
         }
         .sheet(item: $phraseToEditAndCopy) { phrase in
             EditHistoryItemView(content: phrase.content, onCopy: { editedContent in
-                copyToClipboard(editedContent, clipboardManager: clipboardManager)
-                
-                // クイックペーストの処理
                 let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                 let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
                 
-                if currentQuickPaste {
-                    if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.isOptionKeyPressed {
-                        // オプションキーが押されている場合はスキップ
-                    } else if currentQuickPasteToPreviousApp {
-                        ClipHoldApp.performPasteToPreviousApp()
-                    } else {
-                        Task { @MainActor in
-                            try? await Task.sleep(nanoseconds: 50_000_000)
-                            ClipHoldApp.performPaste()
-                        }
-                    }
-                }
-                
-                showCopyConfirmation = true
-                currentCopyConfirmationTask?.cancel()
-                currentCopyConfirmationTask = Task { @MainActor in
-                    try? await Task.sleep(nanoseconds: 2_000_000_000)
-                    guard !Task.isCancelled else { return }
-                    showCopyConfirmation = false
+                performSharedCopyRoutine(
+                    preventQuickPaste: ModifierKeyMonitor.shared.isOptionKeyPressed,
+                    quickPaste: currentQuickPaste,
+                    quickPasteToPreviousApp: currentQuickPasteToPreviousApp,
+                    showCopyConfirmation: $showCopyConfirmation,
+                    currentCopyConfirmationTask: $currentCopyConfirmationTask
+                ) {
+                    copyToClipboard(editedContent, clipboardManager: clipboardManager)
                 }
             }, isSheet: true)
         }
