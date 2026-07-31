@@ -29,10 +29,11 @@ struct HistoryWindowView: View {
     @State private var copyConfirmationTask: Task<Void, Never>? = nil
     @State private var historyUpdateTask: Task<Void, Never>? = nil
     
-    @State private var showQRCodeSheet: Bool = false
-    @State private var selectedItemForQRCode: ClipboardItem?
+    @State private var selectedItemForQRCode: ClipboardItem? = nil
     
     @State private var itemForNewPhrase: ClipboardItem? = nil
+    
+    @State private var isChildSheetPresented: Bool = false
     
     @State private var displayLimit: Int = 100
     
@@ -235,9 +236,9 @@ struct HistoryWindowView: View {
                         selectedItemID: $selectedItemID,
                         showCopyConfirmation: $showCopyConfirmation,
                         currentCopyConfirmationTask: $currentCopyConfirmationTask,
-                        showQRCodeSheet: $showQRCodeSheet,
                         selectedItemForQRCode: $selectedItemForQRCode,
                         itemForNewPhrase: $itemForNewPhrase,
+                        isChildSheetPresented: $isChildSheetPresented,
                         hideNumbersInHistoryWindow: hideNumbersInHistoryWindow,
                         closeWindowOnDoubleClickInHistoryWindow: closeWindowOnDoubleClickInHistoryWindow,
                         scrollToTopOnUpdate: scrollToTopOnUpdate,
@@ -270,6 +271,20 @@ struct HistoryWindowView: View {
                 }
         }
         .onKeyPress { press in
+            // シートが開かれている（または開こうとしている）間は検索欄への入力を無視する
+            if isChildSheetPresented || showingDeleteConfirmation || selectedItemForQRCode != nil || itemToDelete != nil || itemForNewPhrase != nil {
+                #if DEBUG
+                print("Keyboard blocked by state flag in History. child:\(isChildSheetPresented), delConf:\(showingDeleteConfirmation), qr:\(selectedItemForQRCode != nil), itemDel:\(itemToDelete != nil), newPhrase:\(itemForNewPhrase != nil)")
+                #endif
+                return .ignored
+            }
+            if let window = NSApp.keyWindow, window.attachedSheet != nil {
+                #if DEBUG
+                print("Keyboard blocked by attachedSheet in History.")
+                #endif
+                return .ignored
+            }
+            
             guard press.modifiers.isEmpty || press.modifiers == .shift else { return .ignored }
             
             // バックスペースキーの処理
@@ -293,7 +308,16 @@ struct HistoryWindowView: View {
                 return .ignored
             }
             
-            let ignoredKeys: Set<KeyEquivalent> = [.return, .tab, .escape, .space, .upArrow, .downArrow, .leftArrow, .rightArrow, .home, .end, .pageUp, .pageDown, .clear]
+            if press.key == .escape {
+                if !searchText.isEmpty {
+                    searchText = ""
+                    return .handled
+                } else {
+                    return .ignored
+                }
+            }
+            
+            let ignoredKeys: Set<KeyEquivalent> = [.return, .tab, .space, .upArrow, .downArrow, .leftArrow, .rightArrow, .home, .end, .pageUp, .pageDown, .clear]
             if ignoredKeys.contains(press.key) {
                 return .ignored
             }

@@ -128,7 +128,6 @@ struct StandardPhraseWindowView: View {
         
         SharedEditAndCopyMenuItem {
             phraseToEditAndCopy = currentPhrase
-            showingEditAndCopySheet = true
         }
         
         if isURL {
@@ -153,7 +152,6 @@ struct StandardPhraseWindowView: View {
         
         SharedShowQRCodeMenuItem {
             selectedPhraseForQRCode = currentPhrase
-            showQRCodeSheet = true
         }
         
         Divider()
@@ -175,11 +173,9 @@ struct StandardPhraseWindowView: View {
     @State private var searchTask: Task<Void, Never>? = nil
     @State private var showCopyConfirmation: Bool = false
     @State private var currentCopyConfirmationTask: Task<Void, Never>? = nil
-    @State private var showQRCodeSheet: Bool = false
     @State private var selectedPhraseForQRCode: StandardPhrase?
     @State private var phraseToEdit: StandardPhrase? = nil
     @State private var phraseToEditAndCopy: StandardPhrase?
-    @State private var showingEditAndCopySheet = false
 
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
@@ -484,6 +480,20 @@ struct StandardPhraseWindowView: View {
             SharedCopyConfirmationView(showCopyConfirmation: showCopyConfirmation)
         }
         .onKeyPress { press in
+            // シートが開かれている（または開こうとしている）間は検索欄への入力を無視する
+            if showingDeleteConfirmation || selectedPhraseForQRCode != nil || showingAddPresetSheet || phraseToEdit != nil || phraseToEditAndCopy != nil || phraseToMove != nil {
+                #if DEBUG
+                print("Keyboard blocked by state flag in StandardPhrase. delConf:\(showingDeleteConfirmation), qr:\(selectedPhraseForQRCode != nil), addPreset:\(showingAddPresetSheet), toEdit:\(phraseToEdit != nil), toEditCopy:\(phraseToEditAndCopy != nil), toMove:\(phraseToMove != nil)")
+                #endif
+                return .ignored
+            }
+            if let window = NSApp.keyWindow, window.attachedSheet != nil {
+                #if DEBUG
+                print("Keyboard blocked by attachedSheet in StandardPhrase.")
+                #endif
+                return .ignored
+            }
+            
             guard press.modifiers.isEmpty || press.modifiers == .shift else { return .ignored }
             
             // バックスペースキーの処理
@@ -507,7 +517,16 @@ struct StandardPhraseWindowView: View {
                 return .ignored
             }
             
-            let ignoredKeys: Set<KeyEquivalent> = [.return, .tab, .escape, .space, .upArrow, .downArrow, .leftArrow, .rightArrow, .home, .end, .pageUp, .pageDown, .clear]
+            if press.key == .escape {
+                if !searchText.isEmpty {
+                    searchText = ""
+                    return .handled
+                } else {
+                    return .ignored
+                }
+            }
+            
+            let ignoredKeys: Set<KeyEquivalent> = [.return, .tab, .space, .upArrow, .downArrow, .leftArrow, .rightArrow, .home, .end, .pageUp, .pageDown, .clear]
             if ignoredKeys.contains(press.key) {
                 return .ignored
             }

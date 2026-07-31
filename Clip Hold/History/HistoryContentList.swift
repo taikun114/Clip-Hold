@@ -17,9 +17,9 @@ struct HistoryContentList: View {
     @Binding var selectedItemID: UUID?
     @Binding var showCopyConfirmation: Bool
     @Binding var currentCopyConfirmationTask: Task<Void, Never>?
-    @Binding var showQRCodeSheet: Bool
     @Binding var selectedItemForQRCode: ClipboardItem?
     @Binding var itemForNewPhrase: ClipboardItem?
+    @Binding var isChildSheetPresented: Bool
     
     @State private var previousNewestItemID: UUID?
     @State private var previousPinnedItemID: UUID?
@@ -227,7 +227,6 @@ struct HistoryContentList: View {
         
         if currentItem.filePath == nil {
             SharedShowQRCodeMenuItem {
-                showQRCodeSheet = true
                 selectedItemForQRCode = currentItem
             }
         }
@@ -539,6 +538,10 @@ struct HistoryContentList: View {
                 }
             }
         }
+        .onChange(of: showingExcludeAppAlert) { _, newValue in isChildSheetPresented = newValue }
+        .onChange(of: showingDeleteAllFromAppAlert) { _, newValue in isChildSheetPresented = newValue }
+        .onChange(of: itemToEdit) { _, newValue in isChildSheetPresented = (newValue != nil) }
+        .onChange(of: itemToReplacePin) { _, newValue in isChildSheetPresented = (newValue != nil) }
     }
 }
 

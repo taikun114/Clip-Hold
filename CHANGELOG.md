@@ -56,6 +56,8 @@ Notes
 - **Improve to display currently configured shortcut keys in the menu**
 - **Improve operability of History and Standard Phrase windows**
   - When you open the History or Standard Phrase window, the first item is now focused, making it easier to operate with just the keyboard. You can also type directly to search or return focus to the list.
+- **Improve the behavior of the search field in the History and Standard Phrase windows**
+  - Previously, pressing the Escape key closed the window immediately. Now, if there is any text in the search field, pressing Escape once will clear the text, and pressing it a second time will close the window.
 - **Changes to the preset icon picker package**
   - Icon names are now displayed, and you can filter by specific categories using the category picker.
 
