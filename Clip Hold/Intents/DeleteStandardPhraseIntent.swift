@@ -17,6 +17,12 @@ struct DeleteStandardPhraseIntent: AppIntent {
     @Parameter(title: "Phrase", description: "The standard phrase to delete", requestValueDialog: IntentDialog("どの定型文を削除しますか？"), optionsProvider: DeletePhraseOptionsProvider())
     var phrase: StandardPhraseEntity
     
+    static var parameterSummary: some ParameterSummary {
+        Summary("Delete \(\.$phrase)") {
+            \.$preset
+        }
+    }
+    
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         let (deletedCount, presetName, deletedPhraseTitle) = await MainActor.run {
             var localDeletedCount = 0

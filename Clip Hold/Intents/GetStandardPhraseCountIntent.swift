@@ -21,6 +21,13 @@ struct GetStandardPhraseCountIntent: AppIntent {
     )
     var ignoreDuplicates: Bool
 
+    static var parameterSummary: some ParameterSummary {
+        Summary("Get standard phrase count") {
+            \.$preset
+            \.$ignoreDuplicates
+        }
+    }
+
     func perform() async throws -> some IntentResult & ReturnsValue<Int> {
         let count = await MainActor.run { () -> Int in
             let presets = StandardPhrasePresetManager.shared.presets

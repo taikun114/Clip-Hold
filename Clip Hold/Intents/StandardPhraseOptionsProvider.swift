@@ -11,7 +11,10 @@ struct CopyPhraseOptionsProvider: DynamicOptionsProvider {
         let presetEntity = intent?.preset
         
         let targetPhrases: [StandardPhrase]
-        if let presetEntity = presetEntity, presetEntity.id != currentPresetDummyId {
+        if let presetEntity = presetEntity, presetEntity.id == allPresetsDummyId {
+            let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
+            targetPhrases = presets.flatMap { $0.phrases }
+        } else if let presetEntity = presetEntity, presetEntity.id != currentPresetDummyId {
             let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
             targetPhrases = presets.first(where: { $0.id == presetEntity.id })?.phrases ?? []
         } else {
@@ -33,7 +36,35 @@ struct DeletePhraseOptionsProvider: DynamicOptionsProvider {
         let presetEntity = intent?.preset
         
         let targetPhrases: [StandardPhrase]
-        if let presetEntity = presetEntity, presetEntity.id != currentPresetDummyId {
+        if let presetEntity = presetEntity, presetEntity.id == allPresetsDummyId {
+            let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
+            targetPhrases = presets.flatMap { $0.phrases }
+        } else if let presetEntity = presetEntity, presetEntity.id != currentPresetDummyId {
+            let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
+            targetPhrases = presets.first(where: { $0.id == presetEntity.id })?.phrases ?? []
+        } else {
+            targetPhrases = await MainActor.run { StandardPhraseManager.shared.standardPhrases }
+        }
+        
+        return targetPhrases.map { phrase in
+            StandardPhraseEntity(id: phrase.id, title: phrase.title, content: phrase.content)
+        }
+    }
+}
+
+@available(macOS 14.0, *)
+struct GetPhraseOptionsProvider: DynamicOptionsProvider {
+    @IntentParameterDependency<GetStandardPhraseIntent>( \.$preset )
+    var intent
+    
+    func results() async throws -> [StandardPhraseEntity] {
+        let presetEntity = intent?.preset
+        
+        let targetPhrases: [StandardPhrase]
+        if let presetEntity = presetEntity, presetEntity.id == allPresetsDummyId {
+            let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
+            targetPhrases = presets.flatMap { $0.phrases }
+        } else if let presetEntity = presetEntity, presetEntity.id != currentPresetDummyId {
             let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
             targetPhrases = presets.first(where: { $0.id == presetEntity.id })?.phrases ?? []
         } else {

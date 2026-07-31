@@ -13,10 +13,20 @@ struct AddStandardPhraseIntent: AppIntent {
     @Parameter(title: "Text", description: "The content of the standard phrase", requestValueDialog: IntentDialog("追加するテキストは何ですか？"))
     var text: String
     
-    @Parameter(title: "Preset", description: "The preset to add the phrase to", default: nil, requestValueDialog: IntentDialog("どのプリセットに追加しますか？"))
+    @Parameter(title: "Preset", description: "The preset to add the phrase to", requestValueDialog: IntentDialog("どのプリセットに追加しますか？"), optionsProvider: SpecificPresetOptionsProvider())
     var preset: StandardPhrasePresetEntity?
     
+    static var parameterSummary: some ParameterSummary {
+        Summary("Add \(\.$text)") {
+            \.$preset
+        }
+    }
+    
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
+        if preset?.id == allPresetsDummyId {
+            return .result(value: "", dialog: IntentDialog(stringLiteral: "「すべてのプリセット」に追加することはできません。特定のプリセットを選択してください。"))
+        }
+        
         // カスタムタイトルオフ時と同様に、テキスト全体をタイトルとして使用
         let actualTitle = text
         let newPhrase = StandardPhrase(title: actualTitle, content: text)

@@ -9,8 +9,17 @@ struct GetStandardPhraseIntent: AppIntent {
     
     static let openAppWhenRun: Bool = false
     
-    @Parameter(title: "定型文")
+    @Parameter(title: "Preset", description: "The preset to get the phrase from", default: nil, requestValueDialog: IntentDialog("どのプリセットから取得しますか？"))
+    var preset: StandardPhrasePresetEntity?
+    
+    @Parameter(title: "定型文", optionsProvider: GetPhraseOptionsProvider())
     var phrase: StandardPhraseEntity
+    
+    static var parameterSummary: some ParameterSummary {
+        Summary("Get standard phrase \(\.$phrase)") {
+            \.$preset
+        }
+    }
     
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         return .result(value: phrase.content)

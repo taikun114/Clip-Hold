@@ -16,11 +16,19 @@ struct CopyStandardPhraseIntent: AppIntent {
     @Parameter(title: "Phrase", description: "The standard phrase to copy", requestValueDialog: IntentDialog("どの定型文をコピーしますか？"), optionsProvider: CopyPhraseOptionsProvider())
     var phrase: StandardPhraseEntity
     
+    static var parameterSummary: some ParameterSummary {
+        Summary("Copy \(\.$phrase)") {
+            \.$preset
+        }
+    }
+    
     func perform() async throws -> some IntentResult {
         // IDからアイテムを取得
         let targetPhrases: [StandardPhrase]
         let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
-        if let presetEntity = preset, presetEntity.id != currentPresetDummyId {
+        if let presetEntity = preset, presetEntity.id == allPresetsDummyId {
+            targetPhrases = presets.flatMap { $0.phrases }
+        } else if let presetEntity = preset, presetEntity.id != currentPresetDummyId {
             targetPhrases = presets.first(where: { $0.id == presetEntity.id })?.phrases ?? []
         } else {
             targetPhrases = await MainActor.run { StandardPhraseManager.shared.standardPhrases }

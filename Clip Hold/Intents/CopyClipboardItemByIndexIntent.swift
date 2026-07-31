@@ -12,6 +12,10 @@ struct CopyClipboardItemByIndexIntent: AppIntent {
     @Parameter(title: "Number", description: "The number of the item to copy (1 or greater)")
     var index: Int
     
+    static var parameterSummary: some ParameterSummary {
+        Summary("Copy the \(\.$index)th history item")
+    }
+    
     func perform() async throws -> some IntentResult {
         let history = await ChunkedHistoryManager.shared.loadHistory()
         

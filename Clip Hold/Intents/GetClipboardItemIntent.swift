@@ -9,8 +9,12 @@ struct GetClipboardItemIntent: AppIntent {
     
     static let openAppWhenRun: Bool = false
     
-    @Parameter(title: "履歴項目")
+    @Parameter(title: "項目")
     var historyItem: ClipboardItemEntity
+    
+    static var parameterSummary: some ParameterSummary {
+        Summary("Get history item \(\.$historyItem)")
+    }
     
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         return .result(value: historyItem.contentText)

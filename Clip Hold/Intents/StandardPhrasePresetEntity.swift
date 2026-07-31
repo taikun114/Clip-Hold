@@ -56,7 +56,8 @@ struct StandardPhrasePresetEntityQuery: EntityQuery {
     func suggestedEntities() async throws -> [StandardPhrasePresetEntity] {
         let presets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
         var result: [StandardPhrasePresetEntity] = [
-            StandardPhrasePresetEntity(id: currentPresetDummyId, name: "現在のプリセット")
+            StandardPhrasePresetEntity(id: currentPresetDummyId, name: String(localized: "現在のプリセット")),
+            StandardPhrasePresetEntity(id: allPresetsDummyId, name: String(localized: "すべてのプリセット"))
         ]
         result.append(contentsOf: presets.map { StandardPhrasePresetEntity(id: $0.id, name: $0.name) })
         return result

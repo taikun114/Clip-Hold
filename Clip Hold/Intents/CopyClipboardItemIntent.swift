@@ -10,8 +10,12 @@ struct CopyClipboardItemIntent: AppIntent {
     // Spotlightで開いたときのデフォルトアクションにするため
     static let openAppWhenRun: Bool = false
     
-    @Parameter(title: "Item")
+    @Parameter(title: "項目")
     var item: ClipboardItemEntity
+    
+    static var parameterSummary: some ParameterSummary {
+        Summary("Copy history item \(\.$item)")
+    }
     
     func perform() async throws -> some IntentResult {
         // IDからアイテムを取得

@@ -12,8 +12,14 @@ struct GetStandardPhraseByIndexIntent: AppIntent {
     @Parameter(title: "Number", description: "The number of the item to get (1 or greater)")
     var index: Int
     
-    @Parameter(title: "プリセット")
+    @Parameter(title: "プリセット", optionsProvider: SpecificPresetOptionsProvider())
     var preset: StandardPhrasePresetEntity
+    
+    static var parameterSummary: some ParameterSummary {
+        Summary("Get the \(\.$index)th standard phrase") {
+            \.$preset
+        }
+    }
     
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         let targetPresetId = preset.id
@@ -22,6 +28,8 @@ struct GetStandardPhraseByIndexIntent: AppIntent {
             let manager = StandardPhrasePresetManager.shared
             if targetPresetId == currentPresetDummyId {
                 return StandardPhraseManager.shared.standardPhrases
+            } else if targetPresetId == allPresetsDummyId {
+                return manager.presets.flatMap { $0.phrases }
             } else if let selectedPreset = manager.presets.first(where: { $0.id == targetPresetId }) {
                 return selectedPreset.phrases
             } else {
