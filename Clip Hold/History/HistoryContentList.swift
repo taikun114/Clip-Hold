@@ -108,7 +108,7 @@ struct HistoryContentList: View {
         }
         
         SharedCopyMenuItem(
-            action: { performCopy(modifierMonitor.isOptionKeyPressed) },
+            action: { performCopy(modifierMonitor.currentOptionKeyPressed) },
             alternateAction: { performCopy(true) }
         )
         
@@ -142,7 +142,7 @@ struct HistoryContentList: View {
                     }
                 }
             } else {
-                Button { plainTextCopyAction(modifierMonitor.isOptionKeyPressed) } label: {
+                Button { plainTextCopyAction(modifierMonitor.currentOptionKeyPressed) } label: {
                     Text(quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed ? "クイックペーストせずに標準テキストとしてコピー" : "標準テキストとしてコピー")
                 }
             }
@@ -353,7 +353,7 @@ struct HistoryContentList: View {
                     }, primaryAction: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
                             performSharedCopyRoutine(
-                                preventQuickPaste: modifierMonitor.isOptionKeyPressed,
+                                preventQuickPaste: modifierMonitor.currentOptionKeyPressed,
                                 quickPaste: quickPaste,
                                 quickPasteToPreviousApp: quickPasteToPreviousApp,
                                 showCopyConfirmation: $showCopyConfirmation,
@@ -375,7 +375,7 @@ struct HistoryContentList: View {
                             let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
                             
                             performSharedCopyRoutine(
-                                preventQuickPaste: ModifierKeyMonitor.shared.isOptionKeyPressed,
+                                preventQuickPaste: ModifierKeyMonitor.shared.currentOptionKeyPressed,
                                 quickPaste: currentQuickPaste,
                                 quickPasteToPreviousApp: currentQuickPasteToPreviousApp,
                                 showCopyConfirmation: $showCopyConfirmation,

@@ -183,7 +183,7 @@ struct ClipHoldApp: App {
                         NSPasteboard.general.setString(phrase.content, forType: .string)
                         
                         // オプションキーが押されていない場合のみクイックペーストを実行
-                        if quickPaste && !NSEvent.modifierFlags.contains(.option) {
+                        if quickPaste && !ModifierKeyMonitor.shared.currentOptionKeyPressed {
                             Task { @MainActor in
                                 try? await Task.sleep(nanoseconds: 50_000_000)
                                 ClipHoldApp.performPaste()
@@ -333,7 +333,7 @@ struct ClipHoldApp: App {
                         clipboardManager.copyItemToClipboard(item)
                         
                         // オプションキーが押されていない場合のみクイックペーストを実行
-                        if quickPaste && !NSEvent.modifierFlags.contains(.option) {
+                        if quickPaste && !ModifierKeyMonitor.shared.currentOptionKeyPressed {
                             let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste") // ここで最新の値を取得
                             if textOnlyQuickPaste {
                                 // ファイルパスがなく、かつ画像でもない場合にのみペーストを実行

@@ -330,7 +330,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
             
             if currentQuickPaste {
-                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.isOptionKeyPressed {
+                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.currentOptionKeyPressed {
                     return
                 }
                 
@@ -380,7 +380,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
             
             if currentQuickPaste {
-                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.isOptionKeyPressed {
+                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.currentOptionKeyPressed {
                     return
                 }
                 

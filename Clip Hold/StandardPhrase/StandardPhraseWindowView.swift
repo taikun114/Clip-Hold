@@ -122,7 +122,7 @@ struct StandardPhraseWindowView: View {
         }
         
         SharedCopyMenuItem(
-            action: { performCopy(modifierMonitor.isOptionKeyPressed) },
+            action: { performCopy(modifierMonitor.currentOptionKeyPressed) },
             alternateAction: { performCopy(true) }
         )
         
@@ -454,19 +454,16 @@ struct StandardPhraseWindowView: View {
                                 }
                             }, primaryAction: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
-                                    copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
-                                    
-                                    if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
-                                        ClipHoldApp.performPasteToPreviousApp()
+                                    performSharedCopyRoutine(
+                                        preventQuickPaste: modifierMonitor.currentOptionKeyPressed,
+                                        quickPaste: quickPaste,
+                                        quickPasteToPreviousApp: quickPasteToPreviousApp,
+                                        showCopyConfirmation: $showCopyConfirmation,
+                                        currentCopyConfirmationTask: $currentCopyConfirmationTask
+                                    ) {
+                                        copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
                                     }
                                     
-                                    showCopyConfirmation = true
-                                    currentCopyConfirmationTask?.cancel()
-                                    currentCopyConfirmationTask = Task { @MainActor in
-                                        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                        guard !Task.isCancelled else { return }
-                                        showCopyConfirmation = false
-                                    }
                                     if closeWindowOnDoubleClickInStandardPhrasesWindow {
                                         dismiss()
                                     }
@@ -574,7 +571,7 @@ struct StandardPhraseWindowView: View {
                 let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
                 
                 performSharedCopyRoutine(
-                    preventQuickPaste: ModifierKeyMonitor.shared.isOptionKeyPressed,
+                    preventQuickPaste: ModifierKeyMonitor.shared.currentOptionKeyPressed,
                     quickPaste: currentQuickPaste,
                     quickPasteToPreviousApp: currentQuickPasteToPreviousApp,
                     showCopyConfirmation: $showCopyConfirmation,
