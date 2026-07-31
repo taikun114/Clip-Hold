@@ -38,7 +38,10 @@ struct HistoryWindowView: View {
     
     @State private var searchDebounceTask: Task<Void, Never>? = nil
     
+    @State private var searchTrigger: UUID = UUID()
+    
     @FocusState private var isSearchFieldFocused: Bool
+    @FocusState private var isListFocused: Bool
     
     @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
     @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
@@ -178,10 +181,28 @@ struct HistoryWindowView: View {
                     }
                 }
                 self.clipboardManager.filteredHistoryForShortcuts = finalHistoryToApply
+                
+                if self.selectedItemID == nil || !finalHistoryToApply.contains(where: { $0.id == self.selectedItemID }) {
+                    self.selectedItemID = finalHistoryToApply.first?.id
+                }
+                
+                // 明示的にリストへフォーカスを移す（検索中でない場合）
+                if !self.isSearchFieldFocused {
+                    self.isListFocused = true
+                }
+                
                 self.isLoading = false
                 self.isPaginating = false
+                
+                if !isPagination && !isBackground {
+                    self.searchTrigger = UUID()
+                }
             }
         }
+    }
+    
+    private func handleSearchSubmit() {
+        isListFocused = true
     }
     
     var body: some View {
@@ -199,6 +220,9 @@ struct HistoryWindowView: View {
                         selectedSort: $clipboardManager.historySelectedSort,
                         selectedApp: $clipboardManager.historySelectedApp
                     )
+                    .onSubmit(of: .text) {
+                        handleSearchSubmit()
+                    }
                     
                     Spacer(minLength: 0)
                     
@@ -221,6 +245,7 @@ struct HistoryWindowView: View {
                         lineNumberTextWidth: lineNumberTextWidth,
                         trailingPaddingForLineNumber: trailingPaddingForLineNumber,
                         searchText: searchText,
+                        searchTrigger: searchTrigger,
                         onCopyAction: { item in
                             // 内部コピーフラグをtrueに設定
                             clipboardManager.isPerformingInternalCopy = true
@@ -233,6 +258,8 @@ struct HistoryWindowView: View {
                             }
                         }
                     )
+                    .focused($isListFocused)
+                    .defaultFocus($isListFocused, true)
                 }
             }
             
@@ -241,6 +268,59 @@ struct HistoryWindowView: View {
                 .onDisappear {
                     currentCopyConfirmationTask?.cancel()
                 }
+        }
+        .onKeyPress { press in
+            guard press.modifiers.isEmpty || press.modifiers == .shift else { return .ignored }
+            
+            // バックスペースキーの処理
+            if press.key == .delete || press.key == .deleteForward || press.characters == "\u{7F}" || press.characters == "\u{08}" {
+                if !isSearchFieldFocused {
+                    if !searchText.isEmpty {
+                        searchText.removeLast()
+                        isSearchFieldFocused = true
+                        
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 50_000_000)
+                            if let window = NSApp.keyWindow,
+                               let textView = window.firstResponder as? NSTextView {
+                                let length = textView.string.count
+                                textView.setSelectedRange(NSRange(location: length, length: 0))
+                            }
+                        }
+                        return .handled
+                    }
+                }
+                return .ignored
+            }
+            
+            let ignoredKeys: Set<KeyEquivalent> = [.return, .tab, .escape, .space, .upArrow, .downArrow, .leftArrow, .rightArrow, .home, .end, .pageUp, .pageDown, .clear]
+            if ignoredKeys.contains(press.key) {
+                return .ignored
+            }
+            guard let char = press.characters.first, !press.characters.isEmpty else { return .ignored }
+            
+            // 制御文字の入力を無視
+            if let scalar = char.unicodeScalars.first, CharacterSet.controlCharacters.contains(scalar) {
+                return .ignored
+            }
+            
+            if !isSearchFieldFocused {
+                searchText.append(char)
+                isSearchFieldFocused = true
+                
+                // 検索欄にフォーカスが移った後、文字が全選択されるのを防ぐためカーソルを末尾に移動させる
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                    if let window = NSApp.keyWindow,
+                       let textView = window.firstResponder as? NSTextView {
+                        let length = textView.string.count
+                        textView.setSelectedRange(NSRange(location: length, length: 0))
+                    }
+                }
+                
+                return .handled
+            }
+            return .ignored
         }
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.willCloseNotification)) { notification in
             // ウィンドウが閉じられたときに表示上限をリセットしてメモリを解放
@@ -272,8 +352,11 @@ struct HistoryWindowView: View {
         .onAppear {
             clipboardManager.filteredHistoryForShortcuts = []
             performUpdate()
+            
+            // ウインドウ表示時は必ずリストにフォーカスを当てる
             Task { @MainActor in
-                isSearchFieldFocused = true
+                try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                isListFocused = true
             }
         }
         .onDisappear {

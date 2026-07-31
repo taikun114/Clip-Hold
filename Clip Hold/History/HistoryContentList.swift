@@ -66,6 +66,7 @@ struct HistoryContentList: View {
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
     let searchText: String
+    let searchTrigger: UUID
     @EnvironmentObject var dateReloader: DateReloader
     @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
 
@@ -383,6 +384,14 @@ struct HistoryContentList: View {
                         }
                         return true
                     }
+                    .onChange(of: searchTrigger) { _, _ in
+                        if let firstId = filteredHistory.first?.id {
+                            Task { @MainActor in
+                                try? await Task.sleep(nanoseconds: 100_000_000)
+                                scrollViewProxy.scrollTo(firstId)
+                            }
+                        }
+                    }
                     .onChange(of: filteredHistory) { _, newValue in
                         // 不要になったrowIconStore.viewsのエントリをクリーンアップする
                         let currentIDs = Set(clipboardManager.clipboardHistory.map { $0.id })
@@ -403,15 +412,23 @@ struct HistoryContentList: View {
                                 Task { @MainActor in
                                     try? await Task.sleep(nanoseconds: 100_000_000)
                                     if reduceMotion {
-                                        scrollViewProxy.scrollTo(firstId, anchor: .top)
+                                        scrollViewProxy.scrollTo(firstId)
                                     } else {
                                         withAnimation {
-                                            scrollViewProxy.scrollTo(firstId, anchor: .top)
+                                            scrollViewProxy.scrollTo(firstId)
                                         }
                                     }
                                 }
                             }
                         }
+                        
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 10_000_000)
+                            if selectedItemID == nil || !newValue.contains(where: { $0.id == selectedItemID }) {
+                                selectedItemID = newValue.first?.id
+                            }
+                        }
+                        
                         previousNewestItemID = newestItem?.id // 現在の最新アイテムのIDを保存
                         previousPinnedItemID = clipboardManager.pinnedItemID // 現在のピン留めアイテムのIDを保存
                     }

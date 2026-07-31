@@ -182,12 +182,14 @@ struct StandardPhraseWindowView: View {
     @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
     
     @FocusState private var isSearchFieldFocused: Bool
+    @FocusState private var isListFocused: Bool
     
     // 新規プリセット追加シート用の状態変数
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
     
     @State private var presetChangedForScroll: Bool = false
+    @State private var searchTrigger: UUID = UUID()
     
     private var lineNumberTextWidth: CGFloat? {
         guard !hideNumbers, !filteredPhrases.isEmpty else { return nil }
@@ -227,6 +229,15 @@ struct StandardPhraseWindowView: View {
             }
         }
         self.filteredPhrases = newFilteredPhrases
+        
+        if selectedPhraseID == nil || !newFilteredPhrases.contains(where: { $0.id == selectedPhraseID }) {
+            selectedPhraseID = newFilteredPhrases.first?.id
+        }
+        
+        // 明示的にリストへフォーカスを移す（検索中でない場合）
+        if !isSearchFieldFocused {
+            isListFocused = true
+        }
     }
     
     private func movePhrases(from source: IndexSet, to destination: Int) {
@@ -244,6 +255,10 @@ struct StandardPhraseWindowView: View {
         }
     }
     
+    private func handleSearchSubmit() {
+        isListFocused = true
+    }
+    
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
             SharedWindowBackground()
@@ -256,6 +271,9 @@ struct StandardPhraseWindowView: View {
                             searchText: $searchText,
                             isSearchFieldFocused: $isSearchFieldFocused
                         )
+                        .onSubmit(of: .text) {
+                            handleSearchSubmit()
+                        }
                         
                         // プリセット選択メニューを追加
                         Menu {
@@ -335,6 +353,7 @@ struct StandardPhraseWindowView: View {
                             
                             performSearch(searchTerm: newValue)
                             isLoading = false
+                            searchTrigger = UUID()
                         }
                     }
                     .onChange(of: standardPhraseManager.standardPhrases) { _, _ in
@@ -388,18 +407,30 @@ struct StandardPhraseWindowView: View {
                                         }
                                     }
                                 }
+                                .onChange(of: searchTrigger) { _, _ in
+                                    if let firstId = filteredPhrases.first?.id {
+                                        Task { @MainActor in
+                                            try? await Task.sleep(nanoseconds: 100_000_000)
+                                            proxy.scrollTo(firstId)
+                                        }
+                                    }
+                                }
                                 .onChange(of: filteredPhrases) { _, newValue in
                                     if presetChangedForScroll {
                                         if let firstId = newValue.first?.id {
-                                            if reduceMotion {
-                                                proxy.scrollTo(firstId, anchor: .top)
-                                            } else {
-                                                withAnimation {
-                                                    proxy.scrollTo(firstId, anchor: .top)
-                                                }
+                                            Task { @MainActor in
+                                                try? await Task.sleep(nanoseconds: 100_000_000)
+                                                proxy.scrollTo(firstId)
                                             }
                                         }
                                         presetChangedForScroll = false
+                                    }
+                                    
+                                    Task { @MainActor in
+                                        try? await Task.sleep(nanoseconds: 10_000_000)
+                                        if selectedPhraseID == nil || !newValue.contains(where: { $0.id == selectedPhraseID }) {
+                                            selectedPhraseID = newValue.first?.id
+                                        }
                                     }
                                 }
                             }
@@ -427,6 +458,8 @@ struct StandardPhraseWindowView: View {
                                     }
                                 }
                             })
+                            .focused($isListFocused)
+                            .defaultFocus($isListFocused, true)
                         }
                         
                         if isLoading {
@@ -438,6 +471,59 @@ struct StandardPhraseWindowView: View {
             
             // コピー確認メッセージ (元の場所で、このZStackの直下に配置)
             SharedCopyConfirmationView(showCopyConfirmation: showCopyConfirmation)
+        }
+        .onKeyPress { press in
+            guard press.modifiers.isEmpty || press.modifiers == .shift else { return .ignored }
+            
+            // バックスペースキーの処理
+            if press.key == .delete || press.key == .deleteForward || press.characters == "\u{7F}" || press.characters == "\u{08}" {
+                if !isSearchFieldFocused {
+                    if !searchText.isEmpty {
+                        searchText.removeLast()
+                        isSearchFieldFocused = true
+                        
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 50_000_000)
+                            if let window = NSApp.keyWindow,
+                               let textView = window.firstResponder as? NSTextView {
+                                let length = textView.string.count
+                                textView.setSelectedRange(NSRange(location: length, length: 0))
+                            }
+                        }
+                        return .handled
+                    }
+                }
+                return .ignored
+            }
+            
+            let ignoredKeys: Set<KeyEquivalent> = [.return, .tab, .escape, .space, .upArrow, .downArrow, .leftArrow, .rightArrow, .home, .end, .pageUp, .pageDown, .clear]
+            if ignoredKeys.contains(press.key) {
+                return .ignored
+            }
+            guard let char = press.characters.first, !press.characters.isEmpty else { return .ignored }
+            
+            // 制御文字の入力を無視
+            if let scalar = char.unicodeScalars.first, CharacterSet.controlCharacters.contains(scalar) {
+                return .ignored
+            }
+            
+            if !isSearchFieldFocused {
+                searchText.append(char)
+                isSearchFieldFocused = true
+                
+                // 検索欄にフォーカスが移った後、文字が全選択されるのを防ぐためカーソルを末尾に移動させる
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                    if let window = NSApp.keyWindow,
+                       let textView = window.firstResponder as? NSTextView {
+                        let length = textView.string.count
+                        textView.setSelectedRange(NSRange(location: length, length: 0))
+                    }
+                }
+                
+                return .handled
+            }
+            return .ignored
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation) {
@@ -494,8 +580,11 @@ struct StandardPhraseWindowView: View {
         }
         .onAppear {
             performSearch(searchTerm: searchText)
+            
+            // ウインドウ表示時は必ずリストにフォーカスを当てる
             Task { @MainActor in
-                isSearchFieldFocused = true
+                try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                isListFocused = true
             }
         }
         .onDisappear {
