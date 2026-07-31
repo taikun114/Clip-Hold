@@ -22,7 +22,11 @@ struct StandardPhrasePresetEntity: AppEntity, IndexedEntity {
     }
     
     var displayRepresentation: DisplayRepresentation {
-        DisplayRepresentation(title: "\(name)")
+        if id.uuidString == "00000000-0000-0000-0000-000000000000" {
+            return DisplayRepresentation(title: LocalizedStringResource("Default"))
+        } else {
+            return DisplayRepresentation(title: "\(name)")
+        }
     }
 }
 
