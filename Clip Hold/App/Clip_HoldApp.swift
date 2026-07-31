@@ -114,6 +114,29 @@ struct ClipHoldApp: App {
         commandUp.post(tap: .cgSessionEventTap)
     }
     
+    static func performPasteToPreviousApp() {
+        if let bundleIdentifier = FrontmostAppMonitor.shared.lastNonClipHoldAppBundleIdentifier {
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 150_000_000) // ウィンドウが閉じることによるシステムフォーカス移動を待つ
+                
+                let runningApps = NSWorkspace.shared.runningApplications
+                if let targetApp = runningApps.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
+                    if #available(macOS 14.0, *) {
+                        NSApp.yieldActivation(to: targetApp)
+                    }
+                    targetApp.activate()
+                    
+                    try? await Task.sleep(nanoseconds: 150_000_000) // 対象アプリがアクティブになるのを待機
+                    ClipHoldApp.performPaste()
+                } else {
+                    ClipHoldApp.performPaste()
+                }
+            }
+        } else {
+            ClipHoldApp.performPaste()
+        }
+    }
+    
     private var menuBarExtraInsertionBinding: Binding<Bool> {
         Binding<Bool>(
             get: { !self.hideMenuBarExtra }, // hideMenuBarExtra が true なら非表示 (false)

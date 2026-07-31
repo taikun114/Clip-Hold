@@ -111,6 +111,11 @@ struct StandardPhraseWindowView: View {
         
         SharedCopyMenuItem {
             copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
+            
+            if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
+                ClipHoldApp.performPasteToPreviousApp()
+            }
+            
             showCopyConfirmation = true
             currentCopyConfirmationTask?.cancel()
             currentCopyConfirmationTask = Task { @MainActor in
@@ -180,6 +185,9 @@ struct StandardPhraseWindowView: View {
     
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
     @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
+    @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
+    @ObservedObject var modifierMonitor = ModifierKeyMonitor.shared
     
     @FocusState private var isSearchFieldFocused: Bool
     @FocusState private var isListFocused: Bool
@@ -446,6 +454,11 @@ struct StandardPhraseWindowView: View {
                             }, primaryAction: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
                                     copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
+                                    
+                                    if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
+                                        ClipHoldApp.performPasteToPreviousApp()
+                                    }
+                                    
                                     showCopyConfirmation = true
                                     currentCopyConfirmationTask?.cancel()
                                     currentCopyConfirmationTask = Task { @MainActor in
@@ -557,6 +570,24 @@ struct StandardPhraseWindowView: View {
         .sheet(item: $phraseToEditAndCopy) { phrase in
             EditHistoryItemView(content: phrase.content, onCopy: { editedContent in
                 copyToClipboard(editedContent, clipboardManager: clipboardManager)
+                
+                // クイックペーストの処理
+                let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
+                
+                if currentQuickPaste {
+                    if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.isOptionKeyPressed {
+                        // オプションキーが押されている場合はスキップ
+                    } else if currentQuickPasteToPreviousApp {
+                        ClipHoldApp.performPasteToPreviousApp()
+                    } else {
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 50_000_000)
+                            ClipHoldApp.performPaste()
+                        }
+                    }
+                }
+                
                 showCopyConfirmation = true
                 currentCopyConfirmationTask?.cancel()
                 currentCopyConfirmationTask = Task { @MainActor in

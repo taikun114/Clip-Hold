@@ -7,12 +7,16 @@ class FrontmostAppMonitor: ObservableObject {
     static let shared = FrontmostAppMonitor()
     
     @Published var frontmostAppBundleIdentifier: String?
+    @Published var lastNonClipHoldAppBundleIdentifier: String?
     
     private var cancellables = Set<AnyCancellable>()
     private var previousPresetId: UUID? = nil
     
     private init() {
         self.frontmostAppBundleIdentifier = NSWorkspace.shared.frontmostApplication?.bundleIdentifier
+        if self.frontmostAppBundleIdentifier != "design.taikun.Clip-Hold" {
+            self.lastNonClipHoldAppBundleIdentifier = self.frontmostAppBundleIdentifier
+        }
     }
     
     func startMonitoring() {
@@ -26,6 +30,10 @@ class FrontmostAppMonitor: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] bundleIdentifier in
                 guard let self = self else { return }
+                
+                if bundleIdentifier != "design.taikun.Clip-Hold" {
+                    self.lastNonClipHoldAppBundleIdentifier = bundleIdentifier
+                }
                 
                 if UserDefaults.standard.bool(forKey: "excludeClipHoldWindowsFromAutoFilter") && bundleIdentifier == "design.taikun.Clip-Hold" {
                     return

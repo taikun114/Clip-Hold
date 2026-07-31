@@ -8628,6 +8628,40 @@
         }
       }
     },
+    "オンにすると、履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。アクセシビリティの許可が必要です。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn aktiviert, gibt die App beim Kopieren aus dem Verlaufs- oder Standard-Phrasen-Fenster den Fokus an die App mit dem zuvor ausgewählten Textfeld zurück und führt ein Quick Paste aus. Bedienungshilfen-Berechtigungen sind erforderlich."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When turned on, when you copy from the history or standard phrase window, the app will return focus to the app that had the previously selected text field and perform a quick paste. Accessibility permissions are required."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando está activado, al copiar desde la ventana de historial o frases estándar, la aplicación devolverá el enfoque a la aplicación que tenía el campo de texto seleccionado previamente y realizará un pegado rápido. Se requieren permisos de accesibilidad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si activé, lors de la copie depuis la fenêtre d'historique ou de phrases standard, l'application redonnera le focus à l'application qui avait le champ de texte précédemment sélectionné et effectuera un collage rapide. Des autorisations d'accessibilité sont requises."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。アクセシビリティの許可が必要です。"
+          }
+        }
+      }
+    },
     "オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。" : {
       "comment" : "一般設定の「クイックペーストをテキストに限定」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
@@ -9114,6 +9148,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイックペースト"
+          }
+        }
+      }
+    },
+    "クイックペーストせずにコピー" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopieren ohne Quick Paste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy without quick pasting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar sin pegado rápido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier sans collage rapide"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックペーストせずにコピー"
+          }
+        }
+      }
+    },
+    "クイックペーストせずに標準テキストとしてコピー" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als reinen Text kopieren ohne Quick Paste"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy as plain text without quick pasting"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar como texto sin formato sin pegado rápido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier en tant que texte brut sans collage rapide"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックペーストせずに標準テキストとしてコピー"
           }
         }
       }
@@ -17945,6 +18047,40 @@
         }
       }
     },
+    "履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。アクセシビリティの許可が必要です。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Kopieren aus dem Verlaufs- oder Standard-Phrasen-Fenster gibt die App den Fokus an die App mit dem zuvor ausgewählten Textfeld zurück und führt ein Quick Paste aus. Bedienungshilfen-Berechtigungen sind erforderlich."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you copy from the history or standard phrase window, the app will return focus to the app that had the previously selected text field and perform a quick paste. Accessibility permissions are required."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al copiar desde la ventana de historial o frases estándar, la aplicación devolverá el enfoque a la aplicación que tenía el campo de texto seleccionado previamente y realizará un pegado rápido. Se requieren permisos de accesibilidad."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lors de la copie depuis la fenêtre d'historique ou de phrases standard, l'application redonnera le focus à l'application qui avait le champ de texte précédemment sélectionné et effectuera un collage rapide. Des autorisations d'accessibilité sont requises."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。アクセシビリティの許可が必要です。"
+          }
+        }
+      }
+    },
     "履歴に保存されたすべてのファイルとフォルダを削除しますか？関連する履歴も削除されます。この操作は元に戻せません。" : {
       "comment" : "コピー履歴設定で保存フォルダを空にするボタンをクリックしたときに表示されるアラートテキスト。保存フォルダを空にすると、保存フォルダに含まれるファイルやフォルダ等のコピー履歴も削除される(ファイルパスが含まれないコピー履歴はそのまま残る)。",
       "localizations" : {
@@ -20242,6 +20378,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番号を隠す"
+          }
+        }
+      }
+    },
+    "直前のテキストフィールドにクイックペースト" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Paste in das vorherige Textfeld"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Paste to Previous Text Field"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegado rápido al campo de texto anterior"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collage rapide dans le champ de texte précédent"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "直前のテキストフィールドにクイックペースト"
           }
         }
       }

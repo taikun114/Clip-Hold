@@ -6,10 +6,17 @@ import AppKit
 /// クリップボードへのコピーを行うメニュー項目
 struct SharedCopyMenuItem: View {
     let action: () -> Void
+    @ObservedObject var modifierMonitor = ModifierKeyMonitor.shared
+    @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
     
     var body: some View {
         Button(action: action) {
-            Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
+            if quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed {
+                Label("クイックペーストせずにコピー", systemImage: "document.on.document").forceIconOnMacOS27()
+            } else {
+                Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
+            }
         }
     }
 }

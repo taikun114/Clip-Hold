@@ -69,6 +69,9 @@ struct HistoryContentList: View {
     let searchTrigger: UUID
     @EnvironmentObject var dateReloader: DateReloader
     @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
+    @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
+    @ObservedObject var modifierMonitor = ModifierKeyMonitor.shared
 
     
     var onCopyAction: (ClipboardItem) -> Void
@@ -94,6 +97,11 @@ struct HistoryContentList: View {
         SharedCopyMenuItem {
             clipboardManager.isPerformingInternalCopy = true
             onCopyAction(currentItem)
+            
+            if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
+                ClipHoldApp.performPasteToPreviousApp()
+            }
+            
             showCopyConfirmation = true
             currentCopyConfirmationTask?.cancel()
             currentCopyConfirmationTask = Task { @MainActor in
@@ -107,6 +115,11 @@ struct HistoryContentList: View {
             Button {
                 let newItemToCopy = ClipboardItem(text: currentItem.text)
                 onCopyAction(newItemToCopy)
+                
+                if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
+                    ClipHoldApp.performPasteToPreviousApp()
+                }
+                
                 showCopyConfirmation = true
                 currentCopyConfirmationTask?.cancel()
                 currentCopyConfirmationTask = Task { @MainActor in
@@ -115,7 +128,7 @@ struct HistoryContentList: View {
                     showCopyConfirmation = false
                 }
             } label: {
-                Text("標準テキストとしてコピー")
+                Text(quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed ? "クイックペーストせずに標準テキストとしてコピー" : "標準テキストとしてコピー")
             }
         }
         
@@ -326,6 +339,11 @@ struct HistoryContentList: View {
                             // 内部コピーフラグをtrueに設定
                             clipboardManager.isPerformingInternalCopy = true
                             onCopyAction(currentItem)
+                            
+                            if quickPaste && quickPasteToPreviousApp && !modifierMonitor.isOptionKeyPressed {
+                                ClipHoldApp.performPasteToPreviousApp()
+                            }
+                            
                             showCopyConfirmation = true
                             currentCopyConfirmationTask?.cancel()
                             currentCopyConfirmationTask = Task { @MainActor in
@@ -343,6 +361,23 @@ struct HistoryContentList: View {
                             // コピー処理を実装
                             let newItemToCopy = ClipboardItem(text: editedContent)
                             onCopyAction(newItemToCopy)
+                            
+                            // クイックペーストの処理
+                            let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                            let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
+                            
+                            if currentQuickPaste {
+                                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.isOptionKeyPressed {
+                                    // オプションキーが押されている場合はスキップ
+                                } else if currentQuickPasteToPreviousApp {
+                                    ClipHoldApp.performPasteToPreviousApp()
+                                } else {
+                                    Task { @MainActor in
+                                        try? await Task.sleep(nanoseconds: 50_000_000)
+                                        ClipHoldApp.performPaste()
+                                    }
+                                }
+                            }
                             
                             // コピー確認を表示
                             showCopyConfirmation = true

@@ -8,6 +8,10 @@ struct EditHistoryItemView: View {
     var onCopy: (String) -> Void
     var isSheet: Bool = false
     
+    @ObservedObject var modifierMonitor = ModifierKeyMonitor.shared
+    @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
+    
     @FocusState private var isContentFocused: Bool
     
     var body: some View {
@@ -45,7 +49,7 @@ struct EditHistoryItemView: View {
                 .keyboardShortcut(.cancelAction)
                 
                 Spacer()
-                Button("コピー") {
+                Button(quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed ? "クイックペーストせずにコピー" : "コピー") {
                     onCopy(content)
                     if isSheet {
                         dismiss()

@@ -324,6 +324,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             let clipboardManager = ClipboardManager.shared
             clipboardManager.isPerformingInternalCopy = true
             clipboardManager.copyItemToClipboard(ClipboardItem(text: editedContent))
+            
+            // クイックペーストの処理
+            let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+            let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
+            
+            if currentQuickPaste {
+                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.isOptionKeyPressed {
+                    return
+                }
+                
+                if currentQuickPasteToPreviousApp {
+                    ClipHoldApp.performPasteToPreviousApp()
+                } else {
+                    Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 50_000_000)
+                        ClipHoldApp.performPaste()
+                    }
+                }
+            }
         }, isSheet: false)
         
         // 新しいウィンドウコントローラーを作成
@@ -358,10 +377,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             
             // クイックペーストの処理
             let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+            let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
+            
             if currentQuickPaste {
-                Task { @MainActor in
-                    try? await Task.sleep(nanoseconds: 50_000_000)
-                    ClipHoldApp.performPaste()
+                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.isOptionKeyPressed {
+                    return
+                }
+                
+                if currentQuickPasteToPreviousApp {
+                    ClipHoldApp.performPasteToPreviousApp()
+                } else {
+                    Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 50_000_000)
+                        ClipHoldApp.performPaste()
+                    }
                 }
             }
         }, isSheet: false)

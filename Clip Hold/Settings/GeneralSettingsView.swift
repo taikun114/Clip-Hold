@@ -98,6 +98,7 @@ struct GeneralSettingsView: View {
     @AppStorage("excludeClipHoldWindowsFromAutoFilter") var excludeClipHoldWindowsFromAutoFilter: Bool = false
     
     @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
     
     @AppStorage("showCurrentPresetIcon") var showCurrentPresetIcon: Bool = false
@@ -225,6 +226,25 @@ struct GeneralSettingsView: View {
                     .toggleStyle(.switch)
                     .labelsHidden()
                     // quickPasteがオフの時にグレイアウトする
+                    .disabled(!quickPaste)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("直前のテキストフィールドにクイックペースト")
+                            .foregroundStyle(quickPaste ? .primary : .secondary)
+                        Text("履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。アクセシビリティの許可が必要です。")
+                            .font(.caption)
+                            .foregroundStyle(quickPaste ? .secondary : .tertiary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $quickPasteToPreviousApp) {
+                        Text("直前のテキストフィールドにクイックペースト")
+                        Text("オンにすると、履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。アクセシビリティの許可が必要です。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
                     .disabled(!quickPaste)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
