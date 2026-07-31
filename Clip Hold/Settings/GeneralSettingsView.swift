@@ -725,7 +725,7 @@ struct GeneralSettingsView: View {
                 title: Text("メニューに表示する履歴の最大数を設定"),
                 description: nil,
                 currentValue: $tempCustomMenuHistoryValue,
-                onSave: { newValue in
+                onSave: { newValue -> Bool in
                     maxHistoryInMenu = newValue
                     customHistoryValueWasSaved = true // 保存されたことをマーク
                     
@@ -736,6 +736,7 @@ struct GeneralSettingsView: View {
                     } else {
                         tempSelectedMenuOption = .custom(newValue)
                     }
+                    return true
                 },
                 onCancel: {
                     // onDismissで処理するため、ここは空で良い
@@ -756,7 +757,7 @@ struct GeneralSettingsView: View {
                 title: Text("メニューに表示する定型文の最大数を設定"),
                 description: nil,
                 currentValue: $tempCustomPhrasesInMenuValue,
-                onSave: { newValue in
+                onSave: { newValue -> Bool in
                     maxPhrasesInMenu = newValue
                     customPhraseValueWasSaved = true // 保存されたことをマーク
                     
@@ -765,6 +766,7 @@ struct GeneralSettingsView: View {
                     } else {
                         tempSelectedPhraseMenuOption = .custom(newValue)
                     }
+                    return true
                 },
                 onCancel: {
                     // onDismissで処理するため、ここは空で良い

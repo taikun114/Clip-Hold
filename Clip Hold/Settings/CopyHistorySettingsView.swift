@@ -29,6 +29,10 @@ struct CopyHistorySettingsView: View {
     @State private var showingCustomFileSizeSheet = false
     @State private var showingClearHistoryConfirmation = false
     @State private var showingClearFilesConfirmation = false
+    @State private var showingDecreaseHistoryLimitAlertForPicker = false
+    @State private var showingDecreaseHistoryLimitAlertForSheet = false
+    @State private var pendingHistorySaveValue: Int? = nil
+    @State private var pendingHistorySaveOption: HistoryOption? = nil
     
     @State private var customSaveHistoryWasSaved = false
     @State private var customFileSizeWasSaved = false
@@ -439,6 +443,26 @@ struct CopyHistorySettingsView: View {
                 onSave: handleCustomSaveHistorySheetSave,
                 onCancel: {}
             )
+            .alert("古い履歴が削除されます", isPresented: $showingDecreaseHistoryLimitAlertForSheet) {
+                Button("キャンセル", role: .cancel) {
+                    pendingHistorySaveValue = nil
+                    pendingHistorySaveOption = nil
+                }
+                Button("設定", role: .destructive) {
+                    if let value = pendingHistorySaveValue, let option = pendingHistorySaveOption {
+                        applyHistoryLimitChange(newValue: value, option: option)
+                    }
+                    pendingHistorySaveValue = nil
+                    pendingHistorySaveOption = nil
+                    customSaveHistoryWasSaved = true
+                    showingCustomSaveHistorySheet = false
+                }
+            } message: {
+                if let newValue = pendingHistorySaveValue {
+                    let diff = clipboardManager.clipboardHistory.count - newValue
+                    Text("履歴の最大保存数を既に保存されている数よりも小さくしようとしています。これにより、次に履歴が更新されるときに、設定値を超えた\(diff)個の履歴が削除されます。よろしいですか？")
+                }
+            }
         }
         .sheet(isPresented: $showingCustomFileSizeSheet, onDismiss: {
             if !customFileSizeWasSaved {
@@ -512,6 +536,24 @@ struct CopyHistorySettingsView: View {
         } message: {
             Text("履歴に保存されたすべてのファイルとフォルダを削除しますか？関連する履歴も削除されます。この操作は元に戻せません。")
         }
+        .alert("古い履歴が削除されます", isPresented: $showingDecreaseHistoryLimitAlertForPicker) {
+            Button("キャンセル", role: .cancel) {
+                cancelHistoryLimitChange()
+            }
+            Button("設定", role: .destructive) {
+                if let value = pendingHistorySaveValue, let option = pendingHistorySaveOption {
+                    applyHistoryLimitChange(newValue: value, option: option)
+                }
+                pendingHistorySaveValue = nil
+                pendingHistorySaveOption = nil
+                showingCustomSaveHistorySheet = false
+            }
+        } message: {
+            if let newValue = pendingHistorySaveValue {
+                let diff = clipboardManager.clipboardHistory.count - newValue
+                Text("履歴の最大保存数を既に保存されている数よりも小さくしようとしています。これにより、次に履歴が更新されるときに、設定値を超えた\(diff)個の履歴が削除されます。よろしいですか？")
+            }
+        }
     }
     
     // MARK: - Picker onChange Handlers
@@ -521,19 +563,54 @@ struct CopyHistorySettingsView: View {
             tempCustomSaveHistoryValue = maxHistoryToSave // 現在の値をカスタムシートの初期値に
             customSaveHistoryWasSaved = false // シート表示前にリセット
             showingCustomSaveHistorySheet = true
-        } else if newValue == .unlimited {
-            maxHistoryToSave = 0 // 無制限を0として保存
-        } else if let intValue = newValue.intValue {
-            maxHistoryToSave = intValue
+        } else {
+            let intValue = newValue == .unlimited ? 0 : (newValue.intValue ?? 0)
+            _ = checkAndApplyHistoryLimitChange(newValue: intValue, option: newValue, fromSheet: false)
         }
-        // 保存数の変更がメニュー表示数に影響する場合の処理（例：メニュー表示が「履歴の保存数に合わせる」の場合）
+    }
+    
+    private func checkAndApplyHistoryLimitChange(newValue: Int, option: HistoryOption, fromSheet: Bool) -> Bool {
+        let currentHistoryCount = clipboardManager.clipboardHistory.count
+        if newValue > 0 && newValue < currentHistoryCount {
+            pendingHistorySaveValue = newValue
+            pendingHistorySaveOption = option
+            if fromSheet {
+                showingDecreaseHistoryLimitAlertForSheet = true
+            } else {
+                showingDecreaseHistoryLimitAlertForPicker = true
+            }
+            return false
+        } else {
+            applyHistoryLimitChange(newValue: newValue, option: option)
+            if fromSheet {
+                customSaveHistoryWasSaved = true
+            }
+            return true
+        }
+    }
+    
+    private func applyHistoryLimitChange(newValue: Int, option: HistoryOption) {
+        maxHistoryToSave = newValue
+        tempSelectedSaveOption = option
+        
         if UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
             UserDefaults.standard.set(maxHistoryToSave, forKey: "maxHistoryInMenu")
         }
-        // ★修正: 保存数が無制限に設定された場合、かつメニュー表示が「保存数に合わせる」ならデフォルト値に戻す
-        if newValue == .unlimited && UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
+        if option == .unlimited && UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
             UserDefaults.standard.set(10, forKey: "maxHistoryInMenu")
         }
+    }
+    
+    private func cancelHistoryLimitChange() {
+        if maxHistoryToSave == 0 {
+            tempSelectedSaveOption = .unlimited
+        } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxHistoryToSave }) {
+            tempSelectedSaveOption = savedPreset
+        } else {
+            tempSelectedSaveOption = .custom(maxHistoryToSave)
+        }
+        pendingHistorySaveValue = nil
+        pendingHistorySaveOption = nil
     }
     
     // Modified to accept a single newValue parameter, as oldValue is not used in the logic
@@ -568,21 +645,18 @@ struct CopyHistorySettingsView: View {
     }
     
     // MARK: - Custom Sheet Save/Cancel Handlers
-    private func handleCustomSaveHistorySheetSave(newValue: Int) {
-        customSaveHistoryWasSaved = true // 保存されたことをマーク
-        maxHistoryToSave = newValue
+    private func handleCustomSaveHistorySheetSave(newValue: Int) -> Bool {
         
+        let newOption: HistoryOption
         if newValue == 0 {
-            tempSelectedSaveOption = .unlimited
+            newOption = .unlimited
         } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == newValue }) {
-            tempSelectedSaveOption = savedPreset
+            newOption = savedPreset
         } else {
-            tempSelectedSaveOption = .custom(newValue)
+            newOption = .custom(newValue)
         }
         
-        if UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
-            UserDefaults.standard.set(maxHistoryToSave, forKey: "maxHistoryInMenu")
-        }
+        return checkAndApplyHistoryLimitChange(newValue: newValue, option: newOption, fromSheet: true)
     }
     
     private func handleCustomSaveHistorySheetCancel() {
@@ -595,7 +669,7 @@ struct CopyHistorySettingsView: View {
         }
     }
     
-    private func handleCustomFileSizeSheetSave(newValue: Int) {
+    private func handleCustomFileSizeSheetSave(newValue: Int) -> Bool {
         customFileSizeWasSaved = true // 保存されたことをマーク
         let newByteValue = tempCustomFileSizeUnit.byteValue(for: newValue)
         maxFileSizeToSave = newByteValue
@@ -607,6 +681,7 @@ struct CopyHistorySettingsView: View {
         } else {
             tempSelectedFileSizeOption = .custom(newValue, tempCustomFileSizeUnit)
         }
+        return true
     }
     
     private func handleCustomFileSizeSheetCancel() {
@@ -623,7 +698,7 @@ struct CopyHistorySettingsView: View {
         }
     }
     
-    private func handleCustomAlertSheetSave(newValue: Int) {
+    private func handleCustomAlertSheetSave(newValue: Int) -> Bool {
         customAlertWasSaved = true // 保存されたことをマーク
         let newByteValue = tempCustomAlertUnit.byteValue(for: newValue)
         largeFileAlertThreshold = newByteValue
@@ -635,6 +710,7 @@ struct CopyHistorySettingsView: View {
         } else {
             tempSelectedAlertOption = .custom(newValue, tempCustomAlertUnit)
         }
+        return true
     }
     
     private func handleCustomAlertSheetCancel() {

@@ -16616,6 +16616,40 @@
         }
       }
     },
+    "古い履歴が削除されます" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ältere Verläufe werden gelöscht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Older History Will Be Deleted"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El historial más antiguo será eliminado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'historique le plus ancien sera supprimé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "古い履歴が削除されます"
+          }
+        }
+      }
+    },
     "古い順" : {
       "comment" : "履歴ウィンドウの並べ替えオプションの1つ、上から順に、日付が古いものから新しいものへと表示するオプション。",
       "localizations" : {
@@ -18217,6 +18251,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の最大保存数"
+          }
+        }
+      }
+    },
+    "履歴の最大保存数を既に保存されている数よりも小さくしようとしています。これにより、次に履歴が更新されるときに、設定値を超えた%lld個の履歴が削除されます。よろしいですか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie versuchen, die maximale Verlaufsgröße kleiner als die aktuelle Anzahl gespeicherter Elemente einzustellen. Dadurch werden beim nächsten Update %lld Verlaufselemente gelöscht, die das Limit überschreiten. Sind Sie sicher?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are attempting to set the maximum history size smaller than the current number of saved items. This will delete %lld history items that exceed the limit upon the next update. Are you sure?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está intentando establecer el tamaño máximo del historial por debajo del número actual de elementos guardados. Esto eliminará %lld elementos del historial que excedan el límite en la próxima actualización. ¿Está seguro?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous essayez de définir la taille maximale de l'historique à une valeur inférieure au nombre actuel d'éléments enregistrés. Cela supprimera %lld éléments de l'historique qui dépassent la limite lors de la prochaine mise à jour. Êtes-vous sûr ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の最大保存数を既に保存されている数よりも小さくしようとしています。これにより、次に履歴が更新されるときに、設定値を超えた%lld個の履歴が削除されます。よろしいですか？"
           }
         }
       }
@@ -20971,6 +21039,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "複製"
+          }
+        }
+      }
+    },
+    "設定" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Establecer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définir"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
           }
         }
       }
