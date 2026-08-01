@@ -1128,6 +1128,7 @@ struct PresetNameSheet: View {
     @State private var selectedIcon: String?
     @State private var previousIcon: String = ""
     @State private var showingColorPicker = false
+    @State private var isIconHovered = false
     @State private var customBackgroundColor: Color
     @State private var customIconColor: Color
     @State private var searchText = ""
@@ -1180,6 +1181,7 @@ struct PresetNameSheet: View {
                                 Circle()
                                     .fill(color == "custom" ? customBackgroundColor : getColor(from: color))
                                     .frame(width: 30, height: 30)
+                                
                                 Image(systemName: icon.isEmpty ? previousIcon : icon)
                                     .foregroundColor(
                                         color == "accent"
@@ -1187,10 +1189,30 @@ struct PresetNameSheet: View {
                                         : getSymbolColor(forPresetColor: color)
                                     )
                                     .font(.system(size: 14, weight: .bold))
+                                    .contentTransition(.symbolEffect(.replace))
+                                
+                                Circle()
+                                    .fill(Color.black.opacity(0.5))
+                                    .frame(width: 30, height: 30)
+                                    .opacity(isIconHovered ? 1 : 0)
+                                    
+                                Image(systemName: "pencil")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 14, weight: .bold))
+                                    .opacity(isIconHovered ? 1 : 0)
                             }
+                            .animation(.easeInOut(duration: 0.2), value: isIconHovered)
                         }
                         .buttonStyle(.plain)
-                        .popover(isPresented: $showingIconPicker) {
+                        .onHover { isHovered in
+                            isIconHovered = isHovered
+                            if isHovered {
+                                NSCursor.pointingHand.push()
+                            } else {
+                                NSCursor.pop()
+                            }
+                        }
+                        .popover(isPresented: $showingIconPicker, arrowEdge: .leading) {
                             SFSymbolPicker(
                                 isPresented: $showingIconPicker,
                                 selection: $selectedIcon,
@@ -1198,9 +1220,10 @@ struct PresetNameSheet: View {
                                 controlBarPosition: .top,
                                 searchText: $searchText,
                                 iconScale: 4,
-                                iconSpacing: 3
+                                iconSpacing: 3,
+                                showRecents: true
                             )
-                            .frame(width: 300, height: 400)
+                            .frame(width: 350, height: 400)
                         }
                         .onChange(of: selectedIcon) { oldValue, newValue in
                             if let newIcon = newValue, !newIcon.isEmpty {
