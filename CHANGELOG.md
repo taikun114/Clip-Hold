@@ -61,6 +61,8 @@ Notes
 - **Improve to show an alert when attempting to change the maximum number of history to save to a value smaller than the currently saved history count**
 - **Changes to the preset icon picker package**
   - Icon names are now displayed, and you can filter by specific categories using the category picker.
+- **Change the default of “Size for Copy Alert” to 100 MB**
+  - To prevent the saved folder capacity from unexpectedly expanding, the capacity threshold before displaying the alert has been reduced.
 
 ## 1.6.3
 ### New Features

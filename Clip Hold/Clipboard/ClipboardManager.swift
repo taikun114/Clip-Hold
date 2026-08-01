@@ -105,7 +105,7 @@ class ClipboardManager: ObservableObject {
     var temporaryFileUrls: Set<URL> = []
     @AppStorage("maxHistoryToSave") var maxHistoryToSave: Int = 0
     @AppStorage("maxFileSizeToSave") var maxFileSizeToSave: Int = 1_000_000_000
-    @AppStorage("largeFileAlertThreshold") var largeFileAlertThreshold: Int = 1_000_000_000
+    @AppStorage("largeFileAlertThreshold") var largeFileAlertThreshold: Int = 100_000_000
     @AppStorage("ignoreStandardPhrases") var ignoreStandardPhrases: Bool = false
     @Published var excludedAppIdentifiers: [String] = []
     var pasteboardMonitorTimer: Timer?

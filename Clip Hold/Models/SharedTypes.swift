@@ -318,6 +318,8 @@ enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
     }
     
     static let presets: [DataSizeAlertOption] = [
+        .preset(100, .megabytes),
+        .preset(500, .megabytes),
         .preset(1, .gigabytes),
         .preset(2, .gigabytes),
         .preset(5, .gigabytes),

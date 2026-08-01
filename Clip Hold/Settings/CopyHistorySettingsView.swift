@@ -15,7 +15,7 @@ struct CopyHistorySettingsView: View {
     @State private var tempSelectedFileSizeOption: DataSizeOption
     @State private var initialFileSizeOption: DataSizeOption
     
-    @AppStorage("largeFileAlertThreshold") var largeFileAlertThreshold: Int = 1_000_000_000
+    @AppStorage("largeFileAlertThreshold") var largeFileAlertThreshold: Int = 100_000_000
     @State private var tempSelectedAlertOption: DataSizeAlertOption
     @State private var initialAlertOption: DataSizeAlertOption
     @State private var showingCustomAlertSheet = false
@@ -59,10 +59,10 @@ struct CopyHistorySettingsView: View {
         // maxHistoryToSaveは0が無制限を表すため、raw値をそのまま使用。nilの場合は0をデフォルトとする。
         let savedMaxHistoryToSave = savedMaxHistoryToSaveRaw ?? 0
         
-        // largeFileAlertThresholdは、UserDefaultsに値がない場合（nil）にAppStorageのデフォルト値（1GB）を使用。
+        // largeFileAlertThresholdは、UserDefaultsに値がない場合（nil）にAppStorageのデフォルト値（100MB）を使用。
         // 0が明示的に設定されている場合は0として扱う。
         let savedMaxFileSizeToSave = savedMaxFileSizeToSaveRaw ?? 0
-        let savedLargeFileAlertThreshold = savedLargeFileAlertThresholdRaw ?? 1_000_000_000
+        let savedLargeFileAlertThreshold = savedLargeFileAlertThresholdRaw ?? 100_000_000
         
         
         // DEBUG print for initial values from UserDefaults
