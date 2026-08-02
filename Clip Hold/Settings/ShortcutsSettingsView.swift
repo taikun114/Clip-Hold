@@ -7,8 +7,24 @@ struct ShortcutsSettingsView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @AppStorage("useFilteredHistoryForShortcuts") private var useFilteredHistoryForShortcuts: Bool = false
     
+    @AppStorage("historyQuickOverlayModifiers") private var historyQuickOverlayModifiers: Int = 0
+    @AppStorage("standardPhraseQuickOverlayModifiers") private var standardPhraseQuickOverlayModifiers: Int = 0
+    
     var body: some View {
         Form {
+            Section(header: Text("クイックオーバーレイ").font(.headline)) {
+                HStack {
+                    Text("履歴オーバーレイ")
+                    Spacer()
+                    ModifierKeyPickerView(modifiers: $historyQuickOverlayModifiers)
+                }
+                HStack {
+                    Text("定型文オーバーレイ")
+                    Spacer()
+                    ModifierKeyPickerView(modifiers: $standardPhraseQuickOverlayModifiers)
+                }
+            }
+            
             Section(header: Text("ウィンドウ操作").font(.headline)) {
                 HStack {
                     Text("定型文ウィンドウを開く")

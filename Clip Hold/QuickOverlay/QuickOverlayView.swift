@@ -1,4 +1,6 @@
+import AppKit
 import SwiftUI
+import KeyboardShortcuts
 
 enum QuickOverlayType {
     case history
@@ -9,6 +11,7 @@ enum QuickOverlaySelection: Equatable {
     case item(UUID)
     case add
     case openWindow
+    case addPreset
 }
 
 struct QuickOverlayView: View {
@@ -38,6 +41,7 @@ struct QuickOverlayView: View {
     @State private var presetMenuCloseTask: Task<Void, Never>? = nil
     @State private var lastPresetMenuHoverLocation: CGPoint = .zero
     @State private var presetMenuSize: CGSize = .zero
+    @State private var presetListHeight: CGFloat = 0
     @State private var showMenuShadow: Bool = false
     
     let rowIconStore = RowIconStore()
@@ -84,7 +88,9 @@ struct QuickOverlayView: View {
         .background(
             Group {
                 if #available(macOS 26.0, *) {
-                    Color.clear.glassEffect(in: .rect(cornerRadius: 24.0))
+                    (colorScheme == .dark ? Color.black.opacity(0.4) : Color.white.opacity(0.6))
+                        .glassEffect(.clear, in: .rect(cornerRadius: 28.0))
+                        .environment(\.controlActiveState, .active)
                 } else {
                     Color(NSColor.windowBackgroundColor)
                         .opacity(colorScheme == .dark ? 0.3 : 0.6)
@@ -92,38 +98,34 @@ struct QuickOverlayView: View {
                 }
             }
         )
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
-        .onAppear {
-            if currentSelection == nil {
-                // 初期選択を最初のアイテムにする
-                if type == .history {
-                    if let first = clipboardManager.filteredHistoryForShortcuts?.first {
-                        currentSelection = .item(first.id)
-                    }
-                } else {
-                    let phrases = getPhrasesForSelectedPreset()
-                    if let first = phrases.first {
-                        currentSelection = .item(first.id)
-                    }
-                }
-            }
-        }
+        .padding(60) // Provide space for the shadow to render inside the 620x620 window
     }
     
     // MARK: - Subviews
+    
+    private var historyItemsToDisplay: [ClipboardItem] {
+        if let explicit = explicitHistoryItems { return explicit }
+        if let filtered = clipboardManager.filteredHistoryForShortcuts { return filtered }
+        
+        var raw = clipboardManager.clipboardHistory
+        if let pinnedID = clipboardManager.pinnedItemID,
+           let pinnedItem = raw.first(where: { $0.id == pinnedID }) {
+            raw.insert(pinnedItem.createPinnedDuplicate(), at: 0)
+        }
+        return raw
+    }
     
     private var scrollContent: some View {
         ScrollView {
             LazyVStack(spacing: 4) {
                 if type == .history {
-                    // History items (Preview用に明示的なアイテムがあればそれを使用)
-                    let historyItems = explicitHistoryItems ?? Array(clipboardManager.filteredHistoryForShortcuts?.prefix(10) ?? clipboardManager.clipboardHistory.prefix(10))
-                    ForEach(Array(historyItems.enumerated()), id: \.element.id) { index, item in
+                    ForEach(Array(historyItemsToDisplay.enumerated()), id: \.element.id) { index, item in
                         historyItemRow(item, index: index)
                     }
                 } else {
@@ -233,6 +235,29 @@ struct QuickOverlayView: View {
         .padding(.leading, 18)
         .padding(.vertical, 12)
         .padding(.trailing, 12)
+        .onChange(of: currentSelection) { _, newValue in
+            QuickOverlayManager.shared.hoveredAction = nil
+            if case .item(let id) = newValue {
+                if type == .history {
+                    if let item = historyItemsToDisplay.first(where: { $0.id == id }) {
+                        QuickOverlayManager.shared.hoveredItemId = item.originalPinnedItemID ?? item.id
+                    } else {
+                        QuickOverlayManager.shared.hoveredItemId = id
+                    }
+                    QuickOverlayManager.shared.hoveredPhraseId = nil
+                } else {
+                    QuickOverlayManager.shared.hoveredPhraseId = id
+                    QuickOverlayManager.shared.hoveredItemId = nil
+                }
+            } else if newValue == .add || newValue == .openWindow {
+                QuickOverlayManager.shared.hoveredAction = newValue
+                QuickOverlayManager.shared.hoveredItemId = nil
+                QuickOverlayManager.shared.hoveredPhraseId = nil
+            } else {
+                QuickOverlayManager.shared.hoveredItemId = nil
+                QuickOverlayManager.shared.hoveredPhraseId = nil
+            }
+        }
     }
     
     private var footerView: some View {
@@ -259,7 +284,7 @@ struct QuickOverlayView: View {
                 .padding(.horizontal, 8)
                 .padding(.vertical, 6)
                 .background(currentSelection == .add ? Color.accentColor : Color.clear)
-                .cornerRadius(10)
+                .clipShape(Capsule())
             }
             .buttonStyle(PlainButtonStyle())
             .onHover { hovering in
@@ -294,7 +319,7 @@ struct QuickOverlayView: View {
                 .padding(.horizontal, 8)
                 .padding(.vertical, 6)
                 .background(currentSelection == .openWindow ? Color.accentColor : Color.clear)
-                .cornerRadius(10)
+                .clipShape(Capsule())
             }
             .buttonStyle(PlainButtonStyle())
             .onHover { hovering in
@@ -310,12 +335,41 @@ struct QuickOverlayView: View {
     
     private func historyItemRow(_ item: ClipboardItem, index: Int) -> some View {
         let isSelected = currentSelection == .item(item.id)
-        let shortcutIndex = index == 9 ? 0 : index + 1
-        let shortcut = index < 10 ? "⌥⌘\(shortcutIndex)" : ""
+        let isPinned = item.originalPinnedItemID != nil
+        
+        let hasPinnedHeader = historyItemsToDisplay.first?.originalPinnedItemID != nil
+        
+        let shortcut: String
+        if isPinned {
+            if let configuredShortcut = KeyboardShortcuts.getShortcut(for: .copyPinnedHistoryItem) {
+                shortcut = configuredShortcut.description
+            } else {
+                shortcut = ""
+            }
+        } else {
+            let unpinnedIndex = hasPinnedHeader ? index - 1 : index
+            if unpinnedIndex < 10 {
+                let name = KeyboardShortcuts.Name.allClipboardHistoryCopyShortcuts[unpinnedIndex]
+                if let configuredShortcut = KeyboardShortcuts.getShortcut(for: name) {
+                    shortcut = configuredShortcut.description
+                } else {
+                    shortcut = ""
+                }
+            } else {
+                shortcut = ""
+            }
+        }
         
         let truncatedText = item.text.count > 1000 ? String(item.text.prefix(1000)) + "..." : item.text
         
         return HStack(spacing: 8) {
+            if isPinned {
+                Image(systemName: "pin.fill")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 14)
+            }
+            
             ClipboardItemIconView(
                 item: item,
                 showColorCodeIcon: showColorCodeIcon,
@@ -371,8 +425,22 @@ struct QuickOverlayView: View {
     
     private func standardPhraseItemRow(_ phrase: StandardPhrase, index: Int) -> some View {
         let isSelected = currentSelection == .item(phrase.id)
-        let shortcutIndex = index == 9 ? 0 : index + 1
-        let shortcut = index < 10 ? "^⌘\(shortcutIndex)" : ""
+        
+        let shortcut: String
+        if index < 10 {
+            if index < KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts.count {
+                let name = KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts[index]
+                if let configuredShortcut = KeyboardShortcuts.getShortcut(for: name) {
+                    shortcut = configuredShortcut.description
+                } else {
+                    shortcut = ""
+                }
+            } else {
+                shortcut = ""
+            }
+        } else {
+            shortcut = ""
+        }
         
         let isURL: Bool = {
             guard !phrase.content.isEmpty,
@@ -447,7 +515,9 @@ struct QuickOverlayView: View {
         .background(
             Group {
                 if #available(macOS 26.0, *) {
-                    Color.clear.glassEffect(in: .rect(cornerRadius: 16.0))
+                    Color.clear
+                        .glassEffect(in: .rect(cornerRadius: 16.0))
+                        .environment(\.controlActiveState, .active)
                 } else {
                     Color(NSColor.windowBackgroundColor)
                         .opacity(colorScheme == .dark ? 0.3 : 0.6)
@@ -494,12 +564,7 @@ struct QuickOverlayView: View {
                         if !Task.isCancelled {
                             await MainActor.run {
                                 if exitedHorizontally, let hoveredId = hoveredPresetId {
-                                    if hoveredId.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
-                                        if let delegate = NSApp.delegate as? AppDelegate {
-                                            delegate.showAddPresetWindow()
-                                        }
-                                        dismiss()
-                                    } else {
+                                    if hoveredId.uuidString != "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
                                         presetManager.selectedPresetId = hoveredId
                                     }
                                 }
@@ -514,47 +579,57 @@ struct QuickOverlayView: View {
         .padding(.trailing, 20)
     }
     
-    private var presetDropdownScrollContent: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                ForEach(presetManager.presets) { preset in
-                    let isHovered = hoveredPresetId == preset.id
-                    let isSelected = presetManager.selectedPresetId == preset.id
+    private var presetListContent: some View {
+        VStack(spacing: 0) {
+            ForEach(presetManager.presets) { preset in
+                let isHovered = hoveredPresetId == preset.id
+                let isSelected = presetManager.selectedPresetId == preset.id
+                
+                HStack(spacing: 8) {
+                    Image(nsImage: PresetIconGenerator.shared.generateIcon(for: preset))
                     
-                    HStack(spacing: 8) {
-                        Image(nsImage: PresetIconGenerator.shared.generateIcon(for: preset))
-                        
-                        Text(preset.displayName)
-                            .font(.body)
-                            .foregroundColor(isHovered ? .white : (isSelected ? .accentColor : .primary))
-                            .lineLimit(1)
-                        Spacer()
-                        if isSelected {
-                            Image(systemName: "checkmark")
-                                .font(.subheadline)
-                                .foregroundColor(isHovered ? .white : .accentColor)
-                        }
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(isHovered ? Color.accentColor : Color.clear)
-                    .cornerRadius(8)
-                    .contentShape(Rectangle())
-                    .onHover { hovering in
-                        if hovering {
-                            hoveredPresetId = preset.id
-                        }
-                    }
-                    .onTapGesture {
-                        presetManager.selectedPresetId = preset.id
-                        closePresetMenu()
+                    Text(preset.displayName)
+                        .font(.body)
+                        .foregroundColor(isHovered ? .white : (isSelected ? .accentColor : .primary))
+                        .lineLimit(1)
+                    Spacer()
+                    if isSelected {
+                        Image(systemName: "checkmark")
+                            .font(.subheadline)
+                            .foregroundColor(isHovered ? .white : .accentColor)
                     }
                 }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(isHovered ? Color.accentColor : Color.clear)
+                .cornerRadius(8)
+                .contentShape(Rectangle())
+                .onHover { hovering in
+                    if hovering {
+                        hoveredPresetId = preset.id
+                    }
+                }
+                .onTapGesture {
+                    presetManager.selectedPresetId = preset.id
+                    closePresetMenu()
+                }
             }
-            .padding(.horizontal, 8)
-            .padding(.top, 8)
         }
-        .frame(maxHeight: 350)
+        .padding(8)
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear { presetListHeight = geo.size.height }
+                    .onChange(of: geo.size.height) { _, newHeight in presetListHeight = newHeight }
+            }
+        )
+    }
+    
+    private var presetDropdownScrollContent: some View {
+        ScrollView {
+            presetListContent
+        }
+        .frame(height: presetListHeight == 0 ? nil : min(presetListHeight, 350))
     }
     
     private var presetDropdownFooter: some View {
@@ -579,6 +654,12 @@ struct QuickOverlayView: View {
             .onHover { hovering in
                 if hovering {
                     hoveredPresetId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
+                    QuickOverlayManager.shared.hoveredAction = .addPreset
+                } else {
+                    if hoveredPresetId == UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")! {
+                        hoveredPresetId = nil
+                    }
+                    QuickOverlayManager.shared.hoveredAction = nil
                 }
             }
             .onTapGesture {

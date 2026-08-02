@@ -15,7 +15,11 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     // ピン留め表示用の複製アイテムの場合、元のアイテムIDを保持
     var originalPinnedItemID: UUID? = nil
     
+    // ピン留め表示用の固定UUID名前空間（決定論的なUUID生成に使用）
+    private static let pinnedNamespaceBytes: UInt8 = 0xFF
+    
     // ピン留めリスト最先頭表示用の複製アイテムを生成するメソッド
+    // 元のアイテムIDから決定論的にUUIDを生成するため、何度呼んでも同じIDになる
     func createPinnedDuplicate() -> ClipboardItem {
         let copy = ClipboardItem(
             text: self.text,
@@ -29,6 +33,10 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         copy.richText = self.richText
         copy.cachedThumbnailImage = self.cachedThumbnailImage
         copy.originalPinnedItemID = self.id
+        // 元のUUIDの最初のバイトを反転して決定論的な新しいUUIDを作成
+        var uuidBytes = self.id.uuid
+        uuidBytes.0 = uuidBytes.0 ^ ClipboardItem.pinnedNamespaceBytes
+        copy.id = UUID(uuid: uuidBytes)
         return copy
     }
     

@@ -101,6 +101,10 @@ struct GeneralSettingsView: View {
     @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
     
+    @AppStorage("isQuickOverlayEnabled") var isQuickOverlayEnabled: Bool = false
+    @AppStorage("quickOverlayDelay") var quickOverlayDelay: Double = 0.5
+    @AppStorage("quickOverlayPosition") var quickOverlayPosition: String = "center"
+    
     @AppStorage("showCurrentPresetIcon") var showCurrentPresetIcon: Bool = false
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
     
@@ -193,6 +197,75 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
+                // MARK: - クイックオーバーレイ
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("クイックオーバーレイ")
+                        Text("設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にカーソルを合わせてショートカットキーを離すことで簡単にコピーできます。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $isQuickOverlayEnabled) {
+                        Text("クイックオーバーレイ")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("クイックオーバーレイが表示されるまでの時間")
+                            .foregroundStyle(isQuickOverlayEnabled ? .primary : .secondary)
+                        Text("クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。")
+                            .font(.caption)
+                            .foregroundStyle(isQuickOverlayEnabled ? .secondary : .tertiary)
+                    }
+                    Spacer()
+                    Slider(value: $quickOverlayDelay, in: 0.0...2.0, step: 0.1) {
+                        Text("遅延時間")
+                    }
+                    .frame(width: 150)
+                    .labelsHidden()
+                    .disabled(!isQuickOverlayEnabled)
+                    
+                    Text(String(format: "%.1f秒", quickOverlayDelay))
+                        .frame(width: 40, alignment: .trailing)
+                        .foregroundStyle(isQuickOverlayEnabled ? .primary : .secondary)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("クイックオーバーレイの表示場所")
+                            .foregroundStyle(isQuickOverlayEnabled ? .primary : .secondary)
+                        Text("クイックオーバーレイが表示される画面上の場所を選択します。")
+                            .font(.caption)
+                            .foregroundStyle(isQuickOverlayEnabled ? .secondary : .tertiary)
+                    }
+                    Spacer()
+                    Picker("", selection: $quickOverlayPosition) {
+                        if #available(macOS 15.0, *) {
+                            Label("中央", systemImage: "inset.filled.center.rectangle").tag("center")
+                        } else {
+                            Label("中央", systemImage: "rectangle.center.inset.filled").tag("center")
+                        }
+                        Label("上", systemImage: "arrow.up").tag("top")
+                        Label("右上", systemImage: "arrow.up.right").tag("topRight")
+                        Label("右", systemImage: "arrow.right").tag("right")
+                        Label("右下", systemImage: "arrow.down.right").tag("bottomRight")
+                        Label("下", systemImage: "arrow.down").tag("bottom")
+                        Label("左下", systemImage: "arrow.down.left").tag("bottomLeft")
+                        Label("左", systemImage: "arrow.left").tag("left")
+                        Label("左上", systemImage: "arrow.up.left").tag("topLeft")
+                    }
+                    .pickerStyle(.menu)
+                    .frame(width: 150)
+                    .labelsHidden()
+                    .disabled(!isQuickOverlayEnabled)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 HStack {
                     VStack(alignment: .leading) {
                         Text("クイックペースト")

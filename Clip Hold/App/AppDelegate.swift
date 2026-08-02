@@ -27,6 +27,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     // MARK: - Application Lifecycle
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // デフォルト設定を登録
+        UserDefaults.standard.register(defaults: [
+            "historyQuickOverlayModifiers": Int(NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.option.rawValue),
+            "standardPhraseQuickOverlayModifiers": Int(NSEvent.ModifierFlags.control.rawValue | NSEvent.ModifierFlags.command.rawValue)
+        ])
+        
         frontmostAppMonitor.startMonitoring()
         print("AppDelegate: finished launching.")
         
@@ -76,6 +82,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             NotificationManager.shared.scheduleClipboardPausedNotification()
             print("AppDelegate: Clipboard monitoring was paused at launch. Scheduled notification.")
         }
+        
+        // Initialize Quick Overlay Singletons
+        _ = QuickOverlayManager.shared
+        _ = QuickOverlayWindowController.shared
         
         historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
             Task { @MainActor in
@@ -546,5 +556,33 @@ extension UserDefaults {
     @objc dynamic var standardPhraseWindowOverlayTransparency: Double {
         get { double(forKey: "standardPhraseWindowOverlayTransparency") }
         set { set(newValue, forKey: "standardPhraseWindowOverlayTransparency") }
+    }
+    
+    // Quick Overlay Settings
+    @objc dynamic var isQuickOverlayEnabled: Bool {
+        get { bool(forKey: "isQuickOverlayEnabled") }
+        set { set(newValue, forKey: "isQuickOverlayEnabled") }
+    }
+    @objc dynamic var quickOverlayDelay: Double {
+        get { 
+            let val = double(forKey: "quickOverlayDelay")
+            return val == 0 ? 0.5 : val // Default to 0.5s if not set
+        }
+        set { set(newValue, forKey: "quickOverlayDelay") }
+    }
+    @objc dynamic var quickOverlayPosition: String {
+        get { 
+            let val = string(forKey: "quickOverlayPosition")
+            return val ?? "center"
+        }
+        set { set(newValue, forKey: "quickOverlayPosition") }
+    }
+    @objc dynamic var historyQuickOverlayModifiers: Int {
+        get { integer(forKey: "historyQuickOverlayModifiers") }
+        set { set(newValue, forKey: "historyQuickOverlayModifiers") }
+    }
+    @objc dynamic var standardPhraseQuickOverlayModifiers: Int {
+        get { integer(forKey: "standardPhraseQuickOverlayModifiers") }
+        set { set(newValue, forKey: "standardPhraseQuickOverlayModifiers") }
     }
 }
