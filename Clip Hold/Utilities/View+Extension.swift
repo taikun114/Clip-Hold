@@ -96,7 +96,7 @@ extension KeyboardShortcuts.Shortcut {
     @MainActor
     var keyEquivalentChar: Character? {
         let desc = self.description
-        let symbols: Set<Character> = ["⌘", "⌥", "⇧", "⌃", "🌐"]
+        let symbols: Set<Character> = ["⌘", "⌥", "⇧", "⌃", "🌐", "^"]
         let filtered = desc.filter { !symbols.contains($0) }
         return filtered.lowercased().first
     }

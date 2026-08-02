@@ -457,9 +457,9 @@ struct QuickOverlayView: View {
             Spacer()
             
             if !shortcut.isEmpty {
-                Text(shortcut)
+                Text(shortcut.replacingOccurrences(of: "^", with: "⌃"))
                     .font(.subheadline)
-                    .foregroundColor(isSelected ? .white : .secondary)
+                    .foregroundColor(isSelected ? .white : Color(nsColor: .tertiaryLabelColor))
             }
         }
         .padding(8)
@@ -546,9 +546,9 @@ struct QuickOverlayView: View {
             Spacer()
             
             if !shortcut.isEmpty {
-                Text(shortcut)
+                Text(shortcut.replacingOccurrences(of: "^", with: "⌃"))
                     .font(.subheadline)
-                    .foregroundColor(isSelected ? .white : .secondary)
+                    .foregroundColor(isSelected ? .white : Color(nsColor: .tertiaryLabelColor))
             }
         }
         .padding(8)
