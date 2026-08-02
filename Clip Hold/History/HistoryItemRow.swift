@@ -9,21 +9,7 @@ class RowIconStore {
     var views: [UUID: NSView] = [:]
 }
 
-// アイコンのNSViewへの参照を親に渡すためのヘルパー
-private struct IconViewAccessor: NSViewRepresentable {
-    let id: UUID
-    let store: RowIconStore
-    
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        Task { @MainActor in
-            self.store.views[id] = view
-        }
-        return view
-    }
-    
-    func updateNSView(_ nsView: NSView, context: Context) {}
-}
+
 
 private let itemDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
@@ -117,140 +103,17 @@ struct HistoryItemRow<MenuContent: View>: View {
                 }
             }
             
-            // アイコン部分 (アプリアイコンをオーバーレイ表示するかどうかで分岐)
-            let iconView: some View = {
-                // カラーコードアイコンの表示条件をチェック
-                if showColorCodeIcon, item.filePath == nil, let color = ColorCodeParser.parseColor(from: item.text) {
-                    // カラーコードが解析できた場合、専用のカラーアイコンを表示
-                    let baseIconView = ColorCodeIconView(color: color)
-                    
-                    // カラーアイコンにもアプリアイコンを表示する (showAppIconOverlayがtrueの場合のみ)
-                    if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
-                        let appName = clipboardManager.getLocalizedName(for: sourceAppPath) ?? "Unknown App"
-                        return AnyView(
-                            baseIconView
-                                .overlay(
-                                    Group {
-                                        if FileManager.default.fileExists(atPath: sourceAppPath) {
-                                            Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 15, height: 15)
-                                        } else {
-                                            Image(systemName: "questionmark.app.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 15, height: 15)
-                                                .fontWeight(.bold)
-                                        }
-                                    }
-                                        .alignmentGuide(.leading) { _ in 4 }
-                                        .alignmentGuide(.top) { _ in 22.5 }
-                                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
-                                    alignment: .bottomLeading
-                                )
-                                .background(IconViewAccessor(id: item.id, store: rowIconStore))
-                                .help(appName) // ツールチップを追加
-                        )
-                    } else {
-                        return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: rowIconStore)))
-                    }
-                } else {
-                    // 既存のアイコン
-                    let baseIconView: some View = {
-                        if item.isURL { // URLの場合
-                            return AnyView(Image(systemName: "paperclip")
-                                .resizable()
-                                .scaledToFit()
-                                .padding(4)
-                                .frame(width: 30, height: 30)
-                                .foregroundStyle(.secondary))
-                        } else if let cachedIcon = item.cachedThumbnailImage {
-                            return AnyView(Image(nsImage: cachedIcon)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30))
-                        } else if let filePath = item.filePath {
-                            return AnyView(Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 30, height: 30))
-                        } else {
-                            // テキストアイコン (リッチテキストかどうかで分岐)
-                            if item.richText != nil {
-                                // リッチテキストの場合、richtext.pageアイコンを使用 (macOSバージョンによる分岐)
-                                if #available(macOS 15.0, *) {
-                                    return AnyView(Image(systemName: "richtext.page")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding(4)
-                                        .frame(width: 30, height: 30)
-                                        .foregroundStyle(.secondary))
-                                } else {
-                                    return AnyView(Image(systemName: "doc.richtext")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding(4)
-                                        .frame(width: 30, height: 30)
-                                        .foregroundStyle(.secondary))
-                                }
-                            } else {
-                                // 標準テキストの場合、text.pageアイコンを使用 (macOSバージョンによる分岐)
-                                if #available(macOS 15.0, *) {
-                                    return AnyView(Image(systemName: "text.page")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding(4)
-                                        .frame(width: 30, height: 30)
-                                        .foregroundStyle(.secondary))
-                                } else {
-                                    return AnyView(Image(systemName: "doc.plaintext")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .padding(4)
-                                        .frame(width: 30, height: 30)
-                                        .foregroundStyle(.secondary))
-                                }
-                            }
-                        }
-                    }()
-                    
-                    // アプリアイコンをオーバーレイ表示 (showAppIconOverlayがtrueの場合のみ)
-                    if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
-                        let appName = clipboardManager.getLocalizedName(for: sourceAppPath) ?? "Unknown App"
-                        return AnyView(
-                            baseIconView
-                                .overlay(
-                                    Group {
-                                        if FileManager.default.fileExists(atPath: sourceAppPath) {
-                                            Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 15, height: 15)
-                                        } else {
-                                            Image(systemName: "questionmark.app.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 15, height: 15)
-                                                .fontWeight(.bold)
-                                        }
-                                    }
-                                        .alignmentGuide(.leading) { _ in 4 }
-                                        .alignmentGuide(.top) { _ in 22.5 }
-                                        .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1),
-                                    alignment: .bottomLeading
-                                )
-                                .background(IconViewAccessor(id: item.id, store: rowIconStore))
-                                .help(appName) // ツールチップを追加
-                        )
-                    } else {
-                        return AnyView(baseIconView.background(IconViewAccessor(id: item.id, store: rowIconStore)))
-                    }
-                }
-            }()
+            // アイコン部分 (新しく作成した共有コンポーネントを使用)
+            let iconView = ClipboardItemIconView(
+                item: item,
+                showColorCodeIcon: showColorCodeIcon,
+                showAppIconOverlay: showAppIconOverlay,
+                rowIconStore: rowIconStore
+            )
             
             // アイコンにIconViewAccessorを適用して、NSViewの参照を保存する
             iconView
+                .frame(width: 30, height: 30)
                 .onDrag {
                     if let filePath = item.filePath {
                         return NSItemProvider(object: filePath as NSURL)

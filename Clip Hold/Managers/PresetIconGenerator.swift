@@ -5,10 +5,10 @@ import AppKit
 class PresetIconGenerator: ObservableObject {
     static let shared = PresetIconGenerator()
     
-    @Published private(set) var iconCache: [UUID: NSImage] = [:]
-    @Published private(set) var miniIconCache: [UUID: NSImage] = [:]
-    @Published private(set) var dimmedMiniIconCache: [UUID: NSImage] = [:]
-    @Published private(set) var bigIconCache: [UUID: NSImage] = [:] // New cache for big icons
+    private(set) var iconCache: [UUID: NSImage] = [:]
+    private(set) var miniIconCache: [UUID: NSImage] = [:]
+    private(set) var dimmedMiniIconCache: [UUID: NSImage] = [:]
+    private(set) var bigIconCache: [UUID: NSImage] = [:] // New cache for big icons
     
     private var appearanceObserver: NSKeyValueObservation?
     
