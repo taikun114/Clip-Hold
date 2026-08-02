@@ -86,6 +86,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // Initialize Quick Overlay Singletons
         _ = QuickOverlayManager.shared
         _ = QuickOverlayWindowController.shared
+        _ = QuickOverlayTooltipWindowController.shared
         
         historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
             Task { @MainActor in

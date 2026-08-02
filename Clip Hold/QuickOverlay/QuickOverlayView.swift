@@ -44,6 +44,14 @@ struct QuickOverlayView: View {
     @State private var presetListHeight: CGFloat = 0
     @State private var showMenuShadow: Bool = false
     
+    @State private var cachedHistoryItems: [ClipboardItem] = []
+    
+    @State private var currentDisplayLimit: Int = 50
+    @State private var isPaginating: Bool = false
+    
+    // Custom Tooltip State
+    @State private var tooltipTask: Task<Void, Never>? = nil
+    
     let rowIconStore = RowIconStore()
     
     init(type: QuickOverlayType, initialPresetMenuOpen: Bool = false, explicitHistoryItems: [ClipboardItem]? = nil, explicitPhraseItems: [StandardPhrase]? = nil) {
@@ -92,9 +100,9 @@ struct QuickOverlayView: View {
                         .glassEffect(.clear, in: .rect(cornerRadius: 28.0))
                         .environment(\.controlActiveState, .active)
                 } else {
-                    Color(NSColor.windowBackgroundColor)
-                        .opacity(colorScheme == .dark ? 0.3 : 0.6)
+                    Color.clear
                         .background(Material.ultraThin)
+                        .environment(\.controlActiveState, .active)
                 }
             }
         )
@@ -105,28 +113,72 @@ struct QuickOverlayView: View {
         )
         .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
         .padding(60) // Provide space for the shadow to render inside the 620x620 window
+        .onAppear {
+            if type == .history {
+                loadHistoryItems()
+            }
+        }
     }
     
     // MARK: - Subviews
     
-    private var historyItemsToDisplay: [ClipboardItem] {
-        if let explicit = explicitHistoryItems { return explicit }
-        if let filtered = clipboardManager.filteredHistoryForShortcuts { return filtered }
+    private func loadHistoryItems(isPagination: Bool = false) {
+        if !isPagination {
+            if let explicit = explicitHistoryItems {
+                cachedHistoryItems = explicit
+                return
+            }
+            if let filtered = clipboardManager.filteredHistoryForShortcuts {
+                cachedHistoryItems = filtered
+                return
+            }
+        }
         
-        var raw = clipboardManager.clipboardHistory
+        var raw = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+        let limit = currentDisplayLimit > 0 ? currentDisplayLimit : 50
+        raw = Array(raw.prefix(limit))
+        
         if let pinnedID = clipboardManager.pinnedItemID,
            let pinnedItem = raw.first(where: { $0.id == pinnedID }) {
             raw.insert(pinnedItem.createPinnedDuplicate(), at: 0)
         }
-        return raw
+        cachedHistoryItems = raw
+    }
+    
+    private func loadMoreHistoryItems() {
+        guard !isPaginating && currentDisplayLimit < clipboardManager.clipboardHistory.count else { return }
+        // Do not paginate if we are using explicit items or filtered items from the window
+        if explicitHistoryItems != nil { return }
+        if clipboardManager.filteredHistoryForShortcuts != nil { return }
+        
+        isPaginating = true
+        Task {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            await MainActor.run {
+                currentDisplayLimit += 50
+                loadHistoryItems(isPagination: true)
+                isPaginating = false
+            }
+        }
     }
     
     private var scrollContent: some View {
         ScrollView {
             LazyVStack(spacing: 4) {
                 if type == .history {
-                    ForEach(Array(historyItemsToDisplay.enumerated()), id: \.element.id) { index, item in
+                    ForEach(Array(cachedHistoryItems.enumerated()), id: \.element.id) { index, item in
                         historyItemRow(item, index: index)
+                            .onAppear {
+                                if index == cachedHistoryItems.count - 1 {
+                                    loadMoreHistoryItems()
+                                }
+                            }
+                    }
+                    if isPaginating {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .scaleEffect(0.8)
+                            .padding(.vertical, 8)
                     }
                 } else {
                     // Standard phrase items (Preview用に明示的なアイテムがあればそれを使用)
@@ -239,7 +291,7 @@ struct QuickOverlayView: View {
             QuickOverlayManager.shared.hoveredAction = nil
             if case .item(let id) = newValue {
                 if type == .history {
-                    if let item = historyItemsToDisplay.first(where: { $0.id == id }) {
+                    if let item = cachedHistoryItems.first(where: { $0.id == id }) {
                         QuickOverlayManager.shared.hoveredItemId = item.originalPinnedItemID ?? item.id
                     } else {
                         QuickOverlayManager.shared.hoveredItemId = id
@@ -337,7 +389,7 @@ struct QuickOverlayView: View {
         let isSelected = currentSelection == .item(item.id)
         let isPinned = item.originalPinnedItemID != nil
         
-        let hasPinnedHeader = historyItemsToDisplay.first?.originalPinnedItemID != nil
+        let hasPinnedHeader = cachedHistoryItems.first?.originalPinnedItemID != nil
         
         let shortcut: String
         if isPinned {
@@ -421,6 +473,21 @@ struct QuickOverlayView: View {
                 currentSelection = nil
             }
         }
+        .onContinuousHover(coordinateSpace: .global) { phase in
+            switch phase {
+            case .active(_):
+                tooltipTask?.cancel()
+                tooltipTask = Task {
+                    try? await Task.sleep(nanoseconds: 600_000_000)
+                    if !Task.isCancelled {
+                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: ["text": item.text])
+                    }
+                }
+            case .ended:
+                tooltipTask?.cancel()
+                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
+            }
+        }
     }
     
     private func standardPhraseItemRow(_ phrase: StandardPhrase, index: Int) -> some View {
@@ -495,6 +562,21 @@ struct QuickOverlayView: View {
                 currentSelection = nil
             }
         }
+        .onContinuousHover(coordinateSpace: .global) { phase in
+            switch phase {
+            case .active(_):
+                tooltipTask?.cancel()
+                tooltipTask = Task {
+                    try? await Task.sleep(nanoseconds: 600_000_000)
+                    if !Task.isCancelled {
+                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: ["text": phrase.content])
+                    }
+                }
+            case .ended:
+                tooltipTask?.cancel()
+                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
+            }
+        }
     }
     
     private var presetDropdownMenu: some View {
@@ -519,9 +601,9 @@ struct QuickOverlayView: View {
                         .glassEffect(in: .rect(cornerRadius: 16.0))
                         .environment(\.controlActiveState, .active)
                 } else {
-                    Color(NSColor.windowBackgroundColor)
-                        .opacity(colorScheme == .dark ? 0.3 : 0.6)
+                    Color.clear
                         .background(Material.ultraThin)
+                        .environment(\.controlActiveState, .active)
                 }
             }
         )

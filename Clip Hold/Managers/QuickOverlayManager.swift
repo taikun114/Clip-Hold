@@ -29,10 +29,14 @@ class QuickOverlayManager: ObservableObject {
     private func setupMonitors() {
         let mask: NSEvent.EventTypeMask = .flagsChanged
         globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] event in
-            self?.handleFlagsChanged(event: event)
+            Task { @MainActor in
+                self?.handleFlagsChanged(event: event)
+            }
         }
         localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
-            self?.handleFlagsChanged(event: event)
+            Task { @MainActor in
+                self?.handleFlagsChanged(event: event)
+            }
             return event
         }
     }
@@ -46,6 +50,14 @@ class QuickOverlayManager: ObservableObject {
         }
     }
     
+    @MainActor
+    private func handleMouseClick(event: NSEvent) -> NSEvent? {
+        guard UserDefaults.standard.isQuickOverlayEnabled else { return event }
+        
+        // This is a placeholder for actual click handling logic if implemented
+        return event
+    }
+    @MainActor
     private func handleFlagsChanged(event: NSEvent) {
         guard UserDefaults.standard.isQuickOverlayEnabled else { return }
         
@@ -111,6 +123,7 @@ class QuickOverlayManager: ObservableObject {
         delayTask = nil
     }
     
+    @MainActor
     private func executeActionAndClose() {
         isOverlayVisible = false
         cancelDelayTask()
@@ -149,8 +162,17 @@ class QuickOverlayManager: ObservableObject {
                     }
                 } else {
                     if let phraseId = hoveredPhraseId {
+                        // まずデフォルトの定型文を検索
                         if let phrase = StandardPhraseManager.shared.standardPhrases.first(where: { $0.id == phraseId }) {
                             itemToCopy = ClipboardItem(text: phrase.content, date: Date())
+                        } else {
+                            // 見つからない場合はプリセットから検索
+                            for preset in StandardPhrasePresetManager.shared.presets {
+                                if let phrase = preset.phrases.first(where: { $0.id == phraseId }) {
+                                    itemToCopy = ClipboardItem(text: phrase.content, date: Date())
+                                    break
+                                }
+                            }
                         }
                     }
                 }
