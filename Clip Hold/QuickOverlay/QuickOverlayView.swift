@@ -98,6 +98,7 @@ struct QuickOverlayView: View {
                 if #available(macOS 26.0, *) {
                     (colorScheme == .dark ? Color.black.opacity(0.4) : Color.white.opacity(0.6))
                         .glassEffect(.clear, in: .rect(cornerRadius: 28.0))
+                        .saturation(1.5)
                         .environment(\.controlActiveState, .active)
                 } else {
                     Color.clear

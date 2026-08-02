@@ -45,6 +45,7 @@ struct QuickOverlayTooltipView: View {
                 if #available(macOS 26.0, *) {
                     Color.clear
                         .glassEffect(in: .rect(cornerRadius: 28.0))
+                        .saturation(1.5)
                         .environment(\.controlActiveState, .active)
                 } else {
                     Color.clear
