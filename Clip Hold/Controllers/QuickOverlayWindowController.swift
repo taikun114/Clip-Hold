@@ -5,6 +5,11 @@ class ActivePanel: NSPanel {
     override var canBecomeKey: Bool {
         return true
     }
+    
+    // macOSがウィンドウを画面内に強制的に収めようとする（押し下げる）挙動を無効化する
+    override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect {
+        return frameRect
+    }
 }
 
 class QuickOverlayWindowController: NSWindowController {
@@ -62,10 +67,16 @@ class QuickOverlayWindowController: NSWindowController {
     }
     
     private func positionWindow() {
-        guard let window = self.window, let screen = NSScreen.main else { return }
+        guard let window = self.window else { return }
+        
+        // マウスカーソルが存在するディスプレイを取得する（見つからない場合は現在のメインディスプレイ）
+        let mouseLocation = NSEvent.mouseLocation
+        let screen = NSScreen.screens.first(where: { NSMouseInRect(mouseLocation, $0.frame, false) }) ?? NSScreen.main
+        guard let screen = screen else { return }
         
         let position = UserDefaults.standard.quickOverlayPosition
-        let padding: CGFloat = 20
+        let visualPadding: CGFloat = 16
+        let padding: CGFloat = visualPadding - 60
         
         let screenRect = screen.visibleFrame // Accounts for Dock and Menu Bar
         let windowSize = window.frame.size

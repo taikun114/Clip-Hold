@@ -1,12 +1,22 @@
 import AppKit
 import SwiftUI
 
+class UnconstrainedPanel: NSPanel {
+    override var canBecomeKey: Bool {
+        return true
+    }
+    
+    override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect {
+        return frameRect
+    }
+}
+
 class QuickOverlayTooltipWindowController: NSWindowController {
     
     static let shared = QuickOverlayTooltipWindowController()
     
     private init() {
-        let panel = NSPanel(
+        let panel = UnconstrainedPanel(
             contentRect: NSRect(x: 0, y: 0, width: 620, height: 100), // Height is dynamic, width is 500 content + 120 padding
             styleMask: [.nonactivatingPanel, .borderless],
             backing: .buffered,
@@ -36,21 +46,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
               let userInfo = notification.userInfo,
               let text = userInfo["text"] as? String else { return }
         
-        // Setup view
-        let view = QuickOverlayTooltipView(text: text)
-        let hostingView = NSHostingView(rootView: view)
-        
-        // Calculate height based on text. For simplicity, we can let NSHostingView size it,
-        // but we need to set the window frame. NSHostingView's fittingSize can help.
-        let targetWidth: CGFloat = 620
-        hostingView.frame = NSRect(x: 0, y: 0, width: targetWidth, height: 1000)
-        let fittingSize = hostingView.fittingSize
-        let finalHeight = fittingSize.height
-        
-        window.contentView = hostingView
-        
-        positionWindow(height: finalHeight)
-        
+        positionWindow(text: text)
         window.orderFront(nil)
     }
     
@@ -58,40 +54,101 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         window?.orderOut(nil)
     }
     
-    private func positionWindow(height: CGFloat) {
+    private func positionWindow(text: String) {
         guard let window = self.window else { return }
         
-        // Get the overlay position setting
-        let position = UserDefaults.standard.quickOverlayPosition
-        
-        // Get overlay window bounds directly from QuickOverlayWindowController
-        guard let overlayWindow = QuickOverlayWindowController.shared.window else { return }
-        
-        // Overlay window is 620x620. The visual part is 500x500 padded by 60.
-        // So the visual left edge is overlayWindow.frame.minX + 60.
+        guard let overlayWindow = QuickOverlayWindowController.shared.window,
+              let screen = overlayWindow.screen ?? NSScreen.main else { return }
+              
+        let screenRect = screen.visibleFrame
         let overlayFrame = overlayWindow.frame
+        
+        // Overlay visual bounds (620x620 with 60 padding)
         let visualMinX = overlayFrame.minX + 60
         let visualMinY = overlayFrame.minY + 60
+        let visualMaxX = overlayFrame.maxX - 60
         let visualMaxY = overlayFrame.maxY - 60
         
-        var newOrigin = NSPoint(x: visualMinX - 60, y: 0) // -60 for shadow padding of tooltip
+        let gap: CGFloat = 12
         
-        let gap: CGFloat = 12 // 隙間を開ける
+        let spaceAbove = screenRect.maxY - visualMaxY - gap
+        let spaceBelow = visualMinY - screenRect.minY - gap
+        let spaceLeft = visualMinX - screenRect.minX - gap
+        let spaceRight = screenRect.maxX - visualMaxX - gap
         
-        // Determine whether to place tooltip above or below the overlay
-        // If overlay is at the bottom, place above.
-        let isBottomPosition = ["bottom", "bottomLeft", "bottomRight"].contains(position)
+        // Measure natural text height reliably using NSHostingView, now that .fixedSize is removed from the else branch.
+        // This ensures the height is perfectly matched with SwiftUI's text rendering engine.
+        let measureView = QuickOverlayTooltipView(text: text, maxVisualHeight: nil)
+            .frame(width: 620)
+        let measureHosting = NSHostingView(rootView: measureView)
+        // Set a huge height so it doesn't artificially truncate during fittingSize calculation
+        measureHosting.frame = NSRect(x: 0, y: 0, width: 620, height: 10000)
+        let naturalVisualHeight = measureHosting.fittingSize.height - 120
         
-        if isBottomPosition {
-            // Place ABOVE the overlay
-            // Tooltip visual bottom = overlay visual top + gap
-            newOrigin.y = visualMaxY + gap - 60
-        } else {
-            // Place BELOW the overlay
-            // Tooltip visual top = overlay visual bottom - gap
-            newOrigin.y = visualMinY - gap + 60 - height
+        // Cap max visual height at 500 (same as overlay)
+        let targetVisualHeight = min(naturalVisualHeight, 500)
+        
+        let position = UserDefaults.standard.quickOverlayPosition
+        let preferAbove = ["bottom", "bottomLeft", "bottomRight"].contains(position)
+        
+        enum Direction { case above, below, left, right }
+        var chosenDirection: Direction = preferAbove ? .above : .below
+        var finalVisualHeight = targetVisualHeight
+        
+        // Try preferred vertical
+        if chosenDirection == .above && spaceAbove < targetVisualHeight {
+            if spaceBelow >= targetVisualHeight { chosenDirection = .below }
+        } else if chosenDirection == .below && spaceBelow < targetVisualHeight {
+            if spaceAbove >= targetVisualHeight { chosenDirection = .above }
         }
         
-        window.setFrame(NSRect(x: newOrigin.x, y: newOrigin.y, width: 620, height: height), display: true)
+        // If still doesn't fit, check horizontal
+        if (chosenDirection == .above && spaceAbove < targetVisualHeight) || (chosenDirection == .below && spaceBelow < targetVisualHeight) {
+            let neededWidth: CGFloat = 500
+            if spaceRight >= neededWidth {
+                chosenDirection = .right
+            } else if spaceLeft >= neededWidth {
+                chosenDirection = .left
+            } else {
+                // Nowhere fits well, just pick vertical with most space
+                chosenDirection = spaceAbove > spaceBelow ? .above : .below
+                finalVisualHeight = max(spaceAbove, spaceBelow)
+            }
+        }
+        
+        // Now compute actual bounds
+        var newOrigin = NSPoint.zero
+        switch chosenDirection {
+        case .above:
+            newOrigin.x = visualMinX - 60
+            finalVisualHeight = min(finalVisualHeight, spaceAbove)
+            newOrigin.y = visualMaxY + gap - 60
+        case .below:
+            newOrigin.x = visualMinX - 60
+            finalVisualHeight = min(finalVisualHeight, spaceBelow)
+            newOrigin.y = visualMinY - gap - finalVisualHeight - 60
+        case .left:
+            newOrigin.x = visualMinX - gap - 500 - 60
+            finalVisualHeight = min(finalVisualHeight, screenRect.maxY - visualMinY)
+            // Align bottom with overlay bottom
+            newOrigin.y = visualMinY - 60
+        case .right:
+            newOrigin.x = visualMaxX + gap - 60
+            finalVisualHeight = min(finalVisualHeight, screenRect.maxY - visualMinY)
+            // Align bottom with overlay bottom
+            newOrigin.y = visualMinY - 60
+        }
+        
+        // Ensure minimum height
+        finalVisualHeight = max(finalVisualHeight, 50)
+        
+        let finalWindowHeight = finalVisualHeight + 120
+        let needsMarquee = naturalVisualHeight > finalVisualHeight
+        
+        let finalView = QuickOverlayTooltipView(text: text, maxVisualHeight: needsMarquee ? finalVisualHeight : nil)
+        let finalHosting = NSHostingView(rootView: finalView)
+        window.contentView = finalHosting
+        
+        window.setFrame(NSRect(x: newOrigin.x, y: newOrigin.y, width: 620, height: finalWindowHeight), display: true)
     }
 }
