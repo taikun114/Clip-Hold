@@ -103,7 +103,7 @@ struct GeneralSettingsView: View {
     
     @AppStorage("isQuickOverlayEnabled") var isQuickOverlayEnabled: Bool = false
     @AppStorage("quickOverlayDelay") var quickOverlayDelay: Double = 0.5
-    @AppStorage("quickOverlayPosition") var quickOverlayPosition: String = "center"
+    @AppStorage("quickOverlayPosition") var quickOverlayPosition: String = "cursor"
     
     @AppStorage("showCurrentPresetIcon") var showCurrentPresetIcon: Bool = false
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
@@ -232,7 +232,7 @@ struct GeneralSettingsView: View {
                     
                     Text(String(format: "%.1f秒", quickOverlayDelay))
                         .frame(width: 40, alignment: .trailing)
-                        .foregroundStyle(isQuickOverlayEnabled ? .primary : .secondary)
+                        .foregroundStyle(isQuickOverlayEnabled ? .secondary : .tertiary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
@@ -246,6 +246,10 @@ struct GeneralSettingsView: View {
                     }
                     Spacer()
                     Picker("", selection: $quickOverlayPosition) {
+                        Label("カーソル付近", systemImage: "cursorarrow").tag("cursor")
+                        
+                        Divider()
+                        
                         if #available(macOS 15.0, *) {
                             Label("中央", systemImage: "inset.filled.center.rectangle").tag("center")
                         } else {
@@ -261,7 +265,6 @@ struct GeneralSettingsView: View {
                         Label("左上", systemImage: "arrow.up.left").tag("topLeft")
                     }
                     .pickerStyle(.menu)
-                    .frame(width: 150)
                     .labelsHidden()
                     .disabled(!isQuickOverlayEnabled)
                 }

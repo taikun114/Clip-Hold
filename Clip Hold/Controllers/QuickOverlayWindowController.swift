@@ -84,6 +84,43 @@ class QuickOverlayWindowController: NSWindowController {
         var newOrigin = NSPoint(x: 0, y: 0)
         
         switch position {
+        case "cursor":
+            let visualWidth = windowSize.width - 120
+            let visualHeight = windowSize.height - 120
+            
+            // 視覚的な左端をカーソル位置に（右に余裕がなければ右端をカーソル位置に）
+            var x = mouseLocation.x - 60
+            if screenRect.maxX - mouseLocation.x < visualWidth + visualPadding {
+                x = mouseLocation.x - windowSize.width + 60
+            }
+            
+            // X方向の画面端の余白を保証する
+            let visualMinX = x + 60
+            if visualMinX < screenRect.minX + visualPadding {
+                x = screenRect.minX + visualPadding - 60
+            }
+            let visualMaxX = x + 60 + visualWidth
+            if visualMaxX > screenRect.maxX - visualPadding {
+                x = screenRect.maxX - visualPadding - visualWidth - 60
+            }
+            
+            // 視覚的な上端をカーソル位置に
+            var y = mouseLocation.y - windowSize.height + 60
+            
+            // 下に余裕がなければ上にずらす
+            let visualMinY = y + 60
+            if visualMinY < screenRect.minY + visualPadding {
+                y = screenRect.minY + visualPadding - 60
+            }
+            
+            // 万が一上にはみ出す場合は下にずらす
+            let visualMaxY = y + 60 + visualHeight
+            if visualMaxY > screenRect.maxY - visualPadding {
+                y = screenRect.maxY - visualPadding - visualHeight - 60
+            }
+            
+            newOrigin.x = x
+            newOrigin.y = y
         case "top":
             newOrigin.x = screenRect.midX - (windowSize.width / 2)
             newOrigin.y = screenRect.maxY - windowSize.height - padding

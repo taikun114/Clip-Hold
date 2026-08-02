@@ -574,7 +574,7 @@ extension UserDefaults {
     @objc dynamic var quickOverlayPosition: String {
         get { 
             let val = string(forKey: "quickOverlayPosition")
-            return val ?? "center"
+            return val ?? "cursor"
         }
         set { set(newValue, forKey: "quickOverlayPosition") }
     }
