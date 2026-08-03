@@ -375,12 +375,22 @@ struct HistoryWindowView: View {
         .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isBackground: true) }
         .onAppear {
             clipboardManager.filteredHistoryForShortcuts = []
-            performUpdate()
+            
+            if clipboardManager.isHistoryLoaded {
+                performUpdate()
+            } else {
+                isLoading = true
+            }
             
             // ウインドウ表示時は必ずリストにフォーカスを当てる
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
                 isListFocused = true
+            }
+        }
+        .onChange(of: clipboardManager.isHistoryLoaded) { _, loaded in
+            if loaded {
+                performUpdate()
             }
         }
         .onDisappear {

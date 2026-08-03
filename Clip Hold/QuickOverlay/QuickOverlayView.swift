@@ -119,6 +119,13 @@ struct QuickOverlayView: View {
                 loadHistoryItems()
             }
         }
+        .onChange(of: clipboardManager.clipboardHistory) { _, _ in
+            if type == .history {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    loadHistoryItems()
+                }
+            }
+        }
     }
     
     // MARK: - Subviews
@@ -164,32 +171,51 @@ struct QuickOverlayView: View {
     }
     
     private var scrollContent: some View {
-        ScrollView {
-            LazyVStack(spacing: 4) {
-                if type == .history {
-                    ForEach(Array(cachedHistoryItems.enumerated()), id: \.element.id) { index, item in
-                        historyItemRow(item, index: index)
-                            .onAppear {
-                                if index == cachedHistoryItems.count - 1 {
-                                    loadMoreHistoryItems()
-                                }
+        Group {
+            if type == .history && cachedHistoryItems.isEmpty && !clipboardManager.isHistoryLoaded {
+                VStack {
+                    Spacer()
+                    ProgressView()
+                        .controlSize(.regular)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 4) {
+                        if type == .history {
+                            ForEach(Array(cachedHistoryItems.enumerated()), id: \.element.id) { index, item in
+                                historyItemRow(item, index: index)
+                                    .onAppear {
+                                        if index == cachedHistoryItems.count - 1 {
+                                            loadMoreHistoryItems()
+                                        }
+                                    }
                             }
+                            if isPaginating {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle())
+                                    .scaleEffect(0.8)
+                                    .padding(.vertical, 8)
+                            }
+                        } else {
+                            // Standard phrase items (Preview用に明示的なアイテムがあればそれを使用)
+                            let phrases = explicitPhraseItems ?? getPhrasesForSelectedPreset()
+                            ForEach(Array(phrases.enumerated()), id: \.element.id) { index, phrase in
+                                standardPhraseItemRow(phrase, index: index)
+                            }
+                        }
                     }
-                    if isPaginating {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                            .scaleEffect(0.8)
-                            .padding(.vertical, 8)
-                    }
-                } else {
-                    // Standard phrase items (Preview用に明示的なアイテムがあればそれを使用)
-                    let phrases = explicitPhraseItems ?? getPhrasesForSelectedPreset()
-                    ForEach(Array(phrases.enumerated()), id: \.element.id) { index, phrase in
-                        standardPhraseItemRow(phrase, index: index)
-                    }
+                    .padding(.horizontal, 12)
                 }
             }
-            .padding(.horizontal, 12)
+        }
+        .onChange(of: clipboardManager.isHistoryLoaded) { _, loaded in
+            if loaded && type == .history {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    loadHistoryItems()
+                }
+            }
         }
     }
     

@@ -10,6 +10,7 @@ class ClipboardManager: ObservableObject {
     
     @Published var clipboardHistory: [ClipboardItem] = []
     @Published var filteredHistoryForShortcuts: [ClipboardItem]? = nil
+    @Published var isHistoryLoaded: Bool = false
     
     // 進行中のインポートタスクを保持し、クリア時にキャンセル可能にする
     var activeImportTask: Task<Void, Never>?
@@ -196,6 +197,9 @@ class ClipboardManager: ObservableObject {
             }
             
             await self.loadClipboardHistory()
+            await MainActor.run {
+                self.isHistoryLoaded = true
+            }
             print("ClipboardManager: Initialized with history count: \(self.clipboardHistory.count)")
         }
         
