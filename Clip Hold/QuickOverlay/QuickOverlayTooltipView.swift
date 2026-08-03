@@ -1,16 +1,69 @@
 import SwiftUI
+import QuickLookThumbnailing
 
 struct QuickOverlayTooltipView: View {
     let text: String
     let maxVisualHeight: CGFloat
     let sourceAppPath: String?
+    let filePath: String?
+    let fileSize: UInt64?
     
     @State private var offset: CGFloat = 0
     @State private var textHeight: CGFloat = 0
     @State private var hasStartedMarquee = false
     @State private var marqueeStartTask: Task<Void, Never>?
+    @State private var thumbnailImage: NSImage?
     
     var body: some View {
+        Group {
+            if let filePath {
+                fileTooltip(filePath: filePath)
+            } else {
+                textTooltip
+            }
+        }
+        .background(
+            Group {
+                if #available(macOS 26.0, *) {
+                    Color.clear
+                        .glassEffect(in: .rect(cornerRadius: 28.0))
+                        .saturation(1.5)
+                        .environment(\.controlActiveState, .active)
+                } else {
+                    Color.clear
+                        .background(Material.ultraThin)
+                        .environment(\.controlActiveState, .active)
+                }
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 28, style: .continuous).stroke(Color.white.opacity(0.1), lineWidth: 1))
+        .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
+        .padding(60)
+        .onAppear {
+            if let filePath {
+                loadThumbnail(for: filePath)
+            }
+            if filePath == nil {
+                marqueeStartTask?.cancel()
+                marqueeStartTask = Task { @MainActor in
+                    do {
+                        try await Task.sleep(for: .milliseconds(100))
+                    } catch {
+                        return
+                    }
+                    guard !Task.isCancelled else { return }
+                    startMarquee()
+                }
+            }
+        }
+        .onDisappear {
+            marqueeStartTask?.cancel()
+            marqueeStartTask = nil
+        }
+    }
+
+    private var textTooltip: some View {
         VStack(alignment: .leading, spacing: 0) {
             if let sourceAppPath,
                let appURL = URL(fileURLWithPath: sourceAppPath) as URL?,
@@ -48,40 +101,66 @@ struct QuickOverlayTooltipView: View {
                 .frame(height: maxVisualHeight - (sourceAppPath == nil ? 0 : 28), alignment: .top)
                 .clipped()
         }
-        .background(
-            Group {
-                if #available(macOS 26.0, *) {
-                    Color.clear
-                        .glassEffect(in: .rect(cornerRadius: 28.0))
-                        .saturation(1.5)
-                        .environment(\.controlActiveState, .active)
-                } else {
-                    Color.clear
-                        .background(Material.ultraThin)
-                        .environment(\.controlActiveState, .active)
+    }
+
+    private func fileTooltip(filePath: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if let sourceAppPath,
+               let appURL = URL(fileURLWithPath: sourceAppPath) as URL?,
+               FileManager.default.fileExists(atPath: appURL.path) {
+                HStack(spacing: 6) {
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: appURL.path))
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                    Text(FileManager.default.displayName(atPath: appURL.path))
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
+                .padding(.horizontal, 12)
+                .padding(.top, 12)
             }
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 28, style: .continuous).stroke(Color.white.opacity(0.1), lineWidth: 1))
-        .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
-        .padding(60) // Provide space for the shadow to render inside the window
-        .onAppear {
-            // レイアウトが安定するのを待ってからマーキーを開始する
-            marqueeStartTask?.cancel()
-            marqueeStartTask = Task { @MainActor in
-                do {
-                    try await Task.sleep(for: .milliseconds(100))
-                } catch {
-                    return
+
+            HStack(alignment: .center, spacing: 16) {
+                Group {
+                    if let thumbnailImage {
+                        Image(nsImage: thumbnailImage)
+                            .resizable()
+                            .scaledToFit()
+                    } else {
+                        Image(nsImage: NSWorkspace.shared.icon(forFile: filePath))
+                            .resizable()
+                            .scaledToFit()
+                            .padding(32)
+                    }
                 }
-                guard !Task.isCancelled else { return }
-                startMarquee()
+                .frame(width: 256, height: 256)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(FileManager.default.displayName(atPath: filePath))
+                        .font(.body)
+                        .lineLimit(6)
+                    if let fileSize {
+                        Text(ByteCountFormatter.string(fromByteCount: Int64(fileSize), countStyle: .file))
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .padding(16)
         }
-        .onDisappear {
-            marqueeStartTask?.cancel()
-            marqueeStartTask = nil
+    }
+
+    private func loadThumbnail(for filePath: String) {
+        let url = URL(fileURLWithPath: filePath)
+        let request = QLThumbnailGenerator.Request(fileAt: url, size: CGSize(width: 256, height: 256), scale: NSScreen.main?.backingScaleFactor ?? 2, representationTypes: .all)
+        QLThumbnailGenerator.shared.generateRepresentations(for: request) { thumbnail, _, _ in
+            guard let thumbnail else { return }
+            DispatchQueue.main.async {
+                thumbnailImage = thumbnail.nsImage
+            }
         }
     }
     

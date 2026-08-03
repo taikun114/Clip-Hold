@@ -54,7 +54,9 @@ class QuickOverlayTooltipWindowController: NSWindowController {
               let text = userInfo["text"] as? String else { return }
         
         let sourceAppPath = userInfo["sourceAppPath"] as? String
-        positionWindow(text: text, sourceAppPath: sourceAppPath)
+        let filePath = userInfo["filePath"] as? String
+        let fileSize = userInfo["fileSize"] as? UInt64
+        positionWindow(text: text, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize)
         
         guard let contentView = window.contentView else { return }
         contentView.wantsLayer = true
@@ -105,7 +107,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
     }
     
-    private func positionWindow(text: String, sourceAppPath: String?) {
+    private func positionWindow(text: String, sourceAppPath: String?, filePath: String?, fileSize: UInt64?) {
         guard let window = self.window else { return }
         
         guard let overlayWindow = QuickOverlayWindowController.shared.window,
@@ -140,7 +142,12 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         // Since we now use .fixedSize in the view, it will never truncate with '...', so we don't need a buffer.
         let headerHeight: CGFloat = sourceAppPath == nil ? 0 : 28
         let headerSpacing: CGFloat = 0
-        let naturalVisualHeight = ceil(textRect.height) + 32 + headerHeight + headerSpacing
+        let naturalVisualHeight: CGFloat
+        if filePath != nil {
+            naturalVisualHeight = 256 + 32 + (sourceAppPath == nil ? 0 : 28)
+        } else {
+            naturalVisualHeight = ceil(textRect.height) + 32 + headerHeight + headerSpacing
+        }
         
         // Cap max visual height at 500 (same as overlay)
         let targetVisualHeight = min(naturalVisualHeight, 500)
@@ -208,7 +215,13 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
         let finalWindowHeight = finalVisualHeight + 120
         
-        let finalView = QuickOverlayTooltipView(text: text, maxVisualHeight: finalVisualHeight, sourceAppPath: sourceAppPath)
+        let finalView = QuickOverlayTooltipView(
+            text: text,
+            maxVisualHeight: finalVisualHeight,
+            sourceAppPath: sourceAppPath,
+            filePath: filePath,
+            fileSize: fileSize
+        )
         let finalHosting = NSHostingView(rootView: finalView)
         window.contentView = finalHosting
         
