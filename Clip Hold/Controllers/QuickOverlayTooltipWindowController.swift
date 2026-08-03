@@ -53,7 +53,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
               let userInfo = notification.userInfo,
               let text = userInfo["text"] as? String else { return }
         
-        positionWindow(text: text)
+        let sourceAppPath = userInfo["sourceAppPath"] as? String
+        positionWindow(text: text, sourceAppPath: sourceAppPath)
         
         guard let contentView = window.contentView else { return }
         contentView.wantsLayer = true
@@ -104,7 +105,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
     }
     
-    private func positionWindow(text: String) {
+    private func positionWindow(text: String, sourceAppPath: String?) {
         guard let window = self.window else { return }
         
         guard let overlayWindow = QuickOverlayWindowController.shared.window,
@@ -137,7 +138,9 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         )
         // Add 32 for padding (16 top, 16 bottom).
         // Since we now use .fixedSize in the view, it will never truncate with '...', so we don't need a buffer.
-        let naturalVisualHeight = ceil(textRect.height) + 32
+        let headerHeight: CGFloat = sourceAppPath == nil ? 0 : 28
+        let headerSpacing: CGFloat = 0
+        let naturalVisualHeight = ceil(textRect.height) + 32 + headerHeight + headerSpacing
         
         // Cap max visual height at 500 (same as overlay)
         let targetVisualHeight = min(naturalVisualHeight, 500)
@@ -205,7 +208,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
         let finalWindowHeight = finalVisualHeight + 120
         
-        let finalView = QuickOverlayTooltipView(text: text, maxVisualHeight: finalVisualHeight)
+        let finalView = QuickOverlayTooltipView(text: text, maxVisualHeight: finalVisualHeight, sourceAppPath: sourceAppPath)
         let finalHosting = NSHostingView(rootView: finalView)
         window.contentView = finalHosting
         

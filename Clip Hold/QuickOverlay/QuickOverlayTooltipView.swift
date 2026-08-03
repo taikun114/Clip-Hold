@@ -3,6 +3,7 @@ import SwiftUI
 struct QuickOverlayTooltipView: View {
     let text: String
     let maxVisualHeight: CGFloat
+    let sourceAppPath: String?
     
     @State private var offset: CGFloat = 0
     @State private var textHeight: CGFloat = 0
@@ -10,7 +11,23 @@ struct QuickOverlayTooltipView: View {
     @State private var marqueeStartTask: Task<Void, Never>?
     
     var body: some View {
-        Group {
+        VStack(alignment: .leading, spacing: 0) {
+            if let sourceAppPath,
+               let appURL = URL(fileURLWithPath: sourceAppPath) as URL?,
+               FileManager.default.fileExists(atPath: appURL.path) {
+                HStack(spacing: 6) {
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: appURL.path))
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                    Text(FileManager.default.displayName(atPath: appURL.path))
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                .padding(.horizontal, 12)
+                .padding(.top, 12)
+            }
+
             Text(text)
                 .font(.body)
                 .lineLimit(nil)
@@ -28,7 +45,7 @@ struct QuickOverlayTooltipView: View {
                     }
                 )
                 .offset(y: offset)
-                .frame(height: maxVisualHeight, alignment: .top)
+                .frame(height: maxVisualHeight - (sourceAppPath == nil ? 0 : 28), alignment: .top)
                 .clipped()
         }
         .background(

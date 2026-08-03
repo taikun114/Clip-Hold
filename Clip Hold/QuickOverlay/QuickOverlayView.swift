@@ -507,7 +507,7 @@ struct QuickOverlayView: View {
                 tooltipTask = Task {
                     try? await Task.sleep(nanoseconds: 600_000_000)
                     if !Task.isCancelled {
-                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: ["text": item.text])
+                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: ["text": item.text, "sourceAppPath": item.sourceAppPath as Any])
                     }
                 }
             case .ended:
