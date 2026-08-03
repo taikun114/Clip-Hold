@@ -14,6 +14,12 @@ class UnconstrainedPanel: NSPanel {
 class QuickOverlayTooltipWindowController: NSWindowController {
     
     static let shared = QuickOverlayTooltipWindowController()
+
+    private enum TooltipDirection {
+        case above, below, left, right
+    }
+
+    private var tooltipDirection: TooltipDirection = .below
     
     private init() {
         let panel = UnconstrainedPanel(
@@ -29,6 +35,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         panel.backgroundColor = .clear
         panel.isOpaque = false
         panel.hasShadow = false
+        panel.animationBehavior = .none
         
         super.init(window: panel)
         
@@ -47,11 +54,54 @@ class QuickOverlayTooltipWindowController: NSWindowController {
               let text = userInfo["text"] as? String else { return }
         
         positionWindow(text: text)
+        
+        guard let contentView = window.contentView else { return }
+        contentView.wantsLayer = true
+        contentView.layer?.removeAllAnimations()
+        
+        // ツールチップが現れる方向へ少しスライドしながら表示する
+        window.alphaValue = 0
+        let slideDistance: CGFloat = 12
+        let initialTransform: CATransform3D
+        switch tooltipDirection {
+        case .above: initialTransform = CATransform3DMakeTranslation(0, -slideDistance, 0)
+        case .below: initialTransform = CATransform3DMakeTranslation(0, slideDistance, 0)
+        case .left: initialTransform = CATransform3DMakeTranslation(slideDistance, 0, 0)
+        case .right: initialTransform = CATransform3DMakeTranslation(-slideDistance, 0, 0)
+        }
+        contentView.layer?.transform = initialTransform
         window.orderFront(nil)
+        
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.15
+            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            window.animator().alphaValue = 1
+        }
+        
+        let slideAnim = CABasicAnimation(keyPath: "transform")
+        slideAnim.fromValue = initialTransform
+        slideAnim.toValue = CATransform3DIdentity
+        slideAnim.duration = 0.15
+        slideAnim.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        contentView.layer?.add(slideAnim, forKey: "showSlide")
+        contentView.layer?.transform = CATransform3DIdentity
     }
     
     @objc private func hideTooltip() {
-        window?.orderOut(nil)
+        guard let window = self.window, let contentView = window.contentView else { return }
+        contentView.wantsLayer = true
+        
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.15
+            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
+            window.animator().alphaValue = 0
+        }, completionHandler: {
+            window.orderOut(nil)
+            window.alphaValue = 1
+            contentView.layer?.removeAllAnimations()
+            contentView.layer?.transform = CATransform3DIdentity
+        })
+        
     }
     
     private func positionWindow(text: String) {
@@ -141,6 +191,13 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             finalVisualHeight = min(finalVisualHeight, screenRect.maxY - visualMinY)
             // Align bottom with overlay bottom
             newOrigin.y = visualMinY - 60
+        }
+
+        tooltipDirection = switch chosenDirection {
+        case .above: .above
+        case .below: .below
+        case .left: .left
+        case .right: .right
         }
         
         // Ensure minimum height

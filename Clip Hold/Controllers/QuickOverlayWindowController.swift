@@ -17,6 +17,7 @@ class QuickOverlayWindowController: NSWindowController {
     static let shared = QuickOverlayWindowController()
     
     private var isObserving = false
+    private var animationGeneration = 0
     
     private init() {
         // Creates a transparent, borderless panel
@@ -33,6 +34,7 @@ class QuickOverlayWindowController: NSWindowController {
         panel.backgroundColor = .clear
         panel.isOpaque = false
         panel.hasShadow = false
+        panel.animationBehavior = .none
         
         super.init(window: panel)
         
@@ -46,6 +48,7 @@ class QuickOverlayWindowController: NSWindowController {
     
     @objc private func showOverlay() {
         guard let window = self.window, let type = QuickOverlayManager.shared.currentOverlayType else { return }
+        animationGeneration += 1
         
         // Load the view
         let view = QuickOverlayView(type: type)
@@ -54,16 +57,68 @@ class QuickOverlayWindowController: NSWindowController {
             .environmentObject(StandardPhrasePresetManager.shared)
             .environmentObject(DateReloader.shared)
         
-        window.contentView = NSHostingView(rootView: view)
+        let hostingView = NSHostingView(rootView: view)
+        hostingView.wantsLayer = true
+        window.contentView = hostingView
         
         positionWindow()
         
-        // Show window without taking app focus, but make panel key for active appearance
+        // 表示アニメーション: 透明+105%スケールから不透明+100%スケールへ
+        window.alphaValue = 1
+        hostingView.layer?.removeAllAnimations()
         window.makeKeyAndOrderFront(nil)
+        window.displayIfNeeded()
+        hostingView.layoutSubtreeIfNeeded()
+        configureAnimationLayer(for: hostingView)
+        hostingView.layer?.opacity = 0
+        hostingView.layer?.transform = CATransform3DMakeScale(1.05, 1.05, 1)
+        let showOpacity = CABasicAnimation(keyPath: "opacity")
+        showOpacity.fromValue = 0
+        showOpacity.toValue = 1
+        let showScale = CABasicAnimation(keyPath: "transform.scale")
+        showScale.fromValue = 1.05
+        showScale.toValue = 1.0
+        let showAnimation = CAAnimationGroup()
+        showAnimation.animations = [showOpacity, showScale]
+        showAnimation.duration = 0.1
+        showAnimation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        hostingView.layer?.add(showAnimation, forKey: "showAnimation")
+        hostingView.layer?.opacity = 1
+        hostingView.layer?.transform = CATransform3DIdentity
     }
     
     @objc private func hideOverlay() {
-        window?.orderOut(nil)
+        guard let window = self.window, let contentView = window.contentView else { return }
+        animationGeneration += 1
+        let currentGeneration = animationGeneration
+        contentView.wantsLayer = true
+        window.layoutIfNeeded()
+        configureAnimationLayer(for: contentView)
+        contentView.layer?.removeAllAnimations()
+        
+        contentView.layer?.opacity = 1
+        contentView.layer?.transform = CATransform3DIdentity
+        let hideScale = CABasicAnimation(keyPath: "transform.scale")
+        hideScale.fromValue = 1.0
+        hideScale.toValue = 1.05
+        hideScale.duration = 0.1
+        hideScale.timingFunction = CAMediaTimingFunction(name: .easeIn)
+        CATransaction.begin()
+        CATransaction.setCompletionBlock { [weak self, weak window, weak contentView] in
+            guard let self, self.animationGeneration == currentGeneration else { return }
+            window?.orderOut(nil)
+            window?.alphaValue = 1
+            contentView?.layer?.opacity = 1
+            contentView?.layer?.transform = CATransform3DIdentity
+        }
+        contentView.layer?.add(hideScale, forKey: "hideScale")
+        CATransaction.commit()
+
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0.1
+            context.timingFunction = CAMediaTimingFunction(name: .easeIn)
+            window.animator().alphaValue = 0
+        }
     }
     
     private func positionWindow() {
@@ -151,5 +206,13 @@ class QuickOverlayWindowController: NSWindowController {
         }
         
         window.setFrameOrigin(newOrigin)
+    }
+
+    private func configureAnimationLayer(for view: NSView) {
+        guard let layer = view.layer else { return }
+
+        // レイヤーの拡大縮小の基準点を、常にウインドウの中央へ固定する
+        layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        layer.position = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
     }
 }

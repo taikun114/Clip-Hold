@@ -7,6 +7,7 @@ struct QuickOverlayTooltipView: View {
     @State private var offset: CGFloat = 0
     @State private var textHeight: CGFloat = 0
     @State private var hasStartedMarquee = false
+    @State private var marqueeStartTask: Task<Void, Never>?
     
     var body: some View {
         Group {
@@ -50,10 +51,20 @@ struct QuickOverlayTooltipView: View {
         .padding(60) // Provide space for the shadow to render inside the window
         .onAppear {
             // レイアウトが安定するのを待ってからマーキーを開始する
-            Task { @MainActor in
-                try? await Task.sleep(for: .milliseconds(100))
+            marqueeStartTask?.cancel()
+            marqueeStartTask = Task { @MainActor in
+                do {
+                    try await Task.sleep(for: .milliseconds(100))
+                } catch {
+                    return
+                }
+                guard !Task.isCancelled else { return }
                 startMarquee()
             }
+        }
+        .onDisappear {
+            marqueeStartTask?.cancel()
+            marqueeStartTask = nil
         }
     }
     
