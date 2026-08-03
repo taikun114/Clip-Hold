@@ -105,12 +105,9 @@ class QuickOverlayWindowController: NSWindowController {
         hideScale.duration = 0.1
         hideScale.timingFunction = CAMediaTimingFunction(name: .easeIn)
         contentView.layer?.transform = CATransform3DMakeScale(1.05, 1.05, 1)
-        let animationDelegate = AnimationCompletionDelegate { [weak self, weak window, weak contentView] in
+        let animationDelegate = AnimationCompletionDelegate { [weak self, weak window] in
             guard let self, self.animationGeneration == currentGeneration else { return }
             window?.orderOut(nil)
-            window?.alphaValue = 1
-            contentView?.layer?.opacity = 1
-            contentView?.layer?.transform = CATransform3DIdentity
             self.hideAnimationDelegate = nil
         }
         hideAnimationDelegate = animationDelegate

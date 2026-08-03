@@ -175,30 +175,18 @@ class QuickOverlayManager: ObservableObject {
                             }
                         }
                     }
-                }
+            }
             
             if let item = itemToCopy {
-                ClipboardManager.shared.copyItemToClipboard(item)
-                
                 let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                 let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
-                
-                let shouldPaste: Bool
-                if currentQuickPaste {
-                    if type == .history && textOnlyQuickPaste && item.filePath != nil {
-                        shouldPaste = false
-                    } else {
-                        shouldPaste = true
-                    }
-                } else {
-                    shouldPaste = false
-                }
-                
-                if shouldPaste {
-                    // オーバーレイはフォーカスを奪わないため、フォーカス切り替え処理（performPasteToPreviousApp）は不要。
-                    // そのままペーストコマンドを送信する。
+                let shouldPaste = currentQuickPaste && !(type == .history && textOnlyQuickPaste && item.filePath != nil)
+
+                ClipboardManager.shared.copyItemToClipboard(item) {
+                    guard shouldPaste else { return }
                     Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: 50_000_000)
+                        // オーバーレイが非表示になり、キーウインドウ状態が解除された後に送信する
+                        try? await Task.sleep(nanoseconds: 150_000_000)
                         ClipHoldApp.performPaste()
                     }
                 }

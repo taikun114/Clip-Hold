@@ -83,35 +83,35 @@ struct ClipHoldApp: App {
     
     // MARK: - キーボード操作をシミュレートする関数
     static func performPaste() {
-        let delay: TimeInterval = 0.01
-        
-        guard let source = CGEventSource(stateID: .combinedSessionState) else {
-            print("Failed to create event source")
-            return
+        Task.detached(priority: .userInitiated) {
+            guard let source = CGEventSource(stateID: .combinedSessionState) else {
+                print("Failed to create event source")
+                return
+            }
+            
+            guard let commandDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: true),
+                  let vDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: true),
+                  let vUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: false),
+                  let commandUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: false) else {
+                print("Failed to create CGEvent for paste")
+                return
+            }
+            
+            commandDown.flags = .maskCommand
+            commandDown.post(tap: .cgSessionEventTap)
+            try? await Task.sleep(for: .milliseconds(10))
+            
+            vDown.flags = .maskCommand
+            vDown.post(tap: .cgSessionEventTap)
+            try? await Task.sleep(for: .milliseconds(10))
+            
+            vUp.flags = .maskCommand
+            vUp.post(tap: .cgSessionEventTap)
+            try? await Task.sleep(for: .milliseconds(10))
+            
+            commandUp.flags = []
+            commandUp.post(tap: .cgSessionEventTap)
         }
-        
-        guard let commandDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: true),
-              let vDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: true),
-              let vUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_ANSI_V), keyDown: false),
-              let commandUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(kVK_Command), keyDown: false) else {
-            print("Failed to create CGEvent for paste")
-            return
-        }
-        
-        commandDown.flags = .maskCommand
-        commandDown.post(tap: .cgSessionEventTap)
-        Thread.sleep(forTimeInterval: delay)
-        
-        vDown.flags = .maskCommand
-        vDown.post(tap: .cgSessionEventTap)
-        Thread.sleep(forTimeInterval: delay)
-        
-        vUp.flags = .maskCommand
-        vUp.post(tap: .cgSessionEventTap)
-        Thread.sleep(forTimeInterval: delay)
-        
-        commandUp.flags = []
-        commandUp.post(tap: .cgSessionEventTap)
     }
     
     static func performPasteToPreviousApp() {

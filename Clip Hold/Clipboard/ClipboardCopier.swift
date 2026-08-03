@@ -3,7 +3,7 @@ import AppKit // NSPasteboard
 import SwiftUI // @Published
 
 extension ClipboardManager {
-    func copyItemToClipboard(_ item: ClipboardItem) {
+    func copyItemToClipboard(_ item: ClipboardItem, completion: (@Sendable () -> Void)? = nil) {
         // 古い一時ファイルをすべて削除する
         cleanUpTemporaryFiles()
         
@@ -32,6 +32,7 @@ extension ClipboardManager {
                                 // success = true
                             }
                         }
+                        completion?()
                     }
                 }
                 // ファイルパスが存在する場合は、テキストのコピーをスキップ
@@ -77,6 +78,7 @@ extension ClipboardManager {
                         }
                     }
                 }
+                completion?()
             }
         }
     }
