@@ -18,6 +18,7 @@ class QuickOverlayWindowController: NSWindowController {
     
     private var isObserving = false
     private var animationGeneration = 0
+    private var hideAnimationDelegate: AnimationCompletionDelegate?
     
     private init() {
         // Creates a transparent, borderless panel
@@ -103,16 +104,18 @@ class QuickOverlayWindowController: NSWindowController {
         hideScale.toValue = 1.05
         hideScale.duration = 0.1
         hideScale.timingFunction = CAMediaTimingFunction(name: .easeIn)
-        CATransaction.begin()
-        CATransaction.setCompletionBlock { [weak self, weak window, weak contentView] in
+        contentView.layer?.transform = CATransform3DMakeScale(1.05, 1.05, 1)
+        let animationDelegate = AnimationCompletionDelegate { [weak self, weak window, weak contentView] in
             guard let self, self.animationGeneration == currentGeneration else { return }
             window?.orderOut(nil)
             window?.alphaValue = 1
             contentView?.layer?.opacity = 1
             contentView?.layer?.transform = CATransform3DIdentity
+            self.hideAnimationDelegate = nil
         }
+        hideAnimationDelegate = animationDelegate
+        hideScale.delegate = animationDelegate
         contentView.layer?.add(hideScale, forKey: "hideScale")
-        CATransaction.commit()
 
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.1
@@ -214,5 +217,18 @@ class QuickOverlayWindowController: NSWindowController {
         // レイヤーの拡大縮小の基準点を、常にウインドウの中央へ固定する
         layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         layer.position = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
+    }
+}
+
+private final class AnimationCompletionDelegate: NSObject, CAAnimationDelegate {
+    private let completion: () -> Void
+
+    init(completion: @escaping () -> Void) {
+        self.completion = completion
+    }
+
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        guard flag else { return }
+        completion()
     }
 }
