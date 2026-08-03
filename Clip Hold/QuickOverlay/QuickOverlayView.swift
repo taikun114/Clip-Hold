@@ -136,10 +136,6 @@ struct QuickOverlayView: View {
                 cachedHistoryItems = explicit
                 return
             }
-            if let filtered = clipboardManager.filteredHistoryForShortcuts {
-                cachedHistoryItems = filtered
-                return
-            }
         }
         
         var raw = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
@@ -155,9 +151,8 @@ struct QuickOverlayView: View {
     
     private func loadMoreHistoryItems() {
         guard !isPaginating && currentDisplayLimit < clipboardManager.clipboardHistory.count else { return }
-        // Do not paginate if we are using explicit items or filtered items from the window
+        // Do not paginate if we are using explicit items
         if explicitHistoryItems != nil { return }
-        if clipboardManager.filteredHistoryForShortcuts != nil { return }
         
         isPaginating = true
         Task {
