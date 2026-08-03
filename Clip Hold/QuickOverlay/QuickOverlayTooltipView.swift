@@ -2,7 +2,7 @@ import SwiftUI
 
 struct QuickOverlayTooltipView: View {
     let text: String
-    var maxVisualHeight: CGFloat? = nil
+    let maxVisualHeight: CGFloat
     
     @Environment(\.colorScheme) var colorScheme
     @State private var offset: CGFloat = 0
@@ -10,35 +10,27 @@ struct QuickOverlayTooltipView: View {
     
     var body: some View {
         Group {
-            if let maxVisualHeight = maxVisualHeight {
-                // 表示モード（高さ制限あり・はみ出る場合はマーキー）
-                Text(text)
-                    .font(.body)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        GeometryReader { textGeo in
-                            Color.clear.onAppear {
-                                textHeight = textGeo.size.height
-                                startMarquee(maxVisualHeight: maxVisualHeight)
-                            }
-                            .onChange(of: textGeo.size.height) { _, new in
-                                textHeight = new
-                                startMarquee(maxVisualHeight: maxVisualHeight)
-                            }
+            Text(text)
+                .font(.body)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    GeometryReader { textGeo in
+                        Color.clear.onAppear {
+                            textHeight = textGeo.size.height
+                            startMarquee(maxVisualHeight: maxVisualHeight)
                         }
-                    )
-                    .offset(y: offset)
-                    .frame(height: maxVisualHeight, alignment: .top)
-                    .clipped()
-            } else {
-                // 計測モード（無制限）
-                Text(text)
-                    .font(.body)
-                    .padding(16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
+                        .onChange(of: textGeo.size.height) { _, new in
+                            textHeight = new
+                            startMarquee(maxVisualHeight: maxVisualHeight)
+                        }
+                    }
+                )
+                .offset(y: offset)
+                .frame(height: maxVisualHeight, alignment: .top)
+                .clipped()
         }
         .background(
             Group {

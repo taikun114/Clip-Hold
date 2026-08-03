@@ -76,14 +76,18 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let spaceLeft = visualMinX - screenRect.minX - gap
         let spaceRight = screenRect.maxX - visualMaxX - gap
         
-        // Measure natural text height reliably using NSHostingView, now that .fixedSize is removed from the else branch.
-        // This ensures the height is perfectly matched with SwiftUI's text rendering engine.
-        let measureView = QuickOverlayTooltipView(text: text, maxVisualHeight: nil)
-            .frame(width: 620)
-        let measureHosting = NSHostingView(rootView: measureView)
-        // Set a huge height so it doesn't artificially truncate during fittingSize calculation
-        measureHosting.frame = NSRect(x: 0, y: 0, width: 620, height: 10000)
-        let naturalVisualHeight = measureHosting.fittingSize.height - 120
+        // Measure natural text height reliably using NSString to avoid NSHostingView bugs
+        let textWidth: CGFloat = 468 // 620 (window) - 120 (shadow padding) - 32 (text padding)
+        let font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        let textRect = (text as NSString).boundingRect(
+            with: NSSize(width: textWidth, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        )
+        // Add 32 for padding (16 top, 16 bottom).
+        // Since we now use .fixedSize in the view, it will never truncate with '...', so we don't need a buffer.
+        let naturalVisualHeight = ceil(textRect.height) + 32
         
         // Cap max visual height at 500 (same as overlay)
         let targetVisualHeight = min(naturalVisualHeight, 500)
@@ -143,9 +147,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         finalVisualHeight = max(finalVisualHeight, 50)
         
         let finalWindowHeight = finalVisualHeight + 120
-        let needsMarquee = naturalVisualHeight > finalVisualHeight
         
-        let finalView = QuickOverlayTooltipView(text: text, maxVisualHeight: needsMarquee ? finalVisualHeight : nil)
+        let finalView = QuickOverlayTooltipView(text: text, maxVisualHeight: finalVisualHeight)
         let finalHosting = NSHostingView(rootView: finalView)
         window.contentView = finalHosting
         
