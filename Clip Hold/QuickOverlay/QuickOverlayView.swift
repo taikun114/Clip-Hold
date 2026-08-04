@@ -51,6 +51,7 @@ struct QuickOverlayView: View {
     
     // Custom Tooltip State
     @State private var tooltipTask: Task<Void, Never>? = nil
+
     
     let rowIconStore = RowIconStore()
     
@@ -315,8 +316,10 @@ struct QuickOverlayView: View {
             // 項目ホバーに移行した場合はここで解除する（nil への遷移時はボタンホバーと競合しないよう解除しない）。
             if case .item = newValue {
                 QuickOverlayManager.shared.hoveredCopyAsPlainText = false
+                QuickOverlayManager.shared.hoveredEditAndCopy = false
             } else if newValue == .add || newValue == .openWindow {
                 QuickOverlayManager.shared.hoveredCopyAsPlainText = false
+                QuickOverlayManager.shared.hoveredEditAndCopy = false
             }
             if case .item(let id) = newValue {
                 if type == .history {
@@ -478,6 +481,9 @@ struct QuickOverlayView: View {
             },
             onCopyAsPlainText: {
                 QuickOverlayManager.shared.copyItemAsPlainTextAndClose(itemID: item.originalPinnedItemID ?? item.id)
+            },
+            onEditAndCopy: {
+                QuickOverlayManager.shared.showEditAndCopyWindowAndClose(itemID: item.originalPinnedItemID ?? item.id)
             }
         )
     }
@@ -501,62 +507,19 @@ struct QuickOverlayView: View {
             shortcut = ""
         }
         
-        let isURL: Bool = {
-            guard !phrase.content.isEmpty,
-                  let url = URL(string: phrase.content) else {
-                return false
-            }
-            return url.scheme == "http" || url.scheme == "https"
-        }()
-        
-        return HStack(spacing: 8) {
-            Group {
-                if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
-                    ColorCodeIconView(color: color)
-                } else {
-                    Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
-                        .resizable()
-                        .scaledToFit()
-                        .padding(4)
-                        .foregroundStyle(isSelected ? .white : .secondary)
+        return QuickOverlayStandardPhraseItemRow(
+            phrase: phrase,
+            isSelected: isSelected,
+            showColorCodeIcon: showColorCodeIcon,
+            shortcut: shortcut,
+            onHoverItem: { hovering in
+                if hovering {
+                    currentSelection = .item(phrase.id)
+                } else if currentSelection == .item(phrase.id) {
+                    currentSelection = nil
                 }
-            }
-            .frame(width: 30, height: 30)
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(phrase.title)
-                    .font(.body)
-                    .foregroundColor(isSelected ? .white : .primary)
-                    .lineLimit(1)
-                
-                Text(phrase.content)
-                    .font(.caption)
-                    .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
-                    .lineLimit(1)
-            }
-            
-            Spacer()
-            
-            if !shortcut.isEmpty {
-                Text(shortcut.replacingOccurrences(of: "^", with: "⌃"))
-                    .font(.subheadline)
-                    .foregroundColor(isSelected ? .white : Color(nsColor: .tertiaryLabelColor))
-            }
-        }
-        .padding(8)
-        .background(isSelected ? Color.accentColor : Color.clear)
-        .cornerRadius(12)
-        .contentShape(Rectangle())
-        .onHover { hovering in
-            if hovering {
-                currentSelection = .item(phrase.id)
-            } else if currentSelection == .item(phrase.id) {
-                currentSelection = nil
-            }
-        }
-        .onContinuousHover(coordinateSpace: .global) { phase in
-            switch phase {
-            case .active(_):
+            },
+            onItemTooltipShow: {
                 tooltipTask?.cancel()
                 tooltipTask = Task {
                     try? await Task.sleep(nanoseconds: 600_000_000)
@@ -564,11 +527,15 @@ struct QuickOverlayView: View {
                         NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: ["text": phrase.content])
                     }
                 }
-            case .ended:
+            },
+            onItemTooltipHide: {
                 tooltipTask?.cancel()
                 NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
+            },
+            onEditAndCopy: {
+                QuickOverlayManager.shared.showEditAndCopyWindowAndClose(phraseID: phrase.id)
             }
-        }
+        )
     }
     
     private var presetDropdownMenu: some View {
@@ -784,11 +751,16 @@ private struct QuickOverlayHistoryItemRow: View {
     var onItemTooltipShow: () -> Void
     var onItemTooltipHide: () -> Void
     var onCopyAsPlainText: () -> Void
+    var onEditAndCopy: () -> Void
 
     @State private var isButtonHovered = false
     @State private var buttonTopCenterScreen: CGPoint? = nil
     @State private var buttonTooltipTask: Task<Void, Never>? = nil
     @State private var rowContentHeight: CGFloat = 46
+    
+    @State private var isEditAndCopyButtonHovered = false
+    @State private var editAndCopyButtonTopCenterScreen: CGPoint? = nil
+    @State private var editAndCopyButtonTooltipTask: Task<Void, Never>? = nil
     
     /// eraserボタンのサイズ。アイコンの大きさと、ボタンツールチップの上端基準（ボタンの高さ分のオフセット）に使用する
     private var buttonSize: CGFloat {
@@ -815,6 +787,7 @@ private struct QuickOverlayHistoryItemRow: View {
         }
         .onDisappear {
             buttonTooltipTask?.cancel()
+            editAndCopyButtonTooltipTask?.cancel()
         }
     }
 
@@ -902,6 +875,7 @@ private struct QuickOverlayHistoryItemRow: View {
     private var actionButtons: some View {
         HStack(spacing: 2) {
             eraserButton
+            editAndCopyButton
             // 今後追加するボタンはここに並べる
         }
         .padding(.leading, 6)
@@ -938,6 +912,37 @@ private struct QuickOverlayHistoryItemRow: View {
         .background(
             ScreenFrameReader { frame in
                 buttonTopCenterScreen = CGPoint(x: frame.midX, y: frame.maxY)
+            }
+         )
+     }
+
+    /// 変更してコピーボタン。pencil.lineアイコンを使用し、すべての項目で有効。
+    /// クリックすると変更してコピーウインドウが表示される。ホバー中にオーバーレイを閉じた際も同様のウインドウが表示される。
+    private var editAndCopyButton: some View {
+        Button(action: onEditAndCopy) {
+            Image(systemName: "pencil.line")
+                .font(.system(size: buttonSize * 0.46, weight: .medium))
+                .foregroundStyle(isEditAndCopyButtonHovered ? .white : Color(nsColor: .secondaryLabelColor))
+                .frame(width: buttonSize, height: buttonSize)
+                .background(isEditAndCopyButtonHovered ? Color.accentColor : Color.clear)
+                .cornerRadius(12)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            isEditAndCopyButtonHovered = hovering
+            if hovering {
+                setEditAndCopyHoverState(true)
+                showEditAndCopyButtonTooltip()
+            } else {
+                setEditAndCopyHoverState(false)
+                hideEditAndCopyButtonTooltip()
+            }
+        }
+        .accessibilityLabel(String(localized: "変更してコピー..."))
+        .background(
+            ScreenFrameReader { frame in
+                editAndCopyButtonTopCenterScreen = CGPoint(x: frame.midX, y: frame.maxY)
             }
         )
     }
@@ -983,6 +988,47 @@ private struct QuickOverlayHistoryItemRow: View {
         buttonTooltipTask = nil
         NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
     }
+
+    // MARK: - 変更してコピー用のホバー状態
+
+    /// ボタンホバー中に、オーバーレイを閉じた際に変更してコピーウインドウを表示するようマネージャーの状態を更新する
+    private func setEditAndCopyHoverState(_ hovering: Bool) {
+        if hovering {
+            QuickOverlayManager.shared.hoveredAction = nil
+            QuickOverlayManager.shared.hoveredItemId = item.originalPinnedItemID ?? item.id
+            QuickOverlayManager.shared.hoveredPhraseId = nil
+            QuickOverlayManager.shared.hoveredEditAndCopy = true
+        } else {
+            QuickOverlayManager.shared.hoveredEditAndCopy = false
+            QuickOverlayManager.shared.hoveredItemId = nil
+        }
+    }
+
+    // MARK: - 変更してコピーボタンツールチップ
+
+    /// ボタンの中央の上に、通常の項目と同じデザインのツールチップを表示する。
+    /// マウスカーソルの位置には連動させず、ボタンの固定位置に表示する。
+    private func showEditAndCopyButtonTooltip() {
+        editAndCopyButtonTooltipTask?.cancel()
+        editAndCopyButtonTooltipTask = Task {
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            if !Task.isCancelled, let anchor = editAndCopyButtonTopCenterScreen {
+                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
+                    "text": String(localized: "変更してコピー..."),
+                    "isCompact": true,
+                    "buttonHeight": Double(buttonSize),
+                    "anchorX": Double(anchor.x),
+                    "anchorY": Double(anchor.y)
+                ])
+            }
+        }
+    }
+
+    private func hideEditAndCopyButtonTooltip() {
+        editAndCopyButtonTooltipTask?.cancel()
+        editAndCopyButtonTooltipTask = nil
+        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
+    }
 }
 
 // バイト数を読みやすい文字列に変換するヘルパー関数
@@ -990,6 +1036,199 @@ private func formatFileSize(_ byteCount: UInt64) -> String {
     let formatter = ByteCountFormatter()
     formatter.countStyle = .file
     return formatter.string(fromByteCount: Int64(byteCount))
+}
+
+// MARK: - QuickOverlay定型文の行
+
+/// クイックオーバーレイの定型文の1行を表示するビュー。
+/// 履歴の QuickOverlayHistoryItemRow と同様に、
+/// 左側（項目コンテンツ）と右側（アクションボタン群）に分けて構成している。
+private struct QuickOverlayStandardPhraseItemRow: View {
+    let phrase: StandardPhrase
+    let isSelected: Bool
+    let showColorCodeIcon: Bool
+    let shortcut: String
+
+    var onHoverItem: (Bool) -> Void
+    var onItemTooltipShow: () -> Void
+    var onItemTooltipHide: () -> Void
+    var onEditAndCopy: () -> Void
+
+    @State private var isEditAndCopyButtonHovered = false
+    @State private var editAndCopyButtonTopCenterScreen: CGPoint? = nil
+    @State private var editAndCopyButtonTooltipTask: Task<Void, Never>? = nil
+    @State private var rowContentHeight: CGFloat = 46
+
+    /// ボタンのサイズ。項目（ハイライト）の高さに合わせる
+    private var buttonSize: CGFloat {
+        max(rowContentHeight, 44)
+    }
+
+    private var isURL: Bool {
+        guard !phrase.content.isEmpty,
+              let url = URL(string: phrase.content) else {
+            return false
+        }
+        return url.scheme == "http" || url.scheme == "https"
+    }
+
+    var body: some View {
+        HStack(spacing: 0) {
+            leftContent
+            actionButtons
+        }
+        .onDisappear {
+            editAndCopyButtonTooltipTask?.cancel()
+        }
+    }
+
+    // MARK: - 左側（項目コンテンツ）
+
+    private var leftContent: some View {
+        HStack(spacing: 8) {
+            Group {
+                if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
+                    ColorCodeIconView(color: color)
+                } else {
+                    Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(4)
+                        .foregroundStyle(isSelected ? .white : .secondary)
+                }
+            }
+            .frame(width: 30, height: 30)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(phrase.title)
+                    .font(.body)
+                    .foregroundColor(isSelected ? .white : .primary)
+                    .lineLimit(1)
+
+                Text(phrase.content)
+                    .font(.caption)
+                    .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
+                    .lineLimit(1)
+            }
+
+            Spacer()
+
+            if !shortcut.isEmpty {
+                Text(shortcut.replacingOccurrences(of: "^", with: "⌃"))
+                    .font(.subheadline)
+                    .foregroundColor(isSelected ? .white : Color(nsColor: .tertiaryLabelColor))
+            }
+        }
+        .padding(8)
+        .background(isSelected ? Color.accentColor : Color.clear)
+        .cornerRadius(12)
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            onHoverItem(hovering)
+        }
+        .onContinuousHover(coordinateSpace: .global) { phase in
+            switch phase {
+            case .active(_):
+                onItemTooltipShow()
+            case .ended:
+                onItemTooltipHide()
+            }
+        }
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear {
+                        rowContentHeight = geo.size.height
+                    }
+                    .onChange(of: geo.size.height) { _, newHeight in
+                        rowContentHeight = newHeight
+                    }
+            }
+        )
+    }
+
+    // MARK: - 右側（アクションボタン群）
+
+    private var actionButtons: some View {
+        HStack(spacing: 2) {
+            editAndCopyButton
+            // 今後追加するボタンはここに並べる
+        }
+        .padding(.leading, 6)
+        .padding(.trailing, 2)
+    }
+
+    /// 変更してコピーボタン。pencil.lineアイコンを使用し、すべての定型文で有効。
+    /// クリックすると変更してコピーウインドウが表示される。
+    private var editAndCopyButton: some View {
+        Button(action: onEditAndCopy) {
+            Image(systemName: "pencil.line")
+                .font(.system(size: buttonSize * 0.46, weight: .medium))
+                .foregroundStyle(isEditAndCopyButtonHovered ? .white : Color(nsColor: .secondaryLabelColor))
+                .frame(width: buttonSize, height: buttonSize)
+                .background(isEditAndCopyButtonHovered ? Color.accentColor : Color.clear)
+                .cornerRadius(12)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            isEditAndCopyButtonHovered = hovering
+            if hovering {
+                setEditAndCopyHoverState(true)
+                showEditAndCopyButtonTooltip()
+            } else {
+                setEditAndCopyHoverState(false)
+                hideEditAndCopyButtonTooltip()
+            }
+        }
+        .accessibilityLabel(String(localized: "変更してコピー..."))
+        .background(
+            ScreenFrameReader { frame in
+                editAndCopyButtonTopCenterScreen = CGPoint(x: frame.midX, y: frame.maxY)
+            }
+        )
+    }
+
+    // MARK: - 変更してコピー用のホバー状態
+
+    /// ボタンホバー中に、オーバーレイを閉じた際に変更してコピーウインドウを表示するようマネージャーの状態を更新する
+    private func setEditAndCopyHoverState(_ hovering: Bool) {
+        if hovering {
+            QuickOverlayManager.shared.hoveredAction = nil
+            QuickOverlayManager.shared.hoveredPhraseId = phrase.id
+            QuickOverlayManager.shared.hoveredItemId = nil
+            QuickOverlayManager.shared.hoveredEditAndCopy = true
+        } else {
+            QuickOverlayManager.shared.hoveredEditAndCopy = false
+            QuickOverlayManager.shared.hoveredPhraseId = nil
+        }
+    }
+
+    // MARK: - 変更してコピーボタンツールチップ
+
+    /// ボタンの中央の上に、通常の項目と同じデザインのツールチップを表示する。
+    /// マウスカーソルの位置には連動させず、ボタンの固定位置に表示する。
+    private func showEditAndCopyButtonTooltip() {
+        editAndCopyButtonTooltipTask?.cancel()
+        editAndCopyButtonTooltipTask = Task {
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            if !Task.isCancelled, let anchor = editAndCopyButtonTopCenterScreen {
+                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
+                    "text": String(localized: "変更してコピー..."),
+                    "isCompact": true,
+                    "buttonHeight": Double(buttonSize),
+                    "anchorX": Double(anchor.x),
+                    "anchorY": Double(anchor.y)
+                ])
+            }
+        }
+    }
+
+    private func hideEditAndCopyButtonTooltip() {
+        editAndCopyButtonTooltipTask?.cancel()
+        editAndCopyButtonTooltipTask = nil
+        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
+    }
 }
 
 #Preview("定型文オーバーレイ (閉じた状態)") {

@@ -14,6 +14,8 @@ class QuickOverlayManager: ObservableObject {
     @Published var hoveredAction: QuickOverlaySelection? = nil
     // 履歴アイテムをリッチテキストではなく標準テキスト（プレーンテキスト）としてコピーするかどうか
     @Published var hoveredCopyAsPlainText: Bool = false
+    // 変更してコピーウインドウを表示するかどうか
+    @Published var hoveredEditAndCopy: Bool = false
     
     private var globalEventMonitor: Any?
     private var localEventMonitor: Any?
@@ -105,10 +107,12 @@ class QuickOverlayManager: ObservableObject {
                 guard !Task.isCancelled else { return }
                 
                 await MainActor.run {
-                    self.currentOverlayType = type
+                     self.currentOverlayType = type
                     self.hoveredItemId = nil
                     self.hoveredPhraseId = nil
                     self.hoveredAction = nil
+                    self.hoveredCopyAsPlainText = false
+                    self.hoveredEditAndCopy = false
                     self.isOverlayVisible = true
                     
                     // Tell WindowController to show
@@ -152,6 +156,33 @@ class QuickOverlayManager: ObservableObject {
                             }
                         } else if action == .addPreset {
                             delegate.showAddPresetWindow()
+                        }
+                    }
+                }
+            } else if hoveredEditAndCopy {
+                if type == .history {
+                    if let itemId = hoveredItemId {
+                        if let item = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemId }) {
+                            if let delegate = NSApp.delegate as? AppDelegate {
+                                delegate.showEditHistoryWindow(withContent: item.text)
+                            }
+                        }
+                    }
+                } else {
+                    if let phraseId = hoveredPhraseId {
+                        var content: String? = nil
+                        if let phrase = StandardPhraseManager.shared.standardPhrases.first(where: { $0.id == phraseId }) {
+                            content = phrase.content
+                        } else {
+                            for preset in StandardPhrasePresetManager.shared.presets {
+                                if let phrase = preset.phrases.first(where: { $0.id == phraseId }) {
+                                    content = phrase.content
+                                    break
+                                }
+                            }
+                        }
+                        if let content = content, let delegate = NSApp.delegate as? AppDelegate {
+                            delegate.showEditHistoryWindow(withContent: content)
                         }
                     }
                 }
@@ -243,11 +274,61 @@ class QuickOverlayManager: ObservableObject {
         resetSelectionState()
     }
     
+    /// 履歴アイテムを変更してコピーウインドウで編集・加工後にコピーする。
+    /// オーバーレイのpencil.lineボタンをクリックした際に使用する。
+    @MainActor
+    func showEditAndCopyWindowAndClose(itemID: UUID) {
+        guard let item = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemID }) else {
+            isOverlayVisible = false
+            cancelDelayTask()
+            NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+            resetSelectionState()
+            return
+        }
+        
+        isOverlayVisible = false
+        cancelDelayTask()
+        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        
+        let delegate = NSApp.delegate as? AppDelegate
+        delegate?.showEditHistoryWindow(withContent: item.text)
+        
+        resetSelectionState()
+    }
+    
+    /// 定型文を変更してコピーウインドウで編集・加工後にコピーする。
+    /// オーバーレイのpencil.lineボタンをクリックした際に使用する。
+    @MainActor
+    func showEditAndCopyWindowAndClose(phraseID: UUID) {
+        var content: String? = nil
+        if let phrase = StandardPhraseManager.shared.standardPhrases.first(where: { $0.id == phraseID }) {
+            content = phrase.content
+        } else {
+            for preset in StandardPhrasePresetManager.shared.presets {
+                if let phrase = preset.phrases.first(where: { $0.id == phraseID }) {
+                    content = phrase.content
+                    break
+                }
+            }
+        }
+        
+        isOverlayVisible = false
+        cancelDelayTask()
+        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        
+        if let content = content, let delegate = NSApp.delegate as? AppDelegate {
+            delegate.showEditHistoryWindow(withContent: content)
+        }
+        
+        resetSelectionState()
+    }
+    
     private func resetSelectionState() {
         currentOverlayType = nil
         hoveredItemId = nil
         hoveredPhraseId = nil
         hoveredAction = nil
         hoveredCopyAsPlainText = false
+        hoveredEditAndCopy = false
     }
 }
