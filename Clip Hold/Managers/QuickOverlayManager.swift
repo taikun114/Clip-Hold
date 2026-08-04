@@ -12,6 +12,8 @@ class QuickOverlayManager: ObservableObject {
     @Published var hoveredItemId: UUID? = nil
     @Published var hoveredPhraseId: UUID? = nil
     @Published var hoveredAction: QuickOverlaySelection? = nil
+    // 履歴アイテムをリッチテキストではなく標準テキスト（プレーンテキスト）としてコピーするかどうか
+    @Published var hoveredCopyAsStandardText: Bool = false
     
     private var globalEventMonitor: Any?
     private var localEventMonitor: Any?
@@ -155,10 +157,14 @@ class QuickOverlayManager: ObservableObject {
                 }
             } else {
                 var itemToCopy: ClipboardItem? = nil
+                var copyAsStandardText = false
                 
                 if type == .history {
                     if let itemId = hoveredItemId {
-                        itemToCopy = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemId })
+                        if let item = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemId }) {
+                            itemToCopy = item
+                            copyAsStandardText = hoveredCopyAsStandardText
+                        }
                     }
                 } else {
                     if let phraseId = hoveredPhraseId {
@@ -175,28 +181,73 @@ class QuickOverlayManager: ObservableObject {
                             }
                         }
                     }
-            }
-            
-            if let item = itemToCopy {
-                let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
-                let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
-                let shouldPaste = currentQuickPaste && !(type == .history && textOnlyQuickPaste && item.filePath != nil)
-
-                ClipboardManager.shared.copyItemToClipboard(item) {
-                    guard shouldPaste else { return }
-                    Task { @MainActor in
-                        // オーバーレイが非表示になり、キーウインドウ状態が解除された後に送信する
-                        try? await Task.sleep(nanoseconds: 150_000_000)
-                        ClipHoldApp.performPaste()
+                }
+                
+                if let item = itemToCopy {
+                    let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                    let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
+                    let shouldPaste = currentQuickPaste && !(type == .history && textOnlyQuickPaste && item.filePath != nil)
+                    
+                    // 標準テキストとしてコピーする場合は、リッチテキストを含まないプレーンテキストのアイテムを作成する
+                    let itemToUse: ClipboardItem
+                    if type == .history && copyAsStandardText {
+                        itemToUse = ClipboardItem(text: item.text, date: item.date, qrCodeContent: item.qrCodeContent, sourceAppPath: item.sourceAppPath)
+                    } else {
+                        itemToUse = item
+                    }
+                    
+                    ClipboardManager.shared.copyItemToClipboard(itemToUse) {
+                        guard shouldPaste else { return }
+                        Task { @MainActor in
+                            // オーバーレイが非表示になり、キーウインドウ状態が解除された後に送信する
+                            try? await Task.sleep(nanoseconds: 150_000_000)
+                            ClipHoldApp.performPaste()
+                        }
                     }
                 }
             }
         }
+        
+        resetSelectionState()
+    }
+    
+    /// 履歴アイテムを標準テキスト（プレーンテキスト）としてコピーし、オーバーレイを閉じる。
+    /// オーバーレイのeraserボタンをクリックした際に使用する。
+    @MainActor
+    func copyItemAsStandardTextAndClose(itemID: UUID) {
+        guard let item = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemID }) else {
+            isOverlayVisible = false
+            cancelDelayTask()
+            NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+            resetSelectionState()
+            return
         }
         
+        let plainItem = ClipboardItem(text: item.text, date: item.date, qrCodeContent: item.qrCodeContent, sourceAppPath: item.sourceAppPath)
+        
+        isOverlayVisible = false
+        cancelDelayTask()
+        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        
+        let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+        let shouldPaste = currentQuickPaste
+        
+        ClipboardManager.shared.copyItemToClipboard(plainItem) {
+            guard shouldPaste else { return }
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 150_000_000)
+                ClipHoldApp.performPaste()
+            }
+        }
+        
+        resetSelectionState()
+    }
+    
+    private func resetSelectionState() {
         currentOverlayType = nil
         hoveredItemId = nil
         hoveredPhraseId = nil
         hoveredAction = nil
+        hoveredCopyAsStandardText = false
     }
 }

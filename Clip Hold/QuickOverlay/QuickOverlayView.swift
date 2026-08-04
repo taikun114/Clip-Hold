@@ -311,6 +311,13 @@ struct QuickOverlayView: View {
         .padding(.trailing, 12)
         .onChange(of: currentSelection) { _, newValue in
             QuickOverlayManager.shared.hoveredAction = nil
+            // 標準テキストコピー状態は、eraserボタンのホバー中のみ true に保たれる。
+            // 項目ホバーに移行した場合はここで解除する（nil への遷移時はボタンホバーと競合しないよう解除しない）。
+            if case .item = newValue {
+                QuickOverlayManager.shared.hoveredCopyAsStandardText = false
+            } else if newValue == .add || newValue == .openWindow {
+                QuickOverlayManager.shared.hoveredCopyAsStandardText = false
+            }
             if case .item(let id) = newValue {
                 if type == .history {
                     if let item = cachedHistoryItems.first(where: { $0.id == id }) {
@@ -434,70 +441,24 @@ struct QuickOverlayView: View {
             }
         }
         
-        let truncatedText = item.text.count > 1000 ? String(item.text.prefix(1000)) + "..." : item.text
-        
-        return HStack(spacing: 8) {
-            if isPinned {
-                Image(systemName: "pin.fill")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 14)
-            }
-            
-            ClipboardItemIconView(
-                item: item,
-                showColorCodeIcon: showColorCodeIcon,
-                showAppIconOverlay: showAppIconOverlay,
-                rowIconStore: rowIconStore,
-                isSelected: isSelected
-            )
-            .frame(width: 30, height: 30)
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(verbatim: truncatedText)
-                    .font(.body)
-                    .foregroundColor(isSelected ? .white : .primary)
-                    .lineLimit(1)
-                
-                HStack(spacing: 4) {
-                    Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
-                    
-                    if showCharacterCount {
-                        Text("-")
-                        Text("\(item.text.count)文字")
-                    }
-                    
-                    if let fileSize = item.fileSize, item.filePath != nil, !item.isFolder {
-                        Text("-")
-                        Text(formatFileSize(fileSize))
-                    }
+        return QuickOverlayHistoryItemRow(
+            item: item,
+            isSelected: isSelected,
+            showColorCodeIcon: showColorCodeIcon,
+            showAppIconOverlay: showAppIconOverlay,
+            showCharacterCount: showCharacterCount,
+            dateDisplayFormatInHistoryWindow: dateDisplayFormatInHistoryWindow,
+            rowIconStore: rowIconStore,
+            shortcut: shortcut,
+            dateReloader: dateReloader,
+            onHoverItem: { hovering in
+                if hovering {
+                    currentSelection = .item(item.id)
+                } else if currentSelection == .item(item.id) {
+                    currentSelection = nil
                 }
-                .font(.caption)
-                .foregroundStyle(isSelected ? .white.opacity(0.8) : .secondary)
-            }
-            
-            Spacer()
-            
-            if !shortcut.isEmpty {
-                Text(shortcut.replacingOccurrences(of: "^", with: "⌃"))
-                    .font(.subheadline)
-                    .foregroundColor(isSelected ? .white : Color(nsColor: .tertiaryLabelColor))
-            }
-        }
-        .padding(8)
-        .background(isSelected ? Color.accentColor : Color.clear)
-        .cornerRadius(12)
-        .contentShape(Rectangle())
-        .onHover { hovering in
-            if hovering {
-                currentSelection = .item(item.id)
-            } else if currentSelection == .item(item.id) {
-                currentSelection = nil
-            }
-        }
-        .onContinuousHover(coordinateSpace: .global) { phase in
-            switch phase {
-            case .active(_):
+            },
+            onItemTooltipShow: {
                 tooltipTask?.cancel()
                 tooltipTask = Task {
                     try? await Task.sleep(nanoseconds: 600_000_000)
@@ -510,11 +471,15 @@ struct QuickOverlayView: View {
                         ])
                     }
                 }
-            case .ended:
+            },
+            onItemTooltipHide: {
                 tooltipTask?.cancel()
                 NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
+            },
+            onCopyAsStandardText: {
+                QuickOverlayManager.shared.copyItemAsStandardTextAndClose(itemID: item.originalPinnedItemID ?? item.id)
             }
-        }
+        )
     }
     
     private func standardPhraseItemRow(_ phrase: StandardPhrase, index: Int) -> some View {
@@ -795,6 +760,224 @@ struct QuickOverlayView: View {
                 hoveredPresetId = nil
             }
         }
+    }
+}
+
+// MARK: - QuickOverlay履歴の行
+
+/// クイックオーバーレイの履歴の1行を表示するビュー。
+/// 左側（項目コンテンツ）と右側（アクションボタン群）に分けて構成しており、
+/// 右側には今後アクションボタンを追加していけるように設計している。
+private struct QuickOverlayHistoryItemRow: View {
+    let item: ClipboardItem
+    let isSelected: Bool
+    let showColorCodeIcon: Bool
+    let showAppIconOverlay: Bool
+    let showCharacterCount: Bool
+    let dateDisplayFormatInHistoryWindow: String
+    let rowIconStore: RowIconStore
+    let shortcut: String
+
+    @ObservedObject var dateReloader: DateReloader
+
+    var onHoverItem: (Bool) -> Void
+    var onItemTooltipShow: () -> Void
+    var onItemTooltipHide: () -> Void
+    var onCopyAsStandardText: () -> Void
+
+    @State private var isButtonHovered = false
+    @State private var buttonTopCenterScreen: CGPoint? = nil
+    @State private var buttonTooltipTask: Task<Void, Never>? = nil
+    @State private var rowContentHeight: CGFloat = 46
+
+    private var isPinned: Bool {
+        item.originalPinnedItemID != nil
+    }
+
+    /// 標準テキストのみのアイテム（リッチテキストを含まない）はeraserボタンを無効化する
+    private var isStandardTextOnly: Bool {
+        item.richText == nil
+    }
+
+    private var truncatedText: String {
+        item.text.count > 1000 ? String(item.text.prefix(1000)) + "..." : item.text
+    }
+
+    var body: some View {
+        HStack(spacing: 0) {
+            leftContent
+            actionButtons
+        }
+        .onDisappear {
+            buttonTooltipTask?.cancel()
+        }
+    }
+
+    // MARK: - 左側（項目コンテンツ）
+
+    private var leftContent: some View {
+        HStack(spacing: 8) {
+            if isPinned {
+                Image(systemName: "pin.fill")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 14)
+            }
+
+            ClipboardItemIconView(
+                item: item,
+                showColorCodeIcon: showColorCodeIcon,
+                showAppIconOverlay: showAppIconOverlay,
+                rowIconStore: rowIconStore,
+                isSelected: isSelected
+            )
+            .frame(width: 30, height: 30)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(verbatim: truncatedText)
+                    .font(.body)
+                    .foregroundColor(isSelected ? .white : .primary)
+                    .lineLimit(1)
+
+                HStack(spacing: 4) {
+                    Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
+
+                    if showCharacterCount {
+                        Text("-")
+                        Text("\(item.text.count)文字")
+                    }
+
+                    if let fileSize = item.fileSize, item.filePath != nil, !item.isFolder {
+                        Text("-")
+                        Text(formatFileSize(fileSize))
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(isSelected ? .white.opacity(0.8) : .secondary)
+            }
+
+            Spacer()
+
+            if !shortcut.isEmpty {
+                Text(shortcut.replacingOccurrences(of: "^", with: "⌃"))
+                    .font(.subheadline)
+                    .foregroundColor(isSelected ? .white : Color(nsColor: .tertiaryLabelColor))
+            }
+        }
+        .padding(8)
+        .background(isSelected ? Color.accentColor : Color.clear)
+        .cornerRadius(12)
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            onHoverItem(hovering)
+        }
+        .onContinuousHover(coordinateSpace: .global) { phase in
+            switch phase {
+            case .active(_):
+                onItemTooltipShow()
+            case .ended:
+                onItemTooltipHide()
+            }
+        }
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear {
+                        rowContentHeight = geo.size.height
+                    }
+                    .onChange(of: geo.size.height) { _, newHeight in
+                        rowContentHeight = newHeight
+                    }
+            }
+        )
+    }
+
+    // MARK: - 右側（アクションボタン群）
+
+    private var actionButtons: some View {
+        HStack(spacing: 2) {
+            eraserButton
+            // 今後追加するボタンはここに並べる
+        }
+        .padding(.leading, 6)
+        .padding(.trailing, 2)
+    }
+
+    /// 標準テキストとしてコピーするためのボタン。
+    /// アイコンの大きさは項目（ハイライト）の高さに合わせる。
+    private var eraserButton: some View {
+        let buttonSize = max(rowContentHeight, 44)
+
+        return Button(action: onCopyAsStandardText) {
+            Image(systemName: "eraser.line.dashed")
+                .font(.system(size: buttonSize * 0.46, weight: .medium))
+                .foregroundStyle(isButtonHovered ? .white : Color(nsColor: .secondaryLabelColor))
+                .frame(width: buttonSize, height: buttonSize)
+                .background(isButtonHovered ? Color.accentColor : Color.clear)
+                .cornerRadius(12) // 項目のハイライトの角丸と統一する
+        }
+        .buttonStyle(PlainButtonStyle())
+        .disabled(isStandardTextOnly)
+        .opacity(isStandardTextOnly ? 0.4 : 1)
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            guard !isStandardTextOnly else { return }
+            isButtonHovered = hovering
+            if hovering {
+                setStandardTextHoverState(true)
+                showButtonTooltip()
+            } else {
+                setStandardTextHoverState(false)
+                hideButtonTooltip()
+            }
+        }
+        .accessibilityLabel(String(localized: "標準テキストとしてコピー"))
+        .background(
+            ScreenFrameReader { frame in
+                buttonTopCenterScreen = CGPoint(x: frame.midX, y: frame.maxY)
+            }
+        )
+    }
+
+    // MARK: - 標準テキストコピー用のホバー状態
+
+    /// ボタンホバー中に、オーバーレイを閉じた際に標準テキストとしてコピーされるようマネージャーの状態を更新する
+    private func setStandardTextHoverState(_ hovering: Bool) {
+        if hovering {
+            QuickOverlayManager.shared.hoveredAction = nil
+            QuickOverlayManager.shared.hoveredItemId = item.originalPinnedItemID ?? item.id
+            QuickOverlayManager.shared.hoveredPhraseId = nil
+            QuickOverlayManager.shared.hoveredCopyAsStandardText = true
+        } else {
+            QuickOverlayManager.shared.hoveredCopyAsStandardText = false
+            QuickOverlayManager.shared.hoveredItemId = nil
+        }
+    }
+
+    // MARK: - ボタンツールチップ
+
+    /// ボタンの中央の上に、通常の項目と同じデザインのツールチップを表示する。
+    /// マウスカーソルの位置には連動させず、ボタンの固定位置に表示する。
+    private func showButtonTooltip() {
+        buttonTooltipTask?.cancel()
+        buttonTooltipTask = Task {
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            if !Task.isCancelled, let anchor = buttonTopCenterScreen {
+                // 項目のツールチップとは異なり、ボタンの機能説明のみを表示する
+                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
+                    "text": String(localized: "標準テキストとしてコピー"),
+                    "isCompact": true,
+                    "anchorX": Double(anchor.x),
+                    "anchorY": Double(anchor.y)
+                ])
+            }
+        }
+    }
+
+    private func hideButtonTooltip() {
+        buttonTooltipTask?.cancel()
+        buttonTooltipTask = nil
+        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
     }
 }
 
