@@ -13,7 +13,7 @@ class QuickOverlayManager: ObservableObject {
     @Published var hoveredPhraseId: UUID? = nil
     @Published var hoveredAction: QuickOverlaySelection? = nil
     // 履歴アイテムをリッチテキストではなく標準テキスト（プレーンテキスト）としてコピーするかどうか
-    @Published var hoveredCopyAsStandardText: Bool = false
+    @Published var hoveredCopyAsPlainText: Bool = false
     
     private var globalEventMonitor: Any?
     private var localEventMonitor: Any?
@@ -157,13 +157,13 @@ class QuickOverlayManager: ObservableObject {
                 }
             } else {
                 var itemToCopy: ClipboardItem? = nil
-                var copyAsStandardText = false
+                var copyAsPlainText = false
                 
                 if type == .history {
                     if let itemId = hoveredItemId {
                         if let item = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemId }) {
                             itemToCopy = item
-                            copyAsStandardText = hoveredCopyAsStandardText
+                            copyAsPlainText = hoveredCopyAsPlainText
                         }
                     }
                 } else {
@@ -190,7 +190,7 @@ class QuickOverlayManager: ObservableObject {
                     
                     // 標準テキストとしてコピーする場合は、リッチテキストを含まないプレーンテキストのアイテムを作成する
                     let itemToUse: ClipboardItem
-                    if type == .history && copyAsStandardText {
+                    if type == .history && copyAsPlainText {
                         itemToUse = ClipboardItem(text: item.text, date: item.date, qrCodeContent: item.qrCodeContent, sourceAppPath: item.sourceAppPath)
                     } else {
                         itemToUse = item
@@ -214,7 +214,7 @@ class QuickOverlayManager: ObservableObject {
     /// 履歴アイテムを標準テキスト（プレーンテキスト）としてコピーし、オーバーレイを閉じる。
     /// オーバーレイのeraserボタンをクリックした際に使用する。
     @MainActor
-    func copyItemAsStandardTextAndClose(itemID: UUID) {
+    func copyItemAsPlainTextAndClose(itemID: UUID) {
         guard let item = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemID }) else {
             isOverlayVisible = false
             cancelDelayTask()
@@ -248,6 +248,6 @@ class QuickOverlayManager: ObservableObject {
         hoveredItemId = nil
         hoveredPhraseId = nil
         hoveredAction = nil
-        hoveredCopyAsStandardText = false
+        hoveredCopyAsPlainText = false
     }
 }

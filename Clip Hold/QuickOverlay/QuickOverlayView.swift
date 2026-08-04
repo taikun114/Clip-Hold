@@ -314,9 +314,9 @@ struct QuickOverlayView: View {
             // 標準テキストコピー状態は、eraserボタンのホバー中のみ true に保たれる。
             // 項目ホバーに移行した場合はここで解除する（nil への遷移時はボタンホバーと競合しないよう解除しない）。
             if case .item = newValue {
-                QuickOverlayManager.shared.hoveredCopyAsStandardText = false
+                QuickOverlayManager.shared.hoveredCopyAsPlainText = false
             } else if newValue == .add || newValue == .openWindow {
-                QuickOverlayManager.shared.hoveredCopyAsStandardText = false
+                QuickOverlayManager.shared.hoveredCopyAsPlainText = false
             }
             if case .item(let id) = newValue {
                 if type == .history {
@@ -476,8 +476,8 @@ struct QuickOverlayView: View {
                 tooltipTask?.cancel()
                 NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
             },
-            onCopyAsStandardText: {
-                QuickOverlayManager.shared.copyItemAsStandardTextAndClose(itemID: item.originalPinnedItemID ?? item.id)
+            onCopyAsPlainText: {
+                QuickOverlayManager.shared.copyItemAsPlainTextAndClose(itemID: item.originalPinnedItemID ?? item.id)
             }
         )
     }
@@ -783,19 +783,24 @@ private struct QuickOverlayHistoryItemRow: View {
     var onHoverItem: (Bool) -> Void
     var onItemTooltipShow: () -> Void
     var onItemTooltipHide: () -> Void
-    var onCopyAsStandardText: () -> Void
+    var onCopyAsPlainText: () -> Void
 
     @State private var isButtonHovered = false
     @State private var buttonTopCenterScreen: CGPoint? = nil
     @State private var buttonTooltipTask: Task<Void, Never>? = nil
     @State private var rowContentHeight: CGFloat = 46
-
+    
+    /// eraserボタンのサイズ。アイコンの大きさと、ボタンツールチップの上端基準（ボタンの高さ分のオフセット）に使用する
+    private var buttonSize: CGFloat {
+        max(rowContentHeight, 44)
+    }
+    
     private var isPinned: Bool {
         item.originalPinnedItemID != nil
     }
 
     /// 標準テキストのみのアイテム（リッチテキストを含まない）はeraserボタンを無効化する
-    private var isStandardTextOnly: Bool {
+    private var isPlainTextOnly: Bool {
         item.richText == nil
     }
 
@@ -906,9 +911,7 @@ private struct QuickOverlayHistoryItemRow: View {
     /// 標準テキストとしてコピーするためのボタン。
     /// アイコンの大きさは項目（ハイライト）の高さに合わせる。
     private var eraserButton: some View {
-        let buttonSize = max(rowContentHeight, 44)
-
-        return Button(action: onCopyAsStandardText) {
+        return Button(action: onCopyAsPlainText) {
             Image(systemName: "eraser.line.dashed")
                 .font(.system(size: buttonSize * 0.46, weight: .medium))
                 .foregroundStyle(isButtonHovered ? .white : Color(nsColor: .secondaryLabelColor))
@@ -917,17 +920,17 @@ private struct QuickOverlayHistoryItemRow: View {
                 .cornerRadius(12) // 項目のハイライトの角丸と統一する
         }
         .buttonStyle(PlainButtonStyle())
-        .disabled(isStandardTextOnly)
-        .opacity(isStandardTextOnly ? 0.4 : 1)
+        .disabled(isPlainTextOnly)
+        .opacity(isPlainTextOnly ? 0.4 : 1)
         .contentShape(Rectangle())
         .onHover { hovering in
-            guard !isStandardTextOnly else { return }
+            guard !isPlainTextOnly else { return }
             isButtonHovered = hovering
             if hovering {
-                setStandardTextHoverState(true)
+                setPlainTextHoverState(true)
                 showButtonTooltip()
             } else {
-                setStandardTextHoverState(false)
+                setPlainTextHoverState(false)
                 hideButtonTooltip()
             }
         }
@@ -942,14 +945,14 @@ private struct QuickOverlayHistoryItemRow: View {
     // MARK: - 標準テキストコピー用のホバー状態
 
     /// ボタンホバー中に、オーバーレイを閉じた際に標準テキストとしてコピーされるようマネージャーの状態を更新する
-    private func setStandardTextHoverState(_ hovering: Bool) {
+    private func setPlainTextHoverState(_ hovering: Bool) {
         if hovering {
             QuickOverlayManager.shared.hoveredAction = nil
             QuickOverlayManager.shared.hoveredItemId = item.originalPinnedItemID ?? item.id
             QuickOverlayManager.shared.hoveredPhraseId = nil
-            QuickOverlayManager.shared.hoveredCopyAsStandardText = true
+            QuickOverlayManager.shared.hoveredCopyAsPlainText = true
         } else {
-            QuickOverlayManager.shared.hoveredCopyAsStandardText = false
+            QuickOverlayManager.shared.hoveredCopyAsPlainText = false
             QuickOverlayManager.shared.hoveredItemId = nil
         }
     }
@@ -967,6 +970,7 @@ private struct QuickOverlayHistoryItemRow: View {
                 NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
                     "text": String(localized: "標準テキストとしてコピー"),
                     "isCompact": true,
+                    "buttonHeight": Double(buttonSize),
                     "anchorX": Double(anchor.x),
                     "anchorY": Double(anchor.y)
                 ])

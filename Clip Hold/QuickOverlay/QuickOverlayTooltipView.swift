@@ -7,6 +7,7 @@ struct QuickOverlayTooltipView: View {
     let sourceAppPath: String?
     let filePath: String?
     let fileSize: UInt64?
+    let isCompact: Bool
     
     @State private var offset: CGFloat = 0
     @State private var textHeight: CGFloat = 0
@@ -38,8 +39,8 @@ struct QuickOverlayTooltipView: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 28, style: .continuous).stroke(Color.white.opacity(0.1), lineWidth: 1))
-        .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
-        .padding(60)
+        .shadow(color: Color.black.opacity(0.3), radius: isCompact ? 8 : 20, x: 0, y: isCompact ? 4 : 10)
+        .padding(isCompact ? 20 : 60)
         .onAppear {
             if let filePath {
                 loadThumbnail(for: filePath)

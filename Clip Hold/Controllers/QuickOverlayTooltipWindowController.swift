@@ -57,6 +57,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let filePath = userInfo["filePath"] as? String
         let fileSize = userInfo["fileSize"] as? UInt64
         let isCompact = userInfo["isCompact"] as? Bool ?? false
+        let buttonHeight = userInfo["buttonHeight"] as? CGFloat ?? 0
         
         // ボタン等の固定位置（スクリーン座標）に表示する場合はアンカーが指定される
         let anchorPoint: CGPoint?
@@ -66,7 +67,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             anchorPoint = nil
         }
         
-        positionWindow(text: text, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize, anchorPoint: anchorPoint, isCompact: isCompact)
+        positionWindow(text: text, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize, anchorPoint: anchorPoint, isCompact: isCompact, buttonHeight: buttonHeight)
         
         guard let contentView = window.contentView else { return }
         contentView.wantsLayer = true
@@ -117,7 +118,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
     }
     
-    private func positionWindow(text: String, sourceAppPath: String?, filePath: String?, fileSize: UInt64?, anchorPoint: CGPoint?, isCompact: Bool = false) {
+    private func positionWindow(text: String, sourceAppPath: String?, filePath: String?, fileSize: UInt64?, anchorPoint: CGPoint?, isCompact: Bool = false, buttonHeight: CGFloat = 0) {
         guard let window = self.window else { return }
         
         guard let overlayWindow = QuickOverlayWindowController.shared.window,
@@ -126,9 +127,9 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let screenRect = screen.visibleFrame
         let overlayFrame = overlayWindow.frame
         
-        // ツールチップの幅を内容に合わせて決定する
         let maxVisualWidth: CGFloat = 500
-        let windowPadding: CGFloat = 120 // 影用のパディング（両側60）
+        let shadowPadding: CGFloat = isCompact ? 20 : 60
+        let windowPadding: CGFloat = shadowPadding * 2
         let textPadding: CGFloat = 32 // テキストのパディング（上下16、左右16）
         let font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
         
@@ -178,7 +179,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             // ボタン等の固定位置（スクリーン座標）に表示する場合
             // アンカーはボタンの上端中央の座標で、ツールチップの下端がその上に来るように配置する
             let spaceAbove = screenRect.maxY - anchor.y - gap
-            let spaceBelow = anchor.y - screenRect.minY - gap
+            let spaceBelow = anchor.y - buttonHeight - screenRect.minY - gap
             
             var chosenDirection: Direction
             if spaceAbove >= targetVisualHeight {
@@ -191,22 +192,29 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             
             switch chosenDirection {
             case .above:
-                // ツールチップの視覚的下端（= ウィンドウ下端 + 60）がボタンの上端の上に来るようにする
+                // ツールチップの視覚的下端（= ウィンドウ下端 + 影パディング）がボタンの上端の上に来るようにする
                 newOrigin.x = anchor.x - windowWidth / 2
-                newOrigin.y = anchor.y + gap - 60
+                newOrigin.y = anchor.y + gap - shadowPadding
                 finalVisualHeight = min(finalVisualHeight, spaceAbove)
             case .below:
-                // ツールチップの視覚的上端（= ウィンドウ上端 - 60）がボタンの下に来るようにする
+                // ツールチップの視覚的上端（= ウィンドウ上端 - 影パディング）がボタンの下辺の下に来るようにする
                 newOrigin.x = anchor.x - windowWidth / 2
-                newOrigin.y = anchor.y - gap + 60 - (finalVisualHeight + 120)
+                newOrigin.y = anchor.y - buttonHeight - gap + shadowPadding - (finalVisualHeight + windowPadding)
                 finalVisualHeight = min(finalVisualHeight, spaceBelow)
             default:
                 break
             }
             
             // 画面端からはみ出す場合はクランプする
-            newOrigin.x = min(max(newOrigin.x, screenRect.minX), screenRect.maxX - windowWidth)
-            newOrigin.y = min(max(newOrigin.y, screenRect.minY), screenRect.maxY - (finalVisualHeight + 120))
+            if isCompact {
+                // コンパクトツールチップは影のパディング分だけは画面外にはみ出しても良い
+                // （内容自体は画面内に収める）。メニューバー付近での過度の押し下げを防ぐ。
+                newOrigin.x = min(max(newOrigin.x, screenRect.minX - shadowPadding), screenRect.maxX - windowWidth + shadowPadding)
+                newOrigin.y = min(max(newOrigin.y, screenRect.minY - shadowPadding), screenRect.maxY - finalVisualHeight - shadowPadding)
+            } else {
+                newOrigin.x = min(max(newOrigin.x, screenRect.minX), screenRect.maxX - windowWidth)
+                newOrigin.y = min(max(newOrigin.y, screenRect.minY), screenRect.maxY - (finalVisualHeight + windowPadding))
+            }
             
             tooltipDirection = chosenDirection == .above ? .above : .below
         } else {
@@ -280,14 +288,15 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         // Ensure minimum height
         finalVisualHeight = max(finalVisualHeight, 50)
         
-        let finalWindowHeight = finalVisualHeight + 120
+        let finalWindowHeight = finalVisualHeight + windowPadding
         
         let finalView = QuickOverlayTooltipView(
             text: text,
             maxVisualHeight: finalVisualHeight,
             sourceAppPath: sourceAppPath,
             filePath: filePath,
-            fileSize: fileSize
+            fileSize: fileSize,
+            isCompact: isCompact
         )
         let finalHosting = NSHostingView(rootView: finalView)
         window.contentView = finalHosting
