@@ -29,7 +29,7 @@ class QuickOverlayWindowController: NSWindowController {
             defer: false
         )
         
-        panel.level = .floating // Stay on top
+        panel.level = .statusBar // 通常ウィンドウやアラートより上に表示するレベル
         panel.isFloatingPanel = true
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.backgroundColor = .clear
@@ -67,7 +67,9 @@ class QuickOverlayWindowController: NSWindowController {
         // 表示アニメーション: 透明+105%スケールから不透明+100%スケールへ
         window.alphaValue = 1
         hostingView.layer?.removeAllAnimations()
-        window.makeKeyAndOrderFront(nil)
+        // 非アクティブなアプリのウィンドウでも、前面のアラートや入力欄の上に表示できるようにする
+        window.orderFrontRegardless()
+        window.makeKey()
         window.displayIfNeeded()
         hostingView.layoutSubtreeIfNeeded()
         configureAnimationLayer(for: hostingView)
