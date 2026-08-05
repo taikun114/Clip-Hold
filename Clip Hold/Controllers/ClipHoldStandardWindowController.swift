@@ -5,7 +5,7 @@ import SwiftUI
 enum WindowType: String, CaseIterable {
     case addPhrase = "AddPhrase"
     case addPreset = "AddPreset"
-    case editHistory = "EditHistory"
+    case changeItemAndCopy = "ChangeItemAndCopy"
     case newCopy = "NewCopy"
 }
 

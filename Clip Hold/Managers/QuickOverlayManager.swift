@@ -164,7 +164,7 @@ class QuickOverlayManager: ObservableObject {
                     if let itemId = hoveredItemId {
                         if let item = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemId }) {
                             if let delegate = NSApp.delegate as? AppDelegate {
-                                delegate.showEditHistoryWindow(withContent: item.text)
+                                delegate.showChangeItemAndCopyWindow(withContent: item.text)
                             }
                         }
                     }
@@ -182,7 +182,7 @@ class QuickOverlayManager: ObservableObject {
                             }
                         }
                         if let content = content, let delegate = NSApp.delegate as? AppDelegate {
-                            delegate.showEditHistoryWindow(withContent: content)
+                            delegate.showChangeItemAndCopyWindow(withContent: content)
                         }
                     }
                 }
@@ -291,7 +291,7 @@ class QuickOverlayManager: ObservableObject {
         NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
         
         let delegate = NSApp.delegate as? AppDelegate
-        delegate?.showEditHistoryWindow(withContent: item.text)
+        delegate?.showChangeItemAndCopyWindow(withContent: item.text)
         
         resetSelectionState()
     }
@@ -317,7 +317,7 @@ class QuickOverlayManager: ObservableObject {
         NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
         
         if let content = content, let delegate = NSApp.delegate as? AppDelegate {
-            delegate.showEditHistoryWindow(withContent: content)
+            delegate.showChangeItemAndCopyWindow(withContent: content)
         }
         
         resetSelectionState()

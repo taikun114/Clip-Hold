@@ -369,7 +369,7 @@ struct HistoryContentList: View {
                         }
                     })
                     .sheet(item: $itemToEdit) { item in
-                        EditHistoryItemView(content: item.text, onCopy: { editedContent in
+                        ChangeItemAndCopyView(content: item.text, onCopy: { editedContent in
                             let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                             let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
                             

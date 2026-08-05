@@ -727,7 +727,7 @@ struct ClipHoldApp: App {
                 // ウィンドウとして表示する処理をここに実装
                 Task { @MainActor in
                     if let delegate = NSApp.delegate as? AppDelegate {
-                        delegate.showEditHistoryWindow(withContent: latestItem.text)
+                        delegate.showChangeItemAndCopyWindow(withContent: latestItem.text)
                     }
                 }
             }

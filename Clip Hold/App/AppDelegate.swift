@@ -318,9 +318,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     }
     
     @MainActor
-    func showEditHistoryWindow(withContent content: String) {
-        let windowType: WindowType = .editHistory
-        let title = String(localized: "履歴を変更してコピー")
+    func showChangeItemAndCopyWindow(withContent content: String) {
+        let windowType: WindowType = .changeItemAndCopy
+        let title = String(localized: "項目を変更してコピー")
         
         // 既存のウィンドウコントローラーがあればそれを最前面に表示
         if let existingController = windowControllers[windowType] {
@@ -330,7 +330,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             return
         }
         
-        let editView = EditHistoryItemView(content: content, onCopy: { editedContent in
+        let editView = ChangeItemAndCopyView(content: content, onCopy: { editedContent in
             // コピー処理を実装
             let clipboardManager = ClipboardManager.shared
             clipboardManager.isPerformingInternalCopy = true
@@ -380,7 +380,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             return
         }
         
-        let editView = EditHistoryItemView(content: "", title: title, onCopy: { editedContent in
+        let editView = ChangeItemAndCopyView(content: "", title: title, onCopy: { editedContent in
             // コピー処理を実装
             let clipboardManager = ClipboardManager.shared
             clipboardManager.isPerformingInternalCopy = true

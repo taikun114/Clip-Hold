@@ -585,7 +585,7 @@ struct StandardPhraseWindowView: View {
                 .environmentObject(presetManager)
         }
         .sheet(item: $phraseToEditAndCopy) { phrase in
-            EditHistoryItemView(content: phrase.content, onCopy: { editedContent in
+            ChangeItemAndCopyView(content: phrase.content, onCopy: { editedContent in
                 let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                 let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
                 

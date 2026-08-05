@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct EditHistoryItemView: View {
+struct ChangeItemAndCopyView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @State var content: String
@@ -71,8 +71,8 @@ struct EditHistoryItemView: View {
     }
 }
 
-struct EditHistoryItemView_Previews: PreviewProvider {
+struct ChangeItemAndCopyView_Previews: PreviewProvider {
     static var previews: some View {
-        EditHistoryItemView(content: "これは編集する履歴アイテムの内容です。") { _ in }
+        ChangeItemAndCopyView(content: "これは編集する履歴アイテムの内容です。") { _ in }
     }
 }
