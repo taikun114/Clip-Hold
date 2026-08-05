@@ -2727,41 +2727,6 @@
         }
       }
     },
-    "Clip Holdの設定" : {
-      "comment" : "一般設定の、Clip Holdの動作を変更する設定セクションタイトル。アプリ名(Clip Hold)は翻訳しない。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clip Hold-Einstellungen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clip Hold Settings"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajustes de Clip Hold"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paramètres de Clip Hold"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clip Holdの設定"
-          }
-        }
-      }
-    },
     "Clip Holdはオープンソースアプリケーションです。" : {
       "comment" : "設定画面の情報タブに表示される、このアプリ(Clip Hold)がオープンソースアプリケーションであることを表すテキスト。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
@@ -8697,6 +8662,40 @@
         }
       }
     },
+    "オンにすると、設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。この機能はVoiceOverでの操作に最適化されていないため、VoiceOverをご利用の方は、クイックオーバーレイの代わりに履歴ウィンドウや定型文ウィンドウをご利用ください。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn diese Option aktiviert ist, wird das Overlay nur angezeigt, solange Sie die konfigurierte Tastenkombination gedrückt halten. So können Sie ganz einfach kopieren, indem Sie den Zeiger über das gewünschte Element bewegen und die Taste loslassen. Da diese Funktion nicht für VoiceOver optimiert ist, sollten VoiceOver-Benutzer stattdessen das Verlaufsfenster oder das Standard-Phrasen-Fenster anstelle des Schnellen Overlays verwenden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When enabled, the overlay is displayed only while holding down the configured shortcut key, allowing you to copy easily by moving the pointer over the desired item and releasing the key. Because this feature is not optimized for VoiceOver, VoiceOver users should use the history window or standard phrase window instead of Quick Overlay."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al habilitar esta opción, la superposición se muestra solo mientras se mantiene presionada la tecla de acceso directo configurada, lo que le permite copiar fácilmente al mover el puntero sobre el elemento deseado y soltar la tecla. Debido a que esta función no está optimizada para VoiceOver, los usuarios de VoiceOver deben usar la ventana de historial o la ventana de frases estándar en lugar de la Superposición Rápida."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsqu'elle est activée, la superposition s'affiche uniquement lorsque vous maintenez la touche de raccourci configurée enfoncée, vous permettant de copier facilement en déplaçant le pointeur sur l'élément souhaité et en relâchant la touche. Étant donné que cette fonctionnalité n'est pas optimisée pour VoiceOver, les utilisateurs de VoiceOver doivent plutôt utiliser la fenêtre d'historique ou la fenêtre de phrases standard au lieu de la Superposition Rapide."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オンにすると、設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。この機能はVoiceOverでの操作に最適化されていないため、VoiceOverをご利用の方は、クイックオーバーレイの代わりに履歴ウィンドウや定型文ウィンドウをご利用ください。"
+          }
+        }
+      }
+    },
     "オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。" : {
       "comment" : "一般設定の「ダブルクリックでウィンドウを閉じる」オプションを説明するアクセシビリティテキスト。",
       "localizations" : {
@@ -9117,6 +9116,142 @@
         }
       }
     },
+    "クイックオーバーレイ" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schnelles Overlay"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Overlay"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Superposición Rápida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Superposition Rapide"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックオーバーレイ"
+          }
+        }
+      }
+    },
+    "クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie die Zeit an, die die Tastenkombination gedrückt gehalten werden muss, bevor das Schnelle Overlay angezeigt wird."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specify the time to hold down the shortcut key before Quick Overlay is displayed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Especifique el tiempo para mantener presionada la tecla de acceso directo antes de que se muestre la Superposición Rápida."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spécifiez le temps pendant lequel maintenir la touche de raccourci enfoncée avant que la Superposition Rapide ne s'affiche."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。"
+          }
+        }
+      }
+    },
+    "クイックオーバーレイが表示される画面上の場所を選択します。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie die Position auf dem Bildschirm aus, an der das Schnelle Overlay angezeigt wird."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the position on the screen where Quick Overlay is displayed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleccione la posición en la pantalla donde se muestra la Superposición Rápida."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionnez la position sur l'écran où la Superposition Rapide est affichée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックオーバーレイが表示される画面上の場所を選択します。"
+          }
+        }
+      }
+    },
+    "クイックオーバーレイの表示場所" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schnelle Overlay-Position"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Overlay Position"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posición de la Superposición Rápida"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position de la Superposition Rapide"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックオーバーレイの表示場所"
+          }
+        }
+      }
+    },
     "クイックペースト" : {
       "comment" : "「クイックペースト」の機能名。履歴や定型文をコピーした瞬間に自動でペーストしてくれる機能。",
       "localizations" : {
@@ -9216,41 +9351,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイックペーストせずに標準テキストとしてコピー"
-          }
-        }
-      }
-    },
-    "クイックペーストをテキストに限定" : {
-      "comment" : "コピーした項目がテキストの場合にのみクイックペーストを行うように設定するオプション名。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quick Paste nur für Text"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quick Paste Only for Text"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pegada rápida solo para texto"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Collage rapide uniquement pour le texte"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "クイックペーストをテキストに限定"
           }
         }
       }
@@ -12469,6 +12569,40 @@
         }
       }
     },
+    "テキストに限定" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Text"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text Only"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo texto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texte uniquement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストに限定"
+          }
+        }
+      }
+    },
     "テキストのみ" : {
       "comment" : "テキスト関係のフィルタリングオプションのグループ名。",
       "localizations" : {
@@ -14416,6 +14550,40 @@
         }
       }
     },
+    "ポインタ付近" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In der Nähe des Zeigers"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Near Pointer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca del puntero"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Près du pointeur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ポインタ付近"
+          }
+        }
+      }
+    },
     "メール送信画面を開きますか？" : {
       "comment" : "メールの送信画面を開いても良いかを尋ねるメッセージ。",
       "localizations" : {
@@ -15325,6 +15493,74 @@
         }
       }
     },
+    "上" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arriba"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haut"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上"
+          }
+        }
+      }
+    },
+    "下" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abajo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bas"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下"
+          }
+        }
+      }
+    },
     "両方: 相対的 - 絶対的" : {
       "comment" : "日付と時刻の表示方法の選択肢：絶対的と相対的な表示を両方。「相対的な時刻 - 絶対的な日付」のように記載される。",
       "localizations" : {
@@ -15496,6 +15732,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "並び替え"
+          }
+        }
+      }
+    },
+    "中央" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zentrum"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Center"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centre"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中央"
           }
         }
       }
@@ -16685,6 +16955,108 @@
         }
       }
     },
+    "右" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Derecha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Droite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "右"
+          }
+        }
+      }
+    },
+    "右上" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oben rechts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top Right"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arriba a la derecha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En haut à droite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "右上"
+          }
+        }
+      }
+    },
+    "右下" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unten rechts"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom Right"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abajo a la derecha"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En bas à droite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "右下"
+          }
+        }
+      }
+    },
     "各ファイルの最大容量" : {
       "comment" : "一定の容量を超えるファイルをコピーした時は履歴に保存しないように設定する機能の容量設定オプションの項目名。",
       "localizations" : {
@@ -16786,6 +17158,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "各項目に表示される番号を非表示にします。"
+          }
+        }
+      }
+    },
+    "基本" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Général"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "基本"
           }
         }
       }
@@ -17101,6 +17507,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文ウィンドウを開く"
+          }
+        }
+      }
+    },
+    "定型文オーバーレイ" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard-Phrasen-Overlay"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standard Phrase Overlay"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Superposición de frases estándar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Superposition de phrases standard"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文オーバーレイ"
           }
         }
       }
@@ -18115,6 +18555,40 @@
         }
       }
     },
+    "履歴オーバーレイ" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlaufs-Overlay"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History Overlay"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Superposición de historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Superposition d'historique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴オーバーレイ"
+          }
+        }
+      }
+    },
     "履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。アクセシビリティの許可が必要です。" : {
       "localizations" : {
         "de" : {
@@ -18810,41 +19284,6 @@
         }
       }
     },
-    "履歴を変更してコピー" : {
-      "comment" : "その履歴項目をそのままコピーする代わりに、テキストの1部分を編集してから新たにコピーする画面に表示されるタイトルテキスト。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verlauf ändern und kopieren"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Change History and Copy"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cambiar historial y copiar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Changer l'historique et copier"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴を変更してコピー"
-          }
-        }
-      }
-    },
     "履歴を検索" : {
       "comment" : "履歴ウィンドウにある検索ボックスに表示されるサンプルテキスト。",
       "localizations" : {
@@ -18911,6 +19350,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴項目がテキストである場合のみクイックペーストを行うようにします。"
+          }
+        }
+      }
+    },
+    "左" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Left"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gauche"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "左"
+          }
+        }
+      }
+    },
+    "左上" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oben links"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Top Left"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arriba a la izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En haut à gauche"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "左上"
+          }
+        }
+      }
+    },
+    "左下" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unten links"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bottom Left"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abajo a la izquierda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En bas à gauche"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "左下"
           }
         }
       }
@@ -21076,6 +21617,74 @@
         }
       }
     },
+    "表示までの時間" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verzögerung vor der Anzeige"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delay Before Display"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retraso antes de mostrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Délai avant l'affichage"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示までの時間"
+          }
+        }
+      }
+    },
+    "表示場所" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzeigeposition"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display Position"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posición de visualización"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position d'affichage"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "表示場所"
+          }
+        }
+      }
+    },
     "複製" : {
       "comment" : "選択した定型文やプリセットを重複させるオプション名。",
       "localizations" : {
@@ -21176,6 +21785,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "設定..."
+          }
+        }
+      }
+    },
+    "設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Overlay wird nur angezeigt, solange Sie die konfigurierte Tastenkombination gedrückt halten. So können Sie ganz einfach kopieren, indem Sie den Zeiger über das gewünschte Element bewegen und die Taste loslassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The overlay is displayed only while holding down the configured shortcut key, allowing you to copy easily by moving the pointer over the desired item and releasing the key."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La superposición se muestra solo mientras se mantiene presionada la tecla de acceso directo configurada, lo que le permite copiar fácilmente al mover el puntero sobre el elemento deseado y soltar la tecla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La superposition s'affiche uniquement lorsque vous maintenez la touche de raccourci configurée enfoncée, vous permettant de copier facilement en déplaçant le pointeur sur l'élément souhaité et en relâchant la touche."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。"
           }
         }
       }

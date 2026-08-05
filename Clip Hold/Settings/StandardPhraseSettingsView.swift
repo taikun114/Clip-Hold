@@ -12,6 +12,7 @@ struct StandardPhraseSettingsView: View {
     
     var body: some View {
         Form {
+            StandardPhraseWindowSettingsSection()
             PresetSettingsSection()
             PresetAssignmentSection()
             PhraseSettingsSection()
@@ -1387,4 +1388,107 @@ struct PresetNameSheet: View {
     .environmentObject(StandardPhrasePresetManager.shared)
     .environmentObject(PresetAppAssignmentManager.shared)
     .environmentObject(PresetIconGenerator.shared)
+}
+
+
+// MARK: - StandardPhraseWindowSettingsSection
+private struct StandardPhraseWindowSettingsSection: View {
+    @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
+    @AppStorage("standardPhraseWindowIsOverlay") var standardPhraseWindowIsOverlay: Bool = false
+    @AppStorage("standardPhraseWindowOverlayTransparency") var standardPhraseWindowOverlayTransparency: Double = 0.5
+    @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbersInStandardPhrasesWindow: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
+
+    var body: some View {
+        Section(header: Text("定型文ウィンドウ").font(.headline)) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("常に最前面に表示")
+                    Text("ウィンドウを常に最も手前に表示します。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $standardPhraseWindowAlwaysOnTop) {
+                    Text("定型文ウィンドウを常に最前面に表示")
+                    Text("オンにすると、定型文ウィンドウを常に最も手前に表示します。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("オーバーレイ表示")
+                    Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $standardPhraseWindowIsOverlay) {
+                    Text("オーバーレイ表示")
+                    Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                Text("オーバーレイ時の透明度")
+                    .foregroundStyle(standardPhraseWindowIsOverlay ? .primary : .secondary)
+                Spacer()
+                HStack {
+                    Slider(
+                        value: .init(
+                            get: {
+                                return 100 - (standardPhraseWindowOverlayTransparency * 100)
+                            },
+                            set: { sliderValue in
+                                standardPhraseWindowOverlayTransparency = (100 - sliderValue) / 100
+                            }
+                        ),
+                        in: 20...80,
+                        step: 10
+                    )
+                    Text(1 - standardPhraseWindowOverlayTransparency, format: .percent.precision(.fractionLength(0)))
+                        .foregroundStyle(standardPhraseWindowIsOverlay ? .secondary : .tertiary)
+                }
+            }
+            .disabled(!standardPhraseWindowIsOverlay)
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("番号を隠す")
+                    Text("各項目に表示される番号を非表示にします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $hideNumbersInStandardPhrasesWindow) {
+                    Text("定型文ウィンドウの番号を隠す")
+                    Text("オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("ダブルクリックでウィンドウを閉じる")
+                    Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $closeWindowOnDoubleClickInStandardPhrasesWindow) {
+                    Text("ダブルクリックで定型文ウィンドウを閉じる")
+                    Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+        }
+    }
 }

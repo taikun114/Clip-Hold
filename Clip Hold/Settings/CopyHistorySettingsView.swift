@@ -175,6 +175,8 @@ struct CopyHistorySettingsView: View {
     
     var body: some View {
         Form {
+            HistoryWindowSettingsSection()
+
             // MARK: - 履歴の設定
             Section(header: Text("履歴の設定").font(.headline)) {
                 // 履歴の最大保存数
@@ -849,4 +851,209 @@ extension Date {
 #Preview {
     CopyHistorySettingsView()
         .environmentObject(ClipboardManager.shared)
+}
+
+
+// MARK: - HistoryWindowSettingsSection
+private struct HistoryWindowSettingsSection: View {
+    @EnvironmentObject var dateReloader: DateReloader
+    
+    @AppStorage("historyWindowAlwaysOnTop") var historyWindowAlwaysOnTop: Bool = false
+    @AppStorage("historyWindowIsOverlay") var historyWindowIsOverlay: Bool = false
+    @AppStorage("historyWindowOverlayTransparency") var historyWindowOverlayTransparency: Double = 0.5
+    @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
+    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
+    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
+    @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
+    @AppStorage("excludeClipHoldWindowsFromAutoFilter") var excludeClipHoldWindowsFromAutoFilter: Bool = false
+
+    var body: some View {
+            
+
+            
+            // MARK: - 履歴をウィンドウ
+            Section(header: Text("履歴ウィンドウ").font(.headline)) {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("常に最前面に表示")
+                        Text("ウィンドウを常に最も手前に表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $historyWindowAlwaysOnTop) {
+                        Text("履歴ウィンドウを常に最前面に表示")
+                        Text("オンにすると、履歴ウィンドウを常に最も手前に表示します。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("オーバーレイ表示")
+                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $historyWindowIsOverlay) {
+                        Text("オーバーレイ表示")
+                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    Text("オーバーレイ時の透明度")
+                        .foregroundStyle(historyWindowIsOverlay ? .primary : .secondary)
+                    Spacer()
+                    HStack {
+                        Slider(
+                            value: .init(
+                                get: {
+                                    return 100 - (historyWindowOverlayTransparency * 100)
+                                },
+                                set: { sliderValue in
+                                    historyWindowOverlayTransparency = (100 - sliderValue) / 100
+                                }
+                            ),
+                            in: 20...80,
+                            step: 10
+                        )
+                        Text(1 - historyWindowOverlayTransparency, format: .percent.precision(.fractionLength(0)))
+                            .foregroundStyle(historyWindowIsOverlay ? .secondary : .tertiary)
+                    }
+                }
+                .disabled(!historyWindowIsOverlay)
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("アプリアイコンを表示")
+                        Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $showAppIconOverlay) {
+                        Text("アプリアイコンを表示")
+                        Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("日付と時刻の表示方法")
+                        
+                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
+                        let exampleText: String = {
+                            let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
+                            let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
+                            
+                            switch dateDisplayFormatInHistoryWindow {
+                            case "absolute":
+                                return absolutePart
+                            case "relative":
+                                return relativePart
+                            case "both_abs_rel_paren":
+                                return "\(absolutePart) (\(relativePart))"
+                            case "both_abs_rel_hyphen":
+                                return "\(absolutePart) - \(relativePart)"
+                            case "both_rel_abs_paren":
+                                return "\(relativePart) (\(absolutePart))"
+                            case "both_rel_abs_hyphen":
+                                return "\(relativePart) - \(absolutePart)"
+                            default:
+                                return absolutePart
+                            }
+                        }()
+                        
+                        Text("コピーされた日付の表示方法を変更します。\n例: \(exampleText)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInHistoryWindow) {
+                        Text("絶対的").tag("absolute")
+                        Text("相対的").tag("relative")
+                        Text("両方: 絶対的 (相対的)").tag("both_abs_rel_paren")
+                        Text("両方: 絶対的 - 相対的").tag("both_abs_rel_hyphen")
+                        Text("両方: 相対的 (絶対的)").tag("both_rel_abs_paren")
+                        Text("両方: 相対的 - 絶対的").tag("both_rel_abs_hyphen")
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("自動スクロール")
+                        Text("リストが更新されたとき、リストを自動的に最も上にスクロールします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $scrollToTopOnUpdate) {
+                        Text("自動スクロール")
+                        Text("オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("番号を隠す")
+                        Text("各項目に表示される番号を非表示にします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $hideNumbersInHistoryWindow) {
+                        Text("履歴ウィンドウの番号を隠す")
+                        Text("オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("ダブルクリックでウィンドウを閉じる")
+                        Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $closeWindowOnDoubleClickInHistoryWindow) {
+                        Text("ダブルクリックで履歴ウィンドウを閉じる")
+                        Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("アプリの「自動」フィルタリングでClip Holdのウィンドウを除外")
+                        Text("アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $excludeClipHoldWindowsFromAutoFilter) {
+                        Text("アプリの「自動」フィルタリングでClip Holdのウィンドウを除外")
+                        Text("アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            } // End of Section: 履歴ウィンドウ
+    }
 }
