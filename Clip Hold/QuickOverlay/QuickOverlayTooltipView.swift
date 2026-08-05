@@ -64,94 +64,94 @@ struct QuickOverlayTooltipView: View {
         }
     }
 
+    @ViewBuilder
+    private var appHeaderView: some View {
+        if let sourceAppPath,
+           let appURL = URL(fileURLWithPath: sourceAppPath) as URL?,
+           FileManager.default.fileExists(atPath: appURL.path) {
+            HStack(spacing: 6) {
+                Image(nsImage: NSWorkspace.shared.icon(forFile: appURL.path))
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                Text(FileManager.default.displayName(atPath: appURL.path))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
     private var textTooltip: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let sourceAppPath,
-               let appURL = URL(fileURLWithPath: sourceAppPath) as URL?,
-               FileManager.default.fileExists(atPath: appURL.path) {
-                HStack(spacing: 6) {
-                    Image(nsImage: NSWorkspace.shared.icon(forFile: appURL.path))
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                    Text(FileManager.default.displayName(atPath: appURL.path))
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-                .padding(.horizontal, 12)
-                .padding(.top, 12)
-            }
-
-            Text(text)
-                .font(.body)
-                .lineLimit(nil)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(16)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(
-                    GeometryReader { textGeo in
-                        Color.clear.onAppear {
-                            textHeight = textGeo.size.height
-                        }
-                        .onChange(of: textGeo.size.height) { _, new in
-                            textHeight = new
-                        }
-                    }
-                )
-                .offset(y: offset)
-                .frame(height: maxVisualHeight - (sourceAppPath == nil ? 0 : 28), alignment: .top)
-                .clipped()
+            appHeaderView
+            textBody
         }
+    }
+
+    private var textBody: some View {
+        let hasHeader = sourceAppPath != nil
+        let headerH: CGFloat = hasHeader ? 52 : 0
+
+        return Text(text)
+            .font(.body)
+            .lineLimit(nil)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(hasHeader ? [.horizontal, .bottom] : .all, 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                GeometryReader { textGeo in
+                    Color.clear.onAppear {
+                        textHeight = textGeo.size.height
+                    }
+                    .onChange(of: textGeo.size.height) { _, new in
+                        textHeight = new
+                    }
+                }
+            )
+            .offset(y: offset)
+            .frame(height: maxVisualHeight - headerH, alignment: .top)
+            .clipped()
     }
 
     private func fileTooltip(filePath: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            if let sourceAppPath,
-               let appURL = URL(fileURLWithPath: sourceAppPath) as URL?,
-               FileManager.default.fileExists(atPath: appURL.path) {
-                HStack(spacing: 6) {
-                    Image(nsImage: NSWorkspace.shared.icon(forFile: appURL.path))
+            appHeaderView
+            fileBody(filePath: filePath)
+        }
+    }
+
+    private func fileBody(filePath: String) -> some View {
+        HStack(alignment: .center, spacing: 16) {
+            Group {
+                if let thumbnailImage {
+                    Image(nsImage: thumbnailImage)
                         .resizable()
-                        .frame(width: 20, height: 20)
-                    Text(FileManager.default.displayName(atPath: appURL.path))
+                        .scaledToFit()
+                } else {
+                    Image(nsImage: NSWorkspace.shared.icon(forFile: filePath))
+                        .resizable()
+                        .scaledToFit()
+                        .padding(32)
+                }
+            }
+            .frame(width: 256, height: 256)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(text)
+                    .font(.body)
+                    .lineLimit(6)
+                if let fileSize {
+                    Text(ByteCountFormatter.string(fromByteCount: Int64(fileSize), countStyle: .file))
                         .font(.callout)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
                 }
-                .padding(.horizontal, 12)
-                .padding(.top, 12)
             }
-
-            HStack(alignment: .center, spacing: 16) {
-                Group {
-                    if let thumbnailImage {
-                        Image(nsImage: thumbnailImage)
-                            .resizable()
-                            .scaledToFit()
-                    } else {
-                        Image(nsImage: NSWorkspace.shared.icon(forFile: filePath))
-                            .resizable()
-                            .scaledToFit()
-                            .padding(32)
-                    }
-                }
-                .frame(width: 256, height: 256)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(FileManager.default.displayName(atPath: filePath))
-                        .font(.body)
-                        .lineLimit(6)
-                    if let fileSize {
-                        Text(ByteCountFormatter.string(fromByteCount: Int64(fileSize), countStyle: .file))
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding(sourceAppPath != nil ? [.horizontal, .bottom] : .all, 16)
     }
 
     private func loadThumbnail(for filePath: String) {
@@ -167,10 +167,15 @@ struct QuickOverlayTooltipView: View {
     
     private func startMarquee() {
         guard !hasStartedMarquee else { return }
-        guard textHeight > maxVisualHeight else { return }
+        
+        let hasHeader = sourceAppPath != nil
+        let headerH: CGFloat = hasHeader ? 52 : 0
+        let visibleHeight = maxVisualHeight - headerH
+
+        guard textHeight > visibleHeight else { return }
         hasStartedMarquee = true
         
-        let diff = textHeight - maxVisualHeight
+        let diff = textHeight - visibleHeight
         // スクロール速度の計算（1秒間に約30pt進む程度の速度）
         let duration = Double(diff) / 30.0
         

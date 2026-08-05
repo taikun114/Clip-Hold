@@ -798,7 +798,7 @@ private struct QuickOverlayHistoryItemRow: View {
             if isPinned {
                 Image(systemName: "pin.fill")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(isSelected ? .white.opacity(0.8) : .secondary)
                     .frame(width: 14)
             }
 

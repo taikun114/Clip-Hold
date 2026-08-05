@@ -20,6 +20,15 @@ class QuickOverlayTooltipWindowController: NSWindowController {
     }
 
     private var tooltipDirection: TooltipDirection = .below
+    private var currentTooltipIdentity: TooltipIdentity?
+    
+    private struct TooltipIdentity: Equatable {
+        let text: String
+        let sourceAppPath: String?
+        let filePath: String?
+        let isCompact: Bool
+        let anchorPoint: CGPoint?
+    }
     
     private init() {
         let panel = UnconstrainedPanel(
@@ -51,7 +60,12 @@ class QuickOverlayTooltipWindowController: NSWindowController {
     @objc private func showTooltip(_ notification: Notification) {
         guard let window = self.window,
               let userInfo = notification.userInfo,
-              let text = userInfo["text"] as? String else { return }
+              let rawText = userInfo["text"] as? String else { return }
+        
+        // ツールチップの用途では数万文字を全てスクロールして読むことはないため、
+        // 深刻なパフォーマンス低下（フリーズ）を防ぐために5000文字で切り詰める
+        let maxLength = 5000
+        let text = rawText.count > maxLength ? String(rawText.prefix(maxLength)) + "..." : rawText
         
         let sourceAppPath = userInfo["sourceAppPath"] as? String
         let filePath = userInfo["filePath"] as? String
@@ -66,6 +80,20 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         } else {
             anchorPoint = nil
         }
+        
+        let identity = TooltipIdentity(
+            text: rawText,
+            sourceAppPath: sourceAppPath,
+            filePath: filePath,
+            isCompact: isCompact,
+            anchorPoint: anchorPoint
+        )
+        
+        if window.isVisible && self.currentTooltipIdentity == identity {
+            // 既に全く同じ内容・位置のツールチップが表示中の場合は再描画（マーキーリセット等）を防止する
+            return
+        }
+        self.currentTooltipIdentity = identity
         
         positionWindow(text: text, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize, anchorPoint: anchorPoint, isCompact: isCompact, buttonHeight: buttonHeight)
         
@@ -104,6 +132,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
     @objc private func hideTooltip() {
         guard let window = self.window, let contentView = window.contentView else { return }
         contentView.wantsLayer = true
+        
+        self.currentTooltipIdentity = nil
         
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.15
@@ -156,13 +186,13 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         )
         // Add 32 for padding (16 top, 16 bottom).
         // Since we now use .fixedSize in the view, it will never truncate with '...', so we don't need a buffer.
-        let headerHeight: CGFloat = sourceAppPath == nil ? 0 : 28
-        let headerSpacing: CGFloat = 0
+        let headerHeight: CGFloat = sourceAppPath == nil ? 0 : 52
+        let contentVerticalPadding: CGFloat = sourceAppPath == nil ? 32 : 16
         let naturalVisualHeight: CGFloat
         if filePath != nil {
-            naturalVisualHeight = 256 + 32 + (sourceAppPath == nil ? 0 : 28)
+            naturalVisualHeight = 256 + contentVerticalPadding + headerHeight
         } else {
-            naturalVisualHeight = ceil(textRect.height) + 32 + headerHeight + headerSpacing
+            naturalVisualHeight = ceil(textRect.height) + contentVerticalPadding + headerHeight
         }
         
         // Cap max visual height at 500 (same as overlay)
