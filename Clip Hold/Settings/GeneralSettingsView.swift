@@ -93,6 +93,7 @@ struct GeneralSettingsView: View {
     @State private var showingCustomPhraseMenuSheet = false
     @State private var customPhraseValueWasSaved = false
     @State private var customHistoryValueWasSaved = false
+    @State private var showingQuickOverlayTutorial = false
     
     @State private var tempCustomMenuHistoryValue: Int = 10
     @State private var tempCustomPhrasesInMenuValue: Int = 5
@@ -239,7 +240,16 @@ struct GeneralSettingsView: View {
             } // End of Section: クイックペースト
             
             // MARK: - クイックオーバーレイ
-            Section(header: Text("クイックオーバーレイ").font(.headline)) {
+            Section(
+                header: Text("クイックオーバーレイ").font(.headline),
+                footer: HStack {
+                    Spacer()
+                    Button("クイックオーバーレイの使い方...") {
+                        showingQuickOverlayTutorial = true
+                    }
+                    .offset(x: tutorialButtonOffset)
+                }
+            ) {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("クイックオーバーレイ")
@@ -561,6 +571,17 @@ struct GeneralSettingsView: View {
                     // onDismissで処理するため、ここは空で良い
                 }
             )
+        }
+        .sheet(isPresented: $showingQuickOverlayTutorial) {
+            QuickOverlayTutorialView()
+        }
+    }
+    
+    private var tutorialButtonOffset: CGFloat {
+        if #available(macOS 26, *) {
+            return 10
+        } else {
+            return 0
         }
     }
 }

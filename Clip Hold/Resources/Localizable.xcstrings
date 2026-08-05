@@ -8173,6 +8173,40 @@
         }
       }
     },
+    "オーバーレイの右下にある「定型文ウィンドウを開く」（定型文オーバーレイ）または「履歴ウィンドウを開く」（履歴オーバーレイ）にマウスカーソルを合わせてショートカットキーを離すことで、定型文ウィンドウまたは履歴ウィンドウを開くことができます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können das Standardphrasen- oder Verlauf-Fenster öffnen, indem Sie mit der Maus über „Standardphrasen-Fenster öffnen“ (Standardphrasen-Overlay) oder „Verlauf-Fenster öffnen“ (Verlauf-Overlay) unten rechts im Overlay fahren und die Tastenkombination loslassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can open the Standard Phrases or History window by hovering over \"Open Standard Phrases Window\" (Standard Phrases Overlay) or \"Open History Window\" (History Overlay) at the bottom right of the overlay and releasing the shortcut key."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede abrir la ventana de Frases estándar o Historial al pasar el ratón sobre \"Abrir ventana de frases estándar\" (Superposición de frases estándar) o \"Abrir ventana de historial\" (Superposición de historial) en la esquina inferior derecha de la superposición y soltar el atajo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez ouvrir la fenêtre de Phrases standards ou d'Historique en survolant « Ouvrir la fenêtre de phrases standards » (Superposition Phrases standards) ou « Ouvrir la fenêtre d'historique » (Superposition Historique) en bas à droite de la superposition et en relâchant le raccourci."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オーバーレイの右下にある「定型文ウィンドウを開く」（定型文オーバーレイ）または「履歴ウィンドウを開く」（履歴オーバーレイ）にマウスカーソルを合わせてショートカットキーを離すことで、定型文ウィンドウまたは履歴ウィンドウを開くことができます。"
+          }
+        }
+      }
+    },
     "オーバーレイ時の透明度" : {
       "comment" : "履歴や定型文ウィンドウのオーバーレイ表示に関するオプションで、ウィンドウの透明度を設定するオプション名。",
       "localizations" : {
@@ -9218,6 +9252,40 @@
         }
       }
     },
+    "クイックオーバーレイの使い方..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwendung von Quick Overlay..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How to use Quick Overlay..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo usar Quick Overlay..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment utiliser Quick Overlay..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックオーバーレイの使い方..."
+          }
+        }
+      }
+    },
     "クイックオーバーレイの表示場所" : {
       "localizations" : {
         "de" : {
@@ -9248,6 +9316,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クイックオーバーレイの表示場所"
+          }
+        }
+      }
+    },
+    "クイックオーバーレイは、設定されたショートカットキーを押し続けている間だけ表示されるオーバーレイです。デフォルトでは、^ (Control) + ⌘ (Command)キーで定型文オーバーレイ、⌥ (Option) + ⌘ (Command)キーで履歴オーバーレイを開くことができます。\nクイックオーバーレイではマウスカーソルを動かすだけで簡単に操作できるように設計されています。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Overlay ist ein Overlay, das nur angezeigt wird, solange Sie die konfigurierte Tastenkombination gedrückt halten. Standardmäßig öffnen Sie das Standardphrasen-Overlay mit ^ (Control) + ⌘ (Command) und das Verlauf-Overlay mit ⌥ (Option) + ⌘ (Command).\nQuick Overlay ist so konzipiert, dass es sich einfach durch Bewegen des Mauszeigers bedienen lässt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Overlay is an overlay that appears only while you hold down the configured shortcut key. By default, you can open the Standard Phrases Overlay with ^ (Control) + ⌘ (Command) and the History Overlay with ⌥ (Option) + ⌘ (Command).\nQuick Overlay is designed to be easily operated just by moving the mouse cursor."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Overlay es una superposición que aparece solo mientras mantiene presionado el atajo configurado. Por defecto, puede abrir la superposición de Frases estándar con ^ (Control) + ⌘ (Comando) y la superposición de Historial con ⌥ (Opción) + ⌘ (Comando).\nQuick Overlay está diseñado para ser operado fácilmente con solo mover el cursor del ratón."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Overlay est une superposition qui n'apparaît que tant que vous maintenez le raccourci configuré enfoncé. Par défaut, vous ouvrez la superposition de Phrases standards avec ^ (Contrôle) + ⌘ (Commande) et la superposition d'Historique avec ⌥ (Option) + ⌘ (Commande).\nQuick Overlay est conçu pour être facilement utilisé simplement en déplaçant le curseur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックオーバーレイは、設定されたショートカットキーを押し続けている間だけ表示されるオーバーレイです。デフォルトでは、^ (Control) + ⌘ (Command)キーで定型文オーバーレイ、⌥ (Option) + ⌘ (Command)キーで履歴オーバーレイを開くことができます。\nクイックオーバーレイではマウスカーソルを動かすだけで簡単に操作できるように設計されています。"
           }
         }
       }
@@ -14375,6 +14477,40 @@
         }
       }
     },
+    "プリセットメニューでは、マウスカーソルを動かすだけで簡単にプリセットを切り替えることができます。\nプリセットを切り替えるには、切り替えたいプリセット名にマウスカーソルを合わせ、そのままメニューの左か右にマウスカーソルを移動させることでプリセットが切り替わります。プリセットの切り替えをキャンセルしたい場合はメニューの上か下にマウスカーソルを移動させると、プリセットを切り替えずにメニューを閉じることができます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Preset-Menü können Sie Presets einfach durch Bewegen des Mauszeigers wechseln.\nBewegen Sie dazu den Mauszeiger über den gewünschten Preset-Namen und ziehen Sie ihn nach links oder rechts aus dem Menü. Um abzubrechen, bewegen Sie den Mauszeiger nach oben oder unten, um das Menü ohne Wechsel zu schließen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In the preset menu, you can easily switch presets just by moving the mouse cursor.\nTo switch, hover over the preset name you want to switch to, and move the cursor left or right out of the menu. To cancel switching, move the cursor up or down to close the menu without switching."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En el menú de preajustes, puede cambiar de preajuste fácilmente con solo mover el cursor.\nPara cambiar, pase el ratón sobre el nombre del preajuste deseado y mueva el cursor hacia la izquierda o derecha fuera del menú. Para cancelar, mueva el cursor hacia arriba o abajo para cerrar el menú sin cambiar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans le menu des préréglages, vous pouvez facilement changer de préréglage simplement en déplaçant le curseur.\nPour changer, survolez le nom du préréglage souhaité, puis déplacez le curseur vers la gauche ou la droite hors du menu. Pour annuler, déplacez le curseur vers le haut ou le bas pour fermer le menu sans changer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プリセットメニューでは、マウスカーソルを動かすだけで簡単にプリセットを切り替えることができます。\nプリセットを切り替えるには、切り替えたいプリセット名にマウスカーソルを合わせ、そのままメニューの左か右にマウスカーソルを移動させることでプリセットが切り替わります。プリセットの切り替えをキャンセルしたい場合はメニューの上か下にマウスカーソルを移動させると、プリセットを切り替えずにメニューを閉じることができます。"
+          }
+        }
+      }
+    },
     "プリセットをアプリに割り当てると、そのアプリが最前面の時は、自動で選択されたプリセットに切り替わるようになります。" : {
       "comment" : "定型文設定の「プリセットの割り当て」セクションの説明テキスト。",
       "localizations" : {
@@ -16292,6 +16428,40 @@
         }
       }
     },
+    "元となる履歴や定型文を変更してコピーしたい場合、項目の右側にある「変更してコピー...」にマウスカーソルを合わせてショートカットキーを離すことで、「項目を変更してコピー」ウィンドウが開いて項目を変更してコピーすることができます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Sie einen Verlauf oder eine Standardphrase vor dem Kopieren bearbeiten möchten, fahren Sie mit der Maus über „Element ändern und kopieren...“ rechts neben dem Element und lassen Sie die Tastenkombination los, um das Fenster „Element ändern und kopieren“ zu öffnen und das Element zu bearbeiten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If you want to edit a history or standard phrase before copying, hover over \"Change Item and Copy...\" on the right side of the item and release the shortcut key to open the \"Change Item and Copy\" window and edit the item."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si desea editar un historial o frase estándar antes de copiar, pase el ratón sobre \"Cambiar elemento y copiar...\" a la derecha del elemento y suelte el atajo para abrir la ventana \"Cambiar elemento y copiar\" y editar el elemento."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si vous souhaitez modifier un historique ou une phrase standard avant de copier, survolez « Modifier l'élément et copier... » à droite de l'élément et relâchez le raccourci pour ouvrir la fenêtre « Modifier l'élément et copier » et modifier l'élément."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "元となる履歴や定型文を変更してコピーしたい場合、項目の右側にある「変更してコピー...」にマウスカーソルを合わせてショートカットキーを離すことで、「項目を変更してコピー」ウィンドウが開いて項目を変更してコピーすることができます。"
+          }
+        }
+      }
+    },
     "入力エラー" : {
       "comment" : "カスタム値入力画面で不正な値が入力されたときに表示されるアラートタイトル。",
       "localizations" : {
@@ -17371,6 +17541,40 @@
         }
       }
     },
+    "定型文 / 履歴ウィンドウを開く" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrasen- / Verlauf-Fenster öffnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Standard Phrases / History Window"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ventana Frases estándar / Historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la fenêtre Phrases standards / Historique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文 / 履歴ウィンドウを開く"
+          }
+        }
+      }
+    },
     "定型文ウィンドウ" : {
       "comment" : "設定された定型文を一覧で表示するウィンドウの名前。",
       "localizations" : {
@@ -17541,6 +17745,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文オーバーレイ"
+          }
+        }
+      }
+    },
+    "定型文オーバーレイでは、オーバーレイの右上に表示されているプリセット名にマウスカーソルを合わせることでプリセットメニューが自動で開き、プリセットを切り替えたり、新規プリセットを作成したりすることができます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Standardphrasen-Overlay öffnet sich durch Bewegen des Mauszeigers über den oben rechts angezeigten Preset-Namen automatisch das Preset-Menü, in dem Sie Presets wechseln oder neue erstellen können."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In the Standard Phrases Overlay, hovering over the preset name displayed in the top right will automatically open the preset menu, allowing you to switch presets or create a new one."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En la superposición de Frases estándar, pasar el ratón sobre el nombre del preajuste mostrado en la parte superior derecha abrirá automáticamente el menú de preajustes, permitiéndole cambiar de preajuste o crear uno nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans la superposition Phrases standards, survoler le nom du préréglage affiché en haut à droite ouvrira automatiquement le menu des préréglages, vous permettant de changer de préréglage ou d'en créer un nouveau."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文オーバーレイでは、オーバーレイの右上に表示されているプリセット名にマウスカーソルを合わせることでプリセットメニューが自動で開き、プリセットを切り替えたり、新規プリセットを作成したりすることができます。"
+          }
+        }
+      }
+    },
+    "定型文オーバーレイでは、オーバーレイの左下にある「追加」にマウスカーソルを合わせてショートカットキーを離すことで、「定型文を追加」ウィンドウが開いて定型文の追加を行うことができます。\n履歴オーバーレイでは、オーバーレイの左下にある「新規コピー」にマウスカーソルを合わせてショートカットキーを離すことで、「テキストを入力して新規コピー」ウィンドウが開いて新たなコピーの作成を行うことができます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Im Standardphrasen-Overlay öffnet sich das Fenster „Standardphrase hinzufügen“, wenn Sie mit der Maus über „Hinzufügen“ unten links fahren und die Tastenkombination loslassen.\nIm Verlauf-Overlay öffnet sich das Fenster „Text für neue Kopie eingeben“, wenn Sie mit der Maus über „Neue Kopie“ unten links fahren und die Tastenkombination loslassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In the Standard Phrases Overlay, hovering over \"Add\" in the bottom left and releasing the shortcut key opens the \"Add Standard Phrase\" window.\nIn the History Overlay, hovering over \"New Copy\" in the bottom left and releasing the shortcut key opens the \"Enter Text to Create New Copy\" window."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En la superposición de Frases estándar, pasar el ratón sobre \"Agregar\" en la parte inferior izquierda y soltar el atajo abre la ventana \"Agregar frase estándar\".\nEn la superposición de Historial, pasar el ratón sobre \"Nueva copia\" en la parte inferior izquierda y soltar el atajo abre la ventana \"Introducir texto para nueva copia\"."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans la superposition Phrases standards, survoler « Ajouter » en bas à gauche et relâcher le raccourci ouvre la fenêtre « Ajouter une phrase standard ».\nDans la superposition Historique, survoler « Nouvelle copie » en bas à gauche et relâcher le raccourci ouvre la fenêtre « Saisir du texte pour une nouvelle copie »."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文オーバーレイでは、オーバーレイの左下にある「追加」にマウスカーソルを合わせてショートカットキーを離すことで、「定型文を追加」ウィンドウが開いて定型文の追加を行うことができます。\n履歴オーバーレイでは、オーバーレイの左下にある「新規コピー」にマウスカーソルを合わせてショートカットキーを離すことで、「テキストを入力して新規コピー」ウィンドウが開いて新たなコピーの作成を行うことができます。"
           }
         }
       }
@@ -17962,6 +18234,108 @@
         }
       }
     },
+    "定型文プリセットを操作する (1/3)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienung von Standardphrasen-Presets (1/3)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operating Standard Phrase Presets (1/3)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operación de preajustes de frases estándar (1/3)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisation des préréglages de phrases standards (1/3)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文プリセットを操作する (1/3)"
+          }
+        }
+      }
+    },
+    "定型文プリセットを操作する (2/3)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienung von Standardphrasen-Presets (2/3)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operating Standard Phrase Presets (2/3)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operación de preajustes de frases estándar (2/3)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisation des préréglages de phrases standards (2/3)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文プリセットを操作する (2/3)"
+          }
+        }
+      }
+    },
+    "定型文プリセットを操作する (3/3)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienung von Standardphrasen-Presets (3/3)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operating Standard Phrase Presets (3/3)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operación de preajustes de frases estándar (3/3)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisation des préréglages de phrases standards (3/3)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文プリセットを操作する (3/3)"
+          }
+        }
+      }
+    },
     "定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。" : {
       "comment" : "一般設定の「クイックペースト」オプションを説明するテキスト、",
       "localizations" : {
@@ -18202,6 +18576,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "定型文を追加"
+          }
+        }
+      }
+    },
+    "定型文を追加 / 新規コピーする" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standardphrase hinzufügen / Neue Kopie erstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Standard Phrase / Create New Copy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar frase estándar / Crear nueva copia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter phrase standard / Créer nouvelle copie"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "定型文を追加 / 新規コピーする"
           }
         }
       }
@@ -19146,6 +19554,40 @@
         }
       }
     },
+    "履歴または定型文をコピーしたい場合、オーバーレイを開いたままコピーしたい項目にマウスカーソルを合わせ、ショートカットキーを離すことでコピーすることができます。\n設定で「クイックペースト」がオンになっている場合、コピーされた後に自動でペーストされます（履歴の場合、「テキストに限定」設定も適用されます）。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um ein Verlaufs- oder Standardphrasen-Element zu kopieren, fahren Sie mit der Maus über das Element bei geöffnetem Overlay und lassen Sie die Tastenkombination los.\nWenn Quick Paste in den Einstellungen aktiviert ist, wird es nach dem Kopieren automatisch eingefügt (bei Verlauf gilt auch die Einstellung „Nur Text“)."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To copy a history item or standard phrase, hover over the item while the overlay is open and release the shortcut key.\nIf Quick Paste is enabled in settings, it will be automatically pasted after copying (for history, the \"Text Only\" setting also applies)."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para copiar un elemento del historial o frase estándar, pase el ratón sobre el elemento mientras la superposición esté abierta y suelte el atajo.\nSi Quick Paste está activado en los ajustes, se pegará automáticamente después de copiar (para el historial, también se aplica el ajuste \"Solo texto\")."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour copier un élément d'historique ou une phrase standard, survolez l'élément pendant que la superposition est ouverte et relâchez le raccourci.\nSi Quick Paste est activé dans les paramètres, il sera automatiquement collé après la copie (pour l'historique, le paramètre « Texte uniquement » s'applique également)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴または定型文をコピーしたい場合、オーバーレイを開いたままコピーしたい項目にマウスカーソルを合わせ、ショートカットキーを離すことでコピーすることができます。\n設定で「クイックペースト」がオンになっている場合、コピーされた後に自動でペーストされます（履歴の場合、「テキストに限定」設定も適用されます）。"
+          }
+        }
+      }
+    },
     "履歴や定型文の数によっては、再インデックスが完全に終わるまでに時間がかかる事があります。よろしいですか？" : {
       "localizations" : {
         "de" : {
@@ -19319,6 +19761,40 @@
         }
       }
     },
+    "履歴を標準テキストとしてコピーする" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf als reinen Text kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy History as Plain Text"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar historial como texto sin formato"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier l'historique en texte brut"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴を標準テキストとしてコピーする"
+          }
+        }
+      }
+    },
     "履歴項目がテキストである場合のみクイックペーストを行うようにします。" : {
       "comment" : "一般設定の「クイックペーストをテキストに限定」オプションを説明するテキスト。",
       "localizations" : {
@@ -19350,6 +19826,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴項目がテキストである場合のみクイックペーストを行うようにします。"
+          }
+        }
+      }
+    },
+    "履歴項目がリッチテキストの場合、項目の右側にある「標準テキストとしてコピー」ボタンにマウスカーソルを合わせてショートカットキーを離すことで、標準テキストとしてコピーすることができます。\n設定で「クイックペースト」がオンになっている場合、コピーされた後に自動でペーストされます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn ein Verlaufs-Element Rich Text ist, fahren Sie mit der Maus über die Schaltfläche „Als reinen Text kopieren“ rechts neben dem Element und lassen Sie die Tastenkombination los, um es als reinen Text zu kopieren.\nWenn Quick Paste in den Einstellungen aktiviert ist, wird es nach dem Kopieren automatisch eingefügt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If a history item is rich text, hover over the \"Copy as Plain Text\" button on the right side of the item and release the shortcut key to copy it as plain text.\nIf Quick Paste is enabled in settings, it will be automatically pasted after copying."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si un elemento del historial es texto enriquecido, pase el ratón sobre el botón \"Copiar como texto sin formato\" a la derecha del elemento y suelte el atajo para copiarlo como texto sin formato.\nSi Quick Paste está activado en los ajustes, se pegará automáticamente después de copiar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si un élément d'historique est en texte enrichi, survolez le bouton « Copier en texte brut » à droite de l'élément et relâchez le raccourci pour le copier en texte brut.\nSi Quick Paste est activé dans les paramètres, il sera automatiquement collé après la copie."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴項目がリッチテキストの場合、項目の右側にある「標準テキストとしてコピー」ボタンにマウスカーソルを合わせてショートカットキーを離すことで、標準テキストとしてコピーすることができます。\n設定で「クイックペースト」がオンになっている場合、コピーされた後に自動でペーストされます。"
           }
         }
       }
@@ -20183,6 +20693,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "新規プリセットの作成"
+          }
+        }
+      }
+    },
+    "新規プリセットを作成するには、プリセットメニューにある「新規プリセット...」にマウスカーソルを合わせてショートカットキーを離すことで、「プリセットを追加」ウィンドウが開いてプリセットを作成することができます。\nこのメニュー項目では誤操作を防止するため、項目の左右にマウスカーソルを動かしてもアクションは実行されず、メニューが閉じます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um ein neues Preset zu erstellen, fahren Sie mit der Maus über „Neues Preset...“ im Preset-Menü und lassen Sie die Tastenkombination los, um das Fenster „Preset hinzufügen“ zu öffnen.\nUm eine versehentliche Bedienung zu verhindern, wird die Aktion durch Bewegen des Mauszeigers nach links oder rechts auf diesem Menüpunkt nicht ausgeführt und das Menü wird stattdessen geschlossen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To create a new preset, hover over \"New Preset...\" in the preset menu and release the shortcut key to open the \"Add Preset\" window.\nTo prevent accidental operation, moving the mouse cursor left or right on this menu item will not execute the action and will close the menu instead."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para crear un nuevo preajuste, pase el ratón sobre \"Nuevo preajuste...\" en el menú de preajustes y suelte el atajo para abrir la ventana \"Agregar preajuste\".\nPara evitar operaciones accidentales, mover el cursor del ratón a izquierda o derecha sobre este elemento del menú no ejecutará la acción y cerrará el menú en su lugar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour créer un nouveau préréglage, survolez « Nouveau préréglage... » dans le menu des préréglages et relâchez le raccourci pour ouvrir la fenêtre « Ajouter un préréglage ».\nPour éviter toute erreur de manipulation, déplacer le curseur vers la gauche ou la droite sur cet élément de menu n'exécutera pas l'action et fermera plutôt le menu."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規プリセットを作成するには、プリセットメニューにある「新規プリセット...」にマウスカーソルを合わせてショートカットキーを離すことで、「プリセットを追加」ウィンドウが開いてプリセットを作成することができます。\nこのメニュー項目では誤操作を防止するため、項目の左右にマウスカーソルを動かしてもアクションは実行されず、メニューが閉じます。"
           }
         }
       }
@@ -23077,6 +23621,40 @@
         }
       }
     },
+    "項目をコピーする" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Element kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Item"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar elemento"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier l'élément"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "項目をコピーする"
+          }
+        }
+      }
+    },
     "項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。" : {
       "comment" : "一般設定の「ダブルクリックウィンドウを閉じる」オプションを説明するテキスト。",
       "localizations" : {
@@ -23143,6 +23721,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "項目を変更してコピー"
+          }
+        }
+      }
+    },
+    "項目を変更してコピーする" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Element ändern und kopieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change Item and Copy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar elemento y copiar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier l'élément et copier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "項目を変更してコピーする"
           }
         }
       }
