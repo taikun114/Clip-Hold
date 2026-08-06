@@ -298,7 +298,6 @@ struct HistoryContentList: View {
                     .tableColumnHeaders(.hidden)
                     .tableStyle(.inset)
                     .alternatingRowBackgrounds(.disabled)
-                    .animation(reduceMotion ? nil : .default, value: filteredHistory)
                     .onKeyPress(.space) {
                         guard let selectedID = selectedItemID,
                               let selectedItem = filteredHistory.first(where: { $0.id == selectedID }),
@@ -345,6 +344,7 @@ struct HistoryContentList: View {
                         view.blur(radius: isLoading ? 5 : 0)
                     }
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: isLoading)
+                    .animation(reduceMotion ? nil : .default, value: filteredHistory)
                     .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
                             historyMenuItems(for: currentItem)
@@ -426,7 +426,8 @@ struct HistoryContentList: View {
                     }
                     .onChange(of: filteredHistory) { _, newValue in
                         // 不要になったrowIconStore.viewsのエントリをクリーンアップする
-                        let currentIDs = Set(clipboardManager.clipboardHistory.map { $0.id })
+                        // 3万件などの全履歴を走査するとメインスレッドがブロックされるため、現在表示されているアイテム（newValue）のみを対象とする
+                        let currentIDs = Set(newValue.map { $0.id })
                         let oldIDs = Set(rowIconStore.views.keys)
                         let idsToRemove = oldIDs.subtracting(currentIDs)
                         for id in idsToRemove {

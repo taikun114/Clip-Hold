@@ -34,6 +34,34 @@ class ClipboardManager: ObservableObject {
     // アプリケーション名のキャッシュ
     @Published var localizedAppNames: [String: String] = [:]
     
+    // アプリケーションアイコンのキャッシュ（リサイズ済み）
+    @Published var resizedAppIcons: [String: NSImage] = [:]
+    
+    // キャッシュを利用してリサイズ済みのアプリアイコンを非同期で取得するメソッド
+    func getResizedAppIcon(for path: String) -> NSImage? {
+        if let cachedIcon = resizedAppIcons[path] {
+            return cachedIcon
+        }
+        
+        // キャッシュにない場合はバックグラウンドで取得してリサイズ
+        Task.detached {
+            let originalIcon = NSWorkspace.shared.icon(forFile: path)
+            let resizedIcon = NSImage(size: CGSize(width: 16, height: 16))
+            resizedIcon.lockFocus()
+            originalIcon.draw(in: NSRect(origin: .zero, size: CGSize(width: 16, height: 16)),
+                              from: NSRect(origin: .zero, size: originalIcon.size),
+                              operation: .sourceOver,
+                              fraction: 1.0)
+            resizedIcon.unlockFocus()
+            
+            await MainActor.run {
+                self.resizedAppIcons[path] = resizedIcon
+            }
+        }
+        
+        return nil
+    }
+    
     // ピン留めされた履歴アイテムのID
     @Published var pinnedItemID: UUID? {
         didSet {
@@ -232,20 +260,40 @@ class ClipboardManager: ObservableObject {
         print("DEBUG: ClipboardManager: isClipboardMonitoringPausedObserver invalidated.")
     }
     
+    private var _cachedAppPaths: Set<String>?
+    private var _cachedAppPathsHistoryCount: Int = -1
+
     // アプリケーションの履歴を返す算出プロパティ
     var appUsageHistory: [String: String] {
-        let appPaths = Set(clipboardHistory.compactMap { $0.sourceAppPath })
+        let appPaths: Set<String>
+        if _cachedAppPathsHistoryCount == clipboardHistory.count, let cached = _cachedAppPaths {
+            appPaths = cached
+        } else {
+            appPaths = Set(clipboardHistory.compactMap { $0.sourceAppPath })
+            _cachedAppPaths = appPaths
+            _cachedAppPathsHistoryCount = clipboardHistory.count
+        }
+        
         var appNames = [String: String]()
         
         for path in appPaths {
-            let appURL = URL(fileURLWithPath: path)
-            let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
-            
-            if let appBundle = Bundle(url: appURL) {
-                let appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? appBundle.infoDictionary?["CFBundleName"] as? String ?? nonLocalizedName
-                appNames[path] = appName
+            if let cachedName = localizedAppNames[path] {
+                appNames[path] = cachedName
             } else {
-                appNames[path] = nonLocalizedName
+                let appURL = URL(fileURLWithPath: path)
+                let nonLocalizedName = appURL.deletingPathExtension().lastPathComponent
+                
+                let appName: String
+                if let appBundle = Bundle(url: appURL) {
+                    appName = appBundle.localizedInfoDictionary?["CFBundleDisplayName"] as? String ?? appBundle.localizedInfoDictionary?["CFBundleName"] as? String ?? appBundle.infoDictionary?["CFBundleName"] as? String ?? nonLocalizedName
+                } else {
+                    appName = nonLocalizedName
+                }
+                appNames[path] = appName
+                
+                Task { @MainActor [weak self] in
+                    self?.localizedAppNames[path] = appName
+                }
             }
         }
         return appNames

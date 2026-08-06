@@ -17,18 +17,6 @@ struct HistorySearchBar: View {
     // カラーコードフィルタリング設定のバインディング
     @AppStorage("enableColorCodeFilter") var enableColorCodeFilter: Bool = false
     
-    private func resizedAppIcon(for path: String) -> NSImage {
-        let originalIcon = NSWorkspace.shared.icon(forFile: path)
-        let resizedIcon = NSImage(size: CGSize(width: 16, height: 16))
-        resizedIcon.lockFocus()
-        originalIcon.draw(in: NSRect(origin: .zero, size: CGSize(width: 16, height: 16)),
-                          from: NSRect(origin: .zero, size: originalIcon.size),
-                          operation: .sourceOver,
-                          fraction: 1.0)
-        resizedIcon.unlockFocus()
-        return resizedIcon
-    }
-    
     @ViewBuilder
     private var appPickerLabel: some View {
         if let selectedAppPath = selectedApp {
@@ -39,7 +27,11 @@ struct HistorySearchBar: View {
                     Label {
                         Text(appName)
                     } icon: {
-                        Image(nsImage: resizedAppIcon(for: selectedAppPath))
+                        if let icon = clipboardManager.getResizedAppIcon(for: selectedAppPath) {
+                            Image(nsImage: icon)
+                        } else {
+                            Image(systemName: "app")
+                        }
                     }
                 } else {
                     Label {
@@ -128,7 +120,11 @@ struct HistorySearchBar: View {
                                     Text(localizedName)
                                 } icon: {
                                     if FileManager.default.fileExists(atPath: path) {
-                                        Image(nsImage: resizedAppIcon(for: path))
+                                        if let icon = clipboardManager.getResizedAppIcon(for: path) {
+                                            Image(nsImage: icon)
+                                        } else {
+                                            Image(systemName: "app")
+                                        }
                                     } else {
                                         Image(systemName: "questionmark.app")
                                     }

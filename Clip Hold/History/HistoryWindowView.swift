@@ -98,7 +98,7 @@ struct HistoryWindowView: View {
         let isReduceMotion = reduceMotion
         
         Task.detached(priority: .userInitiated) {
-            let filtered = historyCopy.filter { item in
+            let isMatch: (ClipboardItem) -> Bool = { item in
                 // App filter
                 let matchesApp: Bool
                 if currentApp == "auto_filter_mode" {
@@ -152,6 +152,10 @@ struct HistoryWindowView: View {
                 return matchesApp && matchesSearchText && matchesFilter
             }
             
+            let finalHistoryToApply: [ClipboardItem]
+            
+            // 全件フィルタリング後にソートを実行する元の実装に戻す（配列内の順序が保証されていないため）
+            let filtered = historyCopy.filter(isMatch)
             let sorted = filtered.sorted { item1, item2 in
                 switch currentSort {
                 case .newest:
@@ -168,10 +172,10 @@ struct HistoryWindowView: View {
             var finalHistory = Array(sorted.prefix(currentDisplayLimit))
             if let pinnedID = currentPinnedID,
                let pinnedItem = sorted.first(where: { $0.id == pinnedID }) {
-                finalHistory.insert(pinnedItem.createPinnedDuplicate(), at: 0)
+                finalHistory.removeAll(where: { $0.id == pinnedID }) // 表示対象に含まれていたら削除
+                finalHistory.insert(pinnedItem.createPinnedDuplicate(), at: 0) // 先頭に追加
             }
-            
-            let finalHistoryToApply = finalHistory
+            finalHistoryToApply = finalHistory
             
             await MainActor.run {
                 if isReduceMotion {
