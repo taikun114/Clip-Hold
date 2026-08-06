@@ -36,6 +36,9 @@ struct QuickOverlayView: View {
     @State private var hoveredItemId: UUID? = nil
     @State private var currentSelection: QuickOverlaySelection? = nil
     
+    // macOS 26のLiquid Glass背景更新を維持するための微小なアニメーション状態
+    @State private var jiggle: Bool = false
+    
     @State private var isPresetMenuOpen: Bool
     @State private var hoveredPresetId: UUID? = nil
     @State private var presetMenuCloseTask: Task<Void, Never>? = nil
@@ -204,6 +207,19 @@ struct QuickOverlayView: View {
                     }
                     .padding(.horizontal, 12)
                 }
+                .background(
+                    // セーフエリアバーのLiquid Glass背景更新を維持するためのダミーアニメーション（レイアウトに影響しない不透明度のみ）
+                    Color.white
+                        .opacity(jiggle ? 0.002 : 0.001)
+                        .allowsHitTesting(false)
+                        .onAppear {
+                            if #available(macOS 26.0, *) {
+                                withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: true)) {
+                                    jiggle.toggle()
+                                }
+                            }
+                        }
+                )
             }
         }
         .onChange(of: clipboardManager.isHistoryLoaded) { _, loaded in
