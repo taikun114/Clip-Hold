@@ -142,12 +142,12 @@ struct QuickOverlayView: View {
             }
         }
         
-        var raw = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+        let allSortedHistory = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
         let limit = currentDisplayLimit > 0 ? currentDisplayLimit : 50
-        raw = Array(raw.prefix(limit))
+        var raw = Array(allSortedHistory.prefix(limit))
         
         if let pinnedID = clipboardManager.pinnedItemID,
-           let pinnedItem = raw.first(where: { $0.id == pinnedID }) {
+           let pinnedItem = clipboardManager.clipboardHistory.first(where: { $0.id == pinnedID }) {
             raw.insert(pinnedItem.createPinnedDuplicate(), at: 0)
         }
         cachedHistoryItems = raw
