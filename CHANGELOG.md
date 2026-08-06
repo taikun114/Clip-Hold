@@ -23,6 +23,9 @@ Notes
 
 ## 1.7.0
 ### New Features
+- **Add the "Quick Overlay" feature**
+  - A Quick Overlay feature has been added that allows you to easily copy history and standard phrases just by moving the mouse cursor while holding down a shortcut key. Most operations are executed by releasing the shortcut key after moving the mouse cursor while holding it down, so it is designed to be easily operated without explicitly clicking.
+  - You can enable Quick Overlay from the "Quick Overlay" section of the General settings. For detailed instructions on how to use it, you can click the "How to use Quick Overlay..." button in the "Quick Overlay" section of the General settings.
 - **Support for Spotlight search and Shortcuts actions**
   - You can search and copy history and standard phrases from Spotlight, or use Shortcuts actions to copy specific history and standard phrases.
 - **Add the New Copy feature**
@@ -44,6 +47,8 @@ Notes
 - **Fix issue where the app might crash during Quick Paste**
 - **Fix issue where the copy notification would not disappear when copying from the menu in the Standard Phrase window**
 - **Fix issue where some sheets were not displayed correctly on macOS Golden Gate**
+- **Improve settings layout**
+  - The "Standard Phrases Window" section and "History Window" section in the General settings have been moved to the Standard Phrases and Copy History settings, respectively.
 - **Improve the performance of the History window**
   - Implemented pagination, limiting the initial display to 100 items and loading additional history items as you scroll.
 - **Improve history addition performance when copying files**
