@@ -141,6 +141,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             window.animator().alphaValue = 0
         }, completionHandler: {
             window.orderOut(nil)
+            window.contentView = nil // 追加: ウインドウを隠した後にViewを破棄し、アニメーションループを完全に停止させる
             window.alphaValue = 1
             contentView.layer?.removeAllAnimations()
             contentView.layer?.transform = CATransform3DIdentity

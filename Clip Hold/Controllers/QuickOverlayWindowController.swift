@@ -110,6 +110,7 @@ class QuickOverlayWindowController: NSWindowController {
         let animationDelegate = AnimationCompletionDelegate { [weak self, weak window] in
             guard let self, self.animationGeneration == currentGeneration else { return }
             window?.orderOut(nil)
+            window?.contentView = nil // 追加: ウインドウを隠した後にViewを破棄し、アニメーションループを完全に停止させる
             self.hideAnimationDelegate = nil
         }
         hideAnimationDelegate = animationDelegate
