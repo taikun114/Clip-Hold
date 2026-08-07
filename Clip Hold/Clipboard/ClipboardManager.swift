@@ -132,10 +132,20 @@ class ClipboardManager: ObservableObject {
     // MARK: - Properties that need to remain in the main class
     var saveTask: Task<Void, Never>?
     var temporaryFileUrls: Set<URL> = []
-    @AppStorage("maxHistoryToSave") var maxHistoryToSave: Int = 0
-    @AppStorage("maxFileSizeToSave") var maxFileSizeToSave: Int = 1_000_000_000
-    @AppStorage("largeFileAlertThreshold") var largeFileAlertThreshold: Int = 100_000_000
-    @AppStorage("ignoreStandardPhrases") var ignoreStandardPhrases: Bool = false
+    var maxHistoryToSave: Int {
+        UserDefaults.standard.integer(forKey: "maxHistoryToSave")
+    }
+    var maxFileSizeToSave: Int {
+        let val = UserDefaults.standard.object(forKey: "maxFileSizeToSave") as? Int
+        return val ?? 1_000_000_000
+    }
+    var largeFileAlertThreshold: Int {
+        let val = UserDefaults.standard.object(forKey: "largeFileAlertThreshold") as? Int
+        return val ?? 100_000_000
+    }
+    var ignoreStandardPhrases: Bool {
+        UserDefaults.standard.bool(forKey: "ignoreStandardPhrases")
+    }
     @Published var excludedAppIdentifiers: [String] = []
     var pasteboardMonitorTimer: Timer?
     var lastChangeCount: Int = 0

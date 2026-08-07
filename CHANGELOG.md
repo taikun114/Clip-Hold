@@ -47,6 +47,7 @@ Notes
 - **Fix issue where the app might crash during Quick Paste**
 - **Fix issue where the copy notification would not disappear when copying from the menu in the Standard Phrase window**
 - **Fix issue where some sheets were not displayed correctly on macOS Golden Gate**
+- **Fix issue where some history and standard phrase settings were not applied until the app was restarted**
 - **Improve settings layout**
   - The "Standard Phrases Window" section and "History Window" section in the General settings have been moved to the Standard Phrases and Copy History settings, respectively.
 - **Improve the performance of the History window**
