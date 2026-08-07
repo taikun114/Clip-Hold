@@ -340,19 +340,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
             let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
             
-            if currentQuickPaste {
-                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.currentOptionKeyPressed {
+            if currentQuickPaste && currentQuickPasteToPreviousApp {
+                if ModifierKeyMonitor.shared.currentOptionKeyPressed {
                     return
                 }
-                
-                if currentQuickPasteToPreviousApp {
-                    ClipHoldApp.performPasteToPreviousApp()
-                } else {
-                    Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: 50_000_000)
-                        ClipHoldApp.performPaste()
-                    }
-                }
+                ClipHoldApp.performPasteToPreviousApp()
             }
         }, isSheet: false)
         
@@ -390,19 +382,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
             let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
             
-            if currentQuickPaste {
-                if currentQuickPasteToPreviousApp && ModifierKeyMonitor.shared.currentOptionKeyPressed {
+            if currentQuickPaste && currentQuickPasteToPreviousApp {
+                if ModifierKeyMonitor.shared.currentOptionKeyPressed {
                     return
                 }
-                
-                if currentQuickPasteToPreviousApp {
-                    ClipHoldApp.performPasteToPreviousApp()
-                } else {
-                    Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: 50_000_000)
-                        ClipHoldApp.performPaste()
-                    }
-                }
+                ClipHoldApp.performPasteToPreviousApp()
             }
         }, isSheet: false)
         
