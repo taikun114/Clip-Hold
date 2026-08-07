@@ -130,6 +130,15 @@ struct QuickOverlayView: View {
                 }
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("QuickOverlayShouldHide"))) { _ in
+            tooltipTask?.cancel()
+            tooltipTask = nil
+            NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
+        }
+        .onDisappear {
+            tooltipTask?.cancel()
+            tooltipTask = nil
+        }
     }
     
     // MARK: - Subviews
