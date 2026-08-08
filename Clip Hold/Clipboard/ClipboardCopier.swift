@@ -8,6 +8,7 @@ extension ClipboardManager {
         cleanUpTemporaryFiles()
         
         isPerformingInternalCopy = true // 内部コピー操作が開始されたことを示す
+        lastCopiedInternalItem = item
         print("DEBUG: copyItemToClipboard: isPerformingInternalCopy = true")
         
         NSPasteboard.general.clearContents()

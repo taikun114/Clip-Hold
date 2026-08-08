@@ -31,7 +31,7 @@ struct HistoryItemRow<MenuContent: View>: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     
-    let item: ClipboardItem
+    @ObservedObject var item: ClipboardItem
     let index: Int
     let hideNumbers: Bool
     
@@ -123,29 +123,36 @@ struct HistoryItemRow<MenuContent: View>: View {
                 }
                 .contentShape(Rectangle())
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 itemDisplayText
                     .lineLimit(1)
                     .font(.body)
                     .truncationMode(.tail)
                     .foregroundStyle(.primary)
-                HStack(spacing: 4) {
-                    Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
-                    
-                    if showCharacterCount {
-                        Text("-")
-                        Text("\(item.text.count)文字")
+                if item.isCopying && item.isProgressBarVisible {
+                    ProgressView(value: item.copyProgress < 0.0 ? nil : item.copyProgress)
+                        .progressViewStyle(.linear)
+                        .controlSize(.small)
+                } else {
+                    HStack(spacing: 4) {
+                        Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
+                        
+                        if showCharacterCount {
+                            Text("-")
+                            Text("\(item.text.count)文字")
+                        }
+                        
+                        if let fileSize = item.fileSize, item.filePath != nil, !item.isFolder {
+                            Text("-")
+                            Text(formatFileSize(fileSize))
+                        }
                     }
-                    
-                    if let fileSize = item.fileSize, item.filePath != nil, !item.isFolder {
-                        Text("-")
-                        Text(formatFileSize(fileSize))
-                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
             }
             .help(item.text) // コンテンツテキスト部分にツールチップを追加
+            .opacity(item.isCopying ? 0.5 : 1.0)
             
             Spacer()
             

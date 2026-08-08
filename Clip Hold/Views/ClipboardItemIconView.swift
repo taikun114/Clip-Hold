@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ClipboardItemIconView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
-    let item: ClipboardItem
+    @ObservedObject var item: ClipboardItem
     let showColorCodeIcon: Bool
     let showAppIconOverlay: Bool
     var rowIconStore: RowIconStore? = nil

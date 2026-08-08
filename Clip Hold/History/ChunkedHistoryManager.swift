@@ -155,6 +155,28 @@ actor ChunkedHistoryManager {
         }
     }
     
+    func updateHistoryItem(_ updatedItem: ClipboardItem) {
+        do {
+            let chunkCount = try self.getChunkCount()
+            // 新しいアイテムほど後ろのチャンクにある可能性が高いため、逆順で検索
+            for index in stride(from: chunkCount - 1, through: 0, by: -1) {
+                var items = try self.loadHistoryChunk(at: index)
+                if let itemIndex = items.firstIndex(where: { $0.id == updatedItem.id }) {
+                    items[itemIndex] = updatedItem
+                    try self.saveChunk(items, at: index)
+                    print("ChunkedHistoryManager: Updated item with id \(updatedItem.id) in chunk \(index).")
+                    
+                    // Spotlightのインデックスも更新
+                    SpotlightManager.shared.indexHistoryItem(updatedItem)
+                    return
+                }
+            }
+            print("ChunkedHistoryManager: Item with id \(updatedItem.id) not found for updating.")
+        } catch {
+            print("ChunkedHistoryManager: Error updating history item: \(error.localizedDescription)")
+        }
+    }
+    
     func saveChunk(_ items: [ClipboardItem], at chunkIndex: Int) throws {
         guard let historyFileURL = getHistoryFileURL(for: chunkIndex) else { return }
         

@@ -94,6 +94,16 @@ struct HistoryContentList: View {
     
     @ViewBuilder
     private func historyMenuItems(for currentItem: ClipboardItem) -> some View {
+        if currentItem.isCopying {
+            Button(role: .destructive) {
+                currentItem.isCopyCancelled = true
+                clipboardManager.deleteItem(id: currentItem.id)
+            } label: {
+                Label("コピーをキャンセルして履歴から削除", systemImage: "xmark")
+            }
+            Divider()
+        }
+        
         let performCopy = { (preventQuickPaste: Bool) in
             performSharedCopyRoutine(
                 preventQuickPaste: preventQuickPaste,
@@ -111,6 +121,7 @@ struct HistoryContentList: View {
             action: { performCopy(modifierMonitor.currentOptionKeyPressed) },
             alternateAction: { performCopy(true) }
         )
+        .disabled(currentItem.isCopying)
         
         if currentItem.richText != nil {
             let plainTextCopyAction: (Bool) -> Void = { preventQuickPaste in
@@ -126,26 +137,29 @@ struct HistoryContentList: View {
                 }
             }
 
-            if #available(macOS 15.0, *) {
-                if quickPaste && quickPasteToPreviousApp {
-                    Button { plainTextCopyAction(false) } label: {
-                        Text("標準テキストとしてコピー")
-                    }
-                    .modifierKeyAlternate(.option) {
-                        Button { plainTextCopyAction(true) } label: {
-                            Text("クイックペーストせずに標準テキストとしてコピー")
+            Group {
+                if #available(macOS 15.0, *) {
+                    if quickPaste && quickPasteToPreviousApp {
+                        Button { plainTextCopyAction(false) } label: {
+                            Text("標準テキストとしてコピー")
+                        }
+                        .modifierKeyAlternate(.option) {
+                            Button { plainTextCopyAction(true) } label: {
+                                Text("クイックペーストせずに標準テキストとしてコピー")
+                            }
+                        }
+                    } else {
+                        Button { plainTextCopyAction(false) } label: {
+                            Text("標準テキストとしてコピー")
                         }
                     }
                 } else {
-                    Button { plainTextCopyAction(false) } label: {
-                        Text("標準テキストとしてコピー")
+                    Button { plainTextCopyAction(modifierMonitor.currentOptionKeyPressed) } label: {
+                        Text(quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed ? "クイックペーストせずに標準テキストとしてコピー" : "標準テキストとしてコピー")
                     }
                 }
-            } else {
-                Button { plainTextCopyAction(modifierMonitor.currentOptionKeyPressed) } label: {
-                    Text(quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed ? "クイックペーストせずに標準テキストとしてコピー" : "標準テキストとしてコピー")
-                }
             }
+            .disabled(currentItem.isCopying)
         }
         
         SharedEditAndCopyMenuItem {
@@ -168,6 +182,7 @@ struct HistoryContentList: View {
             } label: {
                 Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
             }
+            .disabled(currentItem.isCopying)
         }
         
         if let filePath = currentItem.filePath {
@@ -176,10 +191,12 @@ struct HistoryContentList: View {
             } label: {
                 Label("開く", systemImage: "arrow.up.forward.app")
             }
+            .disabled(currentItem.isCopying)
         }
         
         if currentItem.isURL {
             SharedOpenLinkMenuItem(urlString: currentItem.text)
+                .disabled(currentItem.isCopying)
         }
         
         Divider()
@@ -193,6 +210,7 @@ struct HistoryContentList: View {
             } label: {
                 Label("クイックルック", systemImage: "eye")
             }
+            .disabled(currentItem.isCopying)
         }
         
         let targetID = currentItem.originalPinnedItemID ?? currentItem.id
@@ -252,15 +270,17 @@ struct HistoryContentList: View {
             itemToDelete = currentItem
             showingDeleteConfirmation = true
         }
+        .disabled(currentItem.isCopying)
         
-        if let sourceAppPath = currentItem.sourceAppPath {
-            Button(role: .destructive) {
-                showingDeleteAllFromAppAlert = true
-                appToDeleteFrom = sourceAppPath
-            } label: {
-                Text("このアプリからのすべての履歴を削除...")
+            if let sourceAppPath = currentItem.sourceAppPath {
+                Button(role: .destructive) {
+                    showingDeleteAllFromAppAlert = true
+                    appToDeleteFrom = sourceAppPath
+                } label: {
+                    Text("このアプリからのすべての履歴を削除...")
+                }
+                .disabled(currentItem.isCopying)
             }
-        }
     }
     
     var body: some View {
@@ -351,6 +371,7 @@ struct HistoryContentList: View {
                         }
                     }, primaryAction: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
+                            if currentItem.isCopying { return }
                             performSharedCopyRoutine(
                                 preventQuickPaste: modifierMonitor.currentOptionKeyPressed,
                                 quickPaste: quickPaste,

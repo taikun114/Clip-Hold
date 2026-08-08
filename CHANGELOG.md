@@ -53,6 +53,8 @@ Notes
 - **Improve the performance of the History window**
   - Implemented pagination, limiting the initial display to 100 items and loading additional history items as you scroll.
 - **Improve history addition performance when copying files**
+- **Improve file copying behavior**
+  - A progress bar indicating the progress is now displayed when copying large files, and the duplicate detection system has been enhanced. It is now also possible to cancel the copy midway during large file copies.
 - **Improve icon display on macOS Golden Gate**
 - **Improve the display of History and Standard Phrase windows on macOS Golden Gate**
 - **Improve the add apps to exclude screen**

@@ -252,6 +252,7 @@ struct HistoryWindowView: View {
                         searchText: searchText,
                         searchTrigger: searchTrigger,
                         onCopyAction: { item in
+                            if item.isCopying { return }
                             // 内部コピーフラグをtrueに設定
                             clipboardManager.isPerformingInternalCopy = true
                             ClipboardManager.shared.copyItemToClipboard(item)

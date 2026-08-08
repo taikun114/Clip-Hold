@@ -2,8 +2,7 @@ import Foundation
 import CryptoKit
 
 class HashCalculator {
-    // ファイルのSHA256ハッシュを計算する
-    static func calculateFileHash(at url: URL) -> String? {
+    static func calculateFileHash(at url: URL, fileSize: Int64? = nil, progressHandler: ((Double) -> Void)? = nil, isCancelled: (() -> Bool)? = nil) -> String? {
         var isDirectory: ObjCBool = false
         guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) else {
             return nil
@@ -20,15 +19,28 @@ class HashCalculator {
             
             let hasher = SHA256()
             var hash = hasher
+            var bytesRead: Int64 = 0
+            let size = max(fileSize ?? 1, 1)
             
             while autoreleasepool(invoking: {
-                let chunk = fileHandle.readData(ofLength: 8192)
+                if isCancelled?() == true { return false }
+                
+                let chunk = fileHandle.readData(ofLength: 32768) // 32KB chunks
                 if chunk.isEmpty {
                     return false // 終了
                 }
                 hash.update(data: chunk)
+                
+                bytesRead += Int64(chunk.count)
+                if let progressHandler = progressHandler {
+                    let progress = Double(bytesRead) / Double(size)
+                    progressHandler(min(progress, 1.0))
+                }
+                
                 return true // 続行
             }) { }
+            
+            if isCancelled?() == true { return nil }
             
             let digest = hash.finalize()
             return digest.compactMap { String(format: "%02x", $0) }.joined()

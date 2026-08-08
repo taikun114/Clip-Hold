@@ -761,7 +761,7 @@ struct QuickOverlayView: View {
 /// 左側（項目コンテンツ）と右側（アクションボタン群）に分けて構成しており、
 /// 右側には今後アクションボタンを追加していけるように設計している。
 private struct QuickOverlayHistoryItemRow: View {
-    let item: ClipboardItem
+    @ObservedObject var item: ClipboardItem
     let isSelected: Bool
     let showColorCodeIcon: Bool
     let showAppIconOverlay: Bool
@@ -786,6 +786,10 @@ private struct QuickOverlayHistoryItemRow: View {
     @State private var isEditAndCopyButtonHovered = false
     @State private var editAndCopyButtonTopCenterScreen: CGPoint? = nil
     @State private var editAndCopyButtonTooltipTask: Task<Void, Never>? = nil
+    
+    @State private var isCancelCopyButtonHovered = false
+    @State private var cancelCopyButtonTopCenterScreen: CGPoint? = nil
+    @State private var cancelCopyButtonTooltipTask: Task<Void, Never>? = nil
     
     /// eraserボタンのサイズ。アイコンの大きさと、ボタンツールチップの上端基準（ボタンの高さ分のオフセット）に使用する
     private var buttonSize: CGFloat {
@@ -813,6 +817,7 @@ private struct QuickOverlayHistoryItemRow: View {
         .onDisappear {
             buttonTooltipTask?.cancel()
             editAndCopyButtonTooltipTask?.cancel()
+            cancelCopyButtonTooltipTask?.cancel()
         }
     }
 
@@ -836,43 +841,56 @@ private struct QuickOverlayHistoryItemRow: View {
             )
             .frame(width: 30, height: 30)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(verbatim: truncatedText)
                     .font(.body)
                     .foregroundColor(isSelected ? .white : .primary)
                     .lineLimit(1)
 
-                HStack(spacing: 4) {
-                    Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
+                if item.isCopying {
+                    ProgressView(value: item.copyProgress < 0.0 ? nil : item.copyProgress)
+                        .progressViewStyle(.linear)
+                        .controlSize(.small)
+                        .frame(minHeight: 14)
+                        .transition(.opacity)
+                } else {
+                    HStack(spacing: 4) {
+                        Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
 
-                    if showCharacterCount {
-                        Text("-")
-                        Text("\(item.text.count)文字")
-                    }
+                        if showCharacterCount {
+                            Text("-")
+                            Text("\(item.text.count)文字")
+                        }
 
-                    if let fileSize = item.fileSize, item.filePath != nil, !item.isFolder {
-                        Text("-")
-                        Text(formatFileSize(fileSize))
+                        if let fileSize = item.fileSize, item.filePath != nil, !item.isFolder {
+                            Text("-")
+                            Text(formatFileSize(fileSize))
+                        }
                     }
+                    .font(.caption)
+                    .foregroundStyle(isSelected && !item.isCopying ? .white.opacity(0.8) : .secondary)
+                    .transition(.opacity)
                 }
-                .font(.caption)
-                .foregroundStyle(isSelected ? .white.opacity(0.8) : .secondary)
             }
+            .opacity(item.isCopying ? 0.5 : 1.0)
+            .animation(.easeInOut(duration: 0.3), value: item.isCopying)
 
             Spacer()
 
-            if !shortcut.isEmpty {
+            if !shortcut.isEmpty && !item.isCopying {
                 Text(shortcut.replacingOccurrences(of: "^", with: "⌃"))
                     .font(.subheadline)
                     .foregroundColor(isSelected ? .white : Color(nsColor: .tertiaryLabelColor))
             }
         }
         .padding(8)
-        .background(isSelected ? Color.accentColor : Color.clear)
+        .background(isSelected && !item.isCopying ? Color.accentColor : Color.clear)
         .cornerRadius(12)
         .contentShape(Rectangle())
         .onHover { hovering in
-            onHoverItem(hovering)
+            if !item.isCopying {
+                onHoverItem(hovering)
+            }
         }
         .onContinuousHover(coordinateSpace: .global) { phase in
             switch phase {
@@ -899,12 +917,47 @@ private struct QuickOverlayHistoryItemRow: View {
 
     private var actionButtons: some View {
         HStack(spacing: 2) {
+            if item.isCopying {
+                cancelCopyButton
+            }
             eraserButton
             editAndCopyButton
             // 今後追加するボタンはここに並べる
         }
         .padding(.leading, 6)
         .padding(.trailing, 2)
+    }
+    
+    /// コピーをキャンセルするボタン。
+    private var cancelCopyButton: some View {
+        Button(action: {
+            QuickOverlayManager.shared.cancelCopyAndClose(itemID: item.originalPinnedItemID ?? item.id)
+        }) {
+            Image(systemName: "xmark")
+                .font(.system(size: buttonSize * 0.46, weight: .medium))
+                .foregroundStyle(isCancelCopyButtonHovered ? .white : Color(nsColor: .secondaryLabelColor))
+                .frame(width: buttonSize, height: buttonSize)
+                .background(isCancelCopyButtonHovered ? Color.red : Color.clear)
+                .cornerRadius(12)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .contentShape(Rectangle())
+        .onHover { hovering in
+            isCancelCopyButtonHovered = hovering
+            if hovering {
+                setCancelCopyHoverState(true)
+                showCancelCopyButtonTooltip()
+            } else {
+                setCancelCopyHoverState(false)
+                hideCancelCopyButtonTooltip()
+            }
+        }
+        .accessibilityLabel(String(localized: "コピーをキャンセル"))
+        .background(
+            ScreenFrameReader { frame in
+                cancelCopyButtonTopCenterScreen = CGPoint(x: frame.midX, y: frame.maxY)
+            }
+        )
     }
 
     /// 標準テキストとしてコピーするためのボタン。
@@ -919,11 +972,11 @@ private struct QuickOverlayHistoryItemRow: View {
                 .cornerRadius(12) // 項目のハイライトの角丸と統一する
         }
         .buttonStyle(PlainButtonStyle())
-        .disabled(isPlainTextOnly)
-        .opacity(isPlainTextOnly ? 0.4 : 1)
+        .disabled(isPlainTextOnly || item.isCopying)
+        .opacity((isPlainTextOnly || item.isCopying) ? 0.4 : 1)
         .contentShape(Rectangle())
         .onHover { hovering in
-            guard !isPlainTextOnly else { return }
+            guard !isPlainTextOnly, !item.isCopying else { return }
             isButtonHovered = hovering
             if hovering {
                 setPlainTextHoverState(true)
@@ -986,6 +1039,19 @@ private struct QuickOverlayHistoryItemRow: View {
             QuickOverlayManager.shared.hoveredItemId = nil
         }
     }
+    
+    /// キャンセルボタンホバー中の状態更新
+    private func setCancelCopyHoverState(_ hovering: Bool) {
+        if hovering {
+            QuickOverlayManager.shared.hoveredAction = nil
+            QuickOverlayManager.shared.hoveredItemId = item.originalPinnedItemID ?? item.id
+            QuickOverlayManager.shared.hoveredPhraseId = nil
+            QuickOverlayManager.shared.hoveredCancelCopy = true
+        } else {
+            QuickOverlayManager.shared.hoveredCancelCopy = false
+            QuickOverlayManager.shared.hoveredItemId = nil
+        }
+    }
 
     // MARK: - ボタンツールチップ
 
@@ -1011,6 +1077,30 @@ private struct QuickOverlayHistoryItemRow: View {
     private func hideButtonTooltip() {
         buttonTooltipTask?.cancel()
         buttonTooltipTask = nil
+        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
+    }
+    
+    // MARK: - キャンセルコピー用ボタンツールチップ
+    
+    private func showCancelCopyButtonTooltip() {
+        cancelCopyButtonTooltipTask?.cancel()
+        cancelCopyButtonTooltipTask = Task {
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            if !Task.isCancelled, let anchor = cancelCopyButtonTopCenterScreen {
+                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
+                    "text": String(localized: "コピーをキャンセル"),
+                    "isCompact": true,
+                    "buttonHeight": Double(buttonSize),
+                    "anchorX": Double(anchor.x),
+                    "anchorY": Double(anchor.y)
+                ])
+            }
+        }
+    }
+    
+    private func hideCancelCopyButtonTooltip() {
+        cancelCopyButtonTooltipTask?.cancel()
+        cancelCopyButtonTooltipTask = nil
         NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
     }
 

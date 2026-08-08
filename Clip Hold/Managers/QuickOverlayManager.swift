@@ -16,6 +16,8 @@ class QuickOverlayManager: ObservableObject {
     @Published var hoveredCopyAsPlainText: Bool = false
     // 変更してコピーウインドウを表示するかどうか
     @Published var hoveredEditAndCopy: Bool = false
+    // コピーをキャンセルするかどうか
+    @Published var hoveredCancelCopy: Bool = false
     
     private var globalEventMonitor: Any?
     private var localEventMonitor: Any?
@@ -186,6 +188,15 @@ class QuickOverlayManager: ObservableObject {
                         }
                     }
                 }
+            } else if hoveredCancelCopy {
+                if type == .history {
+                    if let itemId = hoveredItemId {
+                        if let item = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemId }) {
+                            item.isCopyCancelled = true
+                            ClipboardManager.shared.deleteItem(id: item.id)
+                        }
+                    }
+                }
             } else {
                 var itemToCopy: ClipboardItem? = nil
                 var copyAsPlainText = false
@@ -193,8 +204,10 @@ class QuickOverlayManager: ObservableObject {
                 if type == .history {
                     if let itemId = hoveredItemId {
                         if let item = ClipboardManager.shared.clipboardHistory.first(where: { $0.id == itemId }) {
-                            itemToCopy = item
-                            copyAsPlainText = hoveredCopyAsPlainText
+                            if !item.isCopying {
+                                itemToCopy = item
+                                copyAsPlainText = hoveredCopyAsPlainText
+                            }
                         }
                     }
                 } else {
@@ -240,6 +253,18 @@ class QuickOverlayManager: ObservableObject {
         }
         
         resetSelectionState()
+    }
+    
+    /// 履歴アイテムのコピーをキャンセルし、オーバーレイを閉じる。
+    @MainActor
+    func cancelCopyAndClose(itemID: UUID) {
+        hoveredAction = nil
+        hoveredPhraseId = nil
+        hoveredCopyAsPlainText = false
+        hoveredEditAndCopy = false
+        hoveredCancelCopy = true
+        hoveredItemId = itemID
+        executeActionAndClose()
     }
     
     /// 履歴アイテムを標準テキスト（プレーンテキスト）としてコピーし、オーバーレイを閉じる。
@@ -330,5 +355,6 @@ class QuickOverlayManager: ObservableObject {
         hoveredAction = nil
         hoveredCopyAsPlainText = false
         hoveredEditAndCopy = false
+        hoveredCancelCopy = false
     }
 }

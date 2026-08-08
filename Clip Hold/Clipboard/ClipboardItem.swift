@@ -12,6 +12,19 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     @Published var qrCodeContent: String?
     @Published var sourceAppPath: String?
     
+    // 非同期コピー関連のプロパティ (これらはCodableには含めない)
+    @Published var isCopying: Bool = false
+    @Published var isProgressBarVisible: Bool = false
+    @Published var copyProgress: Double = 0.0
+    var copyTask: Task<Void, Never>? = nil
+    var isCopyCancelled: Bool = false
+    var sourceFileURL: URL? = nil // コピー元のファイルURL (セッション中のみ有効)
+    
+    func cancelCopy() {
+        isCopyCancelled = true
+        copyTask?.cancel()
+    }
+    
     // ピン留め表示用の複製アイテムの場合、元のアイテムIDを保持
     var originalPinnedItemID: UUID? = nil
     

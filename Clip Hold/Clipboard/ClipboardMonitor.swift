@@ -132,10 +132,37 @@ extension ClipboardManager {
                                 }
                             }
                             
+                            // 既に同じコピー元URLがコピー中の場合、タスクを新しく開始せず、プレースホルダーとして新しいアイテムを追加する
+                            var remainingFileURLs: [URL] = []
+                            for fileURL in validLocalFileURLs {
+                                if let existingItem = self.clipboardHistory.first(where: { $0.isCopying && $0.sourceFileURL == fileURL }) {
+                                    print("DEBUG: checkPasteboard - File is already being copied: \(fileURL.lastPathComponent), adding duplicate placeholder.")
+                                    
+                                    let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
+                                    let newItem = ClipboardItem(text: existingItem.text, date: Date(), filePath: existingItem.filePath, fileSize: existingItem.fileSize, fileHash: existingItem.fileHash, qrCodeContent: existingItem.qrCodeContent, sourceAppPath: sourceAppPath)
+                                    newItem.sourceFileURL = fileURL
+                                    newItem.cachedThumbnailImage = existingItem.cachedThumbnailImage
+                                    await MainActor.run {
+                                        newItem.isCopying = true
+                                        newItem.isProgressBarVisible = existingItem.isProgressBarVisible
+                                        newItem.copyProgress = existingItem.copyProgress // 元のアイテムと同じ進捗状態にする
+                                    }
+                                    
+                                    await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "already copying file duplicate")
+                                } else {
+                                    remainingFileURLs.append(fileURL)
+                                }
+                            }
+                            
                             // 有効なローカルファイルURLが存在する場合 -> ファイルとして処理
-                            if !validLocalFileURLs.isEmpty {
+                            if !remainingFileURLs.isEmpty {
                                 let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
-                                await self.handleMultipleFilesChange(fileURLs: validLocalFileURLs, sourceAppPath: sourceAppPath)
+                                let copiedInternalItem = wasInternalCopyInitially ? lastCopiedInternalItem : nil
+                                
+                                await self.handleMultipleFilesChange(fileURLs: remainingFileURLs, sourceAppPath: sourceAppPath, originalItem: copiedInternalItem)
+                            }
+                            
+                            if !validLocalFileURLs.isEmpty {
                                 if wasInternalCopyInitially {
                                     await MainActor.run {
                                         self.isPerformingInternalCopy = false
@@ -160,6 +187,25 @@ extension ClipboardManager {
                             print("DEBUG: checkPasteboard - File URL (string) detected: \(url.lastPathComponent)")
                             
                             if url.isFileURL && FileManager.default.fileExists(atPath: url.path) {
+                                // 既に同じコピー元URLがコピー中の場合、タスクを新しく開始せず、プレースホルダーとして新しいアイテムを追加する
+                                if let existingItem = self.clipboardHistory.first(where: { $0.isCopying && $0.sourceFileURL == url }) {
+                                    print("DEBUG: checkPasteboard - File is already being copied: \(url.lastPathComponent), adding duplicate placeholder.")
+                                    
+                                    let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
+                                    let newItem = ClipboardItem(text: existingItem.text, date: Date(), filePath: existingItem.filePath, fileSize: existingItem.fileSize, fileHash: existingItem.fileHash, qrCodeContent: existingItem.qrCodeContent, sourceAppPath: sourceAppPath)
+                                    newItem.sourceFileURL = url
+                                    newItem.cachedThumbnailImage = existingItem.cachedThumbnailImage
+                                    await MainActor.run {
+                                        newItem.isCopying = true
+                                        newItem.isProgressBarVisible = existingItem.isProgressBarVisible
+                                        newItem.copyProgress = existingItem.copyProgress // 元のアイテムと同じ進捗状態にする
+                                    }
+                                    
+                                    await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "already copying file duplicate")
+                                    success = true
+                                    return
+                                }
+                                
                                 var qrCodeContent: String? = nil
                                 if let fileUTI = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType,
                                    fileUTI.conforms(to: .image) {
@@ -169,7 +215,8 @@ extension ClipboardManager {
                                 }
                                 
                                 let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
-                                if let newItem = await self.createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath) {
+                                let copiedInternalItem = wasInternalCopyInitially ? lastCopiedInternalItem : nil
+                                if let newItem = await self.createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath, originalItem: copiedInternalItem) {
                                     await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "file URL (string)")
                                 }
                                 success = true

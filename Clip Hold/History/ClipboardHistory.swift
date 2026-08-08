@@ -210,28 +210,6 @@ extension ClipboardManager {
             
             if Task.isCancelled { return }
             
-            // メモリ負荷を軽減するため、サムネイル生成を100件ずつのバッチ処理で行う
-            // 対象は新しく追加されたアイテム(newItems)のみとする
-            let newItemsWithFiles = newItems.filter { $0.filePath != nil }
-            let chunkSize = 100
-            for i in stride(from: 0, to: newItemsWithFiles.count, by: chunkSize) {
-                if Task.isCancelled { return }
-                
-                let end = min(i + chunkSize, newItemsWithFiles.count)
-                let chunk = Array(newItemsWithFiles[i..<end])
-                
-                await MainActor.run {
-                    for item in chunk {
-                        if let filePath = item.filePath {
-                            self.generateThumbnail(for: item, at: filePath)
-                        }
-                    }
-                }
-                
-                // チャンクごとに待機してメモリ（autoreleasepoolなど）の解放を促す
-                try? await Task.sleep(nanoseconds: 100_000_000) // 0.1秒
-            }
-            
             if Task.isCancelled { return }
             
             // 新しい履歴管理システムに一括で保存
@@ -307,10 +285,6 @@ extension ClipboardManager {
             }
             
             self.clipboardHistory = validHistory
-            
-            for item in self.clipboardHistory where item.filePath != nil {
-                generateThumbnail(for: item, at: item.filePath!)
-            }
             
             print("ClipboardManager: Clipboard history loaded from new system. Count: \(self.clipboardHistory.count)")
         }

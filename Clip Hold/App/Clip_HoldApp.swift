@@ -411,6 +411,7 @@ struct ClipHoldApp: App {
                         .labelStyle(.titleAndIcon)
                     }
                     .applyKeyboardShortcut(for: shortcutName)
+                    .disabled(item.isCopying)
                 }
             }
             
@@ -656,6 +657,7 @@ struct ClipHoldApp: App {
         KeyboardShortcuts.onKeyDown(for: .copyPinnedHistoryItem) {
             let clipboardManager = ClipboardManager.shared
             if let pinnedItem = clipboardManager.pinnedItem {
+                if pinnedItem.isCopying { return }
                 clipboardManager.isPerformingInternalCopy = true
                 clipboardManager.copyItemToClipboard(pinnedItem)
                 
@@ -701,6 +703,8 @@ struct ClipHoldApp: App {
                 // 並び替えた配列に対してインデックスを適用
                 if historySource.indices.contains(i) {
                     let historyItem = historySource[i]
+                    
+                    if historyItem.isCopying { return }
                     
                     // 内部コピーフラグをtrueに設定
                     clipboardManager.isPerformingInternalCopy = true

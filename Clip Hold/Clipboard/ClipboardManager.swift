@@ -16,17 +16,20 @@ class ClipboardManager: ObservableObject {
     var activeImportTask: Task<Void, Never>?
     
     // サンドボックスファイルURLからハッシュを引くためのキャッシュ
-    private var fileHashCache: [URL: String] = [:]
+    @MainActor private var fileHashCache: [URL: String] = [:]
     
+    @MainActor
     func updateFileHashCache(url: URL, hash: String) {
         fileHashCache[url] = hash
     }
     
+    @MainActor
     func getCachedFileHash(for url: URL) -> String? {
         return fileHashCache[url]
     }
     
     // ハッシュからキャッシュ内のファイルURLを検索する
+    @MainActor
     func getFileURL(forHash hash: String) -> URL? {
         return fileHashCache.first(where: { $1 == hash })?.key
     }
@@ -162,12 +165,16 @@ class ClipboardManager: ObservableObject {
                     try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
                     if !Task.isCancelled {
                         self?.isPerformingInternalCopy = false
+                        self?.lastCopiedInternalItem = nil
                         print("DEBUG: isPerformingInternalCopy auto-reset to false")
                     }
                 }
+            } else {
+                lastCopiedInternalItem = nil
             }
         }
     }
+    var lastCopiedInternalItem: ClipboardItem? = nil
     
     private var standardPhraseCopyTimeoutTask: Task<Void, Never>?
     @Published var isCopyingStandardPhrase: Bool = false {
