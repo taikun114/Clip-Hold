@@ -9911,6 +9911,74 @@
         }
       }
     },
+    "クリップボード監視: 一時停止中" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablage-Überwachung: Pausiert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clipboard Monitoring: Paused"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monitoreo del Portapapeles: Pausado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surveillance du Presse-papiers : En pause"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリップボード監視: 一時停止中"
+          }
+        }
+      }
+    },
+    "クリップボード監視: 動作中" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablage-Überwachung: Aktiv"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clipboard Monitoring: Active"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monitoreo del Portapapeles: Activo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surveillance du Presse-papiers : Actif"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリップボード監視: 動作中"
+          }
+        }
+      }
+    },
     "クリップボード監視が一時停止されました。" : {
       "comment" : "プライバシー設定のクリップボード監視を一時停止したときに表示される通知のタイトルテキスト。",
       "localizations" : {
@@ -10016,6 +10084,40 @@
         }
       }
     },
+    "クリップボード監視を一時停止" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablage-Überwachung pausieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause Clipboard Monitoring"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausar el Monitoreo del Portapapeles"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre en pause la Surveillance du Presse-papiers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリップボード監視を一時停止"
+          }
+        }
+      }
+    },
     "クリップボード監視を一時停止します。" : {
       "comment" : "プライバシー設定のクリップボード監視一時停止ボタンのツールチップテキスト。",
       "localizations" : {
@@ -10047,6 +10149,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボード監視を一時停止します。"
+          }
+        }
+      }
+    },
+    "クリップボード監視を再開" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwischenablage-Überwachung fortsetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume Clipboard Monitoring"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reanudar el Monitoreo del Portapapeles"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprendre la Surveillance du Presse-papiers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリップボード監視を再開"
           }
         }
       }

@@ -81,6 +81,16 @@ struct ClipHoldApp: App {
         ClipHoldApp.setupGlobalShortcuts()
     }
     
+    static func toggleClipboardMonitoring() {
+        let defaults = UserDefaults.standard
+        let currentIsPaused = defaults.bool(forKey: "isClipboardMonitoringPaused")
+        
+        defaults.set(!currentIsPaused, forKey: "isClipboardMonitoringPaused")
+        NotificationManager.shared.sendMonitoringStatusNotification(isPaused: !currentIsPaused)
+        
+        print("Toggled isClipboardMonitoringPaused from \(currentIsPaused) to \(!currentIsPaused).")
+    }
+    
     // MARK: - キーボード操作をシミュレートする関数
     static func performPaste() {
         Task.detached(priority: .userInitiated) {
@@ -417,6 +427,32 @@ struct ClipHoldApp: App {
             
             Divider()
             
+            if isClipboardMonitoringPaused {
+                Label("クリップボード監視: 一時停止中", systemImage: "pause.fill")
+                    .labelStyle(.titleAndIcon)
+                
+                Button {
+                    ClipHoldApp.toggleClipboardMonitoring()
+                } label: {
+                    Label("クリップボード監視を再開", systemImage: "play")
+                        .labelStyle(.titleAndIcon)
+                }
+                .applyKeyboardShortcut(for: .toggleClipboardMonitoring)
+            } else {
+                Label("クリップボード監視: 動作中", systemImage: "play.fill")
+                    .labelStyle(.titleAndIcon)
+                
+                Button {
+                    ClipHoldApp.toggleClipboardMonitoring()
+                } label: {
+                    Label("クリップボード監視を一時停止", systemImage: "pause")
+                        .labelStyle(.titleAndIcon)
+                }
+                .applyKeyboardShortcut(for: .toggleClipboardMonitoring)
+            }
+            
+            Divider()
+            
             Button(action: {
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showSettingsWindow()
@@ -478,17 +514,7 @@ struct ClipHoldApp: App {
         
         KeyboardShortcuts.onKeyDown(for: .toggleClipboardMonitoring) {
             print("Toggle Clipboard Monitoring shortcut pressed!")
-            let defaults = UserDefaults.standard
-            let currentIsPaused = defaults.bool(forKey: "isClipboardMonitoringPaused")
-            
-            // UserDefaultsの値を直接トグルする
-            defaults.set(!currentIsPaused, forKey: "isClipboardMonitoringPaused")
-            
-            // ショートカットで切り替えた際に通知を送信
-            NotificationManager.shared.sendMonitoringStatusNotification(isPaused: !currentIsPaused)
-            
-            // コンソール出力はUserDefaultsの変更結果に基づいて行う
-            print("Changed isClipboardMonitoringPaused value from \(currentIsPaused) to \(!currentIsPaused).")
+            ClipHoldApp.toggleClipboardMonitoring()
         }
         
         // 新しい定型文の追加ショートカットの登録

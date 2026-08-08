@@ -59,6 +59,7 @@ Notes
 - **Improve the preset picker display on macOS Tahoe or later**
 - **Improve accuracy of detecting the source application of copied items**
   - A more accurate app is now detected when copying from a background window (e.g., via right-click) while another app is focused. Note that due to system limitations, if you copy text from a context menu on the Clip Hold window (such as in an alert or sheet), another frontmost app will be detected. (Don't worry, copying from the copy history or standard phrases will be recognized correctly.)
+- **Improve to allow toggling clipboard monitoring from the menu**
 - **Improve to display currently configured shortcut keys in the menu**
 - **Improve operability of History and Standard Phrase windows**
   - When you open the History or Standard Phrase window, the first item is now focused, making it easier to operate with just the keyboard. You can also type directly to search or return focus to the list.

@@ -9,20 +9,7 @@ struct PrivacySettingsView: View {
     
     @ObservedObject private var accessibilityChecker = AccessibilityPermissionChecker.shared
     
-    @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false {
-        // isClipboardMonitoringPausedが変更されたときに監視状態を更新
-        didSet {
-            if isClipboardMonitoringPaused {
-                clipboardManager.stopMonitoringPasteboard()
-            } else {
-                clipboardManager.startMonitoringPasteboard()
-            }
-            
-            // 監視状態変更時の通知を送信
-            NotificationManager.shared.sendMonitoringStatusNotification(isPaused: isClipboardMonitoringPaused)
-            print("PrivacySettingsView didSet: Clipboard monitoring state changed to \(isClipboardMonitoringPaused ? "paused" : "resumed").")
-        }
-    }
+    @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
     
     @AppStorage("excludedAppIdentifiersData") var excludedAppIdentifiersData: Data = Data()
     @State private var excludedAppIdentifiers: [String] = [] {
@@ -115,7 +102,7 @@ struct PrivacySettingsView: View {
                     }
                     Spacer()
                     Button(action: {
-                        isClipboardMonitoringPaused.toggle()
+                        ClipHoldApp.toggleClipboardMonitoring()
                     }) {
                         HStack {
                             Image(systemName: isClipboardMonitoringPaused ? "play.fill" : "pause.fill")
