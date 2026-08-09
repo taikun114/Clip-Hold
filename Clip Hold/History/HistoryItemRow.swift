@@ -101,6 +101,11 @@ struct HistoryItemRow<MenuContent: View>: View {
                         .frame(width: lineNumberTextWidth, alignment: .trailing)
                         .padding(.trailing, trailingPaddingForLineNumber)
                 }
+            } else if item.originalPinnedItemID != nil {
+                Image(systemName: "pin.fill")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 14)
             }
             
             // アイコン部分 (新しく作成した共有コンポーネントを使用)
