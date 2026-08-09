@@ -48,6 +48,8 @@ Notes
 - **Fix issue where the copy notification would not disappear when copying from the menu in the Standard Phrase window**
 - **Fix issue where some sheets were not displayed correctly on macOS Golden Gate**
 - **Fix issue where some history and standard phrase settings were not applied until the app was restarted**
+- **Fix issue where processing stopped while the large file copy alert was displayed**
+  - With native alerts, all processing stopped while the alert was displayed due to OS constraints. To fix this, a custom alert was implemented. As a result, processing no longer stops even when the alert is displayed, and the alert is always displayed in the foreground.
 - **Improve settings layout**
   - The "Standard Phrases Window" section and "History Window" section in the General settings have been moved to the Standard Phrases and Copy History settings, respectively.
 - **Improve the performance of the History window**
