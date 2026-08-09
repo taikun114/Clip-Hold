@@ -158,8 +158,7 @@ struct HistoryItemRow<MenuContent: View>: View {
             }
             .help(item.text) // コンテンツテキスト部分にツールチップを追加
             .opacity(item.isCopying ? 0.5 : 1.0)
-            
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
             
             Menu {
                 menuItems()

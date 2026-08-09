@@ -847,7 +847,7 @@ private struct QuickOverlayHistoryItemRow: View {
                     .foregroundColor(isSelected ? .white : .primary)
                     .lineLimit(1)
 
-                if item.isCopying {
+                if item.isCopying && item.isProgressBarVisible {
                     ProgressView(value: item.copyProgress < 0.0 ? nil : item.copyProgress)
                         .progressViewStyle(.linear)
                         .controlSize(.small)
@@ -874,8 +874,7 @@ private struct QuickOverlayHistoryItemRow: View {
             }
             .opacity(item.isCopying ? 0.5 : 1.0)
             .animation(.easeInOut(duration: 0.3), value: item.isCopying)
-
-            Spacer()
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             if !shortcut.isEmpty && !item.isCopying {
                 Text(shortcut.replacingOccurrences(of: "^", with: "⌃"))
