@@ -200,14 +200,19 @@ class ClipboardManager: ObservableObject {
             }
         }
     }
-    // 既存のプロパティ（将来的な互換性維持のため保持）
-    var pendingLargeFileItem: (fileURL: URL, qrCodeContent: String?)?
-    var pendingLargeFileItems: [(fileURL: URL, qrCodeContent: String?)]?
-    var pendingLargeFileItemsSourceAppPath: String? // 新しく追加
-    var pendingLargeImageData: (imageData: Data, qrCodeContent: String?)?
+    // MARK: - Large File Alert Properties
+    // 大容量ファイルの保留リスト（統合）
+    @Published var pendingLargeFileItemsWithSize: [(fileURL: URL, qrCodeContent: String?, fileSize: UInt64?)] = [] {
+        didSet {
+            if showingLargeFileAlert {
+                presentLargeFileConfirmationAlert()
+            }
+        }
+    }
+    @Published var pendingLargeFileItemsSourceAppPath: String?
     
-    // 新しく追加: ファイルサイズ情報を含む新しいプロパティ
-    var pendingLargeFileItemsWithSize: [(fileURL: URL, qrCodeContent: String?, fileSize: UInt64?)]?
+    // 画像データ用の保留プロパティ（これはそのまま保持）
+    var pendingLargeImageData: (imageData: Data, qrCodeContent: String?)?
     
     // MARK: - Initialization
     private init() {

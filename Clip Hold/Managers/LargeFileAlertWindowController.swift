@@ -48,6 +48,9 @@ class FocusablePanel: NSPanel {
 class LargeFileAlertWindowController: NSWindowController {
     static let shared = LargeFileAlertWindowController()
     
+    // 現在表示中のアラートのViewModel
+    var currentViewModel: LargeFileAlertViewModel?
+    
     private init() {
         // Create an invisible, borderless window
         let panel = FocusablePanel(
@@ -78,22 +81,21 @@ class LargeFileAlertWindowController: NSWindowController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func showAlert(title: String, message: String, onSave: @escaping @MainActor () -> Void, onCancel: @escaping @MainActor () -> Void) {
+    func showAlert(title: String, message: String, buttons: [LargeFileAlertButton]) {
         Task { @MainActor [weak self] in
             guard let self = self, let window = self.window else { return }
             
-            let alertView = LargeFileAlertView(
-                title: title,
-                message: message,
-                onSave: {
-                    self.closeWindow()
-                    onSave()
-                },
-                onCancel: {
-                    self.closeWindow()
-                    onCancel()
-                }
-            )
+            // 既に表示中で、ViewModelが存在する場合は内容だけ更新する
+            if let existingViewModel = self.currentViewModel, window.isVisible {
+                existingViewModel.title = title
+                existingViewModel.message = message
+                existingViewModel.buttons = buttons
+                return
+            }
+            
+            let viewModel = LargeFileAlertViewModel(title: title, message: message, buttons: buttons)
+            self.currentViewModel = viewModel
+            let alertView = LargeFileAlertView(viewModel: viewModel)
             
             let hostingController = NSHostingController(rootView: alertView)
             // Ensure background remains transparent
@@ -121,7 +123,8 @@ class LargeFileAlertWindowController: NSWindowController {
         }
     }
     
-    private func closeWindow() {
+    func closeWindow() {
+        self.currentViewModel = nil
         self.close()
     }
 }

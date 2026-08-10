@@ -1,10 +1,34 @@
 import SwiftUI
 
-struct LargeFileAlertView: View {
+struct LargeFileAlertButton: Identifiable {
+    let id = UUID()
     let title: String
-    let message: String
-    let onSave: () -> Void
-    let onCancel: () -> Void
+    let action: () -> Void
+    let isProminent: Bool
+    let keyboardShortcut: KeyboardShortcut?
+    
+    init(title: String, isProminent: Bool = false, keyboardShortcut: KeyboardShortcut? = nil, action: @escaping () -> Void) {
+        self.title = title
+        self.isProminent = isProminent
+        self.keyboardShortcut = keyboardShortcut
+        self.action = action
+    }
+}
+
+class LargeFileAlertViewModel: ObservableObject {
+    @Published var title: String
+    @Published var message: String
+    @Published var buttons: [LargeFileAlertButton]
+    
+    init(title: String, message: String, buttons: [LargeFileAlertButton]) {
+        self.title = title
+        self.message = message
+        self.buttons = buttons
+    }
+}
+
+struct LargeFileAlertView: View {
+    @ObservedObject var viewModel: LargeFileAlertViewModel
     
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.controlActiveState) var controlActiveState
@@ -42,14 +66,15 @@ struct LargeFileAlertView: View {
                     .padding(isMacOS26OrNewer ? 0 : 4)
                     .padding(.bottom, 4)
                 
-                Text(title)
+                Text(viewModel.title)
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundStyle(colorScheme == .dark && !isMacOS26OrNewer ? .white : .primary)
+                    .multilineTextAlignment(isMacOS26OrNewer ? .leading : .center)
                     .fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled)
                 
-                Text(message)
+                Text(viewModel.message)
                     .font(isMacOS26OrNewer ? .body : .callout)
                     .foregroundStyle(colorScheme == .dark && !isMacOS26OrNewer ? .white : .primary)
                     .multilineTextAlignment(isMacOS26OrNewer ? .leading : .center)
@@ -61,35 +86,32 @@ struct LargeFileAlertView: View {
             
             // Buttons
             HStack(spacing: 8) {
-                if isMacOS26OrNewer {
-                    Button(action: onCancel) {
-                        Text(NSLocalizedString("いいえ", comment: ""))
-                            .frame(maxWidth: .infinity)
+                ForEach(viewModel.buttons) { button in
+                    if isMacOS26OrNewer {
+                        if button.isProminent {
+                            Button(action: button.action) {
+                                Text(button.title)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .controlSize(.large)
+                            .buttonStyle(.borderedProminent)
+                            .keyboardShortcut(button.keyboardShortcut)
+                        } else {
+                            Button(action: button.action) {
+                                Text(button.title)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .controlSize(.large)
+                            .keyboardShortcut(button.keyboardShortcut)
+                        }
+                    } else {
+                        Button(action: button.action) {
+                            Text(button.title)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(LegacyAlertButtonStyle(isProminent: button.isProminent))
+                        .keyboardShortcut(button.keyboardShortcut)
                     }
-                    .controlSize(.large)
-                    .keyboardShortcut(.cancelAction)
-                    
-                    Button(action: onSave) {
-                        Text(NSLocalizedString("はい", comment: ""))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .controlSize(.large)
-                    .buttonStyle(.borderedProminent)
-                    .keyboardShortcut(.defaultAction)
-                } else {
-                    Button(action: onCancel) {
-                        Text(NSLocalizedString("いいえ", comment: ""))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(LegacyAlertButtonStyle(isProminent: false))
-                    .keyboardShortcut(.cancelAction)
-                    
-                    Button(action: onSave) {
-                        Text(NSLocalizedString("はい", comment: ""))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(LegacyAlertButtonStyle(isProminent: true))
-                    .keyboardShortcut(.defaultAction)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -108,6 +130,7 @@ struct LargeFileAlertView: View {
                         .environment(\.controlActiveState, .active)
                 }
             }
+            .overlay(WindowDragView())
         )
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
         // 下地: 明るいボーダー (lineWidth: 2 で 0pt〜2ptの範囲に描画)
@@ -136,17 +159,20 @@ struct LargeFileAlertView: View {
             x: 0,
             y: controlActiveState != .inactive ? 16 : 12
         )
-        .background(WindowDragView()) // ドラッグ処理専用のビューを背面に配置
         .padding(60) // Shadow padding
     }
 }
 
 #Preview {
     LargeFileAlertView(
-        title: "大容量ファイルのコピー",
-        message: "100 MBを超えるファイル（124.6 MB）がコピーされました。履歴に保存してもよろしいですか？",
-        onSave: {},
-        onCancel: {}
+        viewModel: LargeFileAlertViewModel(
+            title: "大容量ファイルのコピー",
+            message: "100 MBを超えるファイル（124.6 MB）がコピーされました。履歴に保存してもよろしいですか？",
+            buttons: [
+                LargeFileAlertButton(title: "いいえ", action: {}),
+                LargeFileAlertButton(title: "はい", isProminent: true, action: {})
+            ]
+        )
     )
 }
 

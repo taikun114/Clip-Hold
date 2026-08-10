@@ -136,10 +136,22 @@ extension ClipboardManager {
             let sourceAppPathForAlert = sourceAppPath
             
             await MainActor.run {
-                self.pendingLargeFileItemsWithSize = itemsWithSizeForAlert
-                self.pendingLargeFileItemsSourceAppPath = sourceAppPathForAlert // ソースアプリパスを保持
-                self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
-                print("DEBUG: createClipboardItemsForMultipleFileURLs - Setting showingLargeFileAlert to true for \(fileCount) files with total size \(totalSizeForAlert).")
+                if self.showingLargeFileAlert {
+                    let newItems = itemsWithSizeForAlert.filter { newItem in
+                        !self.pendingLargeFileItemsWithSize.contains { existingItem in
+                            existingItem.fileURL.path == newItem.fileURL.path
+                        }
+                    }
+                    if !newItems.isEmpty {
+                        self.pendingLargeFileItemsWithSize.append(contentsOf: newItems)
+                        print("DEBUG: Appended \(newItems.count) new files to pendingLargeFileItemsWithSize. Total count: \(self.pendingLargeFileItemsWithSize.count)")
+                    }
+                } else {
+                    self.pendingLargeFileItemsWithSize = itemsWithSizeForAlert
+                    self.pendingLargeFileItemsSourceAppPath = sourceAppPathForAlert // ソースアプリパスを保持
+                    self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
+                    print("DEBUG: createClipboardItemsForMultipleFileURLs - Setting showingLargeFileAlert to true for \(fileCount) files with total size \(totalSizeForAlert).")
+                }
             }
             return nil // まだ保存せず、ユーザーのアラート確認を待つ
         } else if maxFileSizeToSave > 0 && totalFileSize > maxFileSizeToSave {
@@ -179,10 +191,18 @@ extension ClipboardManager {
                     } else if largeFileAlertThreshold > 0 && fileSize > largeFileAlertThreshold {
                         // アラートしきい値を超えている場合、アラート表示を要求
                         await MainActor.run {
-                            self.pendingLargeFileItem = (fileURL, qrCodeContent)
-                            self.pendingLargeFileItemsSourceAppPath = sourceAppPath
-                            self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
-                            print("DEBUG: createClipboardItemForFileURL - Setting showingLargeFileAlert to true for file: \(fileURL.lastPathComponent)")
+                            let newItem = (fileURL: fileURL, qrCodeContent: qrCodeContent, fileSize: fileSize)
+                            if self.showingLargeFileAlert {
+                                if !self.pendingLargeFileItemsWithSize.contains(where: { $0.fileURL.path == fileURL.path }) {
+                                    self.pendingLargeFileItemsWithSize.append(newItem)
+                                    print("DEBUG: Appended 1 file to pendingLargeFileItemsWithSize. Total count: \(self.pendingLargeFileItemsWithSize.count)")
+                                }
+                            } else {
+                                self.pendingLargeFileItemsWithSize = [newItem]
+                                self.pendingLargeFileItemsSourceAppPath = sourceAppPath
+                                self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
+                                print("DEBUG: createClipboardItemForFileURL - Setting showingLargeFileAlert to true for file: \(fileURL.lastPathComponent)")
+                            }
                         }
                         return nil // まだ保存せず、ユーザーのアラート確認を待つ
                     }
