@@ -136,6 +136,7 @@ struct LargeFileAlertView: View {
             x: 0,
             y: controlActiveState != .inactive ? 16 : 12
         )
+        .background(WindowDragView()) // ドラッグ処理専用のビューを背面に配置
         .padding(60) // Shadow padding
     }
 }
@@ -199,5 +200,52 @@ struct LegacyAlertButtonStyle: ButtonStyle {
             )
             .foregroundStyle(fgColor)
             .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+    }
+}
+
+// カスタムドラッグ実装用のビュー
+struct WindowDragView: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        return DraggingView()
+    }
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
+class DraggingView: NSView {
+    private var initialMouse: NSPoint?
+    private var initialOrigin: NSPoint?
+    
+    // 背景クリックを透過させず、ドラッグ用に拾う
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        return self
+    }
+    
+    override func mouseDown(with event: NSEvent) {
+        guard let window = self.window else { return }
+        initialMouse = NSEvent.mouseLocation
+        initialOrigin = window.frame.origin
+    }
+    
+    override func mouseDragged(with event: NSEvent) {
+        guard let window = self.window,
+              let initialMouse = initialMouse,
+              let initialOrigin = initialOrigin,
+              let panel = window as? NSPanel else { return }
+        
+        let currentMouse = NSEvent.mouseLocation
+        let deltaX = currentMouse.x - initialMouse.x
+        let deltaY = currentMouse.y - initialMouse.y
+        
+        var newRect = NSRect(origin: NSPoint(x: initialOrigin.x + deltaX, y: initialOrigin.y + deltaY), size: window.frame.size)
+        
+        // 制約を適用（画面上端まで移動許可）
+        newRect = panel.constrainFrameRect(newRect, to: window.screen)
+        
+        window.setFrameOrigin(newRect.origin)
+    }
+    
+    override func mouseUp(with event: NSEvent) {
+        initialMouse = nil
+        initialOrigin = nil
     }
 }
