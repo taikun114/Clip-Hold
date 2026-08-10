@@ -23,32 +23,41 @@ struct LargeFileAlertView: View {
             // Icon
             let iconName: String = {
                 if #available(macOS 15.0, *) {
-                    return "document.badge.plus.fill"
+                    return "document.on.clipboard.fill"
                 } else {
-                    return "doc.fill.badge.plus"
+                    return "doc.on.clipboard.fill"
                 }
             }()
             
             // Title and Message
             VStack(alignment: isMacOS26OrNewer ? .leading : .center, spacing: 12) {
                 Image(systemName: iconName)
-                    .font(.system(size: 40))
-                    .foregroundStyle(Color.accentColor)
-                    .padding(.vertical, isMacOS26OrNewer ? 0 : 4)
+                    .font(.system(size: 24))
+                    .foregroundStyle(.white)
+                    .frame(width: 56, height: 56)
+                    .background(
+                        Circle()
+                            .fill(Color.accentColor)
+                    )
+                    .padding(isMacOS26OrNewer ? 0 : 4)
+                    .padding(.bottom, 4)
                 
                 Text(title)
                     .font(.headline)
                     .fontWeight(.bold)
+                    .foregroundStyle(colorScheme == .dark && !isMacOS26OrNewer ? .white : .primary)
                     .fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled)
                 
                 Text(message)
                     .font(isMacOS26OrNewer ? .body : .callout)
+                    .foregroundStyle(colorScheme == .dark && !isMacOS26OrNewer ? .white : .primary)
                     .multilineTextAlignment(isMacOS26OrNewer ? .leading : .center)
                     .fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled)
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
             
             // Buttons
             HStack(spacing: 8) {
@@ -101,10 +110,25 @@ struct LargeFileAlertView: View {
             }
         )
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        // 下地: 明るいボーダー (lineWidth: 2 で 0pt〜2ptの範囲に描画)
+        .overlay(
+            Group {
+                if colorScheme == .dark && isMacOS26OrNewer {
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.3), lineWidth: 2)
+                        .blendMode(.overlay)
+                } else {
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .strokeBorder(Color.white.opacity(colorScheme == .dark ? 0.2 : 0.3), lineWidth: 2)
+                        .blendMode(colorScheme == .dark ? .plusLighter : .normal)
+                }
+            }
+        )
+        // 上乗せ: 暗いボーダー (lineWidth: 1 で 0pt〜1ptの範囲を上書き)
+        // 結果: 最外周の1pt(非Retinaで1px)が黒、その内側の1pt(非Retinaで1px)が明るいハイライトとして残る
         .overlay(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .strokeBorder(Color.primary.opacity(colorScheme == .dark ? 0.25 : isMacOS26OrNewer ? 0.3 : 0.2), lineWidth: 1)
-                .blendMode(colorScheme == .dark ? .plusLighter : .normal)
+                .strokeBorder(colorScheme == .dark ? Color.black : Color.black.opacity(isMacOS26OrNewer ? 0.25 : 0.3), lineWidth: 1)
         )
         .shadow(
             color: Color.black.opacity(controlActiveState != .inactive ? 0.4 : 0.2),
@@ -139,8 +163,8 @@ struct LegacyAlertButtonStyle: ButtonStyle {
         let topGradientColor = colorScheme == .dark ? Color.white.opacity(0.08) : Color.white.opacity(0.15)
         let bottomGradientColor = colorScheme == .dark ? Color.black.opacity(0.15) : Color.clear
         let nonProminentOpacity = colorScheme == .dark 
-            ? (configuration.isPressed ? 0.5 : 0.35)
-            : (configuration.isPressed ? 0.25 : 0.15)
+            ? (configuration.isPressed ? 0.55 : 0.35)
+            : (configuration.isPressed ? 0.3 : 0.15)
         
         configuration.label
             .padding(.vertical, 6)
@@ -161,7 +185,15 @@ struct LegacyAlertButtonStyle: ButtonStyle {
                                     : Color.clear
                             )
                     } else {
-                        Color.primary.opacity(nonProminentOpacity)
+                        if colorScheme == .dark {
+                            Color.clear
+                                .background(Material.ultraThinMaterial)
+                                .environment(\.controlActiveState, .active)
+                                .saturation(2)
+                                .overlay(Color.primary.opacity(nonProminentOpacity))
+                        } else {
+                            Color.primary.opacity(nonProminentOpacity)
+                        }
                     }
                 }
             )
