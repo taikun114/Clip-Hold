@@ -53,6 +53,7 @@ Notes
 - **Fix issue where processing stopped while the large file copy alert was displayed**
   - With native alerts, all processing stopped while the alert was displayed due to OS constraints. To fix this, a custom alert was implemented. As a result, processing no longer stops even when the alert is displayed, and the alert is always displayed in the foreground.
 - **Fix issue where app icons might not display correctly in the filter menu of the History window on macOS Sonoma**
+- **Fix issue where correct thumbnail images were not displayed when copying images from web browsers or other apps**
 - **Improve settings layout**
   - The "Standard Phrases Window" section and "History Window" section in the General settings have been moved to the Standard Phrases and Copy History settings, respectively.
 - **Improve the performance of the History window**

@@ -295,24 +295,30 @@ extension ClipboardManager {
                         }
                     }
                     
-                    // 4. ローカルファイルURLが有効でない場合、またはWeb URLと画像データが両方存在する場合 -> 画像データを優先 (高優先度)
                     if hasImageDataType {
                         var imageDataFromPasteboard: Data?
                         var imageFromPasteboard: NSImage?
                         
-                        if let tiffData = pasteboard.data(forType: .tiff) {
-                            imageDataFromPasteboard = tiffData
-                            imageFromPasteboard = NSImage(data: tiffData)
-                            print("DEBUG: checkPasteboard - Image data detected on pasteboard (TIFF).")
-                        } else if let pngData = pasteboard.data(forType: .png) {
+                        if let pngData = pasteboard.data(forType: .png) {
                             imageDataFromPasteboard = pngData
                             imageFromPasteboard = NSImage(data: pngData)
                             print("DEBUG: checkPasteboard - Image data detected on pasteboard (PNG).")
-                        } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
-                            imageDataFromPasteboard = image.tiffRepresentation
+                        } else if let tiffData = pasteboard.data(forType: .tiff), let image = NSImage(data: tiffData) {
                             imageFromPasteboard = image
+                            // convert to PNG
+                            if let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
+                                let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
+                                imageDataFromPasteboard = bitmapRep.representation(using: .png, properties: [:])
+                            }
+                            print("DEBUG: checkPasteboard - Image data detected on pasteboard (TIFF converted to PNG).")
+                        } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
+                            imageFromPasteboard = image
+                            if let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
+                                let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
+                                imageDataFromPasteboard = bitmapRep.representation(using: .png, properties: [:])
+                            }
                             if imageDataFromPasteboard != nil {
-                                print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage).")
+                                print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage converted to PNG).")
                             }
                         }
                         
@@ -333,19 +339,25 @@ extension ClipboardManager {
                         var imageDataFromPasteboard: Data?
                         var imageFromPasteboard: NSImage?
                         
-                        if let tiffData = pasteboard.data(forType: .tiff) {
-                            imageDataFromPasteboard = tiffData
-                            imageFromPasteboard = NSImage(data: tiffData)
-                            print("DEBUG: checkPasteboard - Image data detected on pasteboard (TIFF).")
-                        } else if let pngData = pasteboard.data(forType: .png) {
+                        if let pngData = pasteboard.data(forType: .png) {
                             imageDataFromPasteboard = pngData
                             imageFromPasteboard = NSImage(data: pngData)
                             print("DEBUG: checkPasteboard - Image data detected on pasteboard (PNG).")
-                        } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
-                            imageDataFromPasteboard = image.tiffRepresentation
+                        } else if let tiffData = pasteboard.data(forType: .tiff), let image = NSImage(data: tiffData) {
                             imageFromPasteboard = image
+                            if let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
+                                let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
+                                imageDataFromPasteboard = bitmapRep.representation(using: .png, properties: [:])
+                            }
+                            print("DEBUG: checkPasteboard - Image data detected on pasteboard (TIFF converted to PNG).")
+                        } else if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage {
+                            imageFromPasteboard = image
+                            if let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) {
+                                let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
+                                imageDataFromPasteboard = bitmapRep.representation(using: .png, properties: [:])
+                            }
                             if imageDataFromPasteboard != nil {
-                                print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage).")
+                                print("DEBUG: checkPasteboard - Image data detected on pasteboard (from generic NSImage converted to PNG).")
                             }
                         }
                         

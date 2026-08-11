@@ -1,4 +1,5 @@
 import SwiftUI
+import QuickLookThumbnailing
 
 struct ClipboardItemIconView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
@@ -67,6 +68,11 @@ struct ClipboardItemIconView: View {
             Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
                 .resizable()
                 .scaledToFit()
+                .task(id: item.id) {
+                    if item.cachedThumbnailImage == nil && (item.isImage || item.isPDF) {
+                        await generateThumbnailAsync(for: filePath)
+                    }
+                }
         } else {
             if item.richText != nil {
                 if #available(macOS 15.0, *) {
@@ -119,6 +125,38 @@ struct ClipboardItemIconView: View {
         .alignmentGuide(.leading) { _ in 4 }
         .alignmentGuide(.top) { _ in 22.5 }
         .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 1)
+    }
+    
+    private func generateThumbnailAsync(for fileURL: URL) async {
+        guard item.cachedThumbnailImage == nil else { return }
+        
+        let thumbnailSize = CGSize(width: 40, height: 40)
+        let request = QLThumbnailGenerator.Request(fileAt: fileURL, size: thumbnailSize, scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
+        
+        do {
+            let thumbnail = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
+            let paddedImage = clipboardManager.padToSquare(thumbnail.nsImage, size: thumbnailSize)
+            await MainActor.run {
+                item.cachedThumbnailImage = paddedImage
+            }
+        } catch {
+            if item.isImage {
+                // Task.detachedでバックグラウンド実行し、I/Oブロックを避ける
+                let imageResult = await Task.detached { () -> NSImage? in
+                    if let image = NSImage(contentsOf: fileURL) {
+                        return image
+                    }
+                    return nil
+                }.value
+                
+                if let image = imageResult {
+                    let paddedImage = clipboardManager.padToSquare(image, size: thumbnailSize)
+                    await MainActor.run {
+                        item.cachedThumbnailImage = paddedImage
+                    }
+                }
+            }
+        }
     }
 }
 

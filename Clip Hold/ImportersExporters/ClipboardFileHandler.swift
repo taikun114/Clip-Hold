@@ -632,7 +632,16 @@ extension ClipboardManager {
         if let duplicateURL = duplicateURL, FileManager.default.fileExists(atPath: duplicateURL.path) {
             print("ClipboardManager: Found duplicate image in sandbox based on file hash cache: \(duplicateURL.lastPathComponent)")
             let sandboxedFileAttributes = getFileAttributes(duplicateURL)
-            return ClipboardItem(text: "Image File", date: Date(), filePath: duplicateURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+            let newItem = ClipboardItem(text: "Image File", date: Date(), filePath: duplicateURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+            
+            // 即座にサムネイルを生成してセット (画像データから直接生成)
+            if let image = NSImage(data: imageData) {
+                let thumbnailSize = CGSize(width: 40, height: 40) // メニューバーの表示サイズに合わせる
+                newItem.cachedThumbnailImage = ClipboardManager.shared.padToSquare(image, size: thumbnailSize)
+            } else {
+                newItem.cachedThumbnailImage = NSWorkspace.shared.icon(forFile: duplicateURL.path)
+            }
+            return newItem
         }
         
         // 重複が見つからなかった場合、新しい画像を保存
@@ -649,7 +658,16 @@ extension ClipboardManager {
             }
             
             // ファイルサイズとハッシュもセット
-            return ClipboardItem(text: "Image File", date: Date(), filePath: destinationURL, fileSize: newImageSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+            let newItem = ClipboardItem(text: "Image File", date: Date(), filePath: destinationURL, fileSize: newImageSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
+            
+            // 即座にサムネイルを生成してセット (画像データから直接生成)
+            if let image = NSImage(data: imageData) {
+                let thumbnailSize = CGSize(width: 40, height: 40) // メニューバーの表示サイズに合わせる
+                newItem.cachedThumbnailImage = ClipboardManager.shared.padToSquare(image, size: thumbnailSize)
+            } else {
+                newItem.cachedThumbnailImage = NSWorkspace.shared.icon(forFile: destinationURL.path)
+            }
+            return newItem
         } catch {
             print("ClipboardManager: Error saving new image to sandbox: \(error.localizedDescription)")
             return nil
@@ -693,7 +711,12 @@ extension ClipboardManager {
         if let duplicateURL = duplicateURL, FileManager.default.fileExists(atPath: duplicateURL.path) {
             print("ClipboardManager: Found duplicate PDF in sandbox based on file hash cache: \(duplicateURL.lastPathComponent)")
             let attributes = getFileAttributes(duplicateURL)
-            return ClipboardItem(text: "PDF File", date: Date(), filePath: duplicateURL, fileSize: attributes.fileSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+            let newItem = ClipboardItem(text: "PDF File", date: Date(), filePath: duplicateURL, fileSize: attributes.fileSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+            
+            // PDF用のサムネイル生成を非同期で開始
+            self.generateThumbnail(for: newItem, at: duplicateURL)
+            
+            return newItem
         }
         
         // 重複が見つからなかった場合、新しいPDFを保存
@@ -709,7 +732,12 @@ extension ClipboardManager {
                 self.updateFileHashCache(url: destinationURL, hash: newPDFHash)
             }
             
-            return ClipboardItem(text: "PDF File", date: Date(), filePath: destinationURL, fileSize: newPDFSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+            let newItem = ClipboardItem(text: "PDF File", date: Date(), filePath: destinationURL, fileSize: newPDFSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
+            
+            // PDF用のサムネイル生成を非同期で開始
+            self.generateThumbnail(for: newItem, at: destinationURL)
+            
+            return newItem
         } catch {
             print("ClipboardManager: Error saving new PDF to sandbox: \(error.localizedDescription)")
             return nil
