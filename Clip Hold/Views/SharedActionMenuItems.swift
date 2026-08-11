@@ -116,10 +116,38 @@ struct SharedFilterByAppMenuItem: View {
 /// 項目を削除するメニュー項目
 struct SharedDeleteMenuItem: View {
     let action: () -> Void
+    var alternateAction: (() -> Void)? = nil
     
     var body: some View {
-        Button(role: .destructive, action: action) {
-            Label("削除...", systemImage: "trash").forceIconOnMacOS27()
+        if #available(macOS 15.0, *) {
+            if let alternateAction = alternateAction {
+                Button(role: .destructive, action: action) {
+                    Label("削除...", systemImage: "trash").forceIconOnMacOS27()
+                }
+                .modifierKeyAlternate(.option) {
+                    Button(role: .destructive, action: alternateAction) {
+                        Label("この項目のみ削除...", systemImage: "trash").forceIconOnMacOS27()
+                    }
+                }
+            } else {
+                Button(role: .destructive, action: action) {
+                    Label("削除...", systemImage: "trash").forceIconOnMacOS27()
+                }
+            }
+        } else {
+            Button(role: .destructive, action: {
+                if let alternateAction = alternateAction, ModifierKeyMonitor.shared.currentOptionKeyPressed {
+                    alternateAction()
+                } else {
+                    action()
+                }
+            }) {
+                if alternateAction != nil && ModifierKeyMonitor.shared.isOptionKeyPressed {
+                    Label("この項目のみ削除...", systemImage: "trash").forceIconOnMacOS27()
+                } else {
+                    Label("削除...", systemImage: "trash").forceIconOnMacOS27()
+                }
+            }
         }
     }
 }

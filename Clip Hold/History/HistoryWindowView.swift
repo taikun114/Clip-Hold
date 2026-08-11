@@ -20,6 +20,7 @@ struct HistoryWindowView: View {
     
     @State private var showingDeleteConfirmation = false
     @State private var itemToDelete: ClipboardItem?
+    @State private var deleteOnlyThisItem: Bool = false
     @State private var selectedItemID: UUID?
     @State private var isLoading: Bool = false
     @State private var isPaginating: Bool = false
@@ -237,6 +238,7 @@ struct HistoryWindowView: View {
                         isPaginating: $isPaginating,
                         showingDeleteConfirmation: $showingDeleteConfirmation,
                         itemToDelete: $itemToDelete,
+                        deleteOnlyThisItem: $deleteOnlyThisItem,
                         selectedItemID: $selectedItemID,
                         showCopyConfirmation: $showCopyConfirmation,
                         currentCopyConfirmationTask: $currentCopyConfirmationTask,
@@ -414,7 +416,7 @@ struct HistoryWindowView: View {
         .alert("履歴の削除", isPresented: $showingDeleteConfirmation) {
             Button("削除", role: .destructive) {
                 if let item = itemToDelete {
-                    clipboardManager.deleteItem(id: item.id)
+                    clipboardManager.deleteItem(id: item.id, deleteOnlyThisItem: deleteOnlyThisItem)
                     print("DEBUG: Item deleted.")
                     itemToDelete = nil
                     selectedItemID = nil
@@ -424,9 +426,18 @@ struct HistoryWindowView: View {
                 itemToDelete = nil
             }
         } message: {
-            if let item = itemToDelete, item.filePath != nil {
+            if let item = itemToDelete, let filePath = item.filePath {
                 // ファイルパスがある場合
-                Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。")
+                if deleteOnlyThisItem {
+                    let hasOtherItems = clipboardManager.clipboardHistory.contains(where: { $0.filePath == filePath && $0.id != item.id })
+                    if hasOtherItems {
+                        Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？履歴からファイルは削除されず、このファイルに関連する他の履歴は影響を受けません。")
+                    } else {
+                        Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？他に関連する履歴がないため、履歴からこのファイルが削除されます。")
+                    }
+                } else {
+                    Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。")
+                }
             } else {
                 // ファイルパスがない場合（テキストなど）
                 Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？")

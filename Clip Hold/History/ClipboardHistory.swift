@@ -120,7 +120,7 @@ extension ClipboardManager {
         }
     }
     
-    func deleteItem(id: UUID) {
+    func deleteItem(id: UUID, deleteOnlyThisItem: Bool = false) {
         if id == pinnedItemID {
             unpinItem()
         }
@@ -130,24 +130,41 @@ extension ClipboardManager {
         
         self.objectWillChange.send()
         
-        // ファイルアイテムの場合、同じファイルを参照している他の履歴もまとめて削除する
+        // ファイルアイテムの場合、同じファイルを参照している他の履歴もまとめて削除するかどうか
         if let filePath = itemToDelete.filePath {
-            // 同じfilePathを持つアイテムを全て見つける
-            let duplicatedItems = clipboardHistory.filter { $0.filePath == filePath }
-            
-            // メモリ上の履歴から全て削除
-            clipboardHistory.removeAll(where: { $0.filePath == filePath })
-            
-            // ファイル実体を削除
-            deleteFileFromSandbox(at: filePath)
-            
-            // ChunkedHistoryManager からも全て削除
-            for duplicate in duplicatedItems {
+            if deleteOnlyThisItem {
+                // この項目のみ削除
+                clipboardHistory.remove(at: index)
+                
+                // ChunkedHistoryManager からも削除
                 Task {
-                    await ChunkedHistoryManager.shared.deleteHistoryItem(id: duplicate.id)
+                    await ChunkedHistoryManager.shared.deleteHistoryItem(id: id)
                 }
+                
+                // もし他に同じ filePath を参照している履歴がもうなければ、実ファイルも削除する
+                if !clipboardHistory.contains(where: { $0.filePath == filePath }) {
+                    deleteFileFromSandbox(at: filePath)
+                }
+                
+                print("ClipboardManager: Single file item deleted. Total history: \(clipboardHistory.count)")
+            } else {
+                // 同じfilePathを持つアイテムを全て見つける
+                let duplicatedItems = clipboardHistory.filter { $0.filePath == filePath }
+                
+                // メモリ上の履歴から全て削除
+                clipboardHistory.removeAll(where: { $0.filePath == filePath })
+                
+                // ファイル実体を削除
+                deleteFileFromSandbox(at: filePath)
+                
+                // ChunkedHistoryManager からも全て削除
+                for duplicate in duplicatedItems {
+                    Task {
+                        await ChunkedHistoryManager.shared.deleteHistoryItem(id: duplicate.id)
+                    }
+                }
+                print("ClipboardManager: Item and its duplicates deleted. Total history: \(clipboardHistory.count)")
             }
-            print("ClipboardManager: Item and its duplicates deleted. Total history: \(clipboardHistory.count)")
         } else {
             // テキストアイテムの場合は単体削除
             clipboardHistory.remove(at: index)

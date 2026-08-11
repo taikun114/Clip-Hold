@@ -14,6 +14,7 @@ struct HistoryContentList: View {
     @Binding var isPaginating: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var itemToDelete: ClipboardItem?
+    @Binding var deleteOnlyThisItem: Bool
     @Binding var selectedItemID: UUID?
     @Binding var showCopyConfirmation: Bool
     @Binding var currentCopyConfirmationTask: Task<Void, Never>?
@@ -271,10 +272,15 @@ struct HistoryContentList: View {
             }
         }
         
-        SharedDeleteMenuItem {
+        SharedDeleteMenuItem(action: {
             itemToDelete = currentItem
+            deleteOnlyThisItem = false
             showingDeleteConfirmation = true
-        }
+        }, alternateAction: currentItem.filePath != nil ? {
+            itemToDelete = currentItem
+            deleteOnlyThisItem = true
+            showingDeleteConfirmation = true
+        } : nil)
         .disabled(currentItem.isCopying)
         
             if let sourceAppPath = currentItem.sourceAppPath {

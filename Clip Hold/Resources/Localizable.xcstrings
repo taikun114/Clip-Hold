@@ -622,6 +622,40 @@
         }
       }
     },
+    "「%@」を本当に削除しますか？他に関連する履歴がないため、履歴からこのファイルが削除されます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie „%@“ wirklich löschen? Da es keine anderen verknüpften Verlaufseinträge gibt, wird die Datei aus dem Verlauf entfernt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete “%@”? Because there are no other associated history items, the file will be removed from the history."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar “%@”? Como no hay otros elementos del historial asociados, el archivo se eliminará del historial."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment supprimer « %@ » ? Comme il n'y a pas d'autres éléments d'historique associés, le fichier sera retiré de l'historique."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」を本当に削除しますか？他に関連する履歴がないため、履歴からこのファイルが削除されます。"
+          }
+        }
+      }
+    },
     "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。" : {
       "comment" : "履歴ウィンドウから、過去にコピーされたファイルを削除しようとしている際に表示されるアラートメッセージ。ファイル名（履歴名）が表示されます。",
       "localizations" : {
@@ -653,6 +687,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "「%@」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。"
+          }
+        }
+      }
+    },
+    "「%@」を本当に削除しますか？履歴からファイルは削除されず、このファイルに関連する他の履歴は影響を受けません。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie „%@“ wirklich löschen? Die Datei wird nicht aus dem Verlauf entfernt und andere damit verbundene Verlaufseinträge bleiben unberührt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to delete “%@”? The file will not be removed from the history and any other history items associated with this file will be unaffected."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere eliminar “%@”? El archivo no se eliminará del historial y los demás elementos del historial asociados a este archivo no se verán afectados."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment supprimer « %@ » ? Le fichier ne sera pas retiré de l'historique et les autres éléments d'historique associés à ce fichier ne seront pas affectés."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」を本当に削除しますか？履歴からファイルは削除されず、このファイルに関連する他の履歴は影響を受けません。"
           }
         }
       }
@@ -11119,6 +11187,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "この定型文を移動したいプリセットを選択"
+          }
+        }
+      }
+    },
+    "この項目のみ削除..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur diesen Eintrag löschen..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove Only This Item..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar solo este elemento..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer uniquement cet élément..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この項目のみ削除..."
           }
         }
       }

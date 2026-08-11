@@ -54,6 +54,8 @@ Notes
   - The "Standard Phrases Window" section and "History Window" section in the General settings have been moved to the Standard Phrases and Copy History settings, respectively.
 - **Improve the performance of the History window**
   - Implemented pagination, limiting the initial display to 100 items and loading additional history items as you scroll.
+- **Improve History window to allow removing only specific file history**
+  - If the history item is a file, you can now remove it from the list without affecting other related history by holding down the `⌥ (Option)` key and clicking "Remove Only This Item..." from the context menu.
 - **Improve history addition performance when copying files**
 - **Improve file copying behavior**
   - A progress bar indicating the progress is now displayed when copying large files, and the duplicate detection system has been enhanced. It is now also possible to cancel the copy midway during large file copies.
