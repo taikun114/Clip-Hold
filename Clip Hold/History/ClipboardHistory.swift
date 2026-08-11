@@ -88,8 +88,9 @@ extension ClipboardManager {
         Task {
             await ChunkedHistoryManager.shared.saveHistoryItem(newItem)
         }
-        // 既存のスケジューリングは削除
-        // scheduleSaveClipboardHistory()
+        
+        // 追加後に孤立ファイルのクリーンアップをトリガー
+        triggerOrphanedFilesCleanup()
     }
     
     func clearAllHistory() {
@@ -118,6 +119,9 @@ extension ClipboardManager {
         Task {
             await ChunkedHistoryManager.shared.clearAllHistory()
         }
+        
+        // 削除後に孤立ファイルのクリーンアップをトリガー
+        triggerOrphanedFilesCleanup()
     }
     
     func deleteItem(id: UUID, deleteOnlyThisItem: Bool = false) {
@@ -174,6 +178,9 @@ extension ClipboardManager {
                 await ChunkedHistoryManager.shared.deleteHistoryItem(id: id)
             }
         }
+        
+        // 削除後に孤立ファイルのクリーンアップをトリガー
+        triggerOrphanedFilesCleanup()
     }
     
     // MARK: - History Import/Export (ClipboardHistoryImporterExporterが使うメソッドを定義)
@@ -304,6 +311,64 @@ extension ClipboardManager {
             self.clipboardHistory = validHistory
             
             print("ClipboardManager: Clipboard history loaded from new system. Count: \(self.clipboardHistory.count)")
+            
+            // 起動時の履歴読み込み後に孤立ファイルのクリーンアップをトリガー
+            self.triggerOrphanedFilesCleanup()
+        }
+    }
+    
+    // MARK: - Orphaned Files Cleanup
+    
+    /// バックグラウンドで孤立ファイルのクリーンアップをトリガーします。
+    func triggerOrphanedFilesCleanup() {
+        Task.detached(priority: .background) {
+            await self.cleanUpOrphanedFiles()
+        }
+    }
+    
+    /// 履歴リストに含まれていない（孤立した）ファイルを ClipboardFiles フォルダから削除します。
+    func cleanUpOrphanedFiles() async {
+        let fileManager = FileManager.default
+        let appDir = await MainActor.run { self.getAppSpecificDirectory() }
+        guard let appSpecificDirectory = appDir else { return }
+        
+        let filesDirectory = appSpecificDirectory.appendingPathComponent(self.filesDirectoryName, isDirectory: true)
+        
+        guard fileManager.fileExists(atPath: filesDirectory.path) else { return }
+        
+        do {
+            let childURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+            
+            // メインスレッドで現在の履歴アイテムが参照しているファイル名リストを取得
+            let validFileNames = await MainActor.run {
+                var names = Set<String>()
+                for item in self.clipboardHistory {
+                    if let fileName = item.filePath?.lastPathComponent {
+                        names.insert(fileName)
+                    }
+                }
+                return names
+            }
+            
+            var cleanedCount = 0
+            for childURL in childURLs {
+                let fileName = childURL.lastPathComponent
+                // 履歴リストに含まれていないファイルは孤立ファイルとして削除
+                if !validFileNames.contains(fileName) {
+                    do {
+                        try fileManager.removeItem(at: childURL)
+                        cleanedCount += 1
+                    } catch {
+                        print("ClipboardManager: Error removing orphaned file \(fileName): \(error.localizedDescription)")
+                    }
+                }
+            }
+            
+            if cleanedCount > 0 {
+                print("ClipboardManager: Cleaned up \(cleanedCount) orphaned files.")
+            }
+        } catch {
+            print("ClipboardManager: Error cleaning up orphaned files: \(error.localizedDescription)")
         }
     }
 }

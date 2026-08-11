@@ -797,6 +797,40 @@
     "%@" : {
       "shouldTranslate" : false
     },
+    "%@ (計算中...)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (Berechnen...)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (Calculating...)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (Calculando...)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (Calcul en cours...)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (計算中...)"
+          }
+        }
+      }
+    },
     "%@を超えるファイルがコピーされました。履歴に保存してもよろしいですか？" : {
       "comment" : "「コピーアラートを表示する容量」の設定値よりも大きいファイルがコピーされたときに表示されるアラートメッセージ。設定された容量が表示されます。",
       "localizations" : {
@@ -16444,6 +16478,40 @@
         }
       }
     },
+    "一部のフォルダ容量が計算されていないため、実際にはさらに多くの容量が使用されている可能性があります。再計算すると正しい容量が表示されるようになります。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Da einige Ordnergrößen nicht berechnet wurden, wird möglicherweise mehr Speicherplatz verwendet. Eine Neuberechnung zeigt die richtige Größe an."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Because some folder sizes have not been calculated, more space may actually be used. Recalculating will display the correct size."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debido a que no se han calculado algunos tamaños de carpeta, es posible que se esté usando más espacio en realidad. Recalcular mostrará el tamaño correcto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comme la taille de certains dossiers n'a pas été calculée, plus d'espace peut être réellement utilisé. Un recalcul affichera la taille correcte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一部のフォルダ容量が計算されていないため、実際にはさらに多くの容量が使用されている可能性があります。再計算すると正しい容量が表示されるようになります。"
+          }
+        }
+      }
+    },
     "一部の機能には、システムの許可が必要です。" : {
       "comment" : "プライバシー設定の「権限」セクションの説明するテキスト、",
       "localizations" : {
@@ -16965,6 +17033,40 @@
         }
       }
     },
+    "保存フォルダに含まれているすべてのファイルとフォルダの容量を再計算します。項目の数が多いと時間がかかる場合があります。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechnet die Größe aller Dateien und Ordner im gespeicherten Ordner neu. Dies kann bei vielen Elementen einige Zeit dauern."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalculates the size of all files and folders in the saved folder. This may take some time if there are many items."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalcula el tamaño de todos los archivos y carpetas en la carpeta guardada. Esto puede llevar algún tiempo si hay muchos elementos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalcule la taille de tous les fichiers et dossiers dans le dossier enregistré. Cela peut prendre un certain temps s'il y a beaucoup d'éléments."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存フォルダに含まれているすべてのファイルとフォルダの容量を再計算します。項目の数が多いと時間がかかる場合があります。"
+          }
+        }
+      }
+    },
     "保存フォルダの管理" : {
       "comment" : "コピー履歴設定の、コピーしたファイルが保存される保存フォルダを管理する設定がまとめられたセクションタイトル。",
       "localizations" : {
@@ -17031,6 +17133,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "保存フォルダの総容量:"
+          }
+        }
+      }
+    },
+    "保存フォルダの総容量を再計算" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamtgröße des gespeicherten Ordners neu berechnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalculate Total Size of Saved Folder"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalcular el tamaño total de la carpeta guardada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalculer la taille totale du dossier enregistré"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存フォルダの総容量を再計算"
           }
         }
       }
@@ -17413,6 +17549,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "内容: %@"
+          }
+        }
+      }
+    },
+    "再計算" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu berechnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalculate"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalcular"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalculer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再計算"
+          }
+        }
+      }
+    },
+    "再計算..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu berechnen..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalculating..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalculando..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recalcul en cours..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再計算..."
           }
         }
       }
@@ -18114,6 +18318,7 @@
     },
     "各フォルダの容量は正しく計算されないため、実際にはさらに多くの容量が使用されている場合があります。" : {
       "comment" : "コピーしたファイルが保存される保存フォルダの容量に関する注意書きテキスト。",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

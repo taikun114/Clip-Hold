@@ -424,6 +424,9 @@ class ClipboardManager: ObservableObject {
             objectWillChange.send()
             
             print("ClipboardManager: All history from app \(sourceAppPath) deleted. Removed \(itemsToDelete.count) items.")
+            
+            // 削除後に孤立ファイルのクリーンアップをトリガー
+            self.triggerOrphanedFilesCleanup()
         }
     }
     

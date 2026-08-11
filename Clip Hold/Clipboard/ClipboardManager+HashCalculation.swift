@@ -5,13 +5,12 @@ extension ClipboardManager {
     func calculateMissingFileHashesInHistory() async {
         // チャンクされた履歴ファイルを一括で読み込む
         let chunkedHistoryManager = ChunkedHistoryManager.shared
-        var allHistoryItems: [ClipboardItem] = []
-        var updatedChunks: [(index: Int, items: [ClipboardItem])] = []
         
         do {
             let chunkCount = try await chunkedHistoryManager.getChunkCount()
             
             for index in 0..<chunkCount {
+                // チャンクごとに処理し、即座に保存することで競合（Race Condition）を防ぐ
                 let items = try await chunkedHistoryManager.loadHistoryChunk(at: index)
                 var itemsUpdated = false
                 
@@ -25,34 +24,27 @@ extension ClipboardManager {
                             }
                         } else {
                             // ファイルが存在する場合のみハッシュを計算
-                            if FileManager.default.fileExists(atPath: filePath.path) {
-                                let fileHash = HashCalculator.calculateFileHash(at: filePath)
-                                items[itemIndex].fileHash = fileHash
-                                itemsUpdated = true
-                                if let fileHash = fileHash {
+                            var isDirectory: ObjCBool = false
+                            if FileManager.default.fileExists(atPath: filePath.path, isDirectory: &isDirectory) && !isDirectory.boolValue {
+                                if let fileHash = HashCalculator.calculateFileHash(at: filePath) {
+                                    items[itemIndex].fileHash = fileHash
+                                    itemsUpdated = true
+                                    
                                     Task { @MainActor in
                                         self.updateFileHashCache(url: filePath, hash: fileHash)
                                     }
+                                    print("ClipboardManager: Calculated missing hash for file item at chunk \(index), item index \(itemIndex).")
                                 }
-                                print("ClipboardManager: Calculated missing hash for file item at chunk \(index), item index \(itemIndex).")
                             }
                         }
                     }
                 }
                 
-                // 更新があった場合、そのチャンクを記録
+                // 更新があった場合のみ、そのチャンクを即座に保存
                 if itemsUpdated {
-                    updatedChunks.append((index: index, items: items))
+                    try await chunkedHistoryManager.saveChunk(items, at: index)
+                    print("ClipboardManager: Saved updated chunk \(index) with calculated hashes.")
                 }
-                
-                // 全アイテムを一時的に保持（UI表示用など）
-                allHistoryItems.append(contentsOf: items)
-            }
-            
-            // 更新されたチャンクを一括で保存
-            for chunk in updatedChunks {
-                try await chunkedHistoryManager.saveChunk(chunk.items, at: chunk.index)
-                print("ClipboardManager: Saved updated chunk \(chunk.index) with calculated hashes.")
             }
             
         } catch {
