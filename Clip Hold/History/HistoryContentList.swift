@@ -106,8 +106,12 @@ struct HistoryContentList: View {
         }
         
         let performCopy = { (preventQuickPaste: Bool) in
+            let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
+            let isNonText = currentItem.filePath != nil || currentItem.isImage
+            let finalPreventQuickPaste = preventQuickPaste || (textOnlyQuickPaste && isNonText)
+            
             performSharedCopyRoutine(
-                preventQuickPaste: preventQuickPaste,
+                preventQuickPaste: finalPreventQuickPaste,
                 quickPaste: quickPaste,
                 quickPasteToPreviousApp: quickPasteToPreviousApp,
                 showCopyConfirmation: $showCopyConfirmation,
@@ -373,8 +377,12 @@ struct HistoryContentList: View {
                     }, primaryAction: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
                             if currentItem.isCopying { return }
+                            let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
+                            let isNonText = currentItem.filePath != nil || currentItem.isImage
+                            let preventQuickPaste = modifierMonitor.currentOptionKeyPressed || (textOnlyQuickPaste && isNonText)
+                            
                             performSharedCopyRoutine(
-                                preventQuickPaste: modifierMonitor.currentOptionKeyPressed,
+                                preventQuickPaste: preventQuickPaste,
                                 quickPaste: quickPaste,
                                 quickPasteToPreviousApp: quickPasteToPreviousApp,
                                 showCopyConfirmation: $showCopyConfirmation,
