@@ -771,6 +771,7 @@ private struct QuickOverlayHistoryItemRow: View {
     let shortcut: String
 
     @ObservedObject var dateReloader: DateReloader
+    @EnvironmentObject var clipboardManager: ClipboardManager
 
     var onHoverItem: (Bool) -> Void
     var onItemTooltipShow: () -> Void
@@ -852,6 +853,7 @@ private struct QuickOverlayHistoryItemRow: View {
                         .progressViewStyle(.linear)
                         .controlSize(.small)
                         .frame(minHeight: 14)
+                        .id(item.id) // SwiftUIのビュー再利用による直前の進捗残りを防ぐ
                         .transition(.opacity)
                 } else {
                     HStack(spacing: 4) {
@@ -862,9 +864,9 @@ private struct QuickOverlayHistoryItemRow: View {
                             Text("\(item.text.count)文字")
                         }
 
-                        if let fileSize = item.fileSize, item.filePath != nil, !item.isFolder {
+                        if let fileSize = item.fileSize, item.filePath != nil, (!item.isFolder || item.isSizeCalculated) {
                             Text("-")
-                            Text(formatFileSize(fileSize))
+                            Text(formatFileSize(fileSize) + (item.isPartialSize ? String(localized: " 以上") : ""))
                         }
                     }
                     .font(.caption)
@@ -942,6 +944,7 @@ private struct QuickOverlayHistoryItemRow: View {
         .buttonStyle(PlainButtonStyle())
         .contentShape(Rectangle())
         .onHover { hovering in
+            guard !clipboardManager.showingLargeFileAlert else { return }
             isCancelCopyButtonHovered = hovering
             if hovering {
                 setCancelCopyHoverState(true)
@@ -952,6 +955,8 @@ private struct QuickOverlayHistoryItemRow: View {
             }
         }
         .accessibilityLabel(String(localized: "コピーをキャンセル"))
+        .disabled(clipboardManager.showingLargeFileAlert) // アラート表示中はキャンセル不可にする
+        .opacity(clipboardManager.showingLargeFileAlert ? 0.4 : 1)
         .background(
             ScreenFrameReader { frame in
                 cancelCopyButtonTopCenterScreen = CGPoint(x: frame.midX, y: frame.maxY)

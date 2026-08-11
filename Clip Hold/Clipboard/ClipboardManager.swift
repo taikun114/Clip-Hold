@@ -146,6 +146,10 @@ class ClipboardManager: ObservableObject {
         let val = UserDefaults.standard.object(forKey: "largeFileAlertThreshold") as? Int
         return val ?? 100_000_000
     }
+    var folderCalculationTimeout: Double {
+        let val = UserDefaults.standard.object(forKey: "folderCalculationTimeout") as? Double
+        return val ?? 3.0
+    }
     var ignoreStandardPhrases: Bool {
         UserDefaults.standard.bool(forKey: "ignoreStandardPhrases")
     }
@@ -202,7 +206,7 @@ class ClipboardManager: ObservableObject {
     }
     // MARK: - Large File Alert Properties
     // 大容量ファイルの保留リスト（統合）
-    @Published var pendingLargeFileItemsWithSize: [(fileURL: URL, qrCodeContent: String?, fileSize: UInt64?)] = [] {
+    @Published var pendingLargeFileItemsWithSize: [ClipboardItem] = [] {
         didSet {
             if showingLargeFileAlert {
                 presentLargeFileConfirmationAlert()
@@ -210,6 +214,7 @@ class ClipboardManager: ObservableObject {
         }
     }
     @Published var pendingLargeFileItemsSourceAppPath: String?
+    @Published var pendingLargeFileIsTimeout: Bool = false
     
     // 画像データ用の保留プロパティ（これはそのまま保持）
     var pendingLargeImageData: (imageData: Data, qrCodeContent: String?)?

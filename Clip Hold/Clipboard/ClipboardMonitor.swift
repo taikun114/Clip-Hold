@@ -205,20 +205,11 @@ extension ClipboardManager {
                                     success = true
                                     return
                                 }
-                                
-                                var qrCodeContent: String? = nil
-                                if let fileUTI = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType,
-                                   fileUTI.conforms(to: .image) {
-                                    if let image = NSImage(contentsOf: url) {
-                                        qrCodeContent = self.decodeQRCode(from: image)
-                                    }
-                                }
+
                                 
                                 let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
                                 let copiedInternalItem = wasInternalCopyInitially ? lastCopiedInternalItem : nil
-                                if let newItem = await self.createClipboardItemForFileURL(url, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath, originalItem: copiedInternalItem) {
-                                    await self.processAndSaveItem(newItem, wasInternalCopy: wasInternalCopyInitially, description: "file URL (string)")
-                                }
+                                await self.handleMultipleFilesChange(fileURLs: [url], sourceAppPath: sourceAppPath, originalItem: copiedInternalItem)
                                 success = true
                                 return
                             } else if !url.isFileURL && !hasImageDataType {

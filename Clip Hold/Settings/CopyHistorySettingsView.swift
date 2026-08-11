@@ -21,6 +21,7 @@ struct CopyHistorySettingsView: View {
     @State private var showingCustomAlertSheet = false
     
     @AppStorage("ignoreStandardPhrases") var ignoreStandardPhrases: Bool = false
+    @AppStorage("folderCalculationTimeout") var folderCalculationTimeout: Double = 3.0
     
     @State private var tempCustomAlertValue: Int = 1 // カスタム入力シート用の値
     @State private var tempCustomAlertUnit: DataSizeUnit = .gigabytes // カスタム入力シート用の単位
@@ -251,6 +252,26 @@ struct CopyHistorySettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("フォルダ容量計算のタイムアウト")
+                        Text("フォルダがコピーされた時、容量の計算がここで設定した時間よりも長くかかったときに、コピーしたフォルダを履歴に保存するかどうかを求めるアラートが表示されます。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Picker("フォルダ容量計算のタイムアウト", selection: $folderCalculationTimeout) {
+                        Text("1秒").tag(1.0)
+                        Text("3秒").tag(3.0)
+                        Text("5秒").tag(5.0)
+                        Text("10秒").tag(10.0)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+
                 HStack {
                     VStack(alignment: .leading) {
                         Text("各ファイルの最大容量")

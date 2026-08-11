@@ -101,6 +101,7 @@ struct HistoryContentList: View {
             } label: {
                 Label("コピーをキャンセルして履歴から削除", systemImage: "xmark")
             }
+            .disabled(clipboardManager.showingLargeFileAlert) // アラート表示中はキャンセル不可にする
             Divider()
         }
         

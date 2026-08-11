@@ -114,64 +114,120 @@ extension ClipboardManager {
         }
         
         var totalFileSize: UInt64 = 0
-        var fileItemsWithAttributes: [(fileURL: URL, qrCodeContent: String?, fileSize: UInt64?)] = []
+        var isTimeout = false
+        var createdItems: [ClipboardItem] = []
         
-        // 各ファイルの属性を取得し、合計サイズを計算
+        // 1. 即座にUIに追加するための仮アイテムを作成
         for item in itemsWithQRCode {
-            let fileAttributes = getFileAttributes(item.fileURL)
-            totalFileSize += fileAttributes.fileSize ?? 0
-            fileItemsWithAttributes.append((fileURL: item.fileURL, qrCodeContent: item.qrCodeContent, fileSize: fileAttributes.fileSize))
-        }
-        
-        print("DEBUG: createClipboardItemsForMultipleFileURLs - Total file size: \(totalFileSize) bytes for \(itemsWithQRCode.count) files.")
-        
-        // MARK: - ファイルサイズチェック (アラート確認からでない場合のみアラートを表示)
-        if largeFileAlertThreshold > 0 && totalFileSize > largeFileAlertThreshold {
-            // アラートしきい値を超えている場合、アラート表示を要求
-            let fileCount = itemsWithQRCode.count
-            let totalSizeForAlert = totalFileSize // ローカルコピーを作成
-            
-            // MainActor.run内で使用するために、必要な情報をローカル変数にコピー
-            let itemsWithSizeForAlert = fileItemsWithAttributes
-            let sourceAppPathForAlert = sourceAppPath
-            
-            await MainActor.run {
-                if self.showingLargeFileAlert {
-                    let newItems = itemsWithSizeForAlert.filter { newItem in
-                        !self.pendingLargeFileItemsWithSize.contains { existingItem in
-                            existingItem.fileURL.path == newItem.fileURL.path
-                        }
-                    }
-                    if !newItems.isEmpty {
-                        self.pendingLargeFileItemsWithSize.append(contentsOf: newItems)
-                        print("DEBUG: Appended \(newItems.count) new files to pendingLargeFileItemsWithSize. Total count: \(self.pendingLargeFileItemsWithSize.count)")
-                    }
-                } else {
-                    self.pendingLargeFileItemsWithSize = itemsWithSizeForAlert
-                    self.pendingLargeFileItemsSourceAppPath = sourceAppPathForAlert // ソースアプリパスを保持
-                    self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
-                    print("DEBUG: createClipboardItemsForMultipleFileURLs - Setting showingLargeFileAlert to true for \(fileCount) files with total size \(totalSizeForAlert).")
+            if let newItem = await self.createClipboardItemForFileURL(item.fileURL, qrCodeContent: item.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: false, originalItem: originalItem, isPendingOnly: true) {
+                createdItems.append(newItem)
+                await MainActor.run {
+                    self.addAndSaveItem(newItem) // 履歴に表示させる（isCopying = true, copyProgress = -1.0）
                 }
             }
-            return nil // まだ保存せず、ユーザーのアラート確認を待つ
-        } else if maxFileSizeToSave > 0 && totalFileSize > maxFileSizeToSave {
-            // 合計サイズが最大保存サイズ制限を超えている場合は保存しない
-            print("ClipboardManager: Multiple files not saved due to total size limit. Total size: \(totalFileSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
+        }
+        
+        let threshold = UInt64(self.largeFileAlertThreshold)
+        let maxLimit = UInt64(self.maxFileSizeToSave)
+        let timeout = self.folderCalculationTimeout
+        
+        // 2. 非同期でサイズを計算
+        for item in createdItems {
+            guard let url = item.sourceFileURL else { continue }
+            let sizeResult = await self.calculateSizeAsync(url: url, timeout: timeout)
+            
+            // 計算された正確なサイズ（フォルダの場合は中身の合計）でアイテムのサイズを更新
+            await MainActor.run {
+                item.fileSize = sizeResult.size
+                item.isPartialSize = sizeResult.isTimeout
+                item.isSizeCalculated = true
+            }
+            
+            totalFileSize += sizeResult.size
+            if sizeResult.isTimeout {
+                isTimeout = true
+                break
+            }
+            // maxLimit を超えたらそれ以上計算しなくて良い
+            if maxLimit > 0 && totalFileSize > maxLimit {
+                break
+            }
+        }
+        
+        print("DEBUG: createClipboardItemsForMultipleFileURLs - Total calculated size: \(totalFileSize) bytes. isTimeout: \(isTimeout)")
+        
+        // 3. サイズ判定とアラート
+        if maxLimit > 0 && totalFileSize > maxLimit {
+            // サイズ超過で保存しない場合、UIから削除
+            print("ClipboardManager: Multiple files not saved due to total size limit. Total size: \(totalFileSize) bytes. Limit: \(maxLimit) bytes.")
+            let itemsToDelete = createdItems
+            await MainActor.run {
+                for item in itemsToDelete {
+                    self.deleteItem(id: item.id)
+                }
+            }
             return nil
         }
         
-        // アラート表示が不要な場合、各ファイルを個別に処理して保存
-        var savedItems: [ClipboardItem] = []
-        for item in fileItemsWithAttributes {
-            if let newItem = await self.createClipboardItemForFileURL(item.fileURL, qrCodeContent: item.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true, originalItem: originalItem) {
-                savedItems.append(newItem)
+        if isTimeout || (threshold > 0 && totalFileSize > threshold) {
+            // アラート表示
+            let timeoutOccurred = isTimeout
+            let pendingItems = createdItems
+            await MainActor.run {
+                self.pendingLargeFileIsTimeout = timeoutOccurred
+                self.pendingLargeFileItemsSourceAppPath = sourceAppPath
+                self.pendingLargeFileItemsWithSize = pendingItems
+                self.showingLargeFileAlert = true
             }
+            return nil
         }
         
-        return savedItems.isEmpty ? nil : savedItems
+        // 4. アラート不要の場合、直ちに実際のコピー処理を開始
+        for item in createdItems {
+            self.startFileProcessing(for: item, externalFileAttributes: self.getFileAttributes(item.sourceFileURL!), originalItem: originalItem)
+        }
+        
+        return nil // addAndSaveItem は既に呼ばれているので nil を返す
     }
     
-    func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false, originalItem: ClipboardItem? = nil) async -> ClipboardItem? { // private から internal に変更
+    // ヘルパー関数: フォルダのサイズを非同期で計算（タイムアウト付き）
+    func calculateSizeAsync(url: URL, timeout: Double) async -> (size: UInt64, isTimeout: Bool) {
+        var isDirectory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) else {
+            return (0, false)
+        }
+        
+        if !isDirectory.boolValue {
+            let size = getFileAttributes(url).fileSize ?? 0
+            return (size, false)
+        }
+        
+        // バックグラウンドスレッドでディレクトリを探索
+        return await Task.detached(priority: .userInitiated) {
+            let startTime = Date()
+            var folderSize: UInt64 = 0
+            
+            guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: [.fileSizeKey], options: []) else {
+                return (0, false)
+            }
+            
+            while let fileURL = enumerator.nextObject() as? URL {
+                if Date().timeIntervalSince(startTime) > timeout {
+                    return (folderSize, true)
+                }
+                
+                do {
+                    let resourceValues = try fileURL.resourceValues(forKeys: [.fileSizeKey])
+                    folderSize += UInt64(resourceValues.fileSize ?? 0)
+                } catch {
+                    // Ignore errors (e.g. permission denied)
+                }
+            }
+            return (folderSize, false)
+        }.value
+    }
+    
+    func createClipboardItemForFileURL(_ fileURL: URL, qrCodeContent: String? = nil, sourceAppPath: String? = nil, isFromAlertConfirmation: Bool = false, originalItem: ClipboardItem? = nil, isPendingOnly: Bool = false) async -> ClipboardItem? { // private から internal に変更
         _ = createClipboardFilesDirectoryIfNeeded()
         
         // 外部ファイルの属性を取得
@@ -179,36 +235,7 @@ extension ClipboardManager {
         
         print("DEBUG: createClipboardItemForFileURL - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
         
-        // MARK: - ファイルサイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
-        // isPerformingInternalCopy が true の場合は、アラート表示を完全にスキップして保存処理に進む
-        if !isPerformingInternalCopy { // 内部コピーでない場合のみ、アラート表示の可能性を考慮
-            if !isFromAlertConfirmation { // かつ、アラート確認からでない場合のみアラートを表示
-                if let fileSize = externalFileAttributes.fileSize {
-                    // サイズ制限またはアラートしきい値を超えているかチェック
-                    if maxFileSizeToSave > 0 && fileSize > maxFileSizeToSave {
-                        print("ClipboardManager: File not saved due to size limit. File size: \(fileSize) bytes. Limit: \(maxFileSizeToSave) bytes.")
-                        return nil // サイズ制限を超えている場合はnilを返す
-                    } else if largeFileAlertThreshold > 0 && fileSize > largeFileAlertThreshold {
-                        // アラートしきい値を超えている場合、アラート表示を要求
-                        await MainActor.run {
-                            let newItem = (fileURL: fileURL, qrCodeContent: qrCodeContent, fileSize: fileSize)
-                            if self.showingLargeFileAlert {
-                                if !self.pendingLargeFileItemsWithSize.contains(where: { $0.fileURL.path == fileURL.path }) {
-                                    self.pendingLargeFileItemsWithSize.append(newItem)
-                                    print("DEBUG: Appended 1 file to pendingLargeFileItemsWithSize. Total count: \(self.pendingLargeFileItemsWithSize.count)")
-                                }
-                            } else {
-                                self.pendingLargeFileItemsWithSize = [newItem]
-                                self.pendingLargeFileItemsSourceAppPath = sourceAppPath
-                                self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
-                                print("DEBUG: createClipboardItemForFileURL - Setting showingLargeFileAlert to true for file: \(fileURL.lastPathComponent)")
-                            }
-                        }
-                        return nil // まだ保存せず、ユーザーのアラート確認を待つ
-                    }
-                }
-            }
-        }
+        // ファイルサイズチェックは createClipboardItemsForMultipleFileURLs 側で行うため、ここでは省略
         
         // ファイル保存用ディレクトリの取得
         guard let filesDirectory = createClipboardFilesDirectoryIfNeeded() else { return nil }
@@ -238,27 +265,49 @@ extension ClipboardManager {
             return newItem
         }
         
+        var isDirectory: ObjCBool = false
+        FileManager.default.fileExists(atPath: fileURL.path, isDirectory: &isDirectory)
+        let isDir = isDirectory.boolValue
+        
         await MainActor.run {
             newItem.isCopying = true
-            newItem.isProgressBarVisible = false
+            newItem.isProgressBarVisible = isDir // フォルダの場合は最初から表示する
             newItem.copyProgress = -1.0
         }
         
-        // 非同期チャンクコピーを開始するタスク
-        let copyTask = Task.detached(priority: .background) { [weak newItem, weak self] in
-            guard let item = newItem else { return }
-            let startTime = Date()
-            let totalSize = externalFileAttributes.fileSize ?? 1
-            
-            // 1.0秒経過しても完了していない場合のみ、プログレスバーを表示する
-            Task {
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
-                await MainActor.run {
-                    if item.isCopying {
-                        item.isProgressBarVisible = true
+        if !isDir {
+            // ファイルの場合、1.0秒経過しても計算中・アラート表示中・コピー中のままならプログレスバーを表示する
+            Task { [weak newItem] in
+                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1.0秒
+                if let item = newItem {
+                    await MainActor.run {
+                        if item.isCopying {
+                            item.isProgressBarVisible = true
+                        }
                     }
                 }
             }
+        }
+        
+        if isPendingOnly {
+            return newItem
+        }
+        
+        // 非同期チャンクコピーを開始するタスク
+        self.startFileProcessing(for: newItem, externalFileAttributes: externalFileAttributes, originalItem: originalItem)
+        
+        return newItem
+    }
+    
+    func startFileProcessing(for item: ClipboardItem, externalFileAttributes: (fileSize: UInt64?, modificationDate: Date?), originalItem: ClipboardItem?) {
+        guard let fileURL = item.sourceFileURL else { return }
+        guard let destinationURL = item.filePath else { return }
+        let fileName = item.text
+        
+        let copyTask = Task.detached(priority: .background) { [weak item, weak self] in
+            guard let item = item else { return }
+            let startTime = Date()
+            let totalSize = externalFileAttributes.fileSize ?? 1
             
             // サムネイルを高解像度で再生成（ソースURLから並行して行う）
             Task {
@@ -400,9 +449,14 @@ extension ClipboardManager {
             }
             
             // 重複ファイルが見つからなかった場合、コピーを開始
+            var isDir: ObjCBool = false
+            FileManager.default.fileExists(atPath: fileURL.path, isDirectory: &isDir)
+            let isDirectory = isDir.boolValue
+            
             await MainActor.run {
                 item.fileHash = externalFileHash
-                item.copyProgress = 0.0
+                // フォルダの場合は引き続き不確定(indeterminate)、ファイルの場合はハッシュ計算完了の0.5とする
+                item.copyProgress = isDirectory ? -1.0 : 0.5
             }
             
             do {
@@ -410,9 +464,31 @@ extension ClipboardManager {
                     try FileManager.default.removeItem(at: destinationURL)
                 }
                 
-                var isDirectory: ObjCBool = false
-                if FileManager.default.fileExists(atPath: fileURL.path, isDirectory: &isDirectory) && isDirectory.boolValue {
-                    try FileManager.default.copyItem(at: fileURL, to: destinationURL)
+                if isDirectory {
+                    let fm = FileManager()
+                    let delegate = DirectoryCopyDelegate(item: item)
+                    fm.delegate = delegate
+                    
+                    do {
+                        try fm.copyItem(at: fileURL, to: destinationURL)
+                    } catch {
+                        print("ClipboardManager: Error copying directory: \(error)")
+                    }
+                    
+                    if item.isCopyCancelled {
+                        print("ClipboardManager: Copy cancelled for \(fileName) (Directory)")
+                        try? FileManager.default.removeItem(at: destinationURL)
+                        
+                        let sourceURL = fileURL
+                        await MainActor.run {
+                            let itemsToDelete = [item] + ClipboardManager.shared.clipboardHistory.filter { $0.isCopying && $0.sourceFileURL == sourceURL && $0.id != item.id }
+                            for targetItem in itemsToDelete {
+                                ClipboardManager.shared.deleteItem(id: targetItem.id)
+                            }
+                        }
+                        return
+                    }
+                    
                     await MainActor.run {
                         item.copyProgress = 1.0
                     }
@@ -513,9 +589,7 @@ extension ClipboardManager {
         }
         
         // キャンセル用にタスクを保持
-        newItem.copyTask = copyTask
-        
-        return newItem
+        item.copyTask = copyTask
     }
     
     // MARK: - New Helper function for image duplication check and saving
@@ -779,5 +853,52 @@ extension ClipboardManager {
         }
         // temporaryFileUrls セットもクリアする
         temporaryFileUrls.removeAll()
+    }
+}
+
+// フォルダコピー時のキャンセル判定・進捗報告用デリゲート
+private class DirectoryCopyDelegate: NSObject, FileManagerDelegate {
+    weak var item: ClipboardItem?
+    private let totalSize: UInt64
+    private var copiedSize: UInt64 = 0
+    private var lastReportTime: Date = Date()
+    private var lastReportedProgress: Double = 0.0
+    
+    init(item: ClipboardItem) {
+        self.item = item
+        self.totalSize = max(item.fileSize ?? 1, 1) // 0除算を防ぐため最低1とする
+    }
+    
+    func fileManager(_ fileManager: FileManager, shouldCopyItemAt srcURL: URL, to dstURL: URL) -> Bool {
+        // キャンセルされている場合はfalseを返してコピーをスキップさせる
+        if item?.isCopyCancelled == true {
+            return false
+        }
+        
+        // 擬似的な進捗報告（ファイル単位）
+        var isDir: ObjCBool = false
+        if FileManager.default.fileExists(atPath: srcURL.path, isDirectory: &isDir) && !isDir.boolValue {
+            // ファイルのサイズを取得して足し込む
+            if let size = (try? srcURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
+                copiedSize += UInt64(size)
+                
+                let currentProgress = Double(copiedSize) / Double(totalSize)
+                let now = Date()
+                
+                // 進捗が一定量(1%)進んだか、前回の報告から一定時間(0.1秒)経過した場合のみUIを更新する（負荷軽減）
+                if (currentProgress - lastReportedProgress) > 0.01 || now.timeIntervalSince(lastReportTime) > 0.1 {
+                    lastReportTime = now
+                    lastReportedProgress = currentProgress
+                    
+                    // フォルダの場合は -1.0 ではなく、0.0〜1.0の進捗をセットしてプログレスバーを表示させる
+                    Task { @MainActor [weak item] in
+                        // もし1.0を超えていたら0.99で止める（1.0はコピー完了時にセットされるため）
+                        item?.copyProgress = min(currentProgress, 0.99)
+                    }
+                }
+            }
+        }
+        
+        return true
     }
 }

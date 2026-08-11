@@ -138,6 +138,7 @@ struct HistoryItemRow<MenuContent: View>: View {
                     ProgressView(value: item.copyProgress < 0.0 ? nil : item.copyProgress)
                         .progressViewStyle(.linear)
                         .controlSize(.small)
+                        .id(item.id) // SwiftUIのビュー再利用による直前の進捗残りを防ぐ
                 } else {
                     HStack(spacing: 4) {
                         Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
@@ -147,9 +148,9 @@ struct HistoryItemRow<MenuContent: View>: View {
                             Text("\(item.text.count)文字")
                         }
                         
-                        if let fileSize = item.fileSize, item.filePath != nil, !item.isFolder {
+                        if let fileSize = item.fileSize, item.filePath != nil, (!item.isFolder || item.isSizeCalculated) {
                             Text("-")
-                            Text(formatFileSize(fileSize))
+                            Text(formatFileSize(fileSize) + (item.isPartialSize ? String(localized: " 以上") : ""))
                         }
                     }
                     .font(.caption)

@@ -12,6 +12,10 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     @Published var qrCodeContent: String?
     @Published var sourceAppPath: String?
     
+    // フォルダ容量計算のタイムアウト状態などを追跡するためのフラグ（JSONへ保存する）
+    @Published var isPartialSize: Bool = false
+    @Published var isSizeCalculated: Bool = false
+    
     // 非同期コピー関連のプロパティ (これらはCodableには含めない)
     @Published var isCopying: Bool = false
     @Published var isProgressBarVisible: Bool = false
@@ -41,7 +45,9 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
             fileSize: self.fileSize,
             fileHash: self.fileHash,
             qrCodeContent: self.qrCodeContent,
-            sourceAppPath: self.sourceAppPath
+            sourceAppPath: self.sourceAppPath,
+            isPartialSize: self.isPartialSize,
+            isSizeCalculated: self.isSizeCalculated
         )
         copy.richText = self.richText
         copy.cachedThumbnailImage = self.cachedThumbnailImage
@@ -125,10 +131,12 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.fileHash = nil // 新しく追加
         self.qrCodeContent = qrCodeContent
         self.sourceAppPath = sourceAppPath
+        self.isPartialSize = false
+        self.isSizeCalculated = false
     }
     
     // 新しいClipboardItemを作成するためのイニシャライザ (ファイルパス、サイズ、ハッシュあり)
-    init(text: String, date: Date = Date(), filePath: URL?, fileSize: UInt64?, fileHash: String? = nil, qrCodeContent: String? = nil, sourceAppPath: String? = nil) {
+    init(text: String, date: Date = Date(), filePath: URL?, fileSize: UInt64?, fileHash: String? = nil, qrCodeContent: String? = nil, sourceAppPath: String? = nil, isPartialSize: Bool = false, isSizeCalculated: Bool = false) {
         self.id = UUID()
         self.text = text
         self.richText = nil // リッチテキストは初期値nil
@@ -138,6 +146,8 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.fileHash = fileHash // 新しく追加
         self.qrCodeContent = qrCodeContent
         self.sourceAppPath = sourceAppPath
+        self.isPartialSize = isPartialSize
+        self.isSizeCalculated = isSizeCalculated
     }
     
     // 新しいClipboardItemを作成するためのイニシャライザ (リッチテキスト用)
@@ -151,6 +161,8 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.fileHash = nil
         self.qrCodeContent = qrCodeContent
         self.sourceAppPath = sourceAppPath
+        self.isPartialSize = false
+        self.isSizeCalculated = false
     }
     
     // CodableのためのDecodableイニシャライザ
@@ -165,6 +177,8 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.fileHash = try container.decodeIfPresent(String.self, forKey: .fileHash) // 新しく追加
         self.qrCodeContent = try container.decodeIfPresent(String.self, forKey: .qrCodeContent)
         self.sourceAppPath = try container.decodeIfPresent(String.self, forKey: .sourceAppPath)
+        self.isPartialSize = try container.decodeIfPresent(Bool.self, forKey: .isPartialSize) ?? false
+        self.isSizeCalculated = try container.decodeIfPresent(Bool.self, forKey: .isSizeCalculated) ?? false
     }
     
     // CodableのためのEncoded関数
@@ -179,10 +193,12 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         try container.encodeIfPresent(fileHash, forKey: .fileHash) // 新しく追加
         try container.encodeIfPresent(qrCodeContent, forKey: .qrCodeContent)
         try container.encodeIfPresent(sourceAppPath, forKey: .sourceAppPath)
+        try container.encode(isPartialSize, forKey: .isPartialSize)
+        try container.encode(isSizeCalculated, forKey: .isSizeCalculated)
     }
     
     enum CodingKeys: String, CodingKey {
-        case id, text, richText, date, filePath, fileSize, fileHash, qrCodeContent, sourceAppPath // richTextとfileHashを追加
+        case id, text, richText, date, filePath, fileSize, fileHash, qrCodeContent, sourceAppPath, isPartialSize, isSizeCalculated
     }
 }
 

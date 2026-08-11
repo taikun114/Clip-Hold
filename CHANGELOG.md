@@ -57,6 +57,8 @@ Notes
 - **Improve history addition performance when copying files**
 - **Improve file copying behavior**
   - A progress bar indicating the progress is now displayed when copying large files, and the duplicate detection system has been enhanced. It is now also possible to cancel the copy midway during large file copies.
+- **Improve folder copying behavior**
+  - The size displayed in the alert when a folder is copied is now calculated correctly, and an alert is now displayed when the added size calculation timeout is exceeded. Furthermore, the progress of the folder copy is now displayed in the history list.
 - **Improve icon display on macOS Golden Gate**
 - **Improve the display of History and Standard Phrase windows on macOS Golden Gate**
 - **Improve the add apps to exclude screen**

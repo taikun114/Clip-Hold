@@ -93,6 +93,40 @@
         }
       }
     },
+    " 以上" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " oder mehr"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " or more"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " o más"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " ou plus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " 以上"
+          }
+        }
+      }
+    },
     "-" : {
       "shouldTranslate" : false
     },
@@ -1606,6 +1640,40 @@
         }
       }
     },
+    "1秒" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Sekunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Second"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Segundo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Seconde"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1秒"
+          }
+        }
+      }
+    },
     "2_suffix_history" : {
       "comment" : "「2番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「2番目の履歴をコピーする」）。",
       "localizations" : {
@@ -1746,6 +1814,40 @@
         }
       }
     },
+    "3秒" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Sekunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Seconds"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Segundos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Secondes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3秒"
+          }
+        }
+      }
+    },
     "4_suffix_history" : {
       "comment" : "「4番目の履歴」の数字につく序数詞のサフィックス。数字部分は除く。スペースなし。これは「履歴」という言葉にくっつきます（例えば「4番目の履歴をコピーする」）。",
       "localizations" : {
@@ -1882,6 +1984,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番目の"
+          }
+        }
+      }
+    },
+    "5秒" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 Sekunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 Seconds"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 Segundos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 Secondes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5秒"
           }
         }
       }
@@ -2232,6 +2368,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "番目の"
+          }
+        }
+      }
+    },
+    "10秒" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 Sekunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 Seconds"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 Segundos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 Secondes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10秒"
           }
         }
       }
@@ -10921,6 +11091,40 @@
         }
       }
     },
+    "コピーされたフォルダの容量が時間内に計算できませんでした。細かいファイルが大量にあるか、大きなファイルを含むフォルダである可能性があります。履歴に保存してもよろしいですか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Kapazität des kopierten Ordners konnte nicht rechtzeitig berechnet werden. Möglicherweise enthält er eine große Anzahl kleiner Dateien oder sehr große Dateien. Möchten Sie ihn im Verlauf speichern?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The size of the copied folder could not be calculated in time. It may contain a large number of small files or large files. Are you sure you want to save it to the history?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo calcular la capacidad de la carpeta copiada a tiempo. Puede contener una gran cantidad de archivos pequeños o archivos muy grandes. ¿Desea guardarlo en el historial?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La capacité du dossier copié n'a pas pu être calculée à temps. Il peut contenir un grand nombre de petits fichiers ou de très gros fichiers. Souhaitez-vous l'enregistrer dans l'historique ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーされたフォルダの容量が時間内に計算できませんでした。細かいファイルが大量にあるか、大きなファイルを含むフォルダである可能性があります。履歴に保存してもよろしいですか？"
+          }
+        }
+      }
+    },
     "コピーされた日付の表示方法を変更します。\n例: %@" : {
       "comment" : "一般設定で日付と時刻の表示方法を設定する項目の説明文。",
       "localizations" : {
@@ -14399,6 +14603,40 @@
         }
       }
     },
+    "フォルダがコピーされた時、容量の計算がここで設定した時間よりも長くかかったときに、コピーしたフォルダを履歴に保存するかどうかを求めるアラートが表示されます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn ein Ordner kopiert wird und die Kapazitätsberechnung länger dauert als die hier eingestellte Zeit, wird eine Warnung angezeigt, in der gefragt wird, ob der kopierte Ordner im Verlauf gespeichert werden soll."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When a folder is copied, if the size calculation takes longer than the time set here, an alert will be displayed asking whether you are sure you want to save the copied folder to the history."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando se copia una carpeta, si el cálculo de la capacidad tarda más que el tiempo establecido aquí, se mostrará una alerta preguntando si desea guardar la carpeta copiada en el historial."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsqu'un dossier est copié, si le calcul de la capacité prend plus de temps que celui défini ici, une alerte s'affiche pour vous demander si vous souhaitez enregistrer le dossier copié dans l'historique."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダがコピーされた時、容量の計算がここで設定した時間よりも長くかかったときに、コピーしたフォルダを履歴に保存するかどうかを求めるアラートが表示されます。"
+          }
+        }
+      }
+    },
     "フォルダのみ" : {
       "comment" : "フィルタリングオプションの1つ、フォルダだけに絞り込むためのオプション名。",
       "localizations" : {
@@ -14430,6 +14668,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "フォルダのみ"
+          }
+        }
+      }
+    },
+    "フォルダ容量計算のタイムアウト" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitüberschreitung bei der Ordnerkapazitätsberechnung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder Size Calculation Timeout"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo de espera del cálculo de la capacidad de la carpeta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Délai de calcul de la capacité du dossier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フォルダ容量計算のタイムアウト"
           }
         }
       }
@@ -17807,6 +18079,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "大容量ファイルの複数コピー"
+          }
+        }
+      }
+    },
+    "大容量フォルダの可能性があります" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möglichkeit eines großen Ordners"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Possibility of a Large Folder"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posibilidad de una carpeta grande"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Possibilité d'un dossier volumineux"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "大容量フォルダの可能性があります"
           }
         }
       }
