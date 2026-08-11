@@ -551,7 +551,7 @@ extension UserDefaults {
     @objc dynamic var quickOverlayDelay: Double {
         get { 
             if object(forKey: "quickOverlayDelay") == nil {
-                return 0.5 // Default to 0.5s if not set
+                return 0.0 // Default to 0.0s if not set
             }
             return double(forKey: "quickOverlayDelay")
         }

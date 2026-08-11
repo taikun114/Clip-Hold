@@ -83,7 +83,7 @@ struct GeneralSettingsView: View {
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
     
     @AppStorage("isQuickOverlayEnabled") var isQuickOverlayEnabled: Bool = false
-    @AppStorage("quickOverlayDelay") var quickOverlayDelay: Double = 0.5
+    @AppStorage("quickOverlayDelay") var quickOverlayDelay: Double = 0.0
     @AppStorage("quickOverlayPosition") var quickOverlayPosition: String = "cursor"
     
     @AppStorage("showCurrentPresetIcon") var showCurrentPresetIcon: Bool = false
