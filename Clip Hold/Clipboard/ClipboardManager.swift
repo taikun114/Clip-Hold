@@ -40,29 +40,28 @@ class ClipboardManager: ObservableObject {
     // アプリケーションアイコンのキャッシュ（リサイズ済み）
     @Published var resizedAppIcons: [String: NSImage] = [:]
     
-    // キャッシュを利用してリサイズ済みのアプリアイコンを非同期で取得するメソッド
+    // キャッシュを利用してリサイズ済みのアプリアイコンを取得するメソッド
     func getResizedAppIcon(for path: String) -> NSImage? {
         if let cachedIcon = resizedAppIcons[path] {
             return cachedIcon
         }
         
-        // キャッシュにない場合はバックグラウンドで取得してリサイズ
-        Task.detached {
-            let originalIcon = NSWorkspace.shared.icon(forFile: path)
-            let resizedIcon = NSImage(size: CGSize(width: 16, height: 16))
-            resizedIcon.lockFocus()
-            originalIcon.draw(in: NSRect(origin: .zero, size: CGSize(width: 16, height: 16)),
-                              from: NSRect(origin: .zero, size: originalIcon.size),
-                              operation: .sourceOver,
-                              fraction: 1.0)
-            resizedIcon.unlockFocus()
-            
-            await MainActor.run {
-                self.resizedAppIcons[path] = resizedIcon
-            }
+        // macOS 14でのSwiftUIメニュー表示不具合対策として、初回のみ同期的にリサイズして返す
+        let originalIcon = NSWorkspace.shared.icon(forFile: path)
+        let resizedIcon = NSImage(size: CGSize(width: 16, height: 16))
+        resizedIcon.lockFocus()
+        originalIcon.draw(in: NSRect(origin: .zero, size: CGSize(width: 16, height: 16)),
+                          from: NSRect(origin: .zero, size: originalIcon.size),
+                          operation: .sourceOver,
+                          fraction: 1.0)
+        resizedIcon.unlockFocus()
+        
+        // 描画サイクル中の状態更新による警告を防ぐため非同期でキャッシュに保存
+        Task { @MainActor in
+            self.resizedAppIcons[path] = resizedIcon
         }
         
-        return nil
+        return resizedIcon
     }
     
     // ピン留めされた履歴アイテムのID
