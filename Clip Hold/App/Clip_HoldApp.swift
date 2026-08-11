@@ -730,12 +730,14 @@ struct ClipHoldApp: App {
             let clipboardManager = ClipboardManager.shared
             let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
             
-            let historySource: [ClipboardItem]
+            let rawHistorySource: [ClipboardItem]
             if useFiltered, let filteredList = clipboardManager.filteredHistoryForShortcuts {
-                historySource = filteredList
+                rawHistorySource = filteredList
             } else {
-                historySource = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
+                rawHistorySource = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
             }
+            
+            let historySource = rawHistorySource.filter { $0.originalPinnedItemID == nil }
             
             // 最新の履歴アイテムを取得
             if let latestItem = historySource.first {
