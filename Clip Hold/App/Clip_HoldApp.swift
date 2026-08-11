@@ -628,11 +628,8 @@ struct ClipHoldApp: App {
                     
                     let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                     if currentQuickPaste {
-                        Task { @MainActor in
-                            try? await Task.sleep(nanoseconds: 50_000_000)
-                            performPaste() // static メソッドとして呼び出し
-                            print("performPaste")
-                        }
+                        ClipHoldApp.performPasteWithOverlayCheck()
+                        print("performPasteWithOverlayCheck")
                     }
                 } else {
                     // 通知のタイトルと本文を構築
@@ -667,16 +664,10 @@ struct ClipHoldApp: App {
                 if currentQuickPaste {
                     if currentTextOnlyQuickPaste {
                         if pinnedItem.filePath == nil && !pinnedItem.isImage {
-                            Task { @MainActor in
-                                try? await Task.sleep(nanoseconds: 50_000_000)
-                                performPaste()
-                            }
+                            ClipHoldApp.performPasteWithOverlayCheck()
                         }
                     } else {
-                        Task { @MainActor in
-                            try? await Task.sleep(nanoseconds: 50_000_000)
-                            performPaste()
-                        }
+                        ClipHoldApp.performPasteWithOverlayCheck()
                     }
                 }
             } else {
@@ -718,20 +709,14 @@ struct ClipHoldApp: App {
                     if currentQuickPaste {
                         if currentTextOnlyQuickPaste {
                             if historyItem.filePath == nil && !historyItem.isImage {
-                                Task { @MainActor in
-                                    try? await Task.sleep(nanoseconds: 50_000_000)
-                                    performPaste()
-                                    print("performPaste")
-                                }
+                                ClipHoldApp.performPasteWithOverlayCheck()
+                                print("performPasteWithOverlayCheck")
                             } else {
                                 print("textOnlyQuickPaste is on, so non-text content will not be pasted.")
                             }
                         } else {
-                            Task { @MainActor in
-                                try? await Task.sleep(nanoseconds: 50_000_000)
-                                performPaste()
-                                print("performPaste")
-                            }
+                            ClipHoldApp.performPasteWithOverlayCheck()
+                            print("performPasteWithOverlayCheck")
                         }
                     }
                 } else {
@@ -769,6 +754,20 @@ struct ClipHoldApp: App {
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showNewCopyWindow()
                 }
+            }
+        }
+    }
+    
+    static func performPasteWithOverlayCheck() {
+        Task { @MainActor in
+            if QuickOverlayManager.shared.isOverlayVisible {
+                QuickOverlayManager.shared.isOverlayVisible = false
+                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+                try? await Task.sleep(nanoseconds: 150_000_000)
+                performPaste()
+            } else {
+                try? await Task.sleep(nanoseconds: 50_000_000)
+                performPaste()
             }
         }
     }
