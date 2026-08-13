@@ -1340,7 +1340,7 @@ extension CopyHistorySettingsView {
             contentType: exportIncludeFiles ? .clipholdArchive : .json,
             defaultFilename: exportIncludeFiles ? "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).cliphold" : "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).json"
         ) { result in
-            clipboardImporterExporter.handleExportResult(result, from: clipboardManager, includeFiles: exportIncludeFiles) {
+            clipboardImporterExporter.handleExportResult(result, from: clipboardManager, includeFiles: exportIncludeFiles, estimatedFinalSize: estimatedExportSizeMax > 0 ? estimatedExportSizeMax : nil) {
                 showingExportConfigSheet = false
             }
         }

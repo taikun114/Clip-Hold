@@ -62,9 +62,10 @@ class ClipboardHistoryImporterExporter: ObservableObject {
             self.isCancelling = true
             self.exportStatusText = "キャンセル中..."
             self.exportProgress = -1.0
+            
+            self.currentProcess?.terminate()
+            self.exportTask?.cancel()
         }
-        currentProcess?.terminate()
-        exportTask?.cancel()
     }
     
     func cancelImport() {
@@ -72,9 +73,10 @@ class ClipboardHistoryImporterExporter: ObservableObject {
             self.isCancelling = true
             self.importStatusText = "キャンセル中..."
             self.importProgress = -1.0
+            
+            self.currentProcess?.terminate()
+            self.importTask?.cancel()
         }
-        currentProcess?.terminate()
-        importTask?.cancel()
     }
     
     func handleImportResult(_ result: Result<[URL], Error>, into clipboardManager: ClipboardManager, onComplete: @escaping (UInt64) -> Void) {
@@ -483,7 +485,7 @@ class ClipboardHistoryImporterExporter: ObservableObject {
     }
     
     // MARK: - エクスポート結果のハンドリング用メソッド
-    func handleExportResult(_ result: Result<URL, Error>, from clipboardManager: ClipboardManager, includeFiles: Bool, onComplete: @escaping () -> Void) {
+    func handleExportResult(_ result: Result<URL, Error>, from clipboardManager: ClipboardManager, includeFiles: Bool, estimatedFinalSize: Int64? = nil, onComplete: @escaping () -> Void) {
         switch result {
         case .success(let url):
             Task { @MainActor in
@@ -500,12 +502,12 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                         if self.isCancelling {
                             self.sheetAlert = .error(Text("エクスポートがキャンセルされました。"), onDismiss: {
                                 self.isExporting = false
+                                onComplete()
                             })
                             self.isCancelling = false
                         }
                         clipboardManager.startMonitoringPasteboard()
                         clipboardManager.isExporting = false
-                        onComplete()
                     }
                 }
                 let historyToExport = clipboardManager.clipboardHistory
@@ -625,16 +627,22 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                         let tempAarURL = tempDir.appendingPathComponent("archive.aar")
                         
                         // 進捗監視用のタイマー
-                        let targetTotalSize = Int64(totalFilesSize)
+                        let targetMaxEstimatedSize: Int64
+                        if let preCalculated = estimatedFinalSize {
+                            targetMaxEstimatedSize = max(preCalculated, 1024)
+                        } else {
+                            let estimatedSizes = await self.calculateEstimatedExportSize(clipboardManager: clipboardManager, includeFiles: includeFiles)
+                            targetMaxEstimatedSize = max(estimatedSizes.max, 1024)
+                        }
+                        
                         let progressTask = Task {
                             while !Task.isCancelled {
                                 do {
                                     try await Task.sleep(nanoseconds: 200_000_000) // 0.2s
                                     let attr = try fileManager.attributesOfItem(atPath: tempAarURL.path)
                                     if let currentSize = attr[.size] as? Int64 {
-                                        // 圧縮率は高め（例えば0.5）と仮定して進捗を計算。最大0.9まで。
-                                        let estimatedFinalSize = max(Int64(Double(targetTotalSize) * 0.5), 1024)
-                                        let progress = 0.5 + (Double(currentSize) / Double(estimatedFinalSize) * 0.4)
+                                        // 容量推定の大きい方を基準にして進捗を計算。最大0.9まで。
+                                        let progress = 0.5 + (Double(currentSize) / Double(targetMaxEstimatedSize) * 0.4)
                                         await MainActor.run {
                                             if !self.isCancelling {
                                                 self.exportProgress = min(0.9, progress)
@@ -716,6 +724,7 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                     await MainActor.run {
                         self.sheetAlert = .success(Text("クリップボード履歴が正常にエクスポートされました。"), onDismiss: {
                             self.isExporting = false
+                            onComplete()
                         })
                     }
                     print("Clipboard history exported successfully: \(url.path)")
@@ -733,6 +742,7 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                     await MainActor.run {
                         self.sheetAlert = .error(Text("履歴のエクスポートに失敗しました: \(error.localizedDescription)"), onDismiss: {
                             self.isExporting = false
+                            onComplete()
                         })
                     }
                     print("History export error: \(error.localizedDescription)")
