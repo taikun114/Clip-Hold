@@ -323,14 +323,7 @@ struct ClipHoldApp: App {
                     let shortcutName = element.shortcutName
                     
                     let displayText: String = {
-                        let content: String
-                        if item.text == "Image File" {
-                            content = String(localized: "Image File")
-                        } else if item.text == "PDF File" {
-                            content = String(localized: "PDF File")
-                        } else {
-                            content = item.text
-                        }
+                        let content = item.displayTitle
                         
                         var displayContent = content.replacingOccurrences(of: "\n", with: " ")
                         let dateString = item.date.formatted(for: dateDisplayFormatInMenu, currentDate: dateReloader.now)

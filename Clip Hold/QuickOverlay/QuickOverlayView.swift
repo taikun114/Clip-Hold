@@ -495,7 +495,7 @@ struct QuickOverlayView: View {
                     try? await Task.sleep(nanoseconds: 600_000_000)
                     if !Task.isCancelled {
                         NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
-                            "text": item.text,
+                            "text": item.displayTitle,
                             "sourceAppPath": item.sourceAppPath as Any,
                             "filePath": item.filePath?.path as Any,
                             "fileSize": item.fileSize as Any
@@ -813,8 +813,10 @@ private struct QuickOverlayHistoryItemRow: View {
         item.richText == nil
     }
 
-    private var truncatedText: String {
-        item.text.count > 1000 ? String(item.text.prefix(1000)) + "..." : item.text
+    private var itemDisplayText: Text {
+        let title = item.displayTitle
+        let truncatedTitle = title.count > 1000 ? String(title.prefix(1000)) + "..." : title
+        return Text(verbatim: truncatedTitle)
     }
 
     var body: some View {
@@ -850,7 +852,7 @@ private struct QuickOverlayHistoryItemRow: View {
             .frame(width: 30, height: 30)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(verbatim: truncatedText)
+                itemDisplayText
                     .font(.body)
                     .foregroundColor(isSelected ? .white : .primary)
                     .lineLimit(1)

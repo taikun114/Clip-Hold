@@ -73,14 +73,9 @@ struct HistoryItemRow<MenuContent: View>: View {
     }
     
     private var itemDisplayText: Text {
-        if item.text == "Image File" {
-            return Text("Image File")
-        } else if item.text == "PDF File" {
-            return Text("PDF File")
-        } else {
-            let truncatedText = item.text.count > 1000 ? String(item.text.prefix(1000)) + "..." : item.text
-            return Text(verbatim: truncatedText)
-        }
+        let title = item.displayTitle
+        let truncatedTitle = title.count > 1000 ? String(title.prefix(1000)) + "..." : title
+        return Text(verbatim: truncatedTitle)
     }
     
     var body: some View {

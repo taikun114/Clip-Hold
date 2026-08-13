@@ -112,6 +112,17 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         return url.scheme == "http" || url.scheme == "https"
     }
     
+    // 表示用のタイトル（必要に応じてローカライズされる）
+    var displayTitle: String {
+        if text == "Image File" {
+            return String(localized: "Image File")
+        } else if text == "PDF File" {
+            return String(localized: "PDF File")
+        } else {
+            return text
+        }
+    }
+    
     // Codableではないため @Published にできない。
     // UIの自動更新は、このプロパティの変更後に親のObservableObject (ClipboardManager) の変更を通知することで実現
     var cachedThumbnailImage: NSImage?
