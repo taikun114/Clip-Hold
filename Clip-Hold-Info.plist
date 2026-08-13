@@ -13,5 +13,26 @@
 			<string>コピー</string>
 		</dict>
 	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.archive</string>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Clip Hold Archive</string>
+			<key>UTTypeIdentifier</key>
+			<string>design.taikun.Clip-Hold.exports</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>cliphold</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 </dict>
 </plist>

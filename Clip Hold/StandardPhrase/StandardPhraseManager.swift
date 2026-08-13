@@ -134,12 +134,14 @@ class StandardPhraseManager: ObservableObject {
     }
     
     func addPhrase(title: String, content: String) {
+        guard !ClipboardManager.shared.isExporting else { return }
         let newPhrase = StandardPhrase(title: title, content: content)
         standardPhrases.append(newPhrase)
         SpotlightManager.shared.indexStandardPhrase(newPhrase)
     }
     
     func updatePhrase(id: UUID, newTitle: String, newContent: String) {
+        guard !ClipboardManager.shared.isExporting else { return }
         if let index = standardPhrases.firstIndex(where: { $0.id == id }) {
             var phrase = standardPhrases[index]
             phrase.title = newTitle
@@ -150,11 +152,13 @@ class StandardPhraseManager: ObservableObject {
     }
     
     func deletePhrase(id: UUID) {
+        guard !ClipboardManager.shared.isExporting else { return }
         standardPhrases.removeAll { $0.id == id }
         SpotlightManager.shared.removeStandardPhrase(id: id)
     }
     
     func deletePhrase(atOffsets offsets: IndexSet) {
+        guard !ClipboardManager.shared.isExporting else { return }
         // Spotlightから削除
         for index in offsets {
             let phrase = standardPhrases[index]
@@ -164,10 +168,12 @@ class StandardPhraseManager: ObservableObject {
     }
     
     func movePhrase(from source: IndexSet, to destination: Int) {
+        guard !ClipboardManager.shared.isExporting else { return }
         standardPhrases.move(fromOffsets: source, toOffset: destination)
     }
     
     func deleteAllPhrases() {
+        guard !ClipboardManager.shared.isExporting else { return }
         standardPhrases.removeAll()
     }
     
@@ -213,6 +219,7 @@ class StandardPhraseManager: ObservableObject {
     }
     
     @MainActor func addImportedPhrases(_ phrasesToAdd: [StandardPhrase], toPresetId presetId: UUID? = nil) {
+        guard !ClipboardManager.shared.isExporting else { return }
         if let presetId = presetId {
             // 指定されたプリセットに定型文を追加
             if var preset = StandardPhrasePresetManager.shared.presets.first(where: { $0.id == presetId }) {

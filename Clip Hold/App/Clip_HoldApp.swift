@@ -82,6 +82,7 @@ struct ClipHoldApp: App {
     }
     
     static func toggleClipboardMonitoring() {
+        guard !ClipboardManager.shared.isExporting else { return }
         let defaults = UserDefaults.standard
         let currentIsPaused = defaults.bool(forKey: "isClipboardMonitoringPaused")
         
@@ -93,6 +94,7 @@ struct ClipHoldApp: App {
     
     // MARK: - キーボード操作をシミュレートする関数
     static func performPaste() {
+        guard !ClipboardManager.shared.isExporting else { return }
         Task.detached(priority: .userInitiated) {
             guard let source = CGEventSource(stateID: .combinedSessionState) else {
                 print("Failed to create event source")
@@ -125,6 +127,7 @@ struct ClipHoldApp: App {
     }
     
     static func performPasteToPreviousApp() {
+        guard !ClipboardManager.shared.isExporting else { return }
         if let bundleIdentifier = FrontmostAppMonitor.shared.lastNonClipHoldAppBundleIdentifier {
             Task { @MainActor in
                 try? await Task.sleep(nanoseconds: 150_000_000) // ウィンドウが閉じることによるシステムフォーカス移動を待つ
@@ -192,8 +195,8 @@ struct ClipHoldApp: App {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(phrase.content, forType: .string)
                         
-                        // オプションキーが押されていない場合のみクイックペーストを実行
-                        if quickPaste && !ModifierKeyMonitor.shared.currentOptionKeyPressed {
+                        // オプションキーが押されていない場合、かつエクスポート・インポート中でない場合のみクイックペーストを実行
+                        if quickPaste && !ModifierKeyMonitor.shared.currentOptionKeyPressed && !clipboardManager.isExporting {
                             Task { @MainActor in
                                 try? await Task.sleep(nanoseconds: 50_000_000)
                                 ClipHoldApp.performPaste()
@@ -226,6 +229,7 @@ struct ClipHoldApp: App {
                         .labelStyle(.titleAndIcon)
                     }
                     .applyKeyboardShortcut(for: shortcutName)
+                    .disabled(clipboardManager.isExporting)
                 }
             }
             
@@ -245,10 +249,13 @@ struct ClipHoldApp: App {
                         }
                     ),
                     onNewPresetAction: {
-                        if let delegate = NSApp.delegate as? AppDelegate {
-                            delegate.showAddPresetWindow()
+                        if !clipboardManager.isExporting {
+                            if let delegate = NSApp.delegate as? AppDelegate {
+                                delegate.showAddPresetWindow()
+                            }
                         }
-                    }
+                    },
+                    isExporting: clipboardManager.isExporting
                 )
             } label: {
                 Label {
@@ -342,8 +349,8 @@ struct ClipHoldApp: App {
                         clipboardManager.isPerformingInternalCopy = true
                         clipboardManager.copyItemToClipboard(item)
                         
-                        // オプションキーが押されていない場合のみクイックペーストを実行
-                        if quickPaste && !ModifierKeyMonitor.shared.currentOptionKeyPressed {
+                        // オプションキーが押されていない場合、かつエクスポート・インポート中でない場合のみクイックペーストを実行
+                        if quickPaste && !ModifierKeyMonitor.shared.currentOptionKeyPressed && !clipboardManager.isExporting {
                             let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste") // ここで最新の値を取得
                             if textOnlyQuickPaste {
                                 // ファイルパスがなく、かつ画像でもない場合にのみペーストを実行
@@ -411,7 +418,7 @@ struct ClipHoldApp: App {
                         .labelStyle(.titleAndIcon)
                     }
                     .applyKeyboardShortcut(for: shortcutName)
-                    .disabled(item.isCopying)
+                    .disabled(item.isCopying || clipboardManager.isExporting)
                 }
             }
             
@@ -439,6 +446,7 @@ struct ClipHoldApp: App {
                         .labelStyle(.titleAndIcon)
                 }
                 .applyKeyboardShortcut(for: .toggleClipboardMonitoring)
+                .disabled(clipboardManager.isExporting)
             } else {
                 Label("クリップボード監視: 動作中", systemImage: "play.fill")
                     .labelStyle(.titleAndIcon)
@@ -450,6 +458,7 @@ struct ClipHoldApp: App {
                         .labelStyle(.titleAndIcon)
                 }
                 .applyKeyboardShortcut(for: .toggleClipboardMonitoring)
+                .disabled(clipboardManager.isExporting)
             }
             
             Divider()
@@ -514,12 +523,14 @@ struct ClipHoldApp: App {
         }
         
         KeyboardShortcuts.onKeyDown(for: .toggleClipboardMonitoring) {
+            guard !ClipboardManager.shared.isExporting else { return }
             print("Toggle Clipboard Monitoring shortcut pressed!")
             ClipHoldApp.toggleClipboardMonitoring()
         }
         
         // 新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addSNewtandardPhrase) {
+            guard !ClipboardManager.shared.isExporting else { return }
             print("Add New Standard Phrase shortcut pressed!")
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showAddPhraseWindow(withContent: "")
@@ -528,6 +539,7 @@ struct ClipHoldApp: App {
         
         // 新しいプリセットの追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addNewPreset) {
+            guard !ClipboardManager.shared.isExporting else { return }
             print("Add New Preset shortcut pressed!")
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showAddPresetWindow()
@@ -536,6 +548,7 @@ struct ClipHoldApp: App {
         
         // 次のプリセットに切り替えるショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .nextPreset) {
+            guard !ClipboardManager.shared.isExporting else { return }
             print("Switch to Next Preset shortcut pressed!")
             let presetManager = StandardPhrasePresetManager.shared
             if !presetManager.presets.isEmpty {
@@ -571,6 +584,7 @@ struct ClipHoldApp: App {
         
         // 前のプリセットに切り替えるショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .previousPreset) {
+            guard !ClipboardManager.shared.isExporting else { return }
             print("Switch to Previous Preset shortcut pressed!")
             let presetManager = StandardPhrasePresetManager.shared
             if !presetManager.presets.isEmpty {
@@ -606,6 +620,7 @@ struct ClipHoldApp: App {
         
         // クリップボードから新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addStandardPhraseFromClipboard) {
+            guard !ClipboardManager.shared.isExporting else { return }
             print("Add Standard Phrase from Clipboard shortcut pressed!")
             if let delegate = NSApp.delegate as? AppDelegate {
                 let clipboardContent = NSPasteboard.general.string(forType: .string) ?? ""
@@ -617,6 +632,7 @@ struct ClipHoldApp: App {
         for i in 0..<KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts.count {
             let shortcutName = KeyboardShortcuts.Name.allStandardPhraseCopyShortcuts[i]
             KeyboardShortcuts.onKeyDown(for: shortcutName) {
+                guard !ClipboardManager.shared.isExporting else { return }
                 let presetManager = StandardPhrasePresetManager.shared
                 if let selectedPreset = presetManager.selectedPreset, selectedPreset.phrases.indices.contains(i) {
                     let phrase = selectedPreset.phrases[i]
@@ -652,6 +668,7 @@ struct ClipHoldApp: App {
         
         // ピン留め履歴項目のコピーショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .copyPinnedHistoryItem) {
+            guard !ClipboardManager.shared.isExporting else { return }
             let clipboardManager = ClipboardManager.shared
             if let pinnedItem = clipboardManager.pinnedItem {
                 if pinnedItem.isCopying { return }
@@ -679,6 +696,7 @@ struct ClipHoldApp: App {
         for i in 0..<KeyboardShortcuts.Name.allClipboardHistoryCopyShortcuts.count {
             let shortcutName = KeyboardShortcuts.Name.allClipboardHistoryCopyShortcuts[i]
             KeyboardShortcuts.onKeyDown(for: shortcutName) {
+                guard !ClipboardManager.shared.isExporting else { return }
                 // ClipboardManager はシングルトンなので、static context からも .shared でアクセス可能
                 let clipboardManager = ClipboardManager.shared
                 let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
@@ -727,6 +745,7 @@ struct ClipHoldApp: App {
         
         // 最新の履歴を変更してコピーするショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .editAndCopyLatestHistory) {
+            guard !ClipboardManager.shared.isExporting else { return }
             let clipboardManager = ClipboardManager.shared
             let useFiltered = UserDefaults.standard.bool(forKey: "useFilteredHistoryForShortcuts")
             
@@ -752,6 +771,7 @@ struct ClipHoldApp: App {
         
         // テキストを入力してコピーするショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .newCopy) {
+            guard !ClipboardManager.shared.isExporting else { return }
             Task { @MainActor in
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showNewCopyWindow()
@@ -761,6 +781,7 @@ struct ClipHoldApp: App {
     }
     
     static func performPasteWithOverlayCheck() {
+        guard !ClipboardManager.shared.isExporting else { return }
         Task { @MainActor in
             if QuickOverlayManager.shared.isOverlayVisible {
                 QuickOverlayManager.shared.isOverlayVisible = false

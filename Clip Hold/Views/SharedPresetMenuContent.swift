@@ -8,6 +8,7 @@ struct SharedPresetMenuContent: View {
     
     @Binding var selectedPresetId: UUID?
     let onNewPresetAction: () -> Void
+    var isExporting: Bool = false
     
     private let noPresetsUUID = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
     
@@ -54,6 +55,7 @@ struct SharedPresetMenuContent: View {
             Label("新規プリセット...", systemImage: "plus")
                 .forceIconOnMacOS27()
         }
+        .disabled(isExporting)
         .applyKeyboardShortcut(for: .addNewPreset)
     }
 }

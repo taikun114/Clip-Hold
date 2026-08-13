@@ -45,7 +45,14 @@ struct CopyHistorySettingsView: View {
     
     @StateObject private var clipboardImporterExporter = ClipboardHistoryImporterExporter()
     @State private var isShowingImportSheet: Bool = false
-    @State private var isShowingExportSheet: Bool = false
+    @State private var showingExportConfigSheet: Bool = false
+    @State private var isShowingFileExporter: Bool = false
+    @State private var exportIncludeFiles: Bool = true
+    @State private var estimatedExportSizeMin: Int64 = 0
+    @State private var estimatedExportSizeMax: Int64 = 0
+    @State private var cachedSizeWithFiles: (min: Int64, max: Int64)? = nil
+    @State private var cachedSizeWithoutFiles: (min: Int64, max: Int64)? = nil
+    @State private var isCalculatingExportSize: Bool = false
     
     @State private var itemCount: Int = 0
     @State private var totalFolderSize: UInt64 = 0
@@ -351,9 +358,6 @@ struct CopyHistorySettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("クリップボード履歴")
-                        Text("現在、インポートとエクスポートはテキストのみサポートしています。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
@@ -369,7 +373,10 @@ struct CopyHistorySettingsView: View {
                     .help("書き出したクリップボード履歴のJSONファイルを読み込みます。")
                     
                     Button(action: {
-                        self.isShowingExportSheet = true
+                        self.cachedSizeWithFiles = nil
+                        self.cachedSizeWithoutFiles = nil
+                        self.showingExportConfigSheet = true
+                        updateEstimatedSize()
                     }) {
                         HStack {
                             Image(systemName: "square.and.arrow.up")
@@ -474,7 +481,9 @@ struct CopyHistorySettingsView: View {
         }
         // Updated onChange syntax to use a zero-parameter closure
         .onChange(of: clipboardManager.clipboardHistory) {
-            calculateStatistics()
+            if !clipboardImporterExporter.isExporting {
+                calculateStatistics()
+            }
         }
         .sheet(isPresented: $showingCustomSaveHistorySheet, onDismiss: {
             if !customSaveHistoryWasSaved {
@@ -537,28 +546,43 @@ struct CopyHistorySettingsView: View {
                 onCancel: {}
             )
         }
-        .fileExporter(
-            isPresented: $isShowingExportSheet,
-            document: ClipboardHistoryDocument(clipboardItems: clipboardManager.clipboardHistory),
-            contentType: .json,
-            defaultFilename: "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).json"
-        ) { result in
-            clipboardImporterExporter.handleExportResult(result, from: clipboardManager)
+        .sheet(isPresented: $showingExportConfigSheet) {
+            exportSheetContent
         }
         .fileImporter(
             isPresented: $isShowingImportSheet,
-            allowedContentTypes: [.json],
+            allowedContentTypes: [.json, .clipholdArchive],
             allowsMultipleSelection: false
         ) { result in
             print("DEBUG: fileImporter closure called for history import.")
-            clipboardImporterExporter.handleImportResult(result, into: clipboardManager)
+            clipboardImporterExporter.handleImportResult(result, into: clipboardManager) { newTotalSize in
+                self.totalFolderSize = newTotalSize
+                self.hasUncalculatedFolders = false
+                
+                // 再計算を確実に終わらせるため、もし内部で非同期処理が衝突していても最後に正しく反映させる
+                self.calculateStatistics()
+            }
             self.isShowingImportSheet = false
+        }
+        .sheet(isPresented: Binding(
+            get: { clipboardImporterExporter.isExporting && !clipboardImporterExporter.importStatusText.isEmpty },
+            set: { _ in }
+        )) {
+            importSheetContent
         }
         .alert(item: $clipboardImporterExporter.currentAlert) { alertContent in
             Alert(
                 title: alertContent.title,
                 message: alertContent.message,
-                dismissButton: .default(Text("OK"))
+                dismissButton: .default(Text("OK"), action: alertContent.onDismiss)
+            )
+        }
+        .alert(item: $clipboardImporterExporter.currentConfirmationAlert) { alertContent in
+            Alert(
+                title: alertContent.title,
+                message: alertContent.message,
+                primaryButton: .default(alertContent.primaryButtonTitle, action: alertContent.primaryAction),
+                secondaryButton: .cancel(alertContent.secondaryButtonTitle, action: alertContent.secondaryAction)
             )
         }
         .alert("すべてのクリップボード履歴を削除", isPresented: $showingClearHistoryConfirmation) {
@@ -854,7 +878,10 @@ struct CopyHistorySettingsView: View {
             
             do {
                 // ファイルシステムからプロパティを一括取得して高速化
-                let childURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey], options: .skipsHiddenFiles)
+                // .skipsHiddenFiles を使うと macOS の hidden 属性が付いた正当なファイルまで除外されてしまうため、
+                // すべて取得した上で、OSが自動生成する .DS_Store のみ手動で除外する
+                let allChildURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey], options: [])
+                let childURLs = allChildURLs.filter { $0.lastPathComponent != ".DS_Store" }
                 
                 var totalSize: UInt64 = 0
                 var foundUncalculatedFolder = false
@@ -892,127 +919,64 @@ struct CopyHistorySettingsView: View {
         }
     }
     
+    private func updateEstimatedSize() {
+        Task {
+            isCalculatingExportSize = true
+            let currentIncludeFiles = exportIncludeFiles
+            
+            if currentIncludeFiles {
+                if let cached = cachedSizeWithFiles {
+                    if exportIncludeFiles == currentIncludeFiles {
+                        estimatedExportSizeMin = cached.min
+                        estimatedExportSizeMax = cached.max
+                        isCalculatingExportSize = false
+                    }
+                } else {
+                    let sizes = await clipboardImporterExporter.calculateEstimatedExportSize(clipboardManager: clipboardManager, includeFiles: true)
+                    cachedSizeWithFiles = sizes
+                    if exportIncludeFiles == currentIncludeFiles {
+                        estimatedExportSizeMin = sizes.min
+                        estimatedExportSizeMax = sizes.max
+                        isCalculatingExportSize = false
+                    }
+                }
+            } else {
+                if let cached = cachedSizeWithoutFiles {
+                    if exportIncludeFiles == currentIncludeFiles {
+                        estimatedExportSizeMin = cached.min
+                        estimatedExportSizeMax = cached.max
+                        isCalculatingExportSize = false
+                    }
+                } else {
+                    let sizes = await clipboardImporterExporter.calculateEstimatedExportSize(clipboardManager: clipboardManager, includeFiles: false)
+                    cachedSizeWithoutFiles = sizes
+                    if exportIncludeFiles == currentIncludeFiles {
+                        estimatedExportSizeMin = sizes.min
+                        estimatedExportSizeMax = sizes.max
+                        isCalculatingExportSize = false
+                    }
+                }
+            }
+        }
+    }
+    
     private func recalculateAllFolderSizes() {
         isCalculating = true
         Task.detached(priority: .userInitiated) {
-            let fileManager = FileManager.default
-            guard let appSpecificDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("ClipHold") else {
-                await MainActor.run { isCalculating = false }
-                return
-            }
-            let filesDirectory = appSpecificDirectory.appendingPathComponent("ClipboardFiles", isDirectory: true)
-            
-            var newTotalSize: UInt64 = 0
-            var lastUIUpdate = Date()
-            var updatedItems: [ClipboardItem] = []
-            
-            do {
-                let childURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.isDirectoryKey, .fileSizeKey], options: .skipsHiddenFiles)
-                
-                // メインスレッドで現在の履歴アイテムのファイル名リストを取得（孤立ファイルの判定用）
-                let validFileNames = await MainActor.run {
-                    var names = Set<String>()
-                    for item in self.clipboardManager.clipboardHistory {
-                        if let fileName = item.filePath?.lastPathComponent {
-                            names.insert(fileName)
-                        }
-                    }
-                    return names
+            let newTotalSize = await self.clipboardManager.recalculateAllFolderSizes { _, currentSize in
+                await MainActor.run {
+                    self.totalFolderSize = currentSize
                 }
-                
-                for childURL in childURLs {
-                    let fileName = childURL.lastPathComponent
-                    let isOrphan = !validFileNames.contains(fileName)
-                    
-                    var isDirectory: ObjCBool = false
-                    if fileManager.fileExists(atPath: childURL.path, isDirectory: &isDirectory) {
-                        if isDirectory.boolValue {
-                            if isOrphan {
-                                // 孤立したフォルダ（履歴にない）は、calculateStatistics と同じく浅いサイズのみ加算し、中身はスキャンしない
-                                if let fileSize = (try? childURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
-                                    newTotalSize += UInt64(fileSize)
-                                }
-                            } else {
-                                var folderSize: UInt64 = 0
-                                if let enumerator = fileManager.enumerator(at: childURL, includingPropertiesForKeys: [.fileSizeKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) {
-                                    while let subFileURL = enumerator.nextObject() as? URL {
-                                        if let fileSize = (try? subFileURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
-                                            folderSize += UInt64(fileSize)
-                                            newTotalSize += UInt64(fileSize)
-                                            
-                                            let now = Date()
-                                            if now.timeIntervalSince(lastUIUpdate) >= 1.0 {
-                                                lastUIUpdate = now
-                                                let tempSize = newTotalSize
-                                                await MainActor.run { self.totalFolderSize = tempSize }
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                // キューに履歴アイテムの更新を追加
-                                let matchedItems = await MainActor.run { [folderSize, childURL] in
-                                    let matchingItems = self.clipboardManager.clipboardHistory.filter { $0.filePath?.lastPathComponent == childURL.lastPathComponent }
-                                    for item in matchingItems {
-                                        item.fileSize = folderSize
-                                        item.isPartialSize = false
-                                        item.isSizeCalculated = true
-                                    }
-                                    return matchingItems
-                                }
-                                updatedItems.append(contentsOf: matchedItems)
-                            }
-                        } else {
-                            if let fileSize = (try? childURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
-                                newTotalSize += UInt64(fileSize)
-                            }
-                        }
-                    }
-                    
-                    let now = Date()
-                    if now.timeIntervalSince(lastUIUpdate) >= 1.0 {
-                        lastUIUpdate = now
-                        let tempSize = newTotalSize
-                        await MainActor.run { self.totalFolderSize = tempSize }
-                    }
-                }
-                
-                // ChunkedHistoryManager に保存 (O(Chunks) で一括処理)
-                do {
-                    let chunkCount = try await ChunkedHistoryManager.shared.getChunkCount()
-                    var remainingUpdates = Dictionary(uniqueKeysWithValues: updatedItems.map { ($0.id, $0) })
-                    
-                    for index in stride(from: chunkCount - 1, through: 0, by: -1) {
-                        if remainingUpdates.isEmpty { break }
-                        var chunkItems = try await ChunkedHistoryManager.shared.loadHistoryChunk(at: index)
-                        var chunkModified = false
-                        
-                        for i in 0..<chunkItems.count {
-                            if let updatedItem = remainingUpdates[chunkItems[i].id] {
-                                chunkItems[i] = updatedItem
-                                chunkModified = true
-                                remainingUpdates.removeValue(forKey: chunkItems[i].id)
-                            }
-                        }
-                        
-                        if chunkModified {
-                            try await ChunkedHistoryManager.shared.saveChunk(chunkItems, at: index)
-                        }
-                    }
-                } catch {
-                    print("Error bulk updating history chunks: \(error.localizedDescription)")
-                }
-                
-            } catch {
-                print("Error recalculating folder sizes: \(error.localizedDescription)")
             }
             
             await MainActor.run { [newTotalSize] in
                 self.totalFolderSize = newTotalSize
-                self.hasUncalculatedFolders = false
                 self.isCalculating = false
                 // UI再描画のため
                 self.clipboardManager.objectWillChange.send()
+                
+                // 本当に未計算のフォルダがなくなったかを再評価する
+                self.calculateStatistics()
                 
                 // 再計算完了後に孤立ファイルのクリーンアップをトリガー
                 self.clipboardManager.triggerOrphanedFilesCleanup()
@@ -1258,5 +1222,212 @@ private struct HistoryWindowSettingsSection: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: 履歴ウィンドウ
+    }
+}
+
+extension CopyHistorySettingsView {
+    @ViewBuilder
+    private var exportSheetContent: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            if let alert = clipboardImporterExporter.sheetAlert {
+                alert.title
+                    .font(.headline)
+                    .foregroundStyle(alert.isSuccess ? Color.primary : Color.red)
+                
+                alert.message
+                
+                Spacer(minLength: 0)
+                
+                HStack {
+                    Spacer()
+                    Button("OK") {
+                        alert.onDismiss?()
+                        clipboardImporterExporter.sheetAlert = nil
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .controlSize(.large)
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 10) {
+                Text("履歴のエクスポート")
+                    .font(.headline)
+                
+                if !clipboardImporterExporter.isExporting {
+                    Toggle("ファイルやフォルダを含む", isOn: $exportIncludeFiles)
+                        .help("Clip Hold 1.6.3またはそれ以前のバージョンに復元するにはチェックを外す必要があります。")
+                        .onChange(of: exportIncludeFiles) {
+                            updateEstimatedSize()
+                        }
+                    
+                    if isCalculatingExportSize {
+                        Text("推定書き出しサイズ: 計算中...")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        let formattedMin = ByteCountFormatter.string(fromByteCount: estimatedExportSizeMin, countStyle: .file)
+                        let formattedMax = ByteCountFormatter.string(fromByteCount: estimatedExportSizeMax, countStyle: .file)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            if estimatedExportSizeMin == estimatedExportSizeMax {
+                                Text("推定書き出しサイズ: 約\(formattedMin)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("推定書き出しサイズ: \(formattedMin) 〜 \(formattedMax)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text("履歴の内容や保存されているファイルによって、圧縮後のサイズが大きく変動する可能性があります。")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(nil)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if clipboardImporterExporter.isExporting {
+                ProgressView(
+                    clipboardImporterExporter.exportStatusText,
+                    value: clipboardImporterExporter.exportProgress < 0 ? nil : clipboardImporterExporter.exportProgress,
+                    total: 1.0
+                )
+                .id(clipboardImporterExporter.isCancelling ? "export-cancelling" : "export-normal")
+            }
+                
+            Spacer(minLength: 0)
+            
+            Text("エクスポート中はデータの整合性を保つため、ほぼすべての機能が一時的に無効化されます。エクスポートが完了すると再び利用できるようになります。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            if clipboardImporterExporter.isExporting {
+                HStack {
+                    Spacer()
+                    Button("キャンセル") {
+                        clipboardImporterExporter.cancelExport()
+                    }
+                    .keyboardShortcut(.cancelAction)
+                    .controlSize(.large)
+                    .disabled(clipboardImporterExporter.isCancelling)
+                }
+            } else {
+                HStack {
+                    Button("キャンセル") {
+                        showingExportConfigSheet = false
+                    }
+                    .keyboardShortcut(.cancelAction)
+                    .controlSize(.large)
+                    
+                    Spacer()
+                    
+                    Button("エクスポート") {
+                        isShowingFileExporter = true
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .controlSize(.large)
+                }
+            }
+            }
+        }
+        .padding()
+        .frame(width: 350)
+        .fileExporter(
+            isPresented: $isShowingFileExporter,
+            document: ClipboardHistoryDocument(clipboardItems: clipboardManager.clipboardHistory),
+            contentType: exportIncludeFiles ? .clipholdArchive : .json,
+            defaultFilename: exportIncludeFiles ? "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).cliphold" : "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).json"
+        ) { result in
+            clipboardImporterExporter.handleExportResult(result, from: clipboardManager, includeFiles: exportIncludeFiles) {
+                showingExportConfigSheet = false
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var importSheetContent: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            if let alert = clipboardImporterExporter.sheetAlert {
+                alert.title
+                    .font(.headline)
+                    .foregroundStyle(alert.isSuccess ? Color.primary : Color.red)
+                
+                alert.message
+                
+                Spacer(minLength: 0)
+                
+                HStack {
+                    Spacer()
+                    Button("OK") {
+                        alert.onDismiss?()
+                        clipboardImporterExporter.sheetAlert = nil
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .controlSize(.large)
+                }
+            } else if let confirmation = clipboardImporterExporter.currentConfirmationAlert {
+                confirmation.title
+                    .font(.headline)
+                
+                confirmation.message
+                
+                Spacer(minLength: 0)
+                
+                HStack {
+                    Button(action: {
+                        confirmation.secondaryAction()
+                        clipboardImporterExporter.currentConfirmationAlert = nil
+                    }) {
+                        confirmation.secondaryButtonTitle
+                    }
+                    .keyboardShortcut(.cancelAction)
+                    .controlSize(.large)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        confirmation.primaryAction()
+                        clipboardImporterExporter.currentConfirmationAlert = nil
+                    }) {
+                        confirmation.primaryButtonTitle
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .controlSize(.large)
+                }
+            } else {
+                Text("履歴のインポート")
+                    .font(.headline)
+                
+                ProgressView(
+                    clipboardImporterExporter.importStatusText,
+                    value: clipboardImporterExporter.importProgress < 0 ? nil : clipboardImporterExporter.importProgress,
+                    total: 1.0
+                )
+                .progressViewStyle(.linear)
+                .id(clipboardImporterExporter.isCancelling ? "import-cancelling" : "import-normal")
+                
+                Spacer(minLength: 0)
+                
+                Text("インポート中はデータの整合性を保つため、ほぼすべての機能が一時的に無効化されます。インポートが完了すると再び利用できるようになります。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 4)
+                
+                HStack {
+                    Spacer()
+                    Button("キャンセル") {
+                        clipboardImporterExporter.cancelImport()
+                    }
+                    .keyboardShortcut(.cancelAction)
+                    .controlSize(.large)
+                    .disabled(clipboardImporterExporter.isCancelling)
+                }
+            }
+        }
+        .padding()
+        .frame(width: 350)
     }
 }

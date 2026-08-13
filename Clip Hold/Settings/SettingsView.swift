@@ -99,6 +99,7 @@ struct SettingsView: View {
                         .navigationTitle("プライバシー")
                 case "developer":
                     DeveloperSettingsView()
+                        .environmentObject(clipboardManager)
                         .navigationTitle("開発者向け機能")
                 case "info":
                     InfoSettingsView()

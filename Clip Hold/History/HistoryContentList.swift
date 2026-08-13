@@ -127,7 +127,7 @@ struct HistoryContentList: View {
             action: { performCopy(modifierMonitor.currentOptionKeyPressed) },
             alternateAction: { performCopy(true) }
         )
-        .disabled(currentItem.isCopying)
+        .disabled(currentItem.isCopying || clipboardManager.isExporting)
         
         if currentItem.richText != nil {
             let plainTextCopyAction: (Bool) -> Void = { preventQuickPaste in
@@ -165,7 +165,7 @@ struct HistoryContentList: View {
                     }
                 }
             }
-            .disabled(currentItem.isCopying)
+            .disabled(currentItem.isCopying || clipboardManager.isExporting)
         }
         
         SharedEditAndCopyMenuItem {
@@ -188,7 +188,7 @@ struct HistoryContentList: View {
             } label: {
                 Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
             }
-            .disabled(currentItem.isCopying)
+            .disabled(currentItem.isCopying || clipboardManager.isExporting)
         }
         
         if let filePath = currentItem.filePath {
@@ -197,12 +197,12 @@ struct HistoryContentList: View {
             } label: {
                 Label("開く", systemImage: "arrow.up.forward.app")
             }
-            .disabled(currentItem.isCopying)
+            .disabled(currentItem.isCopying || clipboardManager.isExporting)
         }
         
         if currentItem.isURL {
             SharedOpenLinkMenuItem(urlString: currentItem.text)
-                .disabled(currentItem.isCopying)
+                .disabled(currentItem.isCopying || clipboardManager.isExporting)
         }
         
         Divider()
@@ -216,7 +216,7 @@ struct HistoryContentList: View {
             } label: {
                 Label("クイックルック", systemImage: "eye")
             }
-            .disabled(currentItem.isCopying)
+            .disabled(currentItem.isCopying || clipboardManager.isExporting)
         }
         
         let targetID = currentItem.originalPinnedItemID ?? currentItem.id
@@ -226,6 +226,7 @@ struct HistoryContentList: View {
             } label: {
                 Label("ピン留めを解除", systemImage: "pin.slash").forceIconOnMacOS27()
             }
+            .disabled(clipboardManager.isExporting)
         } else {
             Button {
                 if clipboardManager.pinnedItemID != nil {
@@ -241,6 +242,7 @@ struct HistoryContentList: View {
             } label: {
                 Label("ピン留め", systemImage: "pin").forceIconOnMacOS27()
             }
+            .disabled(clipboardManager.isExporting)
         }
         
         Button {
@@ -248,6 +250,7 @@ struct HistoryContentList: View {
         } label: {
             Label("項目から定型文を作成...", systemImage: "pencil")
         }
+        .disabled(clipboardManager.isExporting)
         
         if currentItem.filePath == nil {
             SharedShowQRCodeMenuItem {
@@ -270,6 +273,7 @@ struct HistoryContentList: View {
             } label: {
                 Label("除外するアプリに追加...", systemImage: "hand.raised.circle")
             }
+            .disabled(clipboardManager.isExporting)
         }
         
         SharedDeleteMenuItem(action: {
@@ -281,7 +285,7 @@ struct HistoryContentList: View {
             deleteOnlyThisItem = true
             showingDeleteConfirmation = true
         } : nil)
-        .disabled(currentItem.isCopying)
+        .disabled(currentItem.isCopying || clipboardManager.isExporting)
         
             if let sourceAppPath = currentItem.sourceAppPath {
                 Button(role: .destructive) {
@@ -290,7 +294,7 @@ struct HistoryContentList: View {
                 } label: {
                     Text("このアプリからのすべての履歴を削除...")
                 }
-                .disabled(currentItem.isCopying)
+                .disabled(currentItem.isCopying || clipboardManager.isExporting)
             }
     }
     
@@ -381,6 +385,7 @@ struct HistoryContentList: View {
                             historyMenuItems(for: currentItem)
                         }
                     }, primaryAction: { selectedIDs in
+                        guard !clipboardManager.isExporting else { return }
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
                             if currentItem.isCopying { return }
                             let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")

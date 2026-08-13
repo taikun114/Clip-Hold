@@ -28,6 +28,8 @@ extension ClipboardManager {
     
     // MARK: - Helper function to add and save a new item
     func addAndSaveItem(_ newItem: ClipboardItem) { // private から internal に変更
+        guard !isExporting else { return }
+        
         // 万が一既存の履歴と同じIDが生成されていた場合は新しく生成し直す（念のためのエラーハンドリング）
         while clipboardHistory.contains(where: { $0.id == newItem.id }) {
             print("ClipboardManager: ID collision detected for \(newItem.id). Regenerating UUID...")
@@ -94,6 +96,8 @@ extension ClipboardManager {
     }
     
     func clearAllHistory() {
+        guard !isExporting else { return }
+        
         // インポートタスクが実行中の場合はキャンセル
         activeImportTask?.cancel()
         activeImportTask = nil
@@ -125,6 +129,8 @@ extension ClipboardManager {
     }
     
     func deleteItem(id: UUID, deleteOnlyThisItem: Bool = false) {
+        guard !isExporting else { return }
+        
         if id == pinnedItemID {
             unpinItem()
         }
@@ -203,14 +209,40 @@ extension ClipboardManager {
             }
             
             // 1. 重複を避けて新しいアイテムを結合
-            let existingItemsSet = Set(await MainActor.run { self.clipboardHistory }.map {
+            let existingItems = await MainActor.run { self.clipboardHistory }
+            let existingItemsDict = Dictionary(existingItems.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+            
+            let existingContentSet = Set(existingItems.map {
                 let pathComponent = $0.filePath?.lastPathComponent ?? "nil"
                 return "\($0.text)-\(pathComponent)"
             })
             
-            let newItems = validItems.filter { item in
+            var newItems: [ClipboardItem] = []
+            
+            for item in validItems {
+                if let existingItem = existingItemsDict[item.id] {
+                    var isContentSame = false
+                    if item.text == existingItem.text {
+                        if item.filePath == nil && existingItem.filePath == nil {
+                            isContentSame = true
+                        } else if let newHash = item.fileHash, let existingHash = existingItem.fileHash {
+                            isContentSame = (newHash == existingHash)
+                        } else {
+                            isContentSame = false
+                        }
+                    }
+                    
+                    if isContentSame {
+                        continue
+                    } else {
+                        item.id = UUID()
+                    }
+                }
+                
                 let pathComponent = item.filePath?.lastPathComponent ?? "nil"
-                return !existingItemsSet.contains("\(item.text)-\(pathComponent)")
+                if !existingContentSet.contains("\(item.text)-\(pathComponent)") {
+                    newItems.append(item)
+                }
             }
             
             if newItems.isEmpty || Task.isCancelled {
@@ -218,16 +250,20 @@ extension ClipboardManager {
                 return
             }
             
+            let itemsToAdd = newItems
+            
             // 2. 既存の履歴に新しいアイテムを追加 (メインスレッドでPublishedプロパティを更新)
             let updatedHistory: [ClipboardItem] = await MainActor.run {
-                // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
                 self.objectWillChange.send()
-                self.clipboardHistory.append(contentsOf: newItems)
+                self.clipboardHistory.append(contentsOf: itemsToAdd)
+                
+                // 新しい順（日付が新しいものが先頭）にソート
+                self.clipboardHistory.sort { $0.date > $1.date }
                 
                 // 3. 最大履歴数を超過した場合の処理
                 self.enforceMaxHistoryCount()
                 
-                print("ClipboardManager: History imported. Added \(newItems.count) items, total history count: \(self.clipboardHistory.count)")
+                print("ClipboardManager: History imported. Added \(itemsToAdd.count) items, total history count: \(self.clipboardHistory.count)")
                 
                 return self.clipboardHistory
             }

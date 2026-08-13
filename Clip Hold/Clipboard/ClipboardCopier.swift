@@ -4,6 +4,8 @@ import SwiftUI // @Published
 
 extension ClipboardManager {
     func copyItemToClipboard(_ item: ClipboardItem, completion: (@Sendable () -> Void)? = nil) {
+        if isExporting { return }
+        
         // 古い一時ファイルをすべて削除する
         cleanUpTemporaryFiles()
         

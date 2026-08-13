@@ -23,11 +23,13 @@ Notes
 
 ## 1.7.0
 ### New Features
+- **Support for Spotlight search and Shortcuts actions**
+  - You can search and copy history and standard phrases from Spotlight, or use Shortcuts actions to copy specific history and standard phrases.
+- **Support for importing and exporting history including files**
+  - You can now export all history data, including files and folders saved in the save folder. You can still import history files exported from previous versions.
 - **Add the "Quick Overlay" feature**
   - A Quick Overlay feature has been added that allows you to easily copy history and standard phrases just by moving the mouse cursor while holding down a shortcut key. Most operations are executed by releasing the shortcut key after moving the mouse cursor while holding it down, so it is designed to be easily operated without explicitly clicking.
   - You can enable Quick Overlay from the "Quick Overlay" section of the General settings. For detailed instructions on how to use it, you can click the "How to use Quick Overlay..." button in the "Quick Overlay" section of the General settings.
-- **Support for Spotlight search and Shortcuts actions**
-  - You can search and copy history and standard phrases from Spotlight, or use Shortcuts actions to copy specific history and standard phrases.
 - **Add the New Copy feature**
   - By default, you can press `⌥ (Option)` + `⌘ (Command)` + `A` to enter your favorite text and create a new copy. You no longer need to enter it into a note, etc. when you want to copy a specific string.
 - **Add a pin feature to the copy history**

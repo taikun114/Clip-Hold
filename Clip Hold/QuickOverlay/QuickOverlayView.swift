@@ -396,7 +396,10 @@ struct QuickOverlayView: View {
                 .clipShape(Capsule())
             }
             .buttonStyle(PlainButtonStyle())
+            .disabled(clipboardManager.isExporting)
+            .opacity(clipboardManager.isExporting ? 0.4 : 1.0)
             .onHover { hovering in
+                guard !clipboardManager.isExporting else { return }
                 if hovering { 
                     currentSelection = .add 
                 } else if currentSelection == .add {
@@ -717,7 +720,10 @@ struct QuickOverlayView: View {
             .background(hoveredPresetId == UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")! ? Color.accentColor : Color.clear)
             .cornerRadius(8)
             .contentShape(Rectangle())
+            .disabled(clipboardManager.isExporting)
+            .opacity(clipboardManager.isExporting ? 0.4 : 1.0)
             .onHover { hovering in
+                guard !clipboardManager.isExporting else { return }
                 if hovering {
                     hoveredPresetId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!
                     QuickOverlayManager.shared.hoveredAction = .addPreset
@@ -729,6 +735,7 @@ struct QuickOverlayView: View {
                 }
             }
             .onTapGesture {
+                guard !clipboardManager.isExporting else { return }
                 if let delegate = NSApp.delegate as? AppDelegate {
                     delegate.showAddPresetWindow()
                 }
@@ -976,8 +983,8 @@ private struct QuickOverlayHistoryItemRow: View {
                 .cornerRadius(12) // 項目のハイライトの角丸と統一する
         }
         .buttonStyle(PlainButtonStyle())
-        .disabled(isPlainTextOnly || item.isCopying)
-        .opacity((isPlainTextOnly || item.isCopying) ? 0.4 : 1)
+        .disabled(isPlainTextOnly || item.isCopying || ClipboardManager.shared.isExporting)
+        .opacity((isPlainTextOnly || item.isCopying || ClipboardManager.shared.isExporting) ? 0.4 : 1)
         .contentShape(Rectangle())
         .onHover { hovering in
             guard !isPlainTextOnly, !item.isCopying else { return }
@@ -1010,6 +1017,8 @@ private struct QuickOverlayHistoryItemRow: View {
                 .cornerRadius(12)
         }
         .buttonStyle(PlainButtonStyle())
+        .disabled(item.isCopying || ClipboardManager.shared.isExporting)
+        .opacity((item.isCopying || ClipboardManager.shared.isExporting) ? 0.4 : 1)
         .contentShape(Rectangle())
         .onHover { hovering in
             isEditAndCopyButtonHovered = hovering
@@ -1289,6 +1298,8 @@ private struct QuickOverlayStandardPhraseItemRow: View {
                 .cornerRadius(12)
         }
         .buttonStyle(PlainButtonStyle())
+        .disabled(ClipboardManager.shared.isExporting)
+        .opacity(ClipboardManager.shared.isExporting ? 0.4 : 1)
         .contentShape(Rectangle())
         .onHover { hovering in
             isEditAndCopyButtonHovered = hovering

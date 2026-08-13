@@ -11,6 +11,20 @@ class ClipboardManager: ObservableObject {
     @Published var clipboardHistory: [ClipboardItem] = []
     @Published var filteredHistoryForShortcuts: [ClipboardItem]? = nil
     @Published var isHistoryLoaded: Bool = false
+    @Published var isExporting: Bool = false {
+        didSet {
+            if isExporting {
+                previousMonitoringState = UserDefaults.standard.bool(forKey: "isClipboardMonitoringPaused")
+                UserDefaults.standard.set(true, forKey: "isClipboardMonitoringPaused")
+            } else {
+                if let previousState = previousMonitoringState {
+                    UserDefaults.standard.set(previousState, forKey: "isClipboardMonitoringPaused")
+                }
+            }
+        }
+    }
+    
+    private var previousMonitoringState: Bool? = nil
     
     // 進行中のインポートタスクを保持し、クリア時にキャンセル可能にする
     var activeImportTask: Task<Void, Never>?
@@ -393,6 +407,7 @@ class ClipboardManager: ObservableObject {
     
     // 特定のアプリからの履歴をすべて削除する関数
     func deleteAllHistoryFromApp(sourceAppPath: String) {
+        guard !isExporting else { return }
         Task { @MainActor in
             // 対象となるアイテムを一括で取得
             let itemsToDelete = clipboardHistory.filter { $0.sourceAppPath == sourceAppPath }
@@ -433,5 +448,131 @@ class ClipboardManager: ObservableObject {
     func countHistoryFromApp(sourceAppPath: String) -> Int {
         return clipboardHistory.count { $0.sourceAppPath == sourceAppPath }
     }
+    
+    // インポートや設定画面からの「再計算」を共通化するメソッド
+    func recalculateAllFolderSizes(progressHandler: ((Double, UInt64) async -> Void)? = nil) async -> UInt64 {
+        let fileManager = FileManager.default
+        guard let appSpecificDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("ClipHold") else {
+            return 0
+        }
+        let filesDirectory = appSpecificDirectory.appendingPathComponent("ClipboardFiles", isDirectory: true)
+        
+        var newTotalSize: UInt64 = 0
+        var updatedItems: [ClipboardItem] = []
+        var lastUIUpdate = Date()
+        
+        do {
+            let allChildURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.isDirectoryKey, .fileSizeKey], options: [])
+            let childURLs = allChildURLs.filter { $0.lastPathComponent != ".DS_Store" }
+            let totalFiles = childURLs.count
+            
+            // メインスレッドで現在の履歴アイテムのファイル名リストを取得（孤立ファイルの判定用）
+            let validFileNames = await MainActor.run {
+                var names = Set<String>()
+                for item in self.clipboardHistory {
+                    if let fileName = item.filePath?.lastPathComponent {
+                        names.insert(fileName)
+                    }
+                }
+                return names
+            }
+            
+            for (index, childURL) in childURLs.enumerated() {
+                let fileName = childURL.lastPathComponent
+                let isOrphan = !validFileNames.contains(fileName)
+                
+                var isDirectory: ObjCBool = false
+                if fileManager.fileExists(atPath: childURL.path, isDirectory: &isDirectory) {
+                    if isDirectory.boolValue {
+                        if isOrphan {
+                            // 孤立したフォルダ（履歴にない）は浅いサイズのみ加算
+                            if let fileSize = (try? childURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
+                                newTotalSize += UInt64(fileSize)
+                            }
+                        } else {
+                            var folderSize: UInt64 = 0
+                            if let enumerator = fileManager.enumerator(at: childURL, includingPropertiesForKeys: [.fileSizeKey], options: [.skipsPackageDescendants]) {
+                                while let subFileURL = enumerator.nextObject() as? URL {
+                                    if let fileSize = (try? subFileURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
+                                        folderSize += UInt64(fileSize)
+                                        newTotalSize += UInt64(fileSize)
+                                        
+                                        // サブファイルごとの細かいUI更新 (0.5秒ごと)
+                                        let now = Date()
+                                        if now.timeIntervalSince(lastUIUpdate) >= 0.5, let handler = progressHandler {
+                                            lastUIUpdate = now
+                                            let progress = Double(index) / Double(max(1, totalFiles))
+                                            let currentSize = newTotalSize
+                                            await handler(progress, currentSize)
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            let matchedItems = await MainActor.run { [folderSize, childURL] in
+                                let matchingItems = self.clipboardHistory.filter { $0.filePath?.lastPathComponent == childURL.lastPathComponent }
+                                for item in matchingItems {
+                                    item.fileSize = folderSize
+                                    item.isPartialSize = false
+                                    item.isSizeCalculated = true
+                                }
+                                return matchingItems
+                            }
+                            updatedItems.append(contentsOf: matchedItems)
+                        }
+                    } else {
+                        if let fileSize = (try? childURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
+                            newTotalSize += UInt64(fileSize)
+                        }
+                    }
+                }
+                
+                // アイテムごとのUI更新 (0.5秒ごと または 最後)
+                let now = Date()
+                if now.timeIntervalSince(lastUIUpdate) >= 0.5 || index == totalFiles - 1 {
+                    if let handler = progressHandler {
+                        lastUIUpdate = now
+                        let progress = Double(index + 1) / Double(max(1, totalFiles))
+                        let currentSize = newTotalSize
+                        await handler(progress, currentSize)
+                    }
+                }
+            }
+            
+            // ChunkedHistoryManager に保存
+            do {
+                let chunkCount = try await ChunkedHistoryManager.shared.getChunkCount()
+                var remainingUpdates = Dictionary(uniqueKeysWithValues: updatedItems.map { ($0.id, $0) })
+                
+                for index in stride(from: chunkCount - 1, through: 0, by: -1) {
+                    if remainingUpdates.isEmpty { break }
+                    var chunkItems = try await ChunkedHistoryManager.shared.loadHistoryChunk(at: index)
+                    var chunkModified = false
+                    
+                    for i in 0..<chunkItems.count {
+                        if let updatedItem = remainingUpdates[chunkItems[i].id] {
+                            chunkItems[i] = updatedItem
+                            chunkModified = true
+                            remainingUpdates.removeValue(forKey: chunkItems[i].id)
+                        }
+                    }
+                    
+                    if chunkModified {
+                        try await ChunkedHistoryManager.shared.saveChunk(chunkItems, at: index)
+                    }
+                }
+            } catch {
+                print("Error bulk updating history chunks: \(error.localizedDescription)")
+            }
+            
+        } catch {
+            print("Error recalculating folder sizes: \(error.localizedDescription)")
+        }
+        
+        await MainActor.run {
+            self.objectWillChange.send()
+        }
+        
+        return newTotalSize
+    }
 }
-

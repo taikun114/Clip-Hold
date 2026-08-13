@@ -294,8 +294,11 @@ struct StandardPhraseWindowView: View {
                                     }
                                 ),
                                 onNewPresetAction: {
-                                    showingAddPresetSheet = true
-                                }
+                                    if !clipboardManager.isExporting {
+                                        showingAddPresetSheet = true
+                                    }
+                                },
+                                isExporting: clipboardManager.isExporting
                             )
                         } label: {
                             if let selectedPreset = presetManager.selectedPreset,
@@ -449,6 +452,7 @@ struct StandardPhraseWindowView: View {
                                     standardPhraseMenuItems(for: currentPhrase)
                                 }
                             }, primaryAction: { selectedIDs in
+                                guard !clipboardManager.isExporting else { return }
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
                                     performSharedCopyRoutine(
                                         preventQuickPaste: modifierMonitor.currentOptionKeyPressed,

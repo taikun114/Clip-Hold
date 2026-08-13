@@ -10,6 +10,7 @@ struct DeveloperSettingsView: View {
     @State private var showingSpotlightResetConfirmation = false
     
     @ObservedObject var spotlightManager = SpotlightManager.shared
+    @EnvironmentObject var clipboardManager: ClipboardManager
     
     var body: some View {
         Form {
@@ -133,6 +134,22 @@ struct DeveloperSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: デバッグ
+            
+#if DEBUG
+            // MARK: - Debug Menu (開発者テスト用)
+            Section(header: Text(verbatim: "Debug Menu").font(.headline)) {
+                HStack {
+                    Text(verbatim: "Test isExporting")
+                    Spacer()
+                    Toggle(isOn: $clipboardManager.isExporting) {
+                        Text(verbatim: "Test isExporting")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            }
+#endif
         } // End of Form
         .formStyle(.grouped)
         .alert("すべての設定をリセット", isPresented: $showingResetConfirmation) {
@@ -169,4 +186,5 @@ struct DeveloperSettingsView: View {
 
 #Preview {
     DeveloperSettingsView()
+        .environmentObject(ClipboardManager.shared)
 }

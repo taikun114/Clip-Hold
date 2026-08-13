@@ -37,21 +37,26 @@ struct SharedCopyMenuItem: View {
     @AppStorage("quickPaste") var quickPaste: Bool = false
     @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
     
+    @EnvironmentObject var clipboardManager: ClipboardManager
+    
     var body: some View {
         if #available(macOS 15.0, *) {
             if quickPaste && quickPasteToPreviousApp {
                 Button(action: action) {
                     Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
                 }
+                .disabled(clipboardManager.isExporting)
                 .modifierKeyAlternate(.option) {
                     Button(action: alternateAction ?? action) {
                         Label("クイックペーストせずにコピー", systemImage: "document.on.document").forceIconOnMacOS27()
                     }
+                    .disabled(clipboardManager.isExporting)
                 }
             } else {
                 Button(action: action) {
                     Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
                 }
+                .disabled(clipboardManager.isExporting)
             }
         } else {
             Button(action: action) {
@@ -61,6 +66,7 @@ struct SharedCopyMenuItem: View {
                     Label("コピー", systemImage: "document.on.document").forceIconOnMacOS27()
                 }
             }
+            .disabled(clipboardManager.isExporting)
         }
     }
 }
@@ -69,16 +75,21 @@ struct SharedCopyMenuItem: View {
 struct SharedEditAndCopyMenuItem: View {
     let action: () -> Void
     
+    @EnvironmentObject var clipboardManager: ClipboardManager
+    
     var body: some View {
         Button(action: action) {
             Text("変更してコピー...")
         }
+        .disabled(clipboardManager.isExporting)
     }
 }
 
 /// URLの場合にリンクを開くメニュー項目
 struct SharedOpenLinkMenuItem: View {
     let urlString: String
+    
+    @EnvironmentObject var clipboardManager: ClipboardManager
     
     var body: some View {
         if let url = URL(string: urlString), (url.scheme == "http" || url.scheme == "https") {
@@ -87,6 +98,7 @@ struct SharedOpenLinkMenuItem: View {
             } label: {
                 Label("リンクを開く", systemImage: "paperclip").forceIconOnMacOS27()
             }
+            .disabled(clipboardManager.isExporting)
         }
     }
 }
@@ -95,10 +107,13 @@ struct SharedOpenLinkMenuItem: View {
 struct SharedShowQRCodeMenuItem: View {
     let action: () -> Void
     
+    @EnvironmentObject var clipboardManager: ClipboardManager
+    
     var body: some View {
         Button(action: action) {
             Label("QRコードを表示...", systemImage: "qrcode").forceIconOnMacOS27()
         }
+        .disabled(clipboardManager.isExporting)
     }
 }
 
@@ -106,10 +121,13 @@ struct SharedShowQRCodeMenuItem: View {
 struct SharedFilterByAppMenuItem: View {
     let action: () -> Void
     
+    @EnvironmentObject var clipboardManager: ClipboardManager
+    
     var body: some View {
         Button(action: action) {
             Label("このアプリからの他の履歴を表示", systemImage: "line.3.horizontal.decrease")
         }
+        .disabled(clipboardManager.isExporting)
     }
 }
 
@@ -118,21 +136,26 @@ struct SharedDeleteMenuItem: View {
     let action: () -> Void
     var alternateAction: (() -> Void)? = nil
     
+    @EnvironmentObject var clipboardManager: ClipboardManager
+    
     var body: some View {
         if #available(macOS 15.0, *) {
             if let alternateAction = alternateAction {
                 Button(role: .destructive, action: action) {
                     Label("削除...", systemImage: "trash").forceIconOnMacOS27()
                 }
+                .disabled(clipboardManager.isExporting)
                 .modifierKeyAlternate(.option) {
                     Button(role: .destructive, action: alternateAction) {
                         Label("この項目のみ削除...", systemImage: "trash").forceIconOnMacOS27()
                     }
+                    .disabled(clipboardManager.isExporting)
                 }
             } else {
                 Button(role: .destructive, action: action) {
                     Label("削除...", systemImage: "trash").forceIconOnMacOS27()
                 }
+                .disabled(clipboardManager.isExporting)
             }
         } else {
             Button(role: .destructive, action: {
@@ -148,6 +171,7 @@ struct SharedDeleteMenuItem: View {
                     Label("削除...", systemImage: "trash").forceIconOnMacOS27()
                 }
             }
+            .disabled(clipboardManager.isExporting)
         }
     }
 }
@@ -156,10 +180,13 @@ struct SharedDeleteMenuItem: View {
 struct SharedEditMenuItem: View {
     let action: () -> Void
     
+    @EnvironmentObject var clipboardManager: ClipboardManager
+    
     var body: some View {
         Button(action: action) {
             Label("編集...", systemImage: "pencil")
         }
+        .disabled(clipboardManager.isExporting)
     }
 }
 
@@ -167,10 +194,13 @@ struct SharedEditMenuItem: View {
 struct SharedDuplicateMenuItem: View {
     let action: () -> Void
     
+    @EnvironmentObject var clipboardManager: ClipboardManager
+    
     var body: some View {
         Button(action: action) {
             Label("複製", systemImage: "plus.square.on.square")
         }
+        .disabled(clipboardManager.isExporting)
     }
 }
 
@@ -178,9 +208,12 @@ struct SharedDuplicateMenuItem: View {
 struct SharedMoveMenuItem: View {
     let action: () -> Void
     
+    @EnvironmentObject var clipboardManager: ClipboardManager
+    
     var body: some View {
         Button(action: action) {
             Label("別のプリセットに移動...", systemImage: "folder")
         }
+        .disabled(clipboardManager.isExporting)
     }
 }

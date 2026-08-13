@@ -254,6 +254,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     @MainActor
     func showAddPhraseWindow(withContent content: String) {
+        guard !ClipboardManager.shared.isExporting else { return }
         let windowType: WindowType = .addPhrase
         let title = String(localized: "定型文を追加")
         
@@ -282,6 +283,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     @MainActor
     func showAddPresetWindow() {
+        guard !ClipboardManager.shared.isExporting else { return }
         let windowType: WindowType = .addPreset
         let title = String(localized: "プリセットを追加")
         
@@ -319,6 +321,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     @MainActor
     func showChangeItemAndCopyWindow(withContent content: String) {
+        guard !ClipboardManager.shared.isExporting else { return }
         let windowType: WindowType = .changeItemAndCopy
         let title = String(localized: "項目を変更してコピー")
         
@@ -361,6 +364,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     @MainActor
     func showNewCopyWindow() {
+        guard !ClipboardManager.shared.isExporting else { return }
         let windowType: WindowType = .newCopy
         let title = String(localized: "テキストを入力して新規コピー")
         

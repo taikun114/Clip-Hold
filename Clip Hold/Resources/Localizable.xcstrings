@@ -2790,6 +2790,40 @@
     "Clip Hold" : {
       "shouldTranslate" : false
     },
+    "Clip Hold 1.6.3またはそれ以前のバージョンに復元するにはチェックを外す必要があります。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deaktivieren Sie diese Option, um eine Wiederherstellung auf Clip Hold 1.6.3 oder früher durchzuführen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uncheck this to restore to Clip Hold 1.6.3 or earlier."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desmarque esto para restaurar a Clip Hold 1.6.3 o anterior."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décochez cette case pour restaurer vers Clip Hold 1.6.3 ou antérieur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold 1.6.3またはそれ以前のバージョンに復元するにはチェックを外す必要があります。"
+          }
+        }
+      }
+    },
     "Clip Holdについて" : {
       "comment" : "このアプリ(Clip Hold)についての画面に表示されるタイトルテキスト。アプリ名(Clip Hold)は翻訳しない。",
       "localizations" : {
@@ -8372,6 +8406,142 @@
         }
       }
     },
+    "インポートがキャンセルされました。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import wurde abgebrochen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import was canceled."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se canceló la importación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'importation a été annulée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポートがキャンセルされました。"
+          }
+        }
+      }
+    },
+    "インポートしたファイルにピン留め項目がありましたが、現在このデバイスでは別の項目がピン留めされています。インポートしたピン留め項目に置き換えますか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die importierte Datei enthält ein angeheftetes Element, aber auf diesem Gerät ist derzeit ein anderes Element angeheftet. Möchten Sie es durch das importierte angeheftete Element ersetzen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The imported file contains a pinned item, but another item is currently pinned on this device. Do you want to replace it with the imported pinned item?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El archivo importado contiene un elemento fijado, pero actualmente hay otro elemento fijado en este dispositivo. ¿Desea reemplazarlo con el elemento fijado importado?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fichier importé contient un élément épinglé, mais un autre élément est actuellement épinglé sur cet appareil. Voulez-vous le remplacer par l'élément épinglé importé ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポートしたファイルにピン留め項目がありましたが、現在このデバイスでは別の項目がピン留めされています。インポートしたピン留め項目に置き換えますか？"
+          }
+        }
+      }
+    },
+    "インポートしようとしたファイルは壊れているか、読み取れないためインポートできませんでした。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Datei, die Sie importieren wollten, ist beschädigt oder nicht lesbar und konnte nicht importiert werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The file you tried to import is corrupted or unreadable and could not be imported."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El archivo que intentó importar está dañado o no se puede leer y no se pudo importar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fichier que vous avez essayé d'importer est corrompu ou illisible et n'a pas pu être importé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポートしようとしたファイルは壊れているか、読み取れないためインポートできませんでした。"
+          }
+        }
+      }
+    },
+    "インポート中はデータの整合性を保つため、ほぼすべての機能が一時的に無効化されます。インポートが完了すると再び利用できるようになります。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um die Datenintegrität zu gewährleisten, sind während des Imports fast alle Funktionen vorübergehend deaktiviert. Sie stehen nach Abschluss des Imports wieder zur Verfügung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To maintain data integrity, almost all features are temporarily disabled during import. They will be available again once the import is complete."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para mantener la integridad de los datos, casi todas las funciones se desactivan temporalmente durante la importación. Volverán a estar disponibles una vez finalizada la importación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour préserver l'intégrité des données, presque toutes les fonctionnalités sont temporairement désactivées pendant l'importation. Elles seront de nouveau disponibles une fois l'importation terminée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インポート中はデータの整合性を保つため、ほぼすべての機能が一時的に無効化されます。インポートが完了すると再び利用できるようになります。"
+          }
+        }
+      }
+    },
     "ウィンドウを常に最も手前に表示します。" : {
       "comment" : "一般設定の「常に最前面に表示」オプションを説明するテキスト。",
       "localizations" : {
@@ -8511,6 +8681,40 @@
         }
       }
     },
+    "エクスポートがキャンセルされました。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export wurde abgebrochen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export was canceled."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se canceló la exportación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'exportation a été annulée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エクスポートがキャンセルされました。"
+          }
+        }
+      }
+    },
     "エクスポートしたいプリセットを選択" : {
       "comment" : "プリセットのエクスポートボタンをクリックしたときに表示される画面で、エクスポートしたいプリセットを選ぶようユーザに求めるテキスト。",
       "localizations" : {
@@ -8542,6 +8746,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "エクスポートしたいプリセットを選択"
+          }
+        }
+      }
+    },
+    "エクスポート中はデータの整合性を保つため、ほぼすべての機能が一時的に無効化されます。エクスポートが完了すると再び利用できるようになります。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um die Datenintegrität zu gewährleisten, sind während des Exports fast alle Funktionen vorübergehend deaktiviert. Sie stehen nach Abschluss des Exports wieder zur Verfügung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To maintain data integrity, almost all features are temporarily disabled during export. They will be available again once the export is complete."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para mantener la integridad de los datos, casi todas las funciones se desactivan temporalmente durante la exportación. Volverán a estar disponibles una vez finalizada la exportación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour préserver l'intégrité des données, presque toutes les fonctionnalités sont temporairement désactivées pendant l'exportation. Elles seront de nouveau disponibles une fois l'exportation terminée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エクスポート中はデータの整合性を保つため、ほぼすべての機能が一時的に無効化されます。エクスポートが完了すると再び利用できるようになります。"
           }
         }
       }
@@ -10210,6 +10448,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "クリップボード履歴"
+          }
+        }
+      }
+    },
+    "クリップボード履歴が正常にインポートされ、ピン留め項目が置き換えられました。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zwischenablage-Verlauf wurde erfolgreich importiert und das angeheftete Element wurde ersetzt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clipboard history was successfully imported, and the pinned item was replaced."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El historial del portapapeles se importó correctamente y el elemento fijado fue reemplazado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'historique du presse-papiers a été importé avec succès, et l'élément épinglé a été remplacé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリップボード履歴が正常にインポートされ、ピン留め項目が置き換えられました。"
+          }
+        }
+      }
+    },
+    "クリップボード履歴が正常にインポートされ、ピン留め項目も復元されました。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zwischenablage-Verlauf wurde erfolgreich importiert und das angeheftete Element wurde ebenfalls wiederhergestellt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clipboard history was successfully imported, and the pinned item was also restored."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El historial del portapapeles se importó correctamente y el elemento fijado también fue restaurado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'historique du presse-papiers a été importé avec succès, et l'élément épinglé a également été restauré."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリップボード履歴が正常にインポートされ、ピン留め項目も復元されました。"
           }
         }
       }
@@ -13001,6 +13307,40 @@
         }
       }
     },
+    "そのままにする" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beibehalten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep current"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener actual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserver l'actuel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "そのままにする"
+          }
+        }
+      }
+    },
     "その他のファイル" : {
       "comment" : "フィルタリングオプションの1つ、その他の種類のファイルだけに絞り込むためのオプション名。",
       "localizations" : {
@@ -14284,6 +14624,40 @@
         }
       }
     },
+    "ピン留めの競合" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anheft-Konflikt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin Conflict"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conflicto de fijación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conflit d'épinglage"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピン留めの競合"
+          }
+        }
+      }
+    },
     "ピン留めを置き換え" : {
       "localizations" : {
         "de" : {
@@ -14662,6 +15036,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ファイルやフォルダをコピーしたときにデータが保存されるフォルダを管理します。"
+          }
+        }
+      }
+    },
+    "ファイルやフォルダを含む" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dateien und Ordner einschließen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Include files and folders"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluir archivos y carpetas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclure les fichiers et dossiers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ファイルやフォルダを含む"
           }
         }
       }
@@ -18316,42 +18724,6 @@
         }
       }
     },
-    "各フォルダの容量は正しく計算されないため、実際にはさらに多くの容量が使用されている場合があります。" : {
-      "comment" : "コピーしたファイルが保存される保存フォルダの容量に関する注意書きテキスト。",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Größe jedes Ordners wird nicht korrekt berechnet, daher ist es möglich, dass tatsächlich mehr Speicherplatz belegt wird."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The size of each folder will not be calculated correctly, so it is possible that more space is actually being used."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El tamaño de cada carpeta no se calculará correctamente, por lo que es posible que se esté utilizando más espacio en realidad."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La taille de chaque dossier не sera pas calculée correctement, il est donc possible que plus d'espace soit réellement utilisé."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "各フォルダの容量は正しく計算されないため、実際にはさらに多くの容量が使用されている場合があります。"
-          }
-        }
-      }
-    },
     "各項目に表示される番号を非表示にします。" : {
       "comment" : "一般設定の「番号を隠す」オプションを説明するテキスト。",
       "localizations" : {
@@ -20155,6 +20527,74 @@
         }
       }
     },
+    "履歴のインポート" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf importieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import History"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importar historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer l'historique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴のインポート"
+          }
+        }
+      }
+    },
+    "履歴のエクスポート" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verlauf exportieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export History"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar historial"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter l'historique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴のエクスポート"
+          }
+        }
+      }
+    },
     "履歴のエクスポートに失敗しました: %@" : {
       "comment" : "コピー履歴のエクスポートに失敗したときに表示されるエラーメッセージ。エラー理由のテキストが表示されます。",
       "localizations" : {
@@ -20221,6 +20661,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴の保存数に合わせる"
+          }
+        }
+      }
+    },
+    "履歴の内容や保存されているファイルによって、圧縮後のサイズが大きく変動する可能性があります。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die komprimierte Größe kann je nach Verlaufsinhalt und gespeicherten Dateien stark variieren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The compressed size may vary significantly depending on the history content and saved files."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El tamaño comprimido puede variar significativamente dependiendo del contenido del historial y los archivos guardados."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La taille compressée peut varier considérablement en fonction du contenu de l'historique et des fichiers enregistrés."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴の内容や保存されているファイルによって、圧縮後のサイズが大きく変動する可能性があります。"
           }
         }
       }
@@ -20604,41 +21078,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴ファイルのアップグレードに成功しました"
-          }
-        }
-      }
-    },
-    "履歴ファイルの読み込みまたは解析に失敗しました: %@" : {
-      "comment" : "コピー履歴をインポートした際、インポートしたファイルの読み込みや解析に失敗した場合に表示されるエラーメッセージ。エラー理由のテキストが表示されます。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fehler beim Laden oder Parsen der Verlaufsdatei: %@"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to load or parse history file: %@"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error al cargar o analizar el archivo de historial: %@"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Échec du chargement ou de l'analyse du fichier d'historique : %@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "履歴ファイルの読み込みまたは解析に失敗しました: %@"
           }
         }
       }
@@ -21259,6 +21698,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "指定された番号の履歴が見つかりませんでした"
+          }
+        }
+      }
+    },
+    "推定書き出しサイズ: %@ 〜 %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschätzte Exportgröße: %1$@ bis %2$@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimated export size: %1$@ to %2$@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño estimado de exportación: de %1$@ a %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille d'exportation estimée : %1$@ à %2$@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推定書き出しサイズ: %1$@ 〜 %2$@"
+          }
+        }
+      }
+    },
+    "推定書き出しサイズ: 約%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschätzte Exportgröße: Ca. %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimated export size: Approx. %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño estimado de exportación: Aprox. %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille d'exportation estimée : Env. %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推定書き出しサイズ: 約%@"
+          }
+        }
+      }
+    },
+    "推定書き出しサイズ: 計算中..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschätzte Exportgröße: Wird berechnet..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimated export size: Calculating..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tamaño estimado de exportación: Calculando..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille d'exportation estimée : Calcul en cours..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推定書き出しサイズ: 計算中..."
           }
         }
       }
@@ -22065,37 +22606,36 @@
         }
       }
     },
-    "有効にすると、プリセット情報なしで定型文のみをエクスポートします。" : {
-      "comment" : "プリセットをエクスポートする画面で、プリセット機能に対応する前の古いバージョンのClip Holdで読み込めるように、古い形式で定型文を書き出すかどうかを設定するチェックボックスに表示されるツールチップテキスト。",
+    "有効にすると、プリセット情報なしで定型文のみをエクスポートします。Clip Hold 1.2.1またはそれ以前のバージョンに復元するにはチェックを入れる必要があります。" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn aktiviert, werden nur Standardphrasen ohne Preset-Informationen exportiert."
+            "value" : "Wenn aktiviert, werden nur Standardphrasen ohne voreingestellte Informationen exportiert. Aktivieren Sie dies, um eine Wiederherstellung auf Clip Hold 1.2.1 oder früher durchzuführen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When enabled, only standard phrases are exported without preset information."
+            "value" : "When enabled, exports only standard phrases without preset information. Check this to restore to Clip Hold 1.2.1 or earlier."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuando está activado, solo se exportan frases estándar sin información de preajuste."
+            "value" : "Si está habilitado, exporta solo frases estándar sin información preestablecida. Marque esto para restaurar a Clip Hold 1.2.1 o anterior."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si activé, seules les phrases standard sont exportées sans informations de préréglage."
+            "value" : "Si activé, exporte uniquement les phrases standards sans informations prédéfinies. Cochez cette case pour restaurer vers Clip Hold 1.2.1 ou antérieur."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "有効にすると、プリセット情報なしで定型文のみをエクスポートします。"
+            "value" : "有効にすると、プリセット情報なしで定型文のみをエクスポートします。Clip Hold 1.2.1またはそれ以前のバージョンに復元するにはチェックを入れる必要があります。"
           }
         }
       }
@@ -22375,41 +22915,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "無制限"
-          }
-        }
-      }
-    },
-    "現在、インポートとエクスポートはテキストのみサポートしています。" : {
-      "comment" : "コピー履歴のインポートとエクスポートに関する注意書きテキスト。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Derzeit wird nur Text für den Import und Export unterstützt."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Currently, only text is supported for import and export."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actualmente, solo se admite texto para importar y exportar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actuellement, seul le texte est pris en charge pour l'importation et l'exportation."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "現在、インポートとエクスポートはテキストのみサポートしています。"
           }
         }
       }
@@ -23106,6 +23611,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "置き換え"
+          }
+        }
+      }
+    },
+    "置き換える" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reemplazar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "置き換える"
           }
         }
       }

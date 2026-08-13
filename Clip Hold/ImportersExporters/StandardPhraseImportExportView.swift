@@ -197,7 +197,7 @@ struct StandardPhraseImportExportView: View {
                 .flexiblePickerSizing()
                 
                 Toggle("旧バージョンで使用できるようにする", isOn: $useLegacyFormat)
-                    .help("有効にすると、プリセット情報なしで定型文のみをエクスポートします。")
+                    .help("有効にすると、プリセット情報なしで定型文のみをエクスポートします。Clip Hold 1.2.1またはそれ以前のバージョンに復元するにはチェックを入れる必要があります。")
                 Spacer()
                 
                 HStack {
