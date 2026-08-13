@@ -173,7 +173,6 @@ struct HistoryWindowView: View {
             var finalHistory = Array(sorted.prefix(currentDisplayLimit))
             if let pinnedID = currentPinnedID,
                let pinnedItem = sorted.first(where: { $0.id == pinnedID }) {
-                finalHistory.removeAll(where: { $0.id == pinnedID }) // 表示対象に含まれていたら削除
                 finalHistory.insert(pinnedItem.createPinnedDuplicate(), at: 0) // 先頭に追加
             }
             finalHistoryToApply = finalHistory
