@@ -86,6 +86,7 @@ class ClipboardManager: ObservableObject {
             } else {
                 UserDefaults.standard.removeObject(forKey: "pinnedItemID")
             }
+            updateQuickOverlayHistoryCache()
         }
     }
     
@@ -103,6 +104,28 @@ class ClipboardManager: ObservableObject {
     // ピン留めを解除する
     func unpinItem() {
         pinnedItemID = nil
+    }
+    
+    // クイックオーバーレイ用の事前同期キャッシュ（最新50件＋ピン留め）
+    @Published var quickOverlayHistoryItems: [ClipboardItem] = []
+    
+    /// クイックオーバーレイ用の最新50件（+ピン留め）キャッシュを同期更新する
+    func updateQuickOverlayHistoryCache() {
+        guard !clipboardHistory.isEmpty else {
+            if !quickOverlayHistoryItems.isEmpty {
+                quickOverlayHistoryItems = []
+            }
+            return
+        }
+        
+        let allSortedHistory = clipboardHistory.sorted { $0.date > $1.date }
+        var raw = Array(allSortedHistory.prefix(50))
+        
+        if let pinnedID = pinnedItemID,
+           let pinnedItem = clipboardHistory.first(where: { $0.id == pinnedID }) {
+            raw.insert(pinnedItem.createPinnedDuplicate(), at: 0)
+        }
+        quickOverlayHistoryItems = raw
     }
     
     // History Window States

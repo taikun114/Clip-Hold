@@ -97,6 +97,9 @@ class QuickOverlayManager: ObservableObject {
     private func startDelayTask(for type: QuickOverlayType) {
         cancelDelayTask() // Ensure no existing task
         
+        // キーが押された待機時間の間にビューを先行構築・レイアウト完了させておく
+        QuickOverlayWindowController.shared.prepareOverlay(type: type)
+        
         let delay = UserDefaults.standard.quickOverlayDelay
         let nanoseconds = UInt64(delay * 1_000_000_000)
         

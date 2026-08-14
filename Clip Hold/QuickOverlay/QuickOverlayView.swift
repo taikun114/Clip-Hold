@@ -63,9 +63,27 @@ struct QuickOverlayView: View {
         self._isPresetMenuOpen = State(initialValue: initialPresetMenuOpen)
         self.explicitHistoryItems = explicitHistoryItems
         self.explicitPhraseItems = explicitPhraseItems
+        
+        let initialItems: [ClipboardItem]
+        if let explicit = explicitHistoryItems {
+            initialItems = explicit
+        } else if type == .history {
+            if !ClipboardManager.shared.quickOverlayHistoryItems.isEmpty {
+                initialItems = ClipboardManager.shared.quickOverlayHistoryItems
+            } else {
+                initialItems = Self.fetchInitialHistoryItems(
+                    from: ClipboardManager.shared.clipboardHistory,
+                    pinnedItemID: ClipboardManager.shared.pinnedItemID,
+                    limit: 50
+                )
+            }
+        } else {
+            initialItems = []
+        }
+        self._cachedHistoryItems = State(initialValue: initialItems)
     }
     
-    var body: some View {
+    private var mainLayout: some View {
         Group {
             if #available(macOS 26.0, *) {
                 scrollContent
@@ -84,69 +102,111 @@ struct QuickOverlayView: View {
                 }
             }
         }
-        .overlay(
-            Group {
-                if type == .standardPhrase {
-                    presetDropdownMenu
-                        .opacity(isPresetMenuOpen ? 1 : 0)
-                        .scaleEffect(isPresetMenuOpen ? 1 : 0.95, anchor: .topTrailing)
-                        .allowsHitTesting(isPresetMenuOpen)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPresetMenuOpen)
-                }
-            },
-            alignment: .topTrailing
-        )
-        .frame(width: 500, height: 500)
-        .background(
-            Group {
-                if #available(macOS 26.0, *) {
-                    (colorScheme == .dark ? Color.black.opacity(0.4) : Color.white.opacity(0.6))
-                        .glassEffect(.clear, in: .rect(cornerRadius: 28.0))
-                        .saturation(1.5)
-                        .environment(\.controlActiveState, .active)
-                } else {
-                    Color.clear
-                        .background(Material.ultraThin)
-                        .environment(\.controlActiveState, .active)
-                }
-            }
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(Color.white.opacity(0.1), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
-        .padding(60) // Provide space for the shadow to render inside the 620x620 window
-        .onAppear {
-            if type == .history {
-                loadHistoryItems()
-            }
-        }
-        .onChange(of: clipboardManager.clipboardHistory) { _, _ in
-            if type == .history {
-                withAnimation(.easeInOut(duration: 0.25)) {
-                    loadHistoryItems()
-                }
-            }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("QuickOverlayShouldHide"))) { _ in
-            tooltipTask?.cancel()
-            tooltipTask = nil
-            NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
-        }
-        .onDisappear {
-            tooltipTask?.cancel()
-            tooltipTask = nil
+    }
+    
+    @ViewBuilder
+    private var backgroundMaterial: some View {
+        if #available(macOS 26.0, *) {
+            (colorScheme == .dark ? Color.black.opacity(0.4) : Color.white.opacity(0.6))
+                .glassEffect(.clear, in: .rect(cornerRadius: 28.0))
+                .saturation(1.5)
+                .environment(\.controlActiveState, .active)
+        } else {
+            Color.clear
+                .background(Material.ultraThin)
+                .environment(\.controlActiveState, .active)
         }
     }
     
+    var body: some View {
+        mainLayout
+            .overlay(
+                Group {
+                    if type == .standardPhrase {
+                        presetDropdownMenu
+                            .opacity(isPresetMenuOpen ? 1 : 0)
+                            .scaleEffect(isPresetMenuOpen ? 1 : 0.95, anchor: .topTrailing)
+                            .allowsHitTesting(isPresetMenuOpen)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPresetMenuOpen)
+                    }
+                },
+                alignment: .topTrailing
+            )
+            .frame(width: 500, height: 500)
+            .background(backgroundMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
+            .padding(60) // Provide space for the shadow to render inside the 620x620 window
+            .onAppear {
+                if type == .history && cachedHistoryItems.isEmpty && !clipboardManager.clipboardHistory.isEmpty {
+                    loadHistoryItems()
+                }
+            }
+            .onChange(of: clipboardManager.quickOverlayHistoryItems) { _, newItems in
+                if type == .history {
+                    if currentDisplayLimit == 50 {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            cachedHistoryItems = newItems
+                        }
+                    } else {
+                        loadHistoryItems()
+                    }
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("QuickOverlayShouldHide"))) { _ in
+                tooltipTask?.cancel()
+                tooltipTask = nil
+                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
+                resetDisplayLimitAndReleaseMemory()
+            }
+            .onDisappear {
+                tooltipTask?.cancel()
+                tooltipTask = nil
+                resetDisplayLimitAndReleaseMemory()
+            }
+    }
+    
     // MARK: - Subviews
+    
+    private func resetDisplayLimitAndReleaseMemory() {
+        guard type == .history && currentDisplayLimit > 50 else { return }
+        currentDisplayLimit = 50
+        if !clipboardManager.quickOverlayHistoryItems.isEmpty {
+            cachedHistoryItems = clipboardManager.quickOverlayHistoryItems
+        } else {
+            cachedHistoryItems = Array(cachedHistoryItems.prefix(50))
+        }
+    }
+    
+    static func fetchInitialHistoryItems(
+        from history: [ClipboardItem],
+        pinnedItemID: UUID?,
+        limit: Int = 50
+    ) -> [ClipboardItem] {
+        guard !history.isEmpty else { return [] }
+        let allSortedHistory = history.sorted { $0.date > $1.date }
+        let effectiveLimit = limit > 0 ? limit : 50
+        var raw = Array(allSortedHistory.prefix(effectiveLimit))
+        
+        if let pinnedID = pinnedItemID,
+           let pinnedItem = history.first(where: { $0.id == pinnedID }) {
+            raw.insert(pinnedItem.createPinnedDuplicate(), at: 0)
+        }
+        return raw
+    }
     
     private func loadHistoryItems(isPagination: Bool = false) {
         if !isPagination {
             if let explicit = explicitHistoryItems {
                 cachedHistoryItems = explicit
+                return
+            }
+            if currentDisplayLimit == 50 && !clipboardManager.quickOverlayHistoryItems.isEmpty {
+                cachedHistoryItems = clipboardManager.quickOverlayHistoryItems
                 return
             }
         }

@@ -98,6 +98,9 @@ extension ClipboardManager {
         // 最大履歴数を超過した場合の処理を適用
         enforceMaxHistoryCount()
         
+        // クイックオーバーレイ用の最新50件キャッシュを更新
+        updateQuickOverlayHistoryCache()
+        
         // 履歴を保存 (新しいシステムを使用)
         Task {
             await ChunkedHistoryManager.shared.saveHistoryItem(newItem)
@@ -127,6 +130,7 @@ extension ClipboardManager {
         self.objectWillChange.send()
         clipboardHistory = []
         filteredHistoryForShortcuts = nil // UI用のキャッシュもクリアしてメモリを解放
+        updateQuickOverlayHistoryCache()
         print("ClipboardManager: All history cleared.")
         // 履歴をクリアした際に、一時ファイルもクリーンアップ
         cleanUpTemporaryFiles()
@@ -196,6 +200,9 @@ extension ClipboardManager {
                 await ChunkedHistoryManager.shared.deleteHistoryItem(id: id)
             }
         }
+        
+        // クイックオーバーレイ用の最新50件キャッシュを更新
+        updateQuickOverlayHistoryCache()
         
         // 削除後に孤立ファイルのクリーンアップをトリガー
         triggerOrphanedFilesCleanup()
@@ -274,6 +281,9 @@ extension ClipboardManager {
                 
                 // 3. 最大履歴数を超過した場合の処理
                 self.enforceMaxHistoryCount()
+                
+                // クイックオーバーレイ用の最新50件キャッシュを更新
+                self.updateQuickOverlayHistoryCache()
                 
                 print("ClipboardManager: History imported. Added \(itemsToAdd.count) items, total history count: \(self.clipboardHistory.count)")
                 
@@ -363,6 +373,7 @@ extension ClipboardManager {
             }
             
             self.clipboardHistory = validHistory
+            self.updateQuickOverlayHistoryCache()
             
             print("ClipboardManager: Clipboard history loaded from new system. Count: \(self.clipboardHistory.count)")
             

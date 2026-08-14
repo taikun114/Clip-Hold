@@ -18,6 +18,7 @@ class QuickOverlayWindowController: NSWindowController {
     
     private var isObserving = false
     private var animationGeneration = 0
+    private var currentPreparedType: QuickOverlayType? = nil
     private var hideAnimationDelegate: AnimationCompletionDelegate?
     
     private init() {
@@ -47,11 +48,19 @@ class QuickOverlayWindowController: NSWindowController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc private func showOverlay() {
-        guard let window = self.window, let type = QuickOverlayManager.shared.currentOverlayType else { return }
-        animationGeneration += 1
+    /// キー押下開始時（遅延時間待機中）に呼び出して、ビューの構築とレイアウト計算を事前に完了させておく
+    func prepareOverlay(type: QuickOverlayType) {
+        guard let window = self.window else { return }
         
-        // Load the view
+        // 連打された場合など、既に同じタイプでビューが準備されているなら再生成を行わず位置のみ更新する
+        if currentPreparedType == type, window.contentView != nil {
+            positionWindow()
+            return
+        }
+        
+        currentPreparedType = type
+        
+        // ビューを生成してセット
         let view = QuickOverlayView(type: type)
             .environmentObject(ClipboardManager.shared)
             .environmentObject(StandardPhraseManager.shared)
@@ -61,6 +70,21 @@ class QuickOverlayWindowController: NSWindowController {
         let hostingView = NSHostingView(rootView: view)
         hostingView.wantsLayer = true
         window.contentView = hostingView
+        
+        positionWindow()
+        hostingView.layoutSubtreeIfNeeded()
+    }
+    
+    @objc private func showOverlay() {
+        guard let window = self.window, let type = QuickOverlayManager.shared.currentOverlayType else { return }
+        animationGeneration += 1
+        
+        // 事前準備がまだ行われていない場合は準備する
+        if currentPreparedType != type || window.contentView == nil {
+            prepareOverlay(type: type)
+        }
+        
+        guard let hostingView = window.contentView else { return }
         
         positionWindow()
         
@@ -110,7 +134,8 @@ class QuickOverlayWindowController: NSWindowController {
         let animationDelegate = AnimationCompletionDelegate { [weak self, weak window] in
             guard let self, self.animationGeneration == currentGeneration else { return }
             window?.orderOut(nil)
-            window?.contentView = nil // 追加: ウインドウを隠した後にViewを破棄し、アニメーションループを完全に停止させる
+            window?.contentView = nil // ウインドウを隠した後にViewを破棄し、アニメーションループを完全に停止させる
+            self.currentPreparedType = nil
             self.hideAnimationDelegate = nil
         }
         hideAnimationDelegate = animationDelegate
