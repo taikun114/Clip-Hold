@@ -32,9 +32,13 @@ class NotificationManager {
         
         if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
             content.categoryIdentifier = appDelegate.clipboardPausedNotificationCategory
+#if DEBUG
             print("NotificationManager: Set category identifier '\(appDelegate.clipboardPausedNotificationCategory)' for scheduled notification.")
+#endif
         } else {
+#if DEBUG
             print("NotificationManager: AppDelegate not found or category identifier could not be retrieved. Scheduling notification without category.")
+#endif
             // Fallback: カテゴリがない場合でも通知自体は表示されるが、アクションは表示されない
         }
         
@@ -44,7 +48,9 @@ class NotificationManager {
             if let error = error {
                 print("Clipboard paused notification schedule error: \(error.localizedDescription)")
             } else {
+#if DEBUG
                 print("Clipboard paused notification scheduled.")
+#endif
             }
         }
     }
@@ -60,7 +66,9 @@ class NotificationManager {
         
         // 配信済みの「一時停止通知」を削除
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [clipboardPausedNotificationIdentifier])
+#if DEBUG
         print("NotificationManager: Delivered pause notifications removed.")
+#endif
         
         // 「再開されました」通知を送信
         sendMonitoringStatusNotification(isPaused: false)
@@ -69,7 +77,9 @@ class NotificationManager {
     func removeClipboardPausedNotification() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [clipboardPausedNotificationIdentifier])
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [clipboardPausedNotificationIdentifier])
+#if DEBUG
         print("Clipboard paused notification removed.")
+#endif
     }
     
     func sendMonitoringStatusNotification(isPaused: Bool) {
@@ -87,7 +97,9 @@ class NotificationManager {
             if let error = error {
                 print("Monitoring status change notification send error: \(error.localizedDescription)")
             } else {
+#if DEBUG
                 print("Monitoring status change notification sent. Pause status: \(isPaused)")
+#endif
             }
         }
     }
@@ -202,13 +214,17 @@ class NotificationManager {
             if let error = error {
                 print("Silent notification send error (ID: \(identifier)): \(error.localizedDescription)")
             } else {
+#if DEBUG
                 print("Silent notification sent (ID: \(identifier)).")
+#endif
                 
                 // 5秒後に通知を削除
                 Task {
                     try? await Task.sleep(nanoseconds: 5_000_000_000)
                     UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])
+#if DEBUG
                     print("Removed silent notification (ID: \(identifier)) after 5 seconds.")
+#endif
                 }
             }
         }

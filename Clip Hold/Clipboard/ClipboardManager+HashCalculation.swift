@@ -33,7 +33,9 @@ extension ClipboardManager {
                                     Task { @MainActor in
                                         self.updateFileHashCache(url: filePath, hash: fileHash)
                                     }
+#if DEBUG
                                     print("ClipboardManager: Calculated missing hash for file item at chunk \(index), item index \(itemIndex).")
+#endif
                                 }
                             }
                         }
@@ -43,7 +45,9 @@ extension ClipboardManager {
                 // 更新があった場合のみ、そのチャンクを即座に保存
                 if itemsUpdated {
                     try await chunkedHistoryManager.saveChunk(items, at: index)
+#if DEBUG
                     print("ClipboardManager: Saved updated chunk \(index) with calculated hashes.")
+#endif
                 }
             }
             

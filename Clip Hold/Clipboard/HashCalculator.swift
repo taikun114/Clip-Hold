@@ -45,7 +45,11 @@ class HashCalculator {
             let digest = hash.finalize()
             return digest.compactMap { String(format: "%02x", $0) }.joined()
         } catch let error {
+#if DEBUG
             print("HashCalculator: Error calculating hash for file at \(url.path): \(error.localizedDescription)")
+#else
+            print("HashCalculator: Error calculating file hash: \(error.localizedDescription)")
+#endif
             return nil
         }
     }

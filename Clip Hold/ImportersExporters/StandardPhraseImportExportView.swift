@@ -229,7 +229,11 @@ struct StandardPhraseImportExportView: View {
         ) { result in
             switch result {
             case .success(let url):
+#if DEBUG
                 print("Export successful: \(url)")
+#else
+                print("Export successful.")
+#endif
             case .failure(let error):
                 print("Export failed: \(error.localizedDescription)")
             }

@@ -11,7 +11,9 @@ extension ClipboardManager {
         
         isPerformingInternalCopy = true // 内部コピー操作が開始されたことを示す
         lastCopiedInternalItem = item
+#if DEBUG
         print("DEBUG: copyItemToClipboard: isPerformingInternalCopy = true")
+#endif
         
         NSPasteboard.general.clearContents()
         
@@ -25,7 +27,9 @@ extension ClipboardManager {
                     await MainActor.run {
                         self.isPerformingInternalCopy = true // タイムアウトを延長
                         if NSPasteboard.general.writeObjects([tempURL as NSURL]) {
+#if DEBUG
                             print("File copied to clipboard (original filename): \(tempURL.lastPathComponent)")
+#endif
                             // success = true // 非同期タスク内なので直接UI更新はしない
                         } else {
                             print("Failed to copy temporary file (NSURL) to clipboard.")
@@ -56,27 +60,37 @@ extension ClipboardManager {
                         // Apple HTML pasteboard type を使用してHTMLフラグメントを書き込む
                         let appleHTMLType = NSPasteboard.PasteboardType(rawValue: "Apple HTML pasteboard type")
                         if pasteboard.setString(richText, forType: appleHTMLType) {
+#if DEBUG
                             print("Apple HTML copied to clipboard: \(richText.prefix(20))...")
+#endif
                         }
                         // プレーンテキストも書き込む (フォールバック用)
                         if pasteboard.setString(item.text, forType: .string) {
+#if DEBUG
                             print("Plain text copied to clipboard: \(item.text.prefix(20))...")
+#endif
                         }
                     } else {
                         // RTFを書き込む
                         if pasteboard.setString(richText, forType: .rtf) {
+#if DEBUG
                             print("Rich text copied to clipboard: \(richText.prefix(20))...")
+#endif
                         }
                         // プレーンテキストも書き込む (フォールバック用)
                         if pasteboard.setString(item.text, forType: .string) {
+#if DEBUG
                             print("Plain text copied to clipboard: \(item.text.prefix(20))...")
+#endif
                         }
                     }
                 } else {
                     // リッチテキストがない場合は、プレーンテキストのみを書き込む
                     if pasteboard.string(forType: .string) != item.text { // クリップボードの内容がすでに同じでなければコピー
                         if pasteboard.setString(item.text, forType: .string) {
+#if DEBUG
                             print("Text copied to clipboard: \(item.text.prefix(20))...")
+#endif
                             // success = true
                         }
                     }
@@ -91,7 +105,9 @@ extension ClipboardManager {
     func addTextItem(text: String) {
         // 同じ内容のものが連続して追加された場合はスキップ (ファイルパスがないテキストアイテムとしてのみチェック)
         if let lastItem = clipboardHistory.first, lastItem.text == text, lastItem.filePath == nil {
+#if DEBUG
             print("ClipboardManager: Duplicate text item detected via addTextItem, skipping. Text: \(text.prefix(50))...\n")
+#endif
             return
         }
         

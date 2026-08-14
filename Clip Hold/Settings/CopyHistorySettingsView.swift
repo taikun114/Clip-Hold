@@ -78,9 +78,11 @@ struct CopyHistorySettingsView: View {
         
         
         // DEBUG print for initial values from UserDefaults
+#if DEBUG
         print("DEBUG: init() - savedMaxHistoryToSaveRaw: \(savedMaxHistoryToSaveRaw ?? -1) (using \(savedMaxHistoryToSave))")
         print("DEBUG: init() - savedMaxFileSizeToSaveRaw: \(savedMaxFileSizeToSaveRaw ?? -1) (using \(savedMaxFileSizeToSave))")
         print("DEBUG: init() - savedLargeFileAlertThresholdRaw: \(savedLargeFileAlertThresholdRaw ?? -1) (using \(savedLargeFileAlertThreshold))")
+#endif
         
         // Initialize tempSelectedSaveOption and tempCustomSaveHistoryValue
         let determinedSaveOptions = Self.determineHistorySaveOptions(savedMaxHistoryToSave: savedMaxHistoryToSave)
@@ -361,7 +363,9 @@ struct CopyHistorySettingsView: View {
                     }
                     Spacer()
                     Button(action: {
+#if DEBUG
                         print("DEBUG: Import button tapped. isShowingImportSheet will be true.")
+#endif
                         self.isShowingImportSheet = true
                     }) {
                         HStack {
@@ -554,7 +558,9 @@ struct CopyHistorySettingsView: View {
             allowedContentTypes: [.json, .clipholdArchive],
             allowsMultipleSelection: false
         ) { result in
+#if DEBUG
             print("DEBUG: fileImporter closure called for history import.")
+#endif
             clipboardImporterExporter.handleImportResult(result, into: clipboardManager) { newTotalSize in
                 self.totalFolderSize = newTotalSize
                 self.hasUncalculatedFolders = false
@@ -840,7 +846,9 @@ struct CopyHistorySettingsView: View {
                 // メインスレッドでUIを更新
                 await MainActor.run {
                     self.calculateStatistics()
+#if DEBUG
                     print("DEBUG: All saved files cleared and clipboard history reloaded.")
+#endif
                 }
             } catch {
                 print("Error clearing clipboard files: \(error.localizedDescription)")

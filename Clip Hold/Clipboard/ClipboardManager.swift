@@ -183,7 +183,9 @@ class ClipboardManager: ObservableObject {
                     if !Task.isCancelled {
                         self?.isPerformingInternalCopy = false
                         self?.lastCopiedInternalItem = nil
+#if DEBUG
                         print("DEBUG: isPerformingInternalCopy auto-reset to false")
+#endif
                     }
                 }
             } else {
@@ -202,7 +204,9 @@ class ClipboardManager: ObservableObject {
                     try? await Task.sleep(nanoseconds: 500_000_000) // 0.5秒
                     if !Task.isCancelled {
                         self?.isCopyingStandardPhrase = false
+#if DEBUG
                         print("DEBUG: isCopyingStandardPhrase auto-reset to false")
+#endif
                     }
                 }
             }
@@ -290,14 +294,18 @@ class ClipboardManager: ObservableObject {
             } else {
                 self.startMonitoringPasteboard() // UserDefaultsが再開状態ならタイマーを開始
             }
+#if DEBUG
             print("DEBUG: ClipboardManager: UserDefaults.isClipboardMonitoringPaused changed to \(isPaused). isMonitoring set to \(self.isMonitoring).")
+#endif
         }
     }
     
     // オブジェクト破棄時に監視を停止する
     deinit {
         isClipboardMonitoringPausedObserver?.invalidate()
+#if DEBUG
         print("DEBUG: ClipboardManager: isClipboardMonitoringPausedObserver invalidated.")
+#endif
     }
     
     private var _cachedAppPaths: Set<String>?

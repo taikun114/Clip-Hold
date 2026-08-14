@@ -100,7 +100,11 @@ struct QRCodeView: View {
         ) { result in
             switch result {
             case .success(let url):
+#if DEBUG
                 print("Image saved successfully to: \(url.path)")
+#else
+                print("Image saved successfully.")
+#endif
             case .failure(let error):
                 print("Error saving image: \(error.localizedDescription)")
             }

@@ -48,10 +48,11 @@ class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
         self.windowType = windowType
         self.window?.delegate = self
         
+#if DEBUG
         // ウィンドウの位置とサイズをログに出力
         print("ClipHoldStandardWindowController: New window created. Frame: \(window.frame), Type: \(windowType)")
-        
         print("ClipHoldStandardWindowController: Initialized with title '\(title)', Type: \(windowType)")
+#endif
     }
     
     func showWindowAndCenter(_ center: Bool = true) {
@@ -61,10 +62,12 @@ class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
         }
         // ウィンドウを最前面に表示
         self.window?.makeKeyAndOrderFront(nil)
+#if DEBUG
         // ウィンドウの位置とサイズをログに出力
         if let window = self.window {
             print("ClipHoldStandardWindowController: showWindow called. Frame: \(window.frame), Type: \(windowType), Center: \(center)")
         }
+#endif
         super.showWindow(nil)
     }
     
@@ -72,7 +75,9 @@ class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
     func windowWillClose(_ notification: Notification) {
         // ウィンドウが閉じられるときにコントローラーを解放する
         self.window?.contentViewController = nil
+#if DEBUG
         print("ClipHoldStandardWindowController: Window closed and controller released. Type: \(windowType)")
+#endif
         
         // AppDelegateのwindowWillCloseメソッドを呼び出す
         if let appDelegate = NSApp.delegate as? AppDelegate {

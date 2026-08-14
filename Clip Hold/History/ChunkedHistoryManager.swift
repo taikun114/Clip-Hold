@@ -75,7 +75,9 @@ actor ChunkedHistoryManager {
                     if FileManager.default.fileExists(atPath: filePath.path) {
                         let fileHash = HashCalculator.calculateFileHash(at: filePath)
                         oldHistory[index].fileHash = fileHash
+#if DEBUG
                         print("ChunkedHistoryManager: Calculated hash for migrated file item at index \(index).")
+#endif
                     }
                 }
             }
@@ -164,14 +166,18 @@ actor ChunkedHistoryManager {
                 if let itemIndex = items.firstIndex(where: { $0.id == updatedItem.id }) {
                     items[itemIndex] = updatedItem
                     try self.saveChunk(items, at: index)
+#if DEBUG
                     print("ChunkedHistoryManager: Updated item with id \(updatedItem.id) in chunk \(index).")
+#endif
                     
                     // Spotlightのインデックスも更新
                     SpotlightManager.shared.indexHistoryItem(updatedItem)
                     return
                 }
             }
+#if DEBUG
             print("ChunkedHistoryManager: Item with id \(updatedItem.id) not found for updating.")
+#endif
         } catch {
             print("ChunkedHistoryManager: Error updating history item: \(error.localizedDescription)")
         }
@@ -189,7 +195,9 @@ actor ChunkedHistoryManager {
         // インデックスの更新
         try updateIndex(for: chunkIndex, with: items)
         
+#if DEBUG
         print("ChunkedHistoryManager: Saved \(items.count) items to chunk \(chunkIndex).")
+#endif
     }
     
     func saveHistoryItems(_ items: [ClipboardItem]) throws {
@@ -240,7 +248,9 @@ actor ChunkedHistoryManager {
         let data = try encoder.encode(indexedItems)
         try data.write(to: indexFileURL)
         
+#if DEBUG
         print("ChunkedHistoryManager: Updated index for chunk \(chunkIndex) with \(indexedItems.count) items.")
+#endif
     }
     
     // MARK: - Load Operations
@@ -325,14 +335,18 @@ actor ChunkedHistoryManager {
                 if items.count < initialCount {
                     // アイテムが削除されたチャンクを保存
                     try self.saveChunk(items, at: index)
+#if DEBUG
                     print("ChunkedHistoryManager: Deleted item with id \(id) from chunk \(index).")
+#endif
                     
                     // Spotlightから削除
                     SpotlightManager.shared.removeHistoryItem(id: id)
                     return // 1つのアイテムを削除したら終了
                 }
             }
+#if DEBUG
             print("ChunkedHistoryManager: Item with id \(id) not found for deletion.")
+#endif
         } catch {
             print("ChunkedHistoryManager: Error deleting history item: \(error.localizedDescription)")
         }
@@ -353,7 +367,9 @@ actor ChunkedHistoryManager {
                 // 削除が行われた場合のみ保存
                 if items.count < initialCount {
                     try self.saveChunk(items, at: index)
+#if DEBUG
                     print("ChunkedHistoryManager: Deleted \(initialCount - items.count) items from app \(sourceAppPath) in chunk \(index).")
+#endif
                 }
             }
         } catch {

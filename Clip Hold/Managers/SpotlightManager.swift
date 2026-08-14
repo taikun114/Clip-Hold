@@ -549,7 +549,9 @@ class SpotlightManager: ObservableObject {
                             
                             let remainingChunks = chunkCount - (index + 1)
                             let estimatedRemainingItems = remainingChunks * 100
+#if DEBUG
                             print("SpotlightManager: [Indexing Progress] Completed: \(completedCount), Remaining (est.): \(estimatedRemainingItems) (Chunk \(index + 1)/\(chunkCount))")
+#endif
                             
                             let capturedCount = completedCount
                             Task { @MainActor in

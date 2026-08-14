@@ -21,7 +21,9 @@ extension ClipboardManager {
         if !FileManager.default.fileExists(atPath: filesDirectory.path) {
             do {
                 try FileManager.default.createDirectory(at: filesDirectory, withIntermediateDirectories: true, attributes: nil)
+#if DEBUG
                 print("ClipboardManager: Created clipboard files directory: \(filesDirectory.path)")
+#endif
             } catch {
                 print("ClipboardManager: Error creating clipboard files directory: \(error.localizedDescription)")
                 return nil
@@ -36,7 +38,9 @@ extension ClipboardManager {
         do {
             if FileManager.default.fileExists(atPath: fileURL.path) {
                 try FileManager.default.removeItem(at: fileURL)
+#if DEBUG
                 print("ClipboardManager: Deleted file from sandbox: \(fileURL.lastPathComponent)")
+#endif
             }
         } catch {
             print("ClipboardManager: Error deleting file from sandbox: \(error.localizedDescription)")
@@ -103,7 +107,9 @@ extension ClipboardManager {
     func createClipboardItemsForMultipleFileURLs(_ itemsWithQRCode: [(fileURL: URL, qrCodeContent: String?)], sourceAppPath: String?, originalItem: ClipboardItem? = nil) async -> [ClipboardItem]? {
         // 内部コピーの場合はアラートをスキップ
         if isPerformingInternalCopy {
+#if DEBUG
             print("DEBUG: createClipboardItemsForMultipleFileURLs - isPerformingInternalCopy is true, skipping alert and proceeding to save.")
+#endif
             var savedItems: [ClipboardItem] = []
             for item in itemsWithQRCode {
                 if let newItem = await self.createClipboardItemForFileURL(item.fileURL, qrCodeContent: item.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true, originalItem: originalItem) {
@@ -154,7 +160,9 @@ extension ClipboardManager {
             }
         }
         
+#if DEBUG
         print("DEBUG: createClipboardItemsForMultipleFileURLs - Total calculated size: \(totalFileSize) bytes. isTimeout: \(isTimeout)")
+#endif
         
         // 3. サイズ判定とアラート
         if maxLimit > 0 && totalFileSize > maxLimit {
@@ -233,7 +241,9 @@ extension ClipboardManager {
         // 外部ファイルの属性を取得
         let externalFileAttributes = getFileAttributes(fileURL)
         
+#if DEBUG
         print("DEBUG: createClipboardItemForFileURL - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
+#endif
         
         // ファイルサイズチェックは createClipboardItemsForMultipleFileURLs 側で行うため、ここでは省略
         
@@ -261,7 +271,9 @@ extension ClipboardManager {
             newItem.fileSize = originalItem.fileSize
             newItem.isCopying = false
             newItem.copyProgress = 1.0
+#if DEBUG
             print("DEBUG: createClipboardItemForFileURL - Copied from history. Treated as duplicate immediately.")
+#endif
             return newItem
         }
         
@@ -365,7 +377,9 @@ extension ClipboardManager {
                 foundDuplicateURL = await ClipboardManager.shared.getFileURL(forHash: externalHash)
                 
                 if let duplicateURL = foundDuplicateURL, FileManager.default.fileExists(atPath: duplicateURL.path) {
+#if DEBUG
                     print("ClipboardManager: Found duplicate in sandbox based on file hash cache: \(duplicateURL.lastPathComponent)")
+#endif
                     let displayName = self?.extractOriginalFileName(from: duplicateURL.lastPathComponent) ?? duplicateURL.lastPathComponent
                     let sandboxedFileAttributes = self?.getFileAttributes(duplicateURL)
                     let sourceURL = fileURL
@@ -476,7 +490,9 @@ extension ClipboardManager {
                     }
                     
                     if item.isCopyCancelled {
+#if DEBUG
                         print("ClipboardManager: Copy cancelled for \(fileName) (Directory)")
+#endif
                         try? FileManager.default.removeItem(at: destinationURL)
                         
                         let sourceURL = fileURL
@@ -508,7 +524,9 @@ extension ClipboardManager {
                     
                     while true {
                         if item.isCopyCancelled {
+#if DEBUG
                             print("ClipboardManager: Copy cancelled for \(fileName)")
+#endif
                             try? FileManager.default.removeItem(at: destinationURL)
                             
                             let sourceURL = fileURL
@@ -543,7 +561,9 @@ extension ClipboardManager {
                 if let externalHash = finalHash {
                     await ClipboardManager.shared.updateFileHashCache(url: finalDestinationURL, hash: externalHash)
                 }
+#if DEBUG
                 print("ClipboardManager: Async copied file to sandbox as \(finalDestinationURL.lastPathComponent)")
+#endif
                 
                 // コピー完了後に、Sandboxに保存されたファイルから確実に正しいアイコンを再取得する
                 let finalIconRequest = QLThumbnailGenerator.Request(fileAt: finalDestinationURL, size: CGSize(width: 60, height: 60), scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
@@ -600,7 +620,9 @@ extension ClipboardManager {
         // 画像データのハッシュを計算
         let newImageHash = HashCalculator.calculateImageDataHash(imageData)
         
+#if DEBUG
         print("DEBUG: createClipboardItemFromImageData - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
+#endif
         
         // MARK: - 画像サイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
         // isPerformingInternalCopy が true の場合は、アラート表示を完全にスキップして保存処理に進む
@@ -615,7 +637,9 @@ extension ClipboardManager {
                         self.pendingLargeImageData = (imageData, qrCodeContent)
                         self.pendingLargeFileItemsSourceAppPath = sourceAppPath
                         self.showingLargeFileAlert = true // didSetがNSAlertをトリガーする
+#if DEBUG
                         print("DEBUG: createClipboardItemFromImageData - Setting showingLargeFileAlert to true for image data (size: \(newImageSize))")
+#endif
                     }
                     return nil // まだ保存せず、ユーザーのアラート確認を待つ
                 }
@@ -630,7 +654,9 @@ extension ClipboardManager {
         }
         
         if let duplicateURL = duplicateURL, FileManager.default.fileExists(atPath: duplicateURL.path) {
+#if DEBUG
             print("ClipboardManager: Found duplicate image in sandbox based on file hash cache: \(duplicateURL.lastPathComponent)")
+#endif
             let sandboxedFileAttributes = getFileAttributes(duplicateURL)
             let newItem = ClipboardItem(text: "Image File", date: Date(), filePath: duplicateURL, fileSize: sandboxedFileAttributes.fileSize, fileHash: newImageHash, qrCodeContent: qrCodeContent, sourceAppPath: sourceAppPath)
             
@@ -650,7 +676,9 @@ extension ClipboardManager {
         
         do {
             try imageData.write(to: destinationURL)
+#if DEBUG
             print("ClipboardManager: New image saved to sandbox as \(destinationURL.lastPathComponent)")
+#endif
             
             // 新しく保存された画像のハッシュをキャッシュに登録する
             await MainActor.run {
@@ -682,7 +710,9 @@ extension ClipboardManager {
         // PDFデータのハッシュを計算
         let newPDFHash = HashCalculator.calculateImageDataHash(pdfData)
         
+#if DEBUG
         print("DEBUG: createClipboardItemFromPDFData - isPerformingInternalCopy: \(isPerformingInternalCopy), isFromAlertConfirmation: \(isFromAlertConfirmation)")
+#endif
         
         // MARK: - PDFサイズチェックを追加 (内部コピーでない場合、かつアラート確認からでない場合のみアラートを表示)
         if !isPerformingInternalCopy {
@@ -696,7 +726,9 @@ extension ClipboardManager {
                         self.pendingLargeImageData = (pdfData, nil)
                         self.pendingLargeFileItemsSourceAppPath = sourceAppPath
                         self.showingLargeFileAlert = true
+#if DEBUG
                         print("DEBUG: createClipboardItemFromPDFData - Setting showingLargeFileAlert to true for PDF data (size: \(newPDFSize))")
+#endif
                     }
                     return nil
                 }
@@ -709,7 +741,9 @@ extension ClipboardManager {
         }
         
         if let duplicateURL = duplicateURL, FileManager.default.fileExists(atPath: duplicateURL.path) {
+#if DEBUG
             print("ClipboardManager: Found duplicate PDF in sandbox based on file hash cache: \(duplicateURL.lastPathComponent)")
+#endif
             let attributes = getFileAttributes(duplicateURL)
             let newItem = ClipboardItem(text: "PDF File", date: Date(), filePath: duplicateURL, fileSize: attributes.fileSize, fileHash: newPDFHash, sourceAppPath: sourceAppPath)
             
@@ -725,7 +759,9 @@ extension ClipboardManager {
         
         do {
             try pdfData.write(to: destinationURL)
+#if DEBUG
             print("ClipboardManager: New PDF saved to sandbox as \(destinationURL.lastPathComponent)")
+#endif
             
             // 新しく保存されたPDFのハッシュをキャッシュに登録する
             await MainActor.run {
@@ -806,7 +842,11 @@ extension ClipboardManager {
                     }
                 }
             } catch {
+#if DEBUG
                 print("Failed to generate thumbnail for \(fileURL.lastPathComponent): \(error.localizedDescription)")
+#else
+                print("Failed to generate thumbnail: \(error.localizedDescription)")
+#endif
             }
         }
     }
@@ -841,7 +881,9 @@ extension ClipboardManager {
         
         do {
             try FileManager.default.copyItem(at: originalFilePath, to: tempFileURL)
+#if DEBUG
             print("ClipboardManager: Temporary file created at \(tempFileURL.path) from original file \(originalFilePath.path)")
+#endif
             
             // 追跡リストに追加
             await MainActor.run {
@@ -859,7 +901,9 @@ extension ClipboardManager {
     func cleanUpTemporaryFiles() { // private から internal に変更
         let fileManager = FileManager.default
         let tempDirectoryURL = fileManager.temporaryDirectory.appendingPathComponent("ClipHoldTemp", isDirectory: true)
+#if DEBUG
         print("ClipboardManager: Attempting to clean up temporary files in \(tempDirectoryURL.path)")
+#endif
         
         do {
             if fileManager.fileExists(atPath: tempDirectoryURL.path) {
@@ -868,7 +912,9 @@ extension ClipboardManager {
                 for fileURL in tempContents {
                     do {
                         try fileManager.removeItem(at: fileURL)
+#if DEBUG
                         print("ClipboardManager: Removed temporary file: \(fileURL.lastPathComponent)")
+#endif
                         cleanedCount += 1
                     } catch {
                         print("ClipboardManager: Error removing temporary file \(fileURL.lastPathComponent): \(error.localizedDescription)")

@@ -258,7 +258,9 @@ class StandardPhrasePresetManager: ObservableObject {
                     )
                     presets[i].phrases[j] = newPhrase
                     presetNeedsSave = true
+#if DEBUG
                     print("StandardPhrasePresetManager: Resolved duplicate phrase ID for '\(newPhrase.title)' in preset '\(presets[i].name)'.")
+#endif
                 }
                 seenPhraseIds.insert(presets[i].phrases[j].id)
             }
@@ -281,7 +283,9 @@ class StandardPhrasePresetManager: ObservableObject {
             encoder.outputFormatting = .prettyPrinted
             let data = try encoder.encode(preset.phrases)
             try data.write(to: fileURL)
+#if DEBUG
             print("Saved preset with \(preset.phrases.count) phrases for preset \(preset.id)")
+#endif
         } catch {
             print("Error saving preset to file: \(error.localizedDescription)")
         }

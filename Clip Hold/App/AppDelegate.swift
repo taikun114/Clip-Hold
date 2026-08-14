@@ -75,8 +75,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         // 複数のカテゴリを一度に登録
         UNUserNotificationCenter.current().setNotificationCategories([category, migrationFailureCategory])
+#if DEBUG
         print("Registered notification category '\(clipboardPausedNotificationCategory)' and action '\(resumeMonitoringActionID)'.")
         print("Registered category for migration failure notification.")
+#endif
         
         if UserDefaults.standard.bool(forKey: "isClipboardMonitoringPaused") {
             NotificationManager.shared.scheduleClipboardPausedNotification()
@@ -184,14 +186,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             historyWindowController?.onWindowWillClose = { [weak self] in
                 ClipboardManager.shared.resetHistoryViewFilters()
                 self?.historyWindowController = nil
+#if DEBUG
                 print("AppDelegate: History window closed and filters reset.")
+#endif
             }
             historyWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: History window created and shown.")
+#endif
         } else {
+#if DEBUG
             print("AppDelegate: History window already exists. Bringing to front.")
+#endif
             historyWindowController?.showWindow(nil)
             historyWindowController?.window?.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -230,14 +238,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             standardPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, windowType: .standardPhrase, applyTransparentBackground: true, windowFrameAutosaveKey: "StandardPhraseWindowFrame")
             standardPhraseWindowController?.onWindowWillClose = { [weak self] in
                 self?.standardPhraseWindowController = nil
+#if DEBUG
                 print("AppDelegate: Standard Phrase window closed.")
+#endif
             }
             standardPhraseWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: Static phrase window created and shown.")
+#endif
         } else {
+#if DEBUG
             print("AppDelegate: Static phrase window already exists. Bringing to front.")
+#endif
             standardPhraseWindowController?.showWindow(nil)
             standardPhraseWindowController?.window?.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -262,7 +276,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let existingController = windowControllers[windowType] {
             existingController.showWindowAndCenter(false)
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: Reusing existing \(windowType) window.")
+#endif
             return
         }
         
@@ -278,7 +294,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
         
+#if DEBUG
         print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+#endif
     }
     
     @MainActor
@@ -291,7 +309,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let existingController = windowControllers[windowType] {
             existingController.showWindowAndCenter(false)
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: Reusing existing \(windowType) window.")
+#endif
             return
         }
         
@@ -303,7 +323,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                     controller.close()
                 }
                 self.windowControllers.removeValue(forKey: windowType)
+#if DEBUG
                 print("AppDelegate: \(windowType) window removed from windowControllers asynchronously.")
+#endif
             }
         }, editingPreset: nil)
             .environmentObject(StandardPhrasePresetManager.shared)
@@ -316,7 +338,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
         
+#if DEBUG
         print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+#endif
     }
     
     @MainActor
@@ -329,7 +353,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let existingController = windowControllers[windowType] {
             existingController.showWindowAndCenter(false)
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: Reusing existing \(windowType) window.")
+#endif
             return
         }
         
@@ -359,7 +385,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
         
+#if DEBUG
         print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+#endif
     }
     
     @MainActor
@@ -372,7 +400,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let existingController = windowControllers[windowType] {
             existingController.showWindowAndCenter(false)
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: Reusing existing \(windowType) window.")
+#endif
             return
         }
         
@@ -402,7 +432,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
         
+#if DEBUG
         print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+#endif
     }
     
     // MARK: - NSWindowDelegate
@@ -412,9 +444,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // ウィンドウの種類ごとにウィンドウコントローラーを管理する
         for (type, controller) in windowControllers {
             if closedWindow == controller.window {
+#if DEBUG
                 print("AppDelegate: \(type) window will close. Removing from windowControllers.")
+#endif
                 windowControllers.removeValue(forKey: type)
+#if DEBUG
                 print("AppDelegate: \(type) window removed from windowControllers.")
+#endif
                 break
             }
         }
@@ -423,7 +459,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Application Delegate Methods for Reopening
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         UserDefaults.standard.set(false, forKey: "hideMenuBarExtra")
+#if DEBUG
         print("AppDelegate: Set hideMenuBarExtra to false. Menu bar icon will be displayed.")
+#endif
         
         NSApp.activate(ignoringOtherApps: true)
         
@@ -479,7 +517,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         let notificationCategory = response.notification.request.content.categoryIdentifier
         
         if actionID == resumeMonitoringActionID {
+#if DEBUG
             print("Notification action: 'Resume' was selected.")
+#endif
             // NotificationManager を介して再開ロジックを実行
             NotificationManager.shared.resumeClipboardMonitoringAndSendNotification()
             
@@ -488,7 +528,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 NSApp.activate(ignoringOtherApps: true)
             }
         } else if actionID == "OPEN_DOCUMENTATION_ACTION" && notificationCategory == "MIGRATION_FAILURE_CATEGORY" {
+#if DEBUG
             print("Notification action: 'Show Documentation...' was selected.")
+#endif
             
             // ドキュメントのURLを決定
             let documentationURL: String

@@ -179,7 +179,9 @@ struct DeveloperSettingsView: View {
     private func resetUserDefaults() {
         if let bundleID = Bundle.main.bundleIdentifier {
             UserDefaults.standard.removePersistentDomain(forName: bundleID)
+#if DEBUG
             print("User defaults reset for bundle ID: \(bundleID)")
+#endif
         }
     }
 }

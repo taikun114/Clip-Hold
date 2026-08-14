@@ -38,15 +38,21 @@ struct PrivacySettingsView: View {
     private func addAppToExclusionList(bundleIdentifier: String) {
         if !excludedAppIdentifiers.contains(bundleIdentifier) {
             excludedAppIdentifiers.append(bundleIdentifier)
+#if DEBUG
             print("Excluded app added: \(bundleIdentifier)")
+#endif
         } else {
+#if DEBUG
             print("App already in exclusion list: \(bundleIdentifier)")
+#endif
         }
     }
     
     private func removeAppFromExclusionList(bundleIdentifier: String) {
         excludedAppIdentifiers.removeAll { $0 == bundleIdentifier }
+#if DEBUG
         print("Excluded app removed: \(bundleIdentifier)")
+#endif
     }
     private func updateNotificationAuthorizationStatus() {
         NotificationManager.shared.getNotificationAuthorizationStatus { status in
@@ -169,7 +175,9 @@ struct PrivacySettingsView: View {
                     .help(notificationAuthorizationStatus == .authorized ? "テスト通知を送信します。" : "システム設定の通知設定を開きます。")
                 }
                 .onChange(of: notificationAuthorizationStatus) { oldValue, newValue in
+#if DEBUG
                     print("Notification permission status changed: \(newValue.rawValue)")
+#endif
                 }
                 HStack {
                     if differentiateWithoutColor {
@@ -302,9 +310,13 @@ struct PrivacySettingsView: View {
                                 Task { @MainActor in
                                     if !excludedAppIdentifiers.contains(bundleIdentifier) {
                                         excludedAppIdentifiers.append(bundleIdentifier)
+#if DEBUG
                                         print("Excluded app added via drag and drop: \(bundleIdentifier)")
+#endif
                                     } else {
+#if DEBUG
                                         print("App already in exclusion list: \(bundleIdentifier)")
+#endif
                                     }
                                 }
                             } else {
@@ -318,7 +330,9 @@ struct PrivacySettingsView: View {
                     group.notify(queue: .main) {
                         if invalidItemsCount > 0 {
                             showingInvalidAppAlert = true
+#if DEBUG
                             print("Dropped items include \(invalidItemsCount) non-application item(s).")
+#endif
                         }
                     }
                     
@@ -371,7 +385,9 @@ struct PrivacySettingsView: View {
                                 .padding(.horizontal, 4)
                             
                             Button(action: {
+#if DEBUG
                                 print("Remove App button tapped. Selected: \(selectedExcludedAppId ?? "None")")
+#endif
                                 if let selectedId = selectedExcludedAppId {
                                     removeAppFromExclusionList(bundleIdentifier: selectedId)
                                     selectedExcludedAppId = nil
@@ -470,7 +486,9 @@ struct PrivacySettingsView: View {
                     addAppToExclusionList(bundleIdentifier: bundleIdentifier)
                 },
                 onSelectionCancelled: {
+#if DEBUG
                     print("DEBUG: App selection cancelled.")
+#endif
                 }
             )
             .frame(width: 0, height: 0)

@@ -184,7 +184,11 @@ struct HistoryItemRow<MenuContent: View>: View {
                             item.cachedThumbnailImage = thumbnail.nsImage // item の cachedThumbnailImage を更新
                         }
                     } catch {
+#if DEBUG
                         print("Failed to generate thumbnail for \(filePath.lastPathComponent): \(error.localizedDescription)")
+#else
+                        print("Failed to generate thumbnail: \(error.localizedDescription)")
+#endif
                         // エラー時はデフォルトのファイルアイコンをセット
                         await MainActor.run {
                             item.cachedThumbnailImage = NSWorkspace.shared.icon(forFile: filePath.path)

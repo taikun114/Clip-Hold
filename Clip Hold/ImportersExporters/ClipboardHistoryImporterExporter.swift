@@ -103,7 +103,9 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                 defer {
                     if accessed {
                         url.stopAccessingSecurityScopedResource()
+#if DEBUG
                         print("DEBUG: Security-scoped resource access stopped for URL: \(url.path)")
+#endif
                     }
                     
                     Task { @MainActor in
@@ -124,7 +126,9 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                             self.isExporting = false
                         })
                     }
+#if DEBUG
                     print("DEBUG: Security-scoped resource access failed for URL: \(url.path)")
+#endif
                     return
                 }
                 
@@ -337,7 +341,11 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                         
                         onComplete(finalTotalSize)
                         
+#if DEBUG
                         print("Clipboard history imported successfully: \(url.path)")
+#else
+                        print("Clipboard history imported successfully.")
+#endif
                     }
                     
                 } catch {
@@ -727,14 +735,22 @@ class ClipboardHistoryImporterExporter: ObservableObject {
                             onComplete()
                         })
                     }
+#if DEBUG
                     print("Clipboard history exported successfully: \(url.path)")
+#else
+                    print("Clipboard history exported successfully.")
+#endif
                     
                 } catch {
                     // キャンセルまたはエラー時に、中途半端に書き出された出力先ファイルを削除
                     let _ = url.startAccessingSecurityScopedResource()
                     if FileManager.default.fileExists(atPath: url.path) {
                         try? FileManager.default.removeItem(at: url)
+#if DEBUG
                         print("Deleted incomplete export file at \(url.path)")
+#else
+                        print("Deleted incomplete export file.")
+#endif
                     }
                     url.stopAccessingSecurityScopedResource()
                     

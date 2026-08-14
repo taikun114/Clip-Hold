@@ -89,7 +89,9 @@ extension ClipboardManager {
     }
     
     func handleLargeFileAlertConfirmation(shouldSave: Bool) {
+#if DEBUG
         print("DEBUG: handleLargeFileAlertConfirmation - shouldSave: \(shouldSave)")
+#endif
         if shouldSave {
             Task.detached { [weak self] in
                 guard let self = self else { return }
@@ -97,7 +99,9 @@ extension ClipboardManager {
                 // 新しいプロパティ (pendingLargeFileItemsWithSize) を使用
                 if !self.pendingLargeFileItemsWithSize.isEmpty {
                     let itemsToProcess = self.pendingLargeFileItemsWithSize // ローカルコピー
+#if DEBUG
                     print("DEBUG: handleLargeFileAlertConfirmation - Attempting to process \(itemsToProcess.count) pending file items.")
+#endif
                     
                     var failedItemsCount = 0
                     var successfulItemsCount = 0
@@ -105,7 +109,9 @@ extension ClipboardManager {
                     for item in itemsToProcess {
                         // ユーザーによってコピーがキャンセルされた場合はスキップ
                         if item.isCopyCancelled {
+#if DEBUG
                             print("DEBUG: handleLargeFileAlertConfirmation - Item copy was cancelled. Skipping.")
+#endif
                             continue
                         }
                         
@@ -131,7 +137,9 @@ extension ClipboardManager {
                             self.startFileProcessing(for: item, externalFileAttributes: self.getFileAttributes(url), originalItem: nil)
                         } else {
                             failedItemsCount += 1
+#if DEBUG
                             print("DEBUG: handleLargeFileAlertConfirmation - File not found: \(item.sourceFileURL?.path ?? "Unknown")")
+#endif
                             // 失敗した場合は履歴から削除
                             await MainActor.run {
                                 self.deleteItem(id: item.id)
@@ -178,7 +186,9 @@ extension ClipboardManager {
                     // ユーザーが画像の保存を許可した場合、画像をサンドボックスにコピーし、履歴に追加
                     // ここで createClipboardItemFromImageData を呼び出すことで重複検知ロジックが適用される
                     // アラート確認からの呼び出しであることを示すフラグをtrueにする
+#if DEBUG
                     print("DEBUG: handleLargeFileAlertConfirmation - Attempting to add pending image data.")
+#endif
                     let sourceAppPath = self.pendingLargeFileItemsSourceAppPath
                     if let newItem = await self.createClipboardItemFromImageData(pendingImageData.imageData, qrCodeContent: pendingImageData.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true) {
                         await MainActor.run {
@@ -191,7 +201,9 @@ extension ClipboardManager {
                     // showingLargeFileAlert を false に設定して、didSet が再度NSAlertをトリガーするのを防ぐ
                     if self.showingLargeFileAlert {
                         self.showingLargeFileAlert = false
+#if DEBUG
                         print("DEBUG: handleLargeFileAlertConfirmation - Reset showingLargeFileAlert to false.")
+#endif
                     }
                     self.pendingLargeFileItemsWithSize.removeAll() // 新しいプロパティもリセット
                     self.pendingLargeFileItemsSourceAppPath = nil // リセット
@@ -199,11 +211,15 @@ extension ClipboardManager {
                 }
             }
         } else {
+#if DEBUG
             print("DEBUG: handleLargeFileAlertConfirmation - User chose NOT to save the large file/image(s).")
+#endif
             // showingLargeFileAlert を false に設定して、didSet が再度NSAlertをトリガーするのを防ぐ
             if showingLargeFileAlert {
                 showingLargeFileAlert = false
+#if DEBUG
                 print("DEBUG: handleLargeFileAlertConfirmation - Reset showingLargeFileAlert to false.")
+#endif
             }
             // キャンセルされたのでUIに追加されていた仮アイテムを削除
             let itemsToDelete = pendingLargeFileItemsWithSize

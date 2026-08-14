@@ -15,7 +15,9 @@ class LoginItemManager: ObservableObject {
         // 初期化時に現在のログイン項目の状態を読み込む
         // SMAppService.mainApp.status は現在の登録状態を返します
         self.launchAtLogin = SMAppService.mainApp.status == .enabled
+#if DEBUG
         print("DEBUG: LoginItemManager init() - Initial login item status: \(self.launchAtLogin ? "Enabled" : "Disabled")")
+#endif
     }
     
     private func updateLoginItemStatus(_ enable: Bool) {
@@ -23,7 +25,9 @@ class LoginItemManager: ObservableObject {
             // ログイン項目として登録する
             do {
                 try SMAppService.mainApp.register() //
+#if DEBUG
                 print("DEBUG: App registered as login item.")
+#endif
             } catch {
                 print("ERROR: Failed to register app as login item: \(error.localizedDescription)")
                 // 登録に失敗した場合、UIの状態を元に戻すか、ユーザーに通知する
@@ -35,7 +39,9 @@ class LoginItemManager: ObservableObject {
             // ログイン項目から登録解除する
             do {
                 try SMAppService.mainApp.unregister() //
+#if DEBUG
                 print("DEBUG: App unregistered from login items.")
+#endif
             } catch {
                 print("ERROR: Failed to unregister app from login items: \(error.localizedDescription)")
                 // 登録解除に失敗した場合、UIの状態を元に戻すか、ユーザーに通知する
@@ -53,9 +59,13 @@ class LoginItemManager: ObservableObject {
             let newStatus = SMAppService.mainApp.status == .enabled
             if self.launchAtLogin != newStatus {
                 self.launchAtLogin = newStatus
+#if DEBUG
                 print("DEBUG: Refreshed login item status: \(self.launchAtLogin ? "Enabled" : "Disabled")")
+#endif
             } else {
+#if DEBUG
                 print("DEBUG: Login item status unchanged during refresh.")
+#endif
             }
         }
     }
@@ -102,9 +112,10 @@ struct GeneralSettingsView: View {
         let savedMaxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryInMenu")
         let savedMaxPhrasesInMenu = UserDefaults.standard.integer(forKey: "maxPhrasesInMenu")
         
+#if DEBUG
         // DEBUG print for initial values from UserDefaults (accessing AppStorage directly here is fine)
         print("DEBUG: init() - savedMaxHistoryInMenu: \(savedMaxHistoryInMenu)")
-        
+#endif
         
         // MARK: - ローカル変数を宣言し、それらの値を決定するロジック
         // tempSelectedMenuOption の値を決定
@@ -125,7 +136,9 @@ struct GeneralSettingsView: View {
             determinedTempSelectedMenuOption = .custom(savedMaxHistoryInMenu)
             determinedTempCustomMenuHistoryValue = savedMaxHistoryInMenu
         }
+#if DEBUG
         print("DEBUG: init() - determinedTempSelectedMenuOption after logic: \(determinedTempSelectedMenuOption)") // ローカル変数をプリント
+#endif
         
         // tempSelectedPhraseMenuOption の値を決定
         let determinedTempSelectedPhraseMenuOption: HistoryOption

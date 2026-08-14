@@ -416,7 +416,9 @@ struct HistoryWindowView: View {
             Button("削除", role: .destructive) {
                 if let item = itemToDelete {
                     clipboardManager.deleteItem(id: item.id, deleteOnlyThisItem: deleteOnlyThisItem)
+#if DEBUG
                     print("DEBUG: Item deleted.")
+#endif
                     itemToDelete = nil
                     selectedItemID = nil
                 }

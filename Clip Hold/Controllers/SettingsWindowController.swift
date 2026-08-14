@@ -52,9 +52,13 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
             let adjustedFrame = NSRect(x: adjustedOriginX, y: adjustedOriginY, width: savedFrame.width, height: savedFrame.height)
             
             window?.setFrame(adjustedFrame, display: true)
+#if DEBUG
             print("SettingsWindowController: Loaded and applied saved frame for key '\(autosaveKey)': \(frameString) -> \(NSStringFromRect(adjustedFrame))")
+#endif
         } else {
+#if DEBUG
             print("SettingsWindowController: No saved frame found for key 'SettingsWindowFrame'.")
+#endif
             // 保存されたフレームがない場合は、デフォルトで中央に配置
             window?.center()
         }
@@ -66,7 +70,9 @@ class SettingsWindowController: NSWindowController, NSWindowDelegate {
         if let window = self.window {
             let frameString = NSStringFromRect(window.frame)
             UserDefaults.standard.set(frameString, forKey: autosaveKey)
+#if DEBUG
             print("SettingsWindowController: Saved frame for key '\(autosaveKey)': \(frameString)")
+#endif
         }
         // 通知の監視を解除
         NotificationCenter.default.removeObserver(self, name: NSWindow.willCloseNotification, object: self.window)

@@ -89,7 +89,9 @@ struct ClipHoldApp: App {
         defaults.set(!currentIsPaused, forKey: "isClipboardMonitoringPaused")
         NotificationManager.shared.sendMonitoringStatusNotification(isPaused: !currentIsPaused)
         
+#if DEBUG
         print("Toggled isClipboardMonitoringPaused from \(currentIsPaused) to \(!currentIsPaused).")
+#endif
     }
     
     // MARK: - キーボード操作をシミュレートする関数
@@ -353,7 +355,9 @@ struct ClipHoldApp: App {
                                         ClipHoldApp.performPaste()
                                     }
                                 } else {
+#if DEBUG
                                     print("textOnlyQuickPaste is on, so non-text content will not be pasted.")
+#endif
                                 }
                             } else {
                                 Task { @MainActor in
@@ -502,14 +506,18 @@ struct ClipHoldApp: App {
     
     static func setupGlobalShortcuts() {
         KeyboardShortcuts.onKeyDown(for: .showAllStandardPhrases) {
+#if DEBUG
             print("Show All Standard Phrases shortcut pressed!")
+#endif
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showStandardPhraseWindow()
             }
         }
         
         KeyboardShortcuts.onKeyDown(for: .showAllCopyHistory) {
+#if DEBUG
             print("Show All Clipboard History shortcut pressed!")
+#endif
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showHistoryWindow()
             }
@@ -517,14 +525,18 @@ struct ClipHoldApp: App {
         
         KeyboardShortcuts.onKeyDown(for: .toggleClipboardMonitoring) {
             guard !ClipboardManager.shared.isExporting else { return }
+#if DEBUG
             print("Toggle Clipboard Monitoring shortcut pressed!")
+#endif
             ClipHoldApp.toggleClipboardMonitoring()
         }
         
         // 新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addSNewtandardPhrase) {
             guard !ClipboardManager.shared.isExporting else { return }
+#if DEBUG
             print("Add New Standard Phrase shortcut pressed!")
+#endif
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showAddPhraseWindow(withContent: "")
             }
@@ -533,7 +545,9 @@ struct ClipHoldApp: App {
         // 新しいプリセットの追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addNewPreset) {
             guard !ClipboardManager.shared.isExporting else { return }
+#if DEBUG
             print("Add New Preset shortcut pressed!")
+#endif
             if let delegate = NSApp.delegate as? AppDelegate {
                 delegate.showAddPresetWindow()
             }
@@ -542,7 +556,9 @@ struct ClipHoldApp: App {
         // 次のプリセットに切り替えるショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .nextPreset) {
             guard !ClipboardManager.shared.isExporting else { return }
+#if DEBUG
             print("Switch to Next Preset shortcut pressed!")
+#endif
             let presetManager = StandardPhrasePresetManager.shared
             if !presetManager.presets.isEmpty {
                 let currentIndex = presetManager.presets.firstIndex { $0.id == presetManager.selectedPresetId } ?? -1
@@ -578,7 +594,9 @@ struct ClipHoldApp: App {
         // 前のプリセットに切り替えるショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .previousPreset) {
             guard !ClipboardManager.shared.isExporting else { return }
+#if DEBUG
             print("Switch to Previous Preset shortcut pressed!")
+#endif
             let presetManager = StandardPhrasePresetManager.shared
             if !presetManager.presets.isEmpty {
                 let currentIndex = presetManager.presets.firstIndex { $0.id == presetManager.selectedPresetId } ?? -1
@@ -614,7 +632,9 @@ struct ClipHoldApp: App {
         // クリップボードから新しい定型文の追加ショートカットの登録
         KeyboardShortcuts.onKeyDown(for: .addStandardPhraseFromClipboard) {
             guard !ClipboardManager.shared.isExporting else { return }
+#if DEBUG
             print("Add Standard Phrase from Clipboard shortcut pressed!")
+#endif
             if let delegate = NSApp.delegate as? AppDelegate {
                 let clipboardContent = NSPasteboard.general.string(forType: .string) ?? ""
                 delegate.showAddPhraseWindow(withContent: clipboardContent)
@@ -633,12 +653,16 @@ struct ClipHoldApp: App {
                     clipboardManager.isCopyingStandardPhrase = true
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(phrase.content, forType: .string)
+#if DEBUG
                     print("Standard phrase '\(phrase.title)' copied via shortcut.")
+#endif
                     
                     let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
                     if currentQuickPaste {
                         ClipHoldApp.performPasteWithOverlayCheck()
+#if DEBUG
                         print("performPasteWithOverlayCheck")
+#endif
                     }
                 } else {
                     // 通知のタイトルと本文を構築
@@ -654,7 +678,9 @@ struct ClipHoldApp: App {
                         identifier: "standardPhraseNotSet_\(number)"
                     )
                     
+#if DEBUG
                     print("Standard phrase shortcut \(number) was pressed, but no corresponding phrase exists. Silent notification sent.")
+#endif
                 }
             }
         }
@@ -681,7 +707,9 @@ struct ClipHoldApp: App {
                     }
                 }
             } else {
+#if DEBUG
                 print("Pinned history shortcut pressed, but no item is pinned.")
+#endif
             }
         }
         
@@ -721,17 +749,25 @@ struct ClipHoldApp: App {
                         if currentTextOnlyQuickPaste {
                             if historyItem.filePath == nil && !historyItem.isImage {
                                 ClipHoldApp.performPasteWithOverlayCheck()
+#if DEBUG
                                 print("performPasteWithOverlayCheck")
+#endif
                             } else {
+#if DEBUG
                                 print("textOnlyQuickPaste is on, so non-text content will not be pasted.")
+#endif
                             }
                         } else {
                             ClipHoldApp.performPasteWithOverlayCheck()
+#if DEBUG
                             print("performPasteWithOverlayCheck")
+#endif
                         }
                     }
                 } else {
+#if DEBUG
                     print("History shortcut \(i+1) was pressed, but no corresponding history item (UI position \(i+1)) exists.")
+#endif
                 }
             }
         }

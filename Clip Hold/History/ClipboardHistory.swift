@@ -41,6 +41,7 @@ extension ClipboardManager {
         
         // 最後の履歴項目とアイテムのタイプ（テキスト or ファイル）が一致する場合のみ重複チェックを行う
         if let lastItem = lastItem {
+#if DEBUG
             print("ClipboardManager: Last item details - Text: '\(lastItem.text.prefix(50))...', Date: \(lastItem.date), FilePath: \(String(describing: lastItem.filePath))")
             let lastItemType = lastItem.filePath != nil ? "File" : "Text"
             let newItemType = newItem.filePath != nil ? "File" : "Text"
@@ -70,14 +71,25 @@ extension ClipboardManager {
             else {
                 print("ClipboardManager: Item types are different. Skipping duplicate check and adding to history.")
             }
+#else
+            if (newItem.filePath == nil && lastItem.filePath == nil) || (newItem.filePath != nil && lastItem.filePath != nil) {
+                if isDuplicate(newItem, of: lastItem) {
+                    return
+                }
+            }
+#endif
         } else {
+#if DEBUG
             print("ClipboardManager: History is empty. Adding new item.")
+#endif
         }
         
         self.objectWillChange.send()
         // 履歴を末尾に追加するように変更
         clipboardHistory.append(newItem)
+#if DEBUG
         print("ClipboardManager: New item added to history: \(newItem.text.prefix(50))...")
+#endif
         
         if let filePath = newItem.filePath {
             generateThumbnail(for: newItem, at: filePath)
@@ -289,7 +301,9 @@ extension ClipboardManager {
     
     // MARK: - Max History Count Enforcement
     func enforceMaxHistoryCount() {
+#if DEBUG
         print("DEBUG: enforceMaxHistoryCount() - maxHistoryToSave: \(self.maxHistoryToSave), current history count: \(self.clipboardHistory.count)")
+#endif
         if self.maxHistoryToSave > 0 && self.clipboardHistory.count > self.maxHistoryToSave {
             // 履歴を日付の新しい順に並べ替える（メモリ内でのみ）
             let sortedHistory = self.clipboardHistory.sorted { $0.date > $1.date }
@@ -308,9 +322,13 @@ extension ClipboardManager {
             // objectWillChange.send() を明示的に呼び出すことでUI更新を促す
             self.objectWillChange.send()
             self.clipboardHistory = itemsToKeep
+#if DEBUG
             print("DEBUG: enforceMaxHistoryCount() - Adjusted history to \(self.maxHistoryToSave). Current history count: \(self.clipboardHistory.count)")
+#endif
         } else if self.maxHistoryToSave == 0 { // 無制限の場合
+#if DEBUG
             print("DEBUG: enforceMaxHistoryCount() - No adjustment needed for unlimited setting.")
+#endif
         }
     }
     
