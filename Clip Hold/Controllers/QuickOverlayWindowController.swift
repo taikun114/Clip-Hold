@@ -68,11 +68,25 @@ class QuickOverlayWindowController: NSWindowController {
             .environmentObject(DateReloader.shared)
         
         let hostingView = NSHostingView(rootView: view)
-        hostingView.wantsLayer = true
-        window.contentView = hostingView
+        
+        let rootContainerView = NSView(frame: NSRect(x: 0, y: 0, width: 620, height: 620))
+        rootContainerView.wantsLayer = true
+        rootContainerView.layer?.backgroundColor = NSColor.clear.cgColor
+        
+        let animationContainerView = NSView(frame: rootContainerView.bounds)
+        animationContainerView.wantsLayer = true
+        animationContainerView.layer?.backgroundColor = NSColor.clear.cgColor
+        animationContainerView.identifier = NSUserInterfaceItemIdentifier("AnimationContainer")
+        rootContainerView.addSubview(animationContainerView)
+        
+        hostingView.frame = animationContainerView.bounds
+        hostingView.autoresizingMask = [.width, .height]
+        animationContainerView.addSubview(hostingView)
+        
+        window.contentView = rootContainerView
         
         positionWindow()
-        hostingView.layoutSubtreeIfNeeded()
+        rootContainerView.layoutSubtreeIfNeeded()
     }
     
     @objc private func showOverlay() {
@@ -84,69 +98,141 @@ class QuickOverlayWindowController: NSWindowController {
             prepareOverlay(type: type)
         }
         
-        guard let hostingView = window.contentView else { return }
+        guard let rootContainer = window.contentView,
+              let animationContainerView = rootContainer.subviews.first(where: { $0.identifier?.rawValue == "AnimationContainer" }) else { return }
         
         positionWindow()
         
-        // 表示アニメーション: 透明+105%スケールから不透明+100%スケールへ
-        window.alphaValue = 1
-        hostingView.layer?.removeAllAnimations()
-        // 非アクティブなアプリのウィンドウでも、前面のアラートや入力欄の上に表示できるようにする
+        window.alphaValue = 0 // Initially invisible
+        animationContainerView.layer?.removeAllAnimations()
+        
         window.orderFrontRegardless()
         window.makeKey()
         window.displayIfNeeded()
-        hostingView.layoutSubtreeIfNeeded()
-        configureAnimationLayer(for: hostingView)
-        hostingView.layer?.opacity = 0
-        hostingView.layer?.transform = CATransform3DMakeScale(1.05, 1.05, 1)
-        let showOpacity = CABasicAnimation(keyPath: "opacity")
-        showOpacity.fromValue = 0
-        showOpacity.toValue = 1
-        let showScale = CABasicAnimation(keyPath: "transform.scale")
-        showScale.fromValue = 1.05
-        showScale.toValue = 1.0
-        let showAnimation = CAAnimationGroup()
-        showAnimation.animations = [showOpacity, showScale]
-        showAnimation.duration = 0.1
-        showAnimation.timingFunction = CAMediaTimingFunction(name: .easeOut)
-        hostingView.layer?.add(showAnimation, forKey: "showAnimation")
-        hostingView.layer?.opacity = 1
-        hostingView.layer?.transform = CATransform3DIdentity
+        
+        let w = animationContainerView.bounds.width
+        let h = animationContainerView.bounds.height
+        
+        let txFrom: CGFloat = (1.0 - 1.05) * (w / 2.0)
+        let tyFrom: CGFloat = (1.0 - 1.05) * (h / 2.0)
+        
+        // 1. モデル値をアニメーションの「開始値」に設定する（開始時のフラッシュを防ぐ）
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        animationContainerView.layer?.setValue(1.05, forKeyPath: "transform.scale")
+        animationContainerView.layer?.setValue(txFrom, forKeyPath: "transform.translation.x")
+        animationContainerView.layer?.setValue(tyFrom, forKeyPath: "transform.translation.y")
+        CATransaction.commit()
+        
+        // 2. アニメーションを作成
+        let scaleAnim = CABasicAnimation(keyPath: "transform.scale")
+        scaleAnim.fromValue = 1.05
+        scaleAnim.toValue = 1.0
+        
+        let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
+        txAnim.fromValue = txFrom
+        txAnim.toValue = 0.0
+        
+        let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
+        tyAnim.fromValue = tyFrom
+        tyAnim.toValue = 0.0
+        
+        let group = CAAnimationGroup()
+        group.animations = [scaleAnim, txAnim, tyAnim]
+        group.duration = 0.1
+        group.timingFunction = CAMediaTimingFunction(name: .easeOut)
+        // アニメーション完了後も最終状態を維持する（モデル値更新時のフラッシュを防ぐ）
+        group.isRemovedOnCompletion = false
+        group.fillMode = .forwards
+        
+        animationContainerView.layer?.add(group, forKey: "showScale")
+        
+        // 3. ウインドウのフェードインと同時に実行し、完了後にモデル値を「終了値」へ更新する
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = 0.1
+            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            window.animator().alphaValue = 1
+        }, completionHandler: { [weak animationContainerView] in
+            guard let animationContainerView = animationContainerView else { return }
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
+            animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
+            animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
+            CATransaction.commit()
+            animationContainerView.layer?.removeAllAnimations()
+        })
     }
     
     @objc private func hideOverlay() {
-        guard let window = self.window, let contentView = window.contentView else { return }
+        guard let window = self.window, 
+              let rootContainer = window.contentView,
+              let animationContainerView = rootContainer.subviews.first(where: { $0.identifier?.rawValue == "AnimationContainer" }) else { return }
         animationGeneration += 1
         let currentGeneration = animationGeneration
-        contentView.wantsLayer = true
-        window.layoutIfNeeded()
-        configureAnimationLayer(for: contentView)
-        contentView.layer?.removeAllAnimations()
         
-        contentView.layer?.opacity = 1
-        contentView.layer?.transform = CATransform3DIdentity
-        let hideScale = CABasicAnimation(keyPath: "transform.scale")
-        hideScale.fromValue = 1.0
-        hideScale.toValue = 1.05
-        hideScale.duration = 0.1
-        hideScale.timingFunction = CAMediaTimingFunction(name: .easeIn)
-        contentView.layer?.transform = CATransform3DMakeScale(1.05, 1.05, 1)
-        let animationDelegate = AnimationCompletionDelegate { [weak self, weak window] in
-            guard let self, self.animationGeneration == currentGeneration else { return }
-            window?.orderOut(nil)
-            window?.contentView = nil // ウインドウを隠した後にViewを破棄し、アニメーションループを完全に停止させる
-            self.currentPreparedType = nil
-            self.hideAnimationDelegate = nil
-        }
-        hideAnimationDelegate = animationDelegate
-        hideScale.delegate = animationDelegate
-        contentView.layer?.add(hideScale, forKey: "hideScale")
+        animationContainerView.layer?.removeAllAnimations()
+        
+        let w = animationContainerView.bounds.width
+        let h = animationContainerView.bounds.height
+        
+        let txTo: CGFloat = (1.0 - 1.05) * (w / 2.0)
+        let tyTo: CGFloat = (1.0 - 1.05) * (h / 2.0)
+        
+        // 1. モデル値をアニメーションの「開始値」に設定する
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
+        animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
+        animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
+        CATransaction.commit()
+        
+        // 2. アニメーションを作成
+        let scaleAnim = CABasicAnimation(keyPath: "transform.scale")
+        scaleAnim.fromValue = 1.0
+        scaleAnim.toValue = 1.05
+        
+        let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
+        txAnim.fromValue = 0.0
+        txAnim.toValue = txTo
+        
+        let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
+        tyAnim.fromValue = 0.0
+        tyAnim.toValue = tyTo
+        
+        let group = CAAnimationGroup()
+        group.animations = [scaleAnim, txAnim, tyAnim]
+        group.duration = 0.1
+        group.timingFunction = CAMediaTimingFunction(name: .easeIn)
+        // アニメーション完了後も最終状態を維持する
+        group.isRemovedOnCompletion = false
+        group.fillMode = .forwards
+        
+        animationContainerView.layer?.add(group, forKey: "hideScale")
 
-        NSAnimationContext.runAnimationGroup { context in
+        // 3. ウインドウのフェードアウトと同時に実行し、完了後に破棄する
+        NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.1
             context.timingFunction = CAMediaTimingFunction(name: .easeIn)
             window.animator().alphaValue = 0
-        }
+        }, completionHandler: { [weak self, weak window, weak animationContainerView] in
+            guard let self, self.animationGeneration == currentGeneration else { return }
+            
+            // モデル値を最終状態に更新
+            if let animationContainerView = animationContainerView {
+                CATransaction.begin()
+                CATransaction.setDisableActions(true)
+                animationContainerView.layer?.setValue(1.05, forKeyPath: "transform.scale")
+                animationContainerView.layer?.setValue(txTo, forKeyPath: "transform.translation.x")
+                animationContainerView.layer?.setValue(tyTo, forKeyPath: "transform.translation.y")
+                CATransaction.commit()
+                animationContainerView.layer?.removeAllAnimations()
+            }
+            
+            window?.orderOut(nil)
+            window?.contentView = nil 
+            self.currentPreparedType = nil
+        })
     }
     
     private func positionWindow() {
@@ -236,13 +322,7 @@ class QuickOverlayWindowController: NSWindowController {
         window.setFrameOrigin(newOrigin)
     }
 
-    private func configureAnimationLayer(for view: NSView) {
-        guard let layer = view.layer else { return }
 
-        // レイヤーの拡大縮小の基準点を、常にウインドウの中央へ固定する
-        layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        layer.position = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
-    }
 }
 
 private final class AnimationCompletionDelegate: NSObject, CAAnimationDelegate {
