@@ -723,7 +723,6 @@ private struct PhraseSettingsSection: View {
                 set: { newValue in
                     if let newValue = newValue {
                         presetManager.selectedPresetId = newValue
-                        presetManager.saveSelectedPresetId()
                     }
                 }
             ),

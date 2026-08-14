@@ -11,11 +11,14 @@ class StandardPhrasePresetManager: ObservableObject {
             // 「プリセットなし」が選択されている状態でプリセットが利用可能になった場合、最初のプリセットを選択
             if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" && !presets.isEmpty {
                 selectedPresetId = presets.first?.id
-                saveSelectedPresetId()
             }
         }
     }
-    @Published var selectedPresetId: UUID?
+    @Published var selectedPresetId: UUID? {
+        didSet {
+            saveSelectedPresetId()
+        }
+    }
     
     let presetAddedSubject = PassthroughSubject<Void, Never>()
     
@@ -68,7 +71,6 @@ class StandardPhrasePresetManager: ObservableObject {
         selectedPresetId = defaultPreset.id
         savePresetToFile(defaultPreset)
         savePresetIndex()
-        saveSelectedPresetId()
         // アイコンを生成
         let _ = PresetIconGenerator.shared.generateIcon(for: defaultPreset)
     }
@@ -131,12 +133,10 @@ class StandardPhrasePresetManager: ObservableObject {
                 // デフォルトのプリセットが存在しない場合、利用可能な最初のプリセットを選択
                 selectedPresetId = presets.first?.id
             }
-            saveSelectedPresetId()
             selectedPresetWasUpdated = true
         } else if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" && !presets.isEmpty {
             // 「プリセットなし」が選択されている状態でプリセットが利用可能になった場合、最初のプリセットを選択
             selectedPresetId = presets.first?.id
-            saveSelectedPresetId()
             selectedPresetWasUpdated = true
         }
         
@@ -332,7 +332,7 @@ class StandardPhrasePresetManager: ObservableObject {
         }
     }
     
-    func saveSelectedPresetId() {
+    private func saveSelectedPresetId() {
         // FFFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF は保存しない
         if let selectedPresetId = selectedPresetId,
            selectedPresetId.uuidString != "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF",
@@ -359,7 +359,6 @@ class StandardPhrasePresetManager: ObservableObject {
         }
         savePresetToFile(newPreset)
         savePresetIndex()
-        saveSelectedPresetId()
         let _ = PresetIconGenerator.shared.generateIcon(for: newPreset)
         presetAddedSubject.send()
     }
@@ -382,7 +381,6 @@ class StandardPhrasePresetManager: ObservableObject {
         selectedPresetId = presetWithValidIcon.id
         savePresetToFile(presetWithValidIcon)
         savePresetIndex()
-        saveSelectedPresetId()
         let _ = PresetIconGenerator.shared.generateIcon(for: presetWithValidIcon)
         presetAddedSubject.send()
     }
@@ -401,7 +399,6 @@ class StandardPhrasePresetManager: ObservableObject {
         }
         savePresetToFile(newPreset)
         savePresetIndex()
-        saveSelectedPresetId()
         let _ = PresetIconGenerator.shared.generateIcon(for: newPreset)
         presetAddedSubject.send()
     }
@@ -422,7 +419,6 @@ class StandardPhrasePresetManager: ObservableObject {
         }
         
         savePresetIndex()
-        saveSelectedPresetId()
         
         // 他のプリセットにも影響がないか確認し、存在しないプリセットへの割り当てをクリーンアップ
         cleanupInvalidAssignments()
@@ -562,7 +558,6 @@ class StandardPhrasePresetManager: ObservableObject {
         selectedPresetId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
         
         savePresetIndex()
-        saveSelectedPresetId()
         
         // デフォルトプリセットは再作成しない
         

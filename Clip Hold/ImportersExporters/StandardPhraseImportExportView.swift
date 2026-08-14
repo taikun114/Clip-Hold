@@ -347,7 +347,6 @@ struct StandardPhraseImportExportView: View {
     private func restoreSelectionAfterImport() {
         if let presetId = presetIdBeforeImport, presetId.uuidString != "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
             presetManager.selectedPresetId = presetId
-            presetManager.saveSelectedPresetId()
         }
         presetIdBeforeImport = nil
     }

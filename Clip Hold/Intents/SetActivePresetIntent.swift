@@ -40,7 +40,6 @@ struct SetActivePresetIntent: AppIntent {
             
             if presetManager.presets.contains(where: { $0.id == targetPresetId }) {
                 presetManager.selectedPresetId = targetPresetId
-                presetManager.saveSelectedPresetId()
                 
                 // 通知設定がオンの場合、通知を送信
                 if UserDefaults.standard.bool(forKey: "sendNotificationOnPresetChange") {
