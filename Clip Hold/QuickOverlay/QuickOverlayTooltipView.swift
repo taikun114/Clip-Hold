@@ -7,13 +7,18 @@ struct QuickOverlayTooltipView: View {
     let sourceAppPath: String?
     let filePath: String?
     let fileSize: UInt64?
+    let dateString: String?
+    let characterCount: Int?
     let isCompact: Bool
     
     @State private var offset: CGFloat = 0
     @State private var textHeight: CGFloat = 0
     @State private var hasStartedMarquee = false
     @State private var marqueeStartTask: Task<Void, Never>?
+    @State private var spinnerDelayTask: Task<Void, Never>?
     @State private var thumbnailImage: NSImage?
+    @State private var isThumbnailLoaded = false
+    @State private var showSpinner = false
     
     var body: some View {
         Group {
@@ -61,6 +66,8 @@ struct QuickOverlayTooltipView: View {
         .onDisappear {
             marqueeStartTask?.cancel()
             marqueeStartTask = nil
+            spinnerDelayTask?.cancel()
+            spinnerDelayTask = nil
         }
     }
 
@@ -78,27 +85,54 @@ struct QuickOverlayTooltipView: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
-            .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
     private var textTooltip: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 16) {
             appHeaderView
             textBody
+            if dateString != nil || characterCount != nil {
+                metadataFooterView
+            }
+        }
+        .padding(16)
+    }
+
+    @ViewBuilder
+    private var metadataFooterView: some View {
+        if dateString != nil || characterCount != nil {
+            HStack {
+                if let dateString {
+                    Text(dateString)
+                        .lineLimit(1)
+                }
+                Spacer()
+                if let characterCount {
+                    Text("\(characterCount)文字")
+                        .lineLimit(1)
+                }
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
     }
 
     private var textBody: some View {
         let hasHeader = sourceAppPath != nil
-        let headerH: CGFloat = hasHeader ? 52 : 0
+        let hasFooter = dateString != nil || characterCount != nil
+        let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
+        let spacingH: CGFloat = spacingCount * 16
+        let headerH: CGFloat = hasHeader ? 20 : 0
+        let footerH: CGFloat = hasFooter ? 14 : 0
+        let contentPaddingH: CGFloat = 32
+        let visibleHeight = maxVisualHeight - contentPaddingH - headerH - footerH - spacingH
 
         return Text(text)
             .font(.body)
             .lineLimit(nil)
             .fixedSize(horizontal: false, vertical: true)
-            .padding(hasHeader ? [.horizontal, .bottom] : .all, 16)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
                 GeometryReader { textGeo in
@@ -111,33 +145,48 @@ struct QuickOverlayTooltipView: View {
                 }
             )
             .offset(y: offset)
-            .frame(height: maxVisualHeight - headerH, alignment: .top)
+            .frame(height: max(visibleHeight, 20), alignment: .top)
             .clipped()
     }
 
     private func fileTooltip(filePath: String) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 16) {
             appHeaderView
             fileBody(filePath: filePath)
+            if dateString != nil || characterCount != nil {
+                metadataFooterView
+            }
         }
+        .padding(16)
     }
 
     private func fileBody(filePath: String) -> some View {
         HStack(alignment: .center, spacing: 16) {
-            Group {
+            ZStack {
                 if let thumbnailImage {
                     Image(nsImage: thumbnailImage)
                         .resizable()
                         .scaledToFit()
-                } else {
+                        .transition(.opacity)
+                } else if isThumbnailLoaded {
                     Image(nsImage: NSWorkspace.shared.icon(forFile: filePath))
                         .resizable()
                         .scaledToFit()
                         .padding(32)
+                        .transition(.opacity)
+                } else if showSpinner {
+                    ProgressView()
+                        .controlSize(.regular)
+                        .transition(.opacity)
+                } else {
+                    Color.clear
                 }
             }
             .frame(width: 256, height: 256)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .animation(.easeInOut(duration: 0.25), value: thumbnailImage)
+            .animation(.easeInOut(duration: 0.25), value: isThumbnailLoaded)
+            .animation(.easeInOut(duration: 0.25), value: showSpinner)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(text)
@@ -151,16 +200,35 @@ struct QuickOverlayTooltipView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(sourceAppPath != nil ? [.horizontal, .bottom] : .all, 16)
     }
 
     private func loadThumbnail(for filePath: String) {
+        spinnerDelayTask?.cancel()
+        spinnerDelayTask = Task { @MainActor in
+            do {
+                try await Task.sleep(for: .milliseconds(500))
+            } catch {
+                return
+            }
+            guard !Task.isCancelled, !isThumbnailLoaded else { return }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showSpinner = true
+            }
+        }
+        
         let url = URL(fileURLWithPath: filePath)
         let request = QLThumbnailGenerator.Request(fileAt: url, size: CGSize(width: 256, height: 256), scale: NSScreen.main?.backingScaleFactor ?? 2, representationTypes: .all)
         QLThumbnailGenerator.shared.generateRepresentations(for: request) { thumbnail, _, _ in
-            guard let thumbnail else { return }
             DispatchQueue.main.async {
-                thumbnailImage = thumbnail.nsImage
+                self.spinnerDelayTask?.cancel()
+                self.spinnerDelayTask = nil
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    if let thumbnail {
+                        self.thumbnailImage = thumbnail.nsImage
+                    }
+                    self.isThumbnailLoaded = true
+                    self.showSpinner = false
+                }
             }
         }
     }
@@ -169,8 +237,13 @@ struct QuickOverlayTooltipView: View {
         guard !hasStartedMarquee else { return }
         
         let hasHeader = sourceAppPath != nil
-        let headerH: CGFloat = hasHeader ? 52 : 0
-        let visibleHeight = maxVisualHeight - headerH
+        let hasFooter = dateString != nil || characterCount != nil
+        let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
+        let spacingH: CGFloat = spacingCount * 16
+        let headerH: CGFloat = hasHeader ? 20 : 0
+        let footerH: CGFloat = hasFooter ? 14 : 0
+        let contentPaddingH: CGFloat = 32
+        let visibleHeight = maxVisualHeight - contentPaddingH - headerH - footerH - spacingH
 
         guard textHeight > visibleHeight else { return }
         hasStartedMarquee = true

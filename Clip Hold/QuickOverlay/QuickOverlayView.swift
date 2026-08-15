@@ -618,14 +618,25 @@ struct QuickOverlayView: View {
             onItemTooltipShow: {
                 tooltipTask?.cancel()
                 tooltipTask = Task {
-                    try? await Task.sleep(nanoseconds: 600_000_000)
+                    try? await Task.sleep(nanoseconds: 500_000_000)
                     if !Task.isCancelled {
-                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
+                        var userInfo: [String: Any] = [
                             "text": item.displayTitle,
-                            "sourceAppPath": item.sourceAppPath as Any,
-                            "filePath": item.filePath?.path as Any,
-                            "fileSize": item.fileSize as Any
-                        ])
+                            "dateString": item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now)
+                        ]
+                        if let sourceAppPath = item.sourceAppPath {
+                            userInfo["sourceAppPath"] = sourceAppPath
+                        }
+                        if let filePath = item.filePath?.path {
+                            userInfo["filePath"] = filePath
+                        }
+                        if let fileSize = item.fileSize {
+                            userInfo["fileSize"] = fileSize
+                        }
+                        if showCharacterCount {
+                            userInfo["characterCount"] = item.text.count
+                        }
+                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: userInfo)
                     }
                 }
             },
@@ -676,7 +687,7 @@ struct QuickOverlayView: View {
             onItemTooltipShow: {
                 tooltipTask?.cancel()
                 tooltipTask = Task {
-                    try? await Task.sleep(nanoseconds: 600_000_000)
+                    try? await Task.sleep(nanoseconds: 500_000_000)
                     if !Task.isCancelled {
                         NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: ["text": phrase.content])
                     }
@@ -993,19 +1004,24 @@ private struct QuickOverlayHistoryItemRow: View {
                 } else {
                     HStack(spacing: 4) {
                         Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
+                            .lineLimit(1)
 
                         if showCharacterCount {
                             Text("-")
                             Text("\(item.text.count)文字")
+                                .lineLimit(1)
                         }
 
                         if let fileSize = item.fileSize, item.filePath != nil, (!item.isFolder || item.isSizeCalculated) {
                             Text("-")
                             Text(formatFileSize(fileSize) + (item.isPartialSize ? String(localized: " 以上") : ""))
+                                .lineLimit(1)
                         }
                     }
                     .font(.caption)
                     .foregroundStyle(isSelected && !item.isCopying ? .white.opacity(0.8) : .secondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
                     .transition(.opacity)
                 }
             }
@@ -1215,7 +1231,7 @@ private struct QuickOverlayHistoryItemRow: View {
     private func showButtonTooltip() {
         buttonTooltipTask?.cancel()
         buttonTooltipTask = Task {
-            try? await Task.sleep(nanoseconds: 600_000_000)
+            try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled, let anchor = buttonTopCenterScreen {
                 // 項目のツールチップとは異なり、ボタンの機能説明のみを表示する
                 NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
@@ -1240,7 +1256,7 @@ private struct QuickOverlayHistoryItemRow: View {
     private func showCancelCopyButtonTooltip() {
         cancelCopyButtonTooltipTask?.cancel()
         cancelCopyButtonTooltipTask = Task {
-            try? await Task.sleep(nanoseconds: 600_000_000)
+            try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled, let anchor = cancelCopyButtonTopCenterScreen {
                 NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
                     "text": String(localized: "コピーをキャンセル"),
@@ -1281,7 +1297,7 @@ private struct QuickOverlayHistoryItemRow: View {
     private func showEditAndCopyButtonTooltip() {
         editAndCopyButtonTooltipTask?.cancel()
         editAndCopyButtonTooltipTask = Task {
-            try? await Task.sleep(nanoseconds: 600_000_000)
+            try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled, let anchor = editAndCopyButtonTopCenterScreen {
                 NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
                     "text": String(localized: "変更してコピー..."),
@@ -1489,7 +1505,7 @@ private struct QuickOverlayStandardPhraseItemRow: View {
     private func showEditAndCopyButtonTooltip() {
         editAndCopyButtonTooltipTask?.cancel()
         editAndCopyButtonTooltipTask = Task {
-            try? await Task.sleep(nanoseconds: 600_000_000)
+            try? await Task.sleep(nanoseconds: 500_000_000)
             if !Task.isCancelled, let anchor = editAndCopyButtonTopCenterScreen {
                 NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
                     "text": String(localized: "変更してコピー..."),

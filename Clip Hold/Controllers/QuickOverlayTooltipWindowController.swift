@@ -26,6 +26,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let text: String
         let sourceAppPath: String?
         let filePath: String?
+        let dateString: String?
+        let characterCount: Int?
         let isCompact: Bool
         let anchorPoint: CGPoint?
     }
@@ -70,6 +72,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let sourceAppPath = userInfo["sourceAppPath"] as? String
         let filePath = userInfo["filePath"] as? String
         let fileSize = userInfo["fileSize"] as? UInt64
+        let dateString = userInfo["dateString"] as? String
+        let characterCount = userInfo["characterCount"] as? Int
         let isCompact = userInfo["isCompact"] as? Bool ?? false
         let buttonHeight = userInfo["buttonHeight"] as? CGFloat ?? 0
         
@@ -85,6 +89,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             text: rawText,
             sourceAppPath: sourceAppPath,
             filePath: filePath,
+            dateString: dateString,
+            characterCount: characterCount,
             isCompact: isCompact,
             anchorPoint: anchorPoint
         )
@@ -95,7 +101,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         }
         self.currentTooltipIdentity = identity
         
-        positionWindow(text: text, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize, anchorPoint: anchorPoint, isCompact: isCompact, buttonHeight: buttonHeight)
+        positionWindow(text: text, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize, dateString: dateString, characterCount: characterCount, anchorPoint: anchorPoint, isCompact: isCompact, buttonHeight: buttonHeight)
         
         guard let contentView = window.contentView else { return }
         contentView.wantsLayer = true
@@ -149,7 +155,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
     }
     
-    private func positionWindow(text: String, sourceAppPath: String?, filePath: String?, fileSize: UInt64?, anchorPoint: CGPoint?, isCompact: Bool = false, buttonHeight: CGFloat = 0) {
+    private func positionWindow(text: String, sourceAppPath: String?, filePath: String?, fileSize: UInt64?, dateString: String?, characterCount: Int?, anchorPoint: CGPoint?, isCompact: Bool = false, buttonHeight: CGFloat = 0) {
         guard let window = self.window else { return }
         
         guard let overlayWindow = QuickOverlayWindowController.shared.window,
@@ -187,14 +193,15 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         )
         // Add 32 for padding (16 top, 16 bottom).
         // Since we now use .fixedSize in the view, it will never truncate with '...', so we don't need a buffer.
-        let headerHeight: CGFloat = sourceAppPath == nil ? 0 : 52
-        let contentVerticalPadding: CGFloat = sourceAppPath == nil ? 32 : 16
-        let naturalVisualHeight: CGFloat
-        if filePath != nil {
-            naturalVisualHeight = 256 + contentVerticalPadding + headerHeight
-        } else {
-            naturalVisualHeight = ceil(textRect.height) + contentVerticalPadding + headerHeight
-        }
+        let hasHeader = sourceAppPath != nil
+        let hasFooter = dateString != nil || characterCount != nil
+        let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
+        let headerHeight: CGFloat = hasHeader ? 20 : 0
+        let footerHeight: CGFloat = hasFooter ? 14 : 0
+        let spacingHeight: CGFloat = spacingCount * 16
+        let paddingHeight: CGFloat = 32
+        let contentHeight: CGFloat = filePath != nil ? 256 : ceil(textRect.height)
+        let naturalVisualHeight: CGFloat = contentHeight + paddingHeight + headerHeight + footerHeight + spacingHeight
         
         // Cap max visual height at 500 (same as overlay)
         let targetVisualHeight = min(naturalVisualHeight, 500)
@@ -208,7 +215,6 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
         if let anchor = anchorPoint {
             // ボタン等の固定位置（スクリーン座標）に表示する場合
-            // スクリーンエッジ表示時（メニューバー方向含む）でもショートカットと同じくボタンの真上に表示できるよう、画面フレーム全体（screen.frame）を基準にする
             let effectiveMaxY = screen.frame.maxY
             let effectiveMinY = screen.frame.minY
             let spaceAbove = effectiveMaxY - anchor.y - gap
@@ -225,12 +231,10 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             
             switch chosenDirection {
             case .above:
-                // ツールチップの視覚的下端（= ウィンドウ下端 + 影パディング）がボタンの上端の上に来るようにする
                 newOrigin.x = anchor.x - windowWidth / 2
                 newOrigin.y = anchor.y + gap - shadowPadding
                 finalVisualHeight = min(finalVisualHeight, spaceAbove)
             case .below:
-                // ツールチップの視覚的上端（= ウィンドウ上端 - 影パディング）がボタンの下辺の下に来るようにする
                 newOrigin.x = anchor.x - windowWidth / 2
                 newOrigin.y = anchor.y - buttonHeight - gap + shadowPadding - (finalVisualHeight + windowPadding)
                 finalVisualHeight = min(finalVisualHeight, spaceBelow)
@@ -240,8 +244,6 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             
             // 画面端からはみ出す場合はクランプする
             if isCompact {
-                // コンパクトツールチップは影のパディング分だけは画面外にはみ出しても良い
-                // （内容自体は画面内に収める）。メニューバー付近での過度の押し下げを防ぐ。
                 newOrigin.x = min(max(newOrigin.x, screen.frame.minX - shadowPadding), screen.frame.maxX - windowWidth + shadowPadding)
                 newOrigin.y = min(max(newOrigin.y, effectiveMinY - shadowPadding), effectiveMaxY - finalVisualHeight - shadowPadding)
             } else {
@@ -251,7 +253,6 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             
             tooltipDirection = chosenDirection == .above ? .above : .below
         } else {
-            // Overlay visual bounds (620x620 with 60 padding)
             let visualMinX = overlayFrame.minX + 60
             let visualMinY = overlayFrame.minY + 60
             let visualMaxX = overlayFrame.maxX - 60
@@ -329,6 +330,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             sourceAppPath: sourceAppPath,
             filePath: filePath,
             fileSize: fileSize,
+            dateString: dateString,
+            characterCount: characterCount,
             isCompact: isCompact
         )
         let finalHosting = NSHostingView(rootView: finalView)
