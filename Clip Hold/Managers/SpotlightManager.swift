@@ -356,10 +356,12 @@ class SpotlightManager: ObservableObject {
                 
                 if Task.isCancelled { return }
                 
-                // インデックス済みフラグをリセット
-                let defaults = UserDefaults.standard
-                defaults.set(false, forKey: "hasIndexedExistingHistoryForSpotlight_v1_7_0_full")
-                defaults.set(0, forKey: "lastIndexedHistoryChunkForSpotlight_v1_7_0_full")
+                // インデックス済みフラグをリセット（@AppStorageのバックグラウンド発行警告を防ぐためメインスレッドで実行）
+                await MainActor.run {
+                    let defaults = UserDefaults.standard
+                    defaults.set(false, forKey: "hasIndexedExistingHistoryForSpotlight_v1_7_0_full")
+                    defaults.set(0, forKey: "lastIndexedHistoryChunkForSpotlight_v1_7_0_full")
+                }
                 
                 // 再インデックスを実行
                 self.indexAllExistingItems()
@@ -554,25 +556,24 @@ class SpotlightManager: ObservableObject {
 #endif
                             
                             let capturedCount = completedCount
+                            let nextChunkIndex = index + 1
                             Task { @MainActor in
                                 self.indexedCount = capturedCount
                                 self.progress.completedUnitCount = Int64(capturedCount)
+                                // 進行状況を保存（途中でアプリが終了しても、次回ここから再開できる）
+                                UserDefaults.standard.set(nextChunkIndex, forKey: "lastIndexedHistoryChunkForSpotlight_v1_7_0_full")
                             }
-                            
-                            // 進行状況を保存（途中でアプリが終了しても、次回ここから再開できる）
-                            defaults.set(index + 1, forKey: "lastIndexedHistoryChunkForSpotlight_v1_7_0_full")
                             
                             // メモリのスパイクを防ぐため、少し待機する（4.8GBまで上がっていたため、待機時間を0.1秒に増加してGCを促す）
                             try? await Task.sleep(nanoseconds: 100_000_000) // 0.1秒
                         }
                     }
                     
-                    defaults.set(true, forKey: "hasIndexedExistingHistoryForSpotlight_v1_7_0_full")
-                    print("SpotlightManager: Finished indexing all existing history chunks. Total completed: \(completedCount)")
-                    
-                    Task { @MainActor in
+                    await MainActor.run {
+                        UserDefaults.standard.set(true, forKey: "hasIndexedExistingHistoryForSpotlight_v1_7_0_full")
                         self.isIndexing = false
                     }
+                    print("SpotlightManager: Finished indexing all existing history chunks. Total completed: \(completedCount)")
                 } catch {
                     print("SpotlightManager: Failed to index all existing history chunks: \(error.localizedDescription)")
                     Task { @MainActor in
