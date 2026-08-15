@@ -194,156 +194,6 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: 基本
             
-            // MARK: - クイックペースト
-            Section(header: Text("クイックペースト").font(.headline)) {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("クイックペースト")
-                        Text("定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $quickPaste) {
-                        Text("クイックペースト")
-                        Text("オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("テキストに限定")
-                            .foregroundStyle(quickPaste ? .primary : .secondary)
-                        Text("履歴項目がテキストである場合のみクイックペーストを行うようにします。")
-                            .font(.caption)
-                            .foregroundStyle(quickPaste ? .secondary : .tertiary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $textOnlyQuickPaste) {
-                        Text("テキストに限定")
-                        Text("オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                    // quickPasteがオフの時にグレイアウトする
-                    .disabled(!quickPaste)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("直前のテキストフィールドにクイックペースト")
-                            .foregroundStyle(quickPaste ? .primary : .secondary)
-                        Text("履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。このオプションをオンにすると、新規コピーや変更してコピー機能でもクイックペーストが利用可能になります。アクセシビリティの許可が必要です。")
-                            .font(.caption)
-                            .foregroundStyle(quickPaste ? .secondary : .tertiary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $quickPasteToPreviousApp) {
-                        Text("直前のテキストフィールドにクイックペースト")
-                        Text("オンにすると、履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。このオプションをオンにすると、新規コピーや変更してコピー機能でもクイックペーストが利用可能になります。アクセシビリティの許可が必要です。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                    .disabled(!quickPaste)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            } // End of Section: クイックペースト
-            
-            // MARK: - クイックオーバーレイ
-            Section(
-                header: Text("クイックオーバーレイ").font(.headline),
-                footer: HStack {
-                    Spacer()
-                    Button("スクリーンエッジ...") {
-                        showingScreenEdgeSettings = true
-                    }
-                    .offset(x: tutorialButtonOffset)
-                    
-                    Button("クイックオーバーレイの使い方...") {
-                        showingQuickOverlayTutorial = true
-                    }
-                    .offset(x: tutorialButtonOffset)
-                }
-            ) {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("ショートカットキーで表示")
-                        Text("設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $isQuickOverlayShortcutEnabled) {
-                        Text("ショートカットキーで表示")
-                        Text("オンにすると、設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。この機能はVoiceOverでの操作に最適化されていないため、VoiceOverをご利用の方は、クイックオーバーレイの代わりに履歴ウィンドウや定型文ウィンドウをご利用ください。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("表示までの時間")
-                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .primary : .secondary)
-                        Text("クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。")
-                            .font(.caption)
-                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
-                    }
-                    Spacer()
-                    Slider(value: $quickOverlayShortcutDelay, in: 0.0...2.0, step: 0.1) {
-                        Text("表示までの時間")
-                        Text("クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。")
-                    }
-                    .frame(width: 150)
-                    .labelsHidden()
-                    .disabled(!isQuickOverlayShortcutEnabled)
-                    
-                    Text("\(quickOverlayShortcutDelay, specifier: "%.1f")秒")
-                        .frame(width: 40, alignment: .trailing)
-                        .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("表示場所")
-                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .primary : .secondary)
-                        Text("クイックオーバーレイが表示される画面上の場所を選択します。")
-                            .font(.caption)
-                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
-                    }
-                    Spacer()
-                    Picker("クイックオーバーレイの表示場所", selection: $quickOverlayShortcutPosition) {
-                        Label("ポインタ付近", systemImage: "contextualmenu.and.cursorarrow").tag("cursor")
-                        
-                        Divider()
-                        
-                        if #available(macOS 15.0, *) {
-                            Label("中央", systemImage: "inset.filled.center.rectangle").tag("center")
-                        } else {
-                            Label("中央", systemImage: "rectangle.center.inset.filled").tag("center")
-                        }
-                        Label("上", systemImage: "arrow.up").tag("top")
-                        Label("右上", systemImage: "arrow.up.right").tag("topRight")
-                        Label("右", systemImage: "arrow.right").tag("right")
-                        Label("右下", systemImage: "arrow.down.right").tag("bottomRight")
-                        Label("下", systemImage: "arrow.down").tag("bottom")
-                        Label("左下", systemImage: "arrow.down.left").tag("bottomLeft")
-                        Label("左", systemImage: "arrow.left").tag("left")
-                        Label("左上", systemImage: "arrow.up.left").tag("topLeft")
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .disabled(!isQuickOverlayShortcutEnabled)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            } // End of Section: クイックオーバーレイ
-            
             // MARK: - メニュー
             Section(header: Text("メニュー").font(.headline)) {
                 // 定型文の最大表示数
@@ -521,6 +371,156 @@ struct GeneralSettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: メニュー
+            
+            // MARK: - クイックペースト
+            Section(header: Text("クイックペースト").font(.headline)) {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("クイックペースト")
+                        Text("定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $quickPaste) {
+                        Text("クイックペースト")
+                        Text("オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("テキストに限定")
+                            .foregroundStyle(quickPaste ? .primary : .secondary)
+                        Text("履歴項目がテキストである場合のみクイックペーストを行うようにします。")
+                            .font(.caption)
+                            .foregroundStyle(quickPaste ? .secondary : .tertiary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $textOnlyQuickPaste) {
+                        Text("テキストに限定")
+                        Text("オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                    // quickPasteがオフの時にグレイアウトする
+                    .disabled(!quickPaste)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("直前のテキストフィールドにクイックペースト")
+                            .foregroundStyle(quickPaste ? .primary : .secondary)
+                        Text("履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。このオプションをオンにすると、新規コピーや変更してコピー機能でもクイックペーストが利用可能になります。アクセシビリティの許可が必要です。")
+                            .font(.caption)
+                            .foregroundStyle(quickPaste ? .secondary : .tertiary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $quickPasteToPreviousApp) {
+                        Text("直前のテキストフィールドにクイックペースト")
+                        Text("オンにすると、履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。このオプションをオンにすると、新規コピーや変更してコピー機能でもクイックペーストが利用可能になります。アクセシビリティの許可が必要です。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                    .disabled(!quickPaste)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            } // End of Section: クイックペースト
+            
+            // MARK: - クイックオーバーレイ
+            Section(
+                header: Text("クイックオーバーレイ").font(.headline),
+                footer: HStack {
+                    Spacer()
+                    Button("スクリーンエッジ...") {
+                        showingScreenEdgeSettings = true
+                    }
+                    .offset(x: tutorialButtonOffset)
+                    
+                    Button("クイックオーバーレイの使い方...") {
+                        showingQuickOverlayTutorial = true
+                    }
+                    .offset(x: tutorialButtonOffset)
+                }
+            ) {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("ショートカットキーで表示")
+                        Text("設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $isQuickOverlayShortcutEnabled) {
+                        Text("ショートカットキーで表示")
+                        Text("オンにすると、設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。この機能はVoiceOverでの操作に最適化されていないため、VoiceOverをご利用の方は、クイックオーバーレイの代わりに履歴ウィンドウや定型文ウィンドウをご利用ください。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("表示までの時間")
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .primary : .secondary)
+                        Text("クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。")
+                            .font(.caption)
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
+                    }
+                    Spacer()
+                    Slider(value: $quickOverlayShortcutDelay, in: 0.0...2.0, step: 0.1) {
+                        Text("表示までの時間")
+                        Text("クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。")
+                    }
+                    .frame(width: 150)
+                    .labelsHidden()
+                    .disabled(!isQuickOverlayShortcutEnabled)
+                    
+                    Text("\(quickOverlayShortcutDelay, specifier: "%.1f")秒")
+                        .frame(width: 40, alignment: .trailing)
+                        .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("表示場所")
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .primary : .secondary)
+                        Text("クイックオーバーレイが表示される画面上の場所を選択します。")
+                            .font(.caption)
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
+                    }
+                    Spacer()
+                    Picker("クイックオーバーレイの表示場所", selection: $quickOverlayShortcutPosition) {
+                        Label("ポインタ付近", systemImage: "contextualmenu.and.cursorarrow").tag("cursor")
+                        
+                        Divider()
+                        
+                        if #available(macOS 15.0, *) {
+                            Label("中央", systemImage: "inset.filled.center.rectangle").tag("center")
+                        } else {
+                            Label("中央", systemImage: "rectangle.center.inset.filled").tag("center")
+                        }
+                        Label("上", systemImage: "arrow.up").tag("top")
+                        Label("右上", systemImage: "arrow.up.right").tag("topRight")
+                        Label("右", systemImage: "arrow.right").tag("right")
+                        Label("右下", systemImage: "arrow.down.right").tag("bottomRight")
+                        Label("下", systemImage: "arrow.down").tag("bottom")
+                        Label("左下", systemImage: "arrow.down.left").tag("bottomLeft")
+                        Label("左", systemImage: "arrow.left").tag("left")
+                        Label("左上", systemImage: "arrow.up.left").tag("topLeft")
+                    }
+                    .pickerStyle(.menu)
+                    .labelsHidden()
+                    .disabled(!isQuickOverlayShortcutEnabled)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            } // End of Section: クイックオーバーレイ
         } // End of Form
         .formStyle(.grouped)
         .onAppear {
