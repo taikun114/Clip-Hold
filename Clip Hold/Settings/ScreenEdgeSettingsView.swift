@@ -74,7 +74,7 @@ struct ScreenEdgeSettingsView: View {
                         .frame(width: 140)
                         .labelsHidden()
                         
-                        Text(String(format: "%.1f秒", screenEdgeDelay))
+                        Text("\(screenEdgeDelay, specifier: "%.1f")秒")
                             .frame(width: 40, alignment: .trailing)
                             .foregroundStyle(.secondary)
                     }

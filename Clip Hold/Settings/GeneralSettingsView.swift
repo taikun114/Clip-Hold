@@ -303,7 +303,7 @@ struct GeneralSettingsView: View {
                     .labelsHidden()
                     .disabled(!isQuickOverlayShortcutEnabled)
                     
-                    Text(String(format: "%.1f秒", quickOverlayShortcutDelay))
+                    Text("\(quickOverlayShortcutDelay, specifier: "%.1f")秒")
                         .frame(width: 40, alignment: .trailing)
                         .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
                 }
