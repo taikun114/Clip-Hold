@@ -1029,11 +1029,7 @@ private struct QuickOverlayHistoryItemRow: View {
             }
         }
         .onDrag {
-            if let filePath = item.filePath {
-                return NSItemProvider(object: filePath as NSURL)
-            } else {
-                return NSItemProvider(object: item.text as NSString)
-            }
+            return item.makeItemProvider()
         }
         .onHover { hovering in
             if !item.isCopying {
@@ -1126,6 +1122,12 @@ private struct QuickOverlayHistoryItemRow: View {
         .disabled(isPlainTextOnly || item.isCopying || ClipboardManager.shared.isExporting)
         .opacity((isPlainTextOnly || item.isCopying || ClipboardManager.shared.isExporting) ? 0.4 : 1)
         .contentShape(Rectangle())
+        .onDrag {
+            guard !isPlainTextOnly, !item.isCopying, !ClipboardManager.shared.isExporting else {
+                return NSItemProvider()
+            }
+            return item.makeItemProvider(forcePlainText: true)
+        }
         .onHover { hovering in
             guard !isPlainTextOnly, !item.isCopying else { return }
             isButtonHovered = hovering

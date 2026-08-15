@@ -115,11 +115,7 @@ struct HistoryItemRow<MenuContent: View>: View {
             iconView
                 .frame(width: 30, height: 30)
                 .onDrag {
-                    if let filePath = item.filePath {
-                        return NSItemProvider(object: filePath as NSURL)
-                    } else {
-                        return NSItemProvider(object: item.text as NSString)
-                    }
+                    return item.makeItemProvider()
                 }
                 .contentShape(Rectangle())
             

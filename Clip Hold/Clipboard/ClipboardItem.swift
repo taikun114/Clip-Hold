@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UniformTypeIdentifiers
 
 class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     var id: UUID
@@ -210,6 +211,54 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     
     enum CodingKeys: String, CodingKey {
         case id, text, richText, date, filePath, fileSize, fileHash, qrCodeContent, sourceAppPath, isPartialSize, isSizeCalculated
+    }
+}
+
+// MARK: - ドラッグ＆ドロップ対応
+extension ClipboardItem {
+    /// ドラッグ＆ドロップ用の NSItemProvider を生成する
+    /// - Parameter forcePlainText: true の場合はリッチテキストを含めずプレーンテキスト（またはファイル）として提供する
+    func makeItemProvider(forcePlainText: Bool = false) -> NSItemProvider {
+        if let filePath = self.filePath {
+            return NSItemProvider(object: filePath as NSURL)
+        }
+        
+        let plainText = self.text
+        
+        if !forcePlainText, let richText = self.richText {
+            let provider = NSItemProvider()
+            
+            // HTML の場合
+            if richText.hasPrefix("<!DOCTYPE html") || richText.hasPrefix("<html") || richText.hasPrefix("<HTML") || richText.hasPrefix("<meta") {
+                if let htmlData = richText.data(using: .utf8) {
+                    provider.registerDataRepresentation(forTypeIdentifier: UTType.html.identifier, visibility: .all) { completion in
+                        completion(htmlData, nil)
+                        return nil
+                    }
+                }
+            } else {
+                // RTF の場合
+                if let rtfData = richText.data(using: .utf8) {
+                    provider.registerDataRepresentation(forTypeIdentifier: UTType.rtf.identifier, visibility: .all) { completion in
+                        completion(rtfData, nil)
+                        return nil
+                    }
+                }
+            }
+            
+            // プレーンテキスト（フォールバック用）も同時に登録
+            if let textData = plainText.data(using: .utf8) {
+                provider.registerDataRepresentation(forTypeIdentifier: UTType.plainText.identifier, visibility: .all) { completion in
+                    completion(textData, nil)
+                    return nil
+                }
+            }
+            
+            return provider
+        } else {
+            // プレーンテキストのみ
+            return NSItemProvider(object: plainText as NSString)
+        }
     }
 }
 

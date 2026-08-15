@@ -189,8 +189,6 @@ class QuickOverlayWindowController: NSWindowController {
               let animationContainerView = rootContainer.subviews.first(where: { $0.identifier?.rawValue == "AnimationContainer" }) else { return }
         
         let mode = QuickOverlayManager.shared.presentationMode
-        let peekTx: CGFloat
-        let peekTy: CGFloat
         let txValues: [CGFloat]
         let tyValues: [CGFloat]
         
@@ -198,24 +196,19 @@ class QuickOverlayWindowController: NSWindowController {
             let offset: CGFloat = 476.0
             switch edge.edgeSide {
             case .top:
-                peekTx = 0.0; peekTy = offset
                 txValues = [0.0, 0.0, 0.0]
                 tyValues = [offset, -4.0, 0.0]
             case .bottom:
-                peekTx = 0.0; peekTy = -offset
                 txValues = [0.0, 0.0, 0.0]
                 tyValues = [-offset, 4.0, 0.0]
             case .left:
-                peekTx = -offset; peekTy = 0.0
                 txValues = [-offset, 4.0, 0.0]
                 tyValues = [0.0, 0.0, 0.0]
             case .right:
-                peekTx = offset; peekTy = 0.0
                 txValues = [offset, -4.0, 0.0]
                 tyValues = [0.0, 0.0, 0.0]
             }
         } else {
-            peekTx = 0.0; peekTy = 0.0
             txValues = [0.0, 0.0, 0.0]
             tyValues = [0.0, 0.0, 0.0]
         }
@@ -402,9 +395,6 @@ class QuickOverlayWindowController: NSWindowController {
         animationContainerView.layer?.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         animationContainerView.layer?.position = CGPoint(x: rootContainer.bounds.midX, y: rootContainer.bounds.midY)
         
-        let w = animationContainerView.bounds.width
-        let h = animationContainerView.bounds.height
-        
         let mode = QuickOverlayManager.shared.presentationMode
         let txTo: CGFloat
         let tyTo: CGFloat
@@ -505,7 +495,6 @@ class QuickOverlayWindowController: NSWindowController {
         let screen = NSScreen.screens.first(where: { NSMouseInRect(mouseLocation, $0.frame.insetBy(dx: -10, dy: -10), false) }) ?? NSScreen.main
         guard let screen = screen else { return }
         
-        let windowSize = window.frame.size
         let screenRect = screen.visibleFrame // メニューバーやDockの内側領域
         
         var newOrigin = NSPoint(x: 0, y: 0)
