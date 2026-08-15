@@ -43,7 +43,7 @@ class QuickOverlayWindowController: NSWindowController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(showOverlay), name: NSNotification.Name("QuickOverlayShouldShow"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showPeekOverlay), name: NSNotification.Name("QuickOverlayShouldShowPeek"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(expandPeekOverlay), name: NSNotification.Name("QuickOverlayShouldExpandPeek"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(expandPeekOverlay(_:)), name: NSNotification.Name("QuickOverlayShouldExpandPeek"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(hideOverlay), name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
     }
     
@@ -167,12 +167,14 @@ class QuickOverlayWindowController: NSWindowController {
         
         animationContainerView.layer?.add(group, forKey: "peekAnimation")
         
+        let peekGeneration = animationGeneration
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.18
             context.timingFunction = CAMediaTimingFunction(controlPoints: 0.16, 1.0, 0.3, 1.0)
             window.animator().alphaValue = 1
-        }, completionHandler: { [weak animationContainerView] in
-            guard let animationContainerView = animationContainerView else { return }
+        }, completionHandler: { [weak self, weak animationContainerView] in
+            guard let self, self.animationGeneration == peekGeneration,
+                  let animationContainerView = animationContainerView else { return }
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             animationContainerView.layer?.setValue(peekTx, forKeyPath: "transform.translation.x")
@@ -183,12 +185,19 @@ class QuickOverlayWindowController: NSWindowController {
     }
     
     /// ピーク状態から完全表示（フルオープン）への展開アニメーション
-    @objc private func expandPeekOverlay() {
+    @objc private func expandPeekOverlay(_ notification: NSNotification) {
         guard let window = self.window,
               let rootContainer = window.contentView,
               let animationContainerView = rootContainer.subviews.first(where: { $0.identifier?.rawValue == "AnimationContainer" }) else { return }
+        animationGeneration += 1
         
-        let mode = QuickOverlayManager.shared.presentationMode
+        // @Publishedプロパティ更新前に通知のuserInfoから取得する
+        let mode: QuickOverlayPresentationMode
+        if let userInfoMode = notification.userInfo?["mode"] as? QuickOverlayPresentationMode {
+            mode = userInfoMode
+        } else {
+            mode = QuickOverlayManager.shared.presentationMode
+        }
         let txValues: [CGFloat]
         let tyValues: [CGFloat]
         
@@ -213,18 +222,7 @@ class QuickOverlayWindowController: NSWindowController {
             tyValues = [0.0, 0.0, 0.0]
         }
         
-        animationContainerView.layer?.removeAllAnimations()
-        
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        animationContainerView.layer?.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        animationContainerView.layer?.position = CGPoint(x: rootContainer.bounds.midX, y: rootContainer.bounds.midY)
-        animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
-        animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
-        animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
-        CATransaction.commit()
-        
-        // 厳密に3.0pxだけ上品に行き過ぎて、ふんわりスムーズに戻る2区間イージング
+        // アニメーションオブジェクトをトランザクション外で事前に作成する
         let keyTimes: [NSNumber] = [0.0, 0.52, 1.0]
         let timingFuncs = [
             CAMediaTimingFunction(controlPoints: 0.16, 1.0, 0.3, 1.0),
@@ -249,35 +247,45 @@ class QuickOverlayWindowController: NSWindowController {
         group.isRemovedOnCompletion = false
         group.fillMode = .forwards
         
-        // アニメーションが途中で打ち切られないよう、CAAnimationGroupの完了通知でモデル値更新とクリーンアップを行う
+        let expandGeneration = animationGeneration
         let animDelegate = AnimationCompletionDelegate { [weak self, weak animationContainerView] in
-            guard let animationContainerView = animationContainerView else { return }
+            guard let self, self.animationGeneration == expandGeneration,
+                  let animationContainerView = animationContainerView else { return }
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
             animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
             CATransaction.commit()
             animationContainerView.layer?.removeAllAnimations()
-            self?.expandAnimationDelegate = nil
+            self.expandAnimationDelegate = nil
         }
         self.expandAnimationDelegate = animDelegate
         group.delegate = animDelegate
         
-        animationContainerView.layer?.add(group, forKey: "expandAnimation")
-        
-        window.level = .floating // メニューバーの下に潜り込ませる
+        // window.makeKey()はウィンドウサーバーとの通信が発生するため、
+        // CAアニメーション開始前に完了させておく
+        window.level = .floating
         window.makeKey()
         
-        NSAnimationContext.runAnimationGroup { context in
-            context.duration = 0.20
-            context.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            window.animator().alphaValue = 1.0
-        }
+        // モデル値をアニメーションの最終位置ではなく開始位置（ピーク位置）に設定する。
+        // macOS 14ではCATransaction内でもモデル値が1フレーム描画される場合があるが、
+        // 開始位置にしておけばピーク位置からの自然な連続表示になり、ちらつきが発生しない。
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        animationContainerView.layer?.removeAllAnimations()
+        animationContainerView.layer?.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        animationContainerView.layer?.position = CGPoint(x: rootContainer.bounds.midX, y: rootContainer.bounds.midY)
+        animationContainerView.layer?.setValue(txValues[0], forKeyPath: "transform.translation.x")
+        animationContainerView.layer?.setValue(tyValues[0], forKeyPath: "transform.translation.y")
+        animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
+        animationContainerView.layer?.add(group, forKey: "expandAnimation")
+        CATransaction.commit()
     }
     
     @objc private func showOverlay() {
         guard let window = self.window, let type = QuickOverlayManager.shared.currentOverlayType else { return }
         animationGeneration += 1
+        let currentGeneration = animationGeneration
         
         // 事前準備がまだ行われていない場合は準備する
         if currentPreparedType != type || window.contentView == nil {
@@ -371,8 +379,9 @@ class QuickOverlayWindowController: NSWindowController {
             context.duration = animDuration
             context.timingFunction = timingFunc
             window.animator().alphaValue = 1
-        }, completionHandler: { [weak animationContainerView] in
-            guard let animationContainerView = animationContainerView else { return }
+        }, completionHandler: { [weak self, weak animationContainerView] in
+            guard let self, self.animationGeneration == currentGeneration,
+                  let animationContainerView = animationContainerView else { return }
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
@@ -433,7 +442,7 @@ class QuickOverlayWindowController: NSWindowController {
             timingFunc = CAMediaTimingFunction(name: .easeIn)
         }
         
-        // 2. アニメーションを作成
+        // 2. アニメーションを作成（opacityを含めてすべてCore Animationで処理する）
         let scaleAnim = CABasicAnimation(keyPath: "transform.scale")
         scaleAnim.fromValue = 1.0
         scaleAnim.toValue = scaleTo
@@ -446,39 +455,41 @@ class QuickOverlayWindowController: NSWindowController {
         tyAnim.fromValue = animationContainerView.layer?.value(forKeyPath: "transform.translation.y") as? CGFloat ?? 0.0
         tyAnim.toValue = tyTo
         
+        let opacityAnim = CABasicAnimation(keyPath: "opacity")
+        opacityAnim.fromValue = 1.0
+        opacityAnim.toValue = 0.0
+        
         let group = CAAnimationGroup()
-        group.animations = [scaleAnim, txAnim, tyAnim]
+        group.animations = [scaleAnim, txAnim, tyAnim, opacityAnim]
         group.duration = animDuration
         group.timingFunction = timingFunc
-        // アニメーション完了後も最終状態を維持する
         group.isRemovedOnCompletion = false
         group.fillMode = .forwards
         
-        animationContainerView.layer?.add(group, forKey: "hideAnimation")
-
-        // 3. ウインドウのフェードアウトと同時に実行し、完了後に破棄する
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = animDuration
-            context.timingFunction = timingFunc
-            window.animator().alphaValue = 0
-        }, completionHandler: { [weak self, weak window, weak animationContainerView] in
+        // 3. アニメーション完了後にウインドウを破棄する
+        let hideDelegate = AnimationCompletionDelegate { [weak self, weak window, weak animationContainerView] in
             guard let self, self.animationGeneration == currentGeneration else { return }
             
-            // モデル値を最終状態に更新
             if let animationContainerView = animationContainerView {
                 CATransaction.begin()
                 CATransaction.setDisableActions(true)
                 animationContainerView.layer?.setValue(scaleTo, forKeyPath: "transform.scale")
                 animationContainerView.layer?.setValue(txTo, forKeyPath: "transform.translation.x")
                 animationContainerView.layer?.setValue(tyTo, forKeyPath: "transform.translation.y")
+                animationContainerView.layer?.opacity = 1.0
                 CATransaction.commit()
                 animationContainerView.layer?.removeAllAnimations()
             }
             
             window?.orderOut(nil)
-            window?.contentView = nil 
+            window?.contentView = nil
             self.currentPreparedType = nil
-        })
+            self.hideAnimationDelegate = nil
+        }
+        self.hideAnimationDelegate = hideDelegate
+        group.delegate = hideDelegate
+        
+        animationContainerView.layer?.add(group, forKey: "hideAnimation")
     }
     
     /// オーバーレイの視覚的な表示領域（シャドウのパディングを除いた500x500の領域）

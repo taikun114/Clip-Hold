@@ -146,9 +146,17 @@ class QuickOverlayManager: ObservableObject {
     @MainActor
     func expandPeekToFullOverlay(position: ScreenEdgePosition, mouseLocation: NSPoint) {
         let inset = calculateEdgeInset(for: position, mouseLocation: mouseLocation)
+        let newMode = QuickOverlayPresentationMode.screenEdge(edge: position, mouseLocation: mouseLocation, isPeeking: false, edgeInset: inset)
+        // CAアニメーション開始に必要なデータを通知のuserInfoで渡し、
+        // @Publishedプロパティの更新はアニメーション開始後に行うことで、
+        // SwiftUIのビュー再レンダリングによるレイヤーツリーへの干渉を防ぐ
+        NotificationCenter.default.post(
+            name: NSNotification.Name("QuickOverlayShouldExpandPeek"),
+            object: nil,
+            userInfo: ["mode": newMode]
+        )
         self.isPeeking = false
-        self.presentationMode = .screenEdge(edge: position, mouseLocation: mouseLocation, isPeeking: false, edgeInset: inset)
-        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldExpandPeek"), object: nil)
+        self.presentationMode = newMode
     }
     
     /// スクリーンエッジからクイックオーバーレイを完全表示する
