@@ -18312,19 +18312,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recalculating..."
+            "value" : "Recalculate..."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recalculando..."
+            "value" : "Recalcular..."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recalcul en cours..."
+            "value" : "Recalculer..."
           }
         },
         "ja" : {
