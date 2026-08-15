@@ -208,9 +208,11 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
         if let anchor = anchorPoint {
             // ボタン等の固定位置（スクリーン座標）に表示する場合
-            // アンカーはボタンの上端中央の座標で、ツールチップの下端がその上に来るように配置する
-            let spaceAbove = screenRect.maxY - anchor.y - gap
-            let spaceBelow = anchor.y - buttonHeight - screenRect.minY - gap
+            // スクリーンエッジ表示時（メニューバー方向含む）でもショートカットと同じくボタンの真上に表示できるよう、画面フレーム全体（screen.frame）を基準にする
+            let effectiveMaxY = screen.frame.maxY
+            let effectiveMinY = screen.frame.minY
+            let spaceAbove = effectiveMaxY - anchor.y - gap
+            let spaceBelow = anchor.y - buttonHeight - effectiveMinY - gap
             
             var chosenDirection: Direction
             if spaceAbove >= targetVisualHeight {
@@ -240,8 +242,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             if isCompact {
                 // コンパクトツールチップは影のパディング分だけは画面外にはみ出しても良い
                 // （内容自体は画面内に収める）。メニューバー付近での過度の押し下げを防ぐ。
-                newOrigin.x = min(max(newOrigin.x, screenRect.minX - shadowPadding), screenRect.maxX - windowWidth + shadowPadding)
-                newOrigin.y = min(max(newOrigin.y, screenRect.minY - shadowPadding), screenRect.maxY - finalVisualHeight - shadowPadding)
+                newOrigin.x = min(max(newOrigin.x, screen.frame.minX - shadowPadding), screen.frame.maxX - windowWidth + shadowPadding)
+                newOrigin.y = min(max(newOrigin.y, effectiveMinY - shadowPadding), effectiveMaxY - finalVisualHeight - shadowPadding)
             } else {
                 newOrigin.x = min(max(newOrigin.x, screenRect.minX), screenRect.maxX - windowWidth)
                 newOrigin.y = min(max(newOrigin.y, screenRect.minY), screenRect.maxY - (finalVisualHeight + windowPadding))

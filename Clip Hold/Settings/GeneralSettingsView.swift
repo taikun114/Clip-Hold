@@ -104,6 +104,7 @@ struct GeneralSettingsView: View {
     @State private var customPhraseValueWasSaved = false
     @State private var customHistoryValueWasSaved = false
     @State private var showingQuickOverlayTutorial = false
+    @State private var showingScreenEdgeSettings = false
     
     @State private var tempCustomMenuHistoryValue: Int = 10
     @State private var tempCustomPhrasesInMenuValue: Int = 5
@@ -257,6 +258,11 @@ struct GeneralSettingsView: View {
                 header: Text("クイックオーバーレイ").font(.headline),
                 footer: HStack {
                     Spacer()
+                    Button("スクリーンエッジ...") {
+                        showingScreenEdgeSettings = true
+                    }
+                    .offset(x: tutorialButtonOffset)
+                    
                     Button("クイックオーバーレイの使い方...") {
                         showingQuickOverlayTutorial = true
                     }
@@ -587,6 +593,9 @@ struct GeneralSettingsView: View {
         }
         .sheet(isPresented: $showingQuickOverlayTutorial) {
             QuickOverlayTutorialView()
+        }
+        .sheet(isPresented: $showingScreenEdgeSettings) {
+            ScreenEdgeSettingsView()
         }
     }
     

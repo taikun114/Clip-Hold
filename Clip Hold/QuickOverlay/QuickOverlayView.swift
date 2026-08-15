@@ -21,6 +21,7 @@ struct QuickOverlayView: View {
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @EnvironmentObject var dateReloader: DateReloader
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var quickOverlayManager = QuickOverlayManager.shared
     
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
@@ -56,7 +57,27 @@ struct QuickOverlayView: View {
     @State private var tooltipTask: Task<Void, Never>? = nil
 
     
+    @State private var outsideCloseTask: Task<Void, Never>? = nil
+    
     let rowIconStore = RowIconStore()
+    
+    private var overlayCornerRadii: RectangleCornerRadii {
+        switch QuickOverlayManager.shared.presentationMode {
+        case .screenEdge(let edge, _, _, _):
+            switch edge.edgeSide {
+            case .top:
+                return RectangleCornerRadii(topLeading: 0, bottomLeading: 28, bottomTrailing: 28, topTrailing: 0)
+            case .bottom:
+                return RectangleCornerRadii(topLeading: 28, bottomLeading: 0, bottomTrailing: 0, topTrailing: 28)
+            case .left:
+                return RectangleCornerRadii(topLeading: 0, bottomLeading: 0, bottomTrailing: 28, topTrailing: 28)
+            case .right:
+                return RectangleCornerRadii(topLeading: 28, bottomLeading: 28, bottomTrailing: 0, topTrailing: 0)
+            }
+        case .shortcut:
+            return RectangleCornerRadii(topLeading: 28, bottomLeading: 28, bottomTrailing: 28, topTrailing: 28)
+        }
+    }
     
     init(type: QuickOverlayType, initialPresetMenuOpen: Bool = false, explicitHistoryItems: [ClipboardItem]? = nil, explicitPhraseItems: [StandardPhrase]? = nil) {
         self.type = type
@@ -108,7 +129,7 @@ struct QuickOverlayView: View {
     private var backgroundMaterial: some View {
         if #available(macOS 26.0, *) {
             (colorScheme == .dark ? Color.black.opacity(0.4) : Color.white.opacity(0.6))
-                .glassEffect(.clear, in: .rect(cornerRadius: 28.0))
+                .glassEffect(.clear, in: UnevenRoundedRectangle(cornerRadii: overlayCornerRadii))
                 .saturation(1.5)
                 .environment(\.controlActiveState, .active)
         } else {
@@ -118,29 +139,84 @@ struct QuickOverlayView: View {
         }
     }
     
+    private var topInset: CGFloat {
+        if case .screenEdge(let edge, _, _, let inset) = quickOverlayManager.presentationMode, edge.edgeSide == .top {
+            return inset
+        }
+        return 0
+    }
+    
+    private var bottomInset: CGFloat {
+        if case .screenEdge(let edge, _, _, let inset) = quickOverlayManager.presentationMode, edge.edgeSide == .bottom {
+            return inset
+        }
+        return 0
+    }
+    
+    private var leftInset: CGFloat {
+        if case .screenEdge(let edge, _, _, let inset) = quickOverlayManager.presentationMode, edge.edgeSide == .left {
+            return inset
+        }
+        return 0
+    }
+    
+    private var rightInset: CGFloat {
+        if case .screenEdge(let edge, _, _, let inset) = quickOverlayManager.presentationMode, edge.edgeSide == .right {
+            return inset
+        }
+        return 0
+    }
+    
     var body: some View {
-        mainLayout
-            .overlay(
-                Group {
-                    if type == .standardPhrase {
-                        presetDropdownMenu
-                            .opacity(isPresetMenuOpen ? 1 : 0)
-                            .scaleEffect(isPresetMenuOpen ? 1 : 0.95, anchor: .topTrailing)
-                            .allowsHitTesting(isPresetMenuOpen)
-                            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPresetMenuOpen)
-                    }
-                },
-                alignment: .topTrailing
-            )
-            .frame(width: 500, height: 500)
-            .background(backgroundMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
-            .padding(60) // Provide space for the shadow to render inside the 620x620 window
+        VStack(spacing: 0) {
+            // 上辺の場合：上部にメニューバー裏への拡張領域
+            if topInset > 0 {
+                Color.clear.frame(height: topInset)
+            }
+            
+            HStack(spacing: 0) {
+                // 左辺の場合：左部にDock裏への拡張領域
+                if leftInset > 0 {
+                    Color.clear.frame(width: leftInset)
+                }
+                
+                // メインコンテンツ（500x500固定）
+                mainLayout
+                    .overlay(
+                        Group {
+                            if type == .standardPhrase {
+                                presetDropdownMenu
+                                    .opacity(isPresetMenuOpen ? 1 : 0)
+                                    .scaleEffect(isPresetMenuOpen ? 1 : 0.95, anchor: .topTrailing)
+                                    .allowsHitTesting(isPresetMenuOpen)
+                                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPresetMenuOpen)
+                            }
+                        },
+                        alignment: .topTrailing
+                    )
+                    .frame(width: 500, height: 500)
+                
+                // 右辺の場合：右部にDock裏への拡張領域
+                if rightInset > 0 {
+                    Color.clear.frame(width: rightInset)
+                }
+            }
+            
+            // 下辺の場合：下部にDock裏への拡張領域
+            if bottomInset > 0 {
+                Color.clear.frame(height: bottomInset)
+            }
+        }
+        .frame(width: 500 + leftInset + rightInset, height: 500 + topInset + bottomInset)
+        .background(backgroundMaterial)
+        .clipShape(UnevenRoundedRectangle(cornerRadii: overlayCornerRadii))
+        .overlay(
+            UnevenRoundedRectangle(cornerRadii: overlayCornerRadii)
+                .stroke(Color.white.opacity(0.1), lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
+        .padding(60) // Provide space for the shadow to render inside the window
+        .allowsHitTesting(!quickOverlayManager.isPeeking)
             .onAppear {
                 if type == .history && cachedHistoryItems.isEmpty && !clipboardManager.clipboardHistory.isEmpty {
                     loadHistoryItems()
@@ -158,12 +234,16 @@ struct QuickOverlayView: View {
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("QuickOverlayShouldHide"))) { _ in
+                outsideCloseTask?.cancel()
+                outsideCloseTask = nil
                 tooltipTask?.cancel()
                 tooltipTask = nil
                 NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldHide"), object: nil)
                 resetDisplayLimitAndReleaseMemory()
             }
             .onDisappear {
+                outsideCloseTask?.cancel()
+                outsideCloseTask = nil
                 tooltipTask?.cancel()
                 tooltipTask = nil
                 resetDisplayLimitAndReleaseMemory()
@@ -432,14 +512,7 @@ struct QuickOverlayView: View {
     private var footerView: some View {
         HStack {
             Button(action: {
-                if let delegate = NSApp.delegate as? AppDelegate {
-                    if type == .history {
-                        delegate.showNewCopyWindow()
-                    } else {
-                        delegate.showAddPhraseWindow(withContent: "")
-                    }
-                }
-                dismiss()
+                QuickOverlayManager.shared.performActionAndClose(action: .add)
             }) {
                 HStack(spacing: 4) {
                     Image(systemName: "plus")
@@ -470,14 +543,7 @@ struct QuickOverlayView: View {
             Spacer()
             
             Button(action: {
-                if let delegate = NSApp.delegate as? AppDelegate {
-                    if type == .history {
-                        delegate.showHistoryWindow()
-                    } else {
-                        delegate.showStandardPhraseWindow()
-                    }
-                }
-                dismiss()
+                QuickOverlayManager.shared.performActionAndClose(action: .openWindow)
             }) {
                 HStack(spacing: 6) {
                     Image(systemName: "macwindow.on.rectangle")
@@ -957,6 +1023,18 @@ private struct QuickOverlayHistoryItemRow: View {
         .background(isSelected && !item.isCopying ? Color.accentColor : Color.clear)
         .cornerRadius(12)
         .contentShape(Rectangle())
+        .onTapGesture {
+            if !item.isCopying {
+                QuickOverlayManager.shared.copyHistoryItemAndClose(itemID: item.originalPinnedItemID ?? item.id)
+            }
+        }
+        .onDrag {
+            if let filePath = item.filePath {
+                return NSItemProvider(object: filePath as NSURL)
+            } else {
+                return NSItemProvider(object: item.text as NSString)
+            }
+        }
         .onHover { hovering in
             if !item.isCopying {
                 onHoverItem(hovering)
@@ -1313,6 +1391,12 @@ private struct QuickOverlayStandardPhraseItemRow: View {
         .background(isSelected ? Color.accentColor : Color.clear)
         .cornerRadius(12)
         .contentShape(Rectangle())
+        .onTapGesture {
+            QuickOverlayManager.shared.copyStandardPhraseAndClose(phraseID: phrase.id)
+        }
+        .onDrag {
+            return NSItemProvider(object: phrase.content as NSString)
+        }
         .onHover { hovering in
             onHoverItem(hovering)
         }

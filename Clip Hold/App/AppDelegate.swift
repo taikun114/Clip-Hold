@@ -89,6 +89,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         _ = QuickOverlayManager.shared
         _ = QuickOverlayWindowController.shared
         _ = QuickOverlayTooltipWindowController.shared
+        ScreenEdgeManager.shared.startMonitoring()
         
         historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
             Task { @MainActor in
@@ -617,5 +618,26 @@ extension UserDefaults {
     @objc dynamic var standardPhraseQuickOverlayModifiers: Int {
         get { integer(forKey: "standardPhraseQuickOverlayModifiers") }
         set { set(newValue, forKey: "standardPhraseQuickOverlayModifiers") }
+    }
+    
+    // MARK: - Screen Edge Settings
+    @objc dynamic var screenEdgeDelay: Double {
+        get {
+            if object(forKey: "screenEdgeDelay") == nil {
+                return 0.5
+            }
+            let val = double(forKey: "screenEdgeDelay")
+            return max(val, 0.5)
+        }
+        set { set(max(newValue, 0.5), forKey: "screenEdgeDelay") }
+    }
+    
+    func getScreenEdgeTarget(for position: ScreenEdgePosition) -> ScreenEdgeTarget {
+        let raw = string(forKey: position.rawValue) ?? "none"
+        return ScreenEdgeTarget(rawValue: raw) ?? .none
+    }
+    
+    func setScreenEdgeTarget(_ target: ScreenEdgeTarget, for position: ScreenEdgePosition) {
+        set(target.rawValue, forKey: position.rawValue)
     }
 }

@@ -9864,6 +9864,40 @@
         }
       }
     },
+    "クイックオーバーレイが表示されるまでマウスカーソルを画面の端に触れ続ける時間を指定します。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gibt die Dauer an, die der Mauszeiger am Bildschirmrand gehalten werden muss, bis Quick Overlay angezeigt wird."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specifies the duration to hold the mouse cursor at the screen edge until Quick Overlay is displayed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Especifica la duración que se debe mantener el cursor en el borde de la pantalla hasta que se muestre Quick Overlay."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spécifie la durée pendant laquelle le curseur doit toucher le bord de l'écran avant que Quick Overlay ne s'affiche."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クイックオーバーレイが表示されるまでマウスカーソルを画面の端に触れ続ける時間を指定します。"
+          }
+        }
+      }
+    },
     "クイックオーバーレイが表示される画面上の場所を選択します。" : {
       "localizations" : {
         "de" : {
@@ -12291,6 +12325,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スキップする"
+          }
+        }
+      }
+    },
+    "スクリーンエッジ" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmkante"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen Edge"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borde de pantalla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bord de l'écran"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクリーンエッジ"
+          }
+        }
+      }
+    },
+    "スクリーンエッジ..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bildschirmkante..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screen Edge..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borde de pantalla..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bord de l'écran..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクリーンエッジ..."
           }
         }
       }
@@ -15974,6 +16076,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ポインタ付近"
+          }
+        }
+      }
+    },
+    "マウスカーソルで画面の端に触れることでクイックオーバーレイを表示することができます。\nスクリーンエッジによって表示されるクイックオーバーレイでは、項目をクリックして選択・コピーしたり、ドラッグアンドドロップして特定の場所にペーストしたりできます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie können Quick Overlay anzeigen, indem Sie den Bildschirmrand mit dem Mauszeiger berühren.\nIm per Bildschirmkante angezeigten Quick Overlay können Sie auf Elemente klicken, um sie auszuwählen und zu kopieren, oder sie per Drag & Drop an einer bestimmten Stelle einfügen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can display Quick Overlay by touching the edge of the screen with your mouse cursor.\nIn the Quick Overlay displayed via Screen Edge, you can click items to select and copy them, or drag and drop to paste them into a specific location."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede mostrar Quick Overlay tocando el borde de la pantalla con el cursor del ratón.\nEn el Quick Overlay mostrado mediante Borde de pantalla, puede hacer clic en los elementos para seleccionarlos y copiarlos, o arrastrarlos y soltarlos para pegarlos en una ubicación específica."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous pouvez afficher Quick Overlay en touchant le bord de l'écran avec le curseur de votre souris.\nDans le Quick Overlay affiché via Bord de l'écran, vous pouvez cliquer sur les éléments pour les sélectionner et les copier, ou les glisser-déposer pour les coller à un emplacement spécifique."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マウスカーソルで画面の端に触れることでクイックオーバーレイを表示することができます。\nスクリーンエッジによって表示されるクイックオーバーレイでは、項目をクリックして選択・コピーしたり、ドラッグアンドドロップして特定の場所にペーストしたりできます。"
           }
         }
       }
