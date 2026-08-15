@@ -260,7 +260,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             let spaceLeft = visualMinX - screenRect.minX - gap
             let spaceRight = screenRect.maxX - visualMaxX - gap
             
-            let position = UserDefaults.standard.quickOverlayPosition
+            let position = UserDefaults.standard.quickOverlayShortcutPosition
             let preferAbove = ["bottom", "bottomLeft", "bottomRight"].contains(position)
             
             var chosenDirection: Direction = preferAbove ? .above : .below

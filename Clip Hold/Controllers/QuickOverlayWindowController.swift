@@ -243,7 +243,7 @@ class QuickOverlayWindowController: NSWindowController {
         let screen = NSScreen.screens.first(where: { NSMouseInRect(mouseLocation, $0.frame, false) }) ?? NSScreen.main
         guard let screen = screen else { return }
         
-        let position = UserDefaults.standard.quickOverlayPosition
+        let position = UserDefaults.standard.quickOverlayShortcutPosition
         let visualPadding: CGFloat = 16
         let padding: CGFloat = visualPadding - 60
         

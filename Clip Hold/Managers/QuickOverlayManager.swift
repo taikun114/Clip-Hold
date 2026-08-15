@@ -58,14 +58,14 @@ class QuickOverlayManager: ObservableObject {
     
     @MainActor
     private func handleMouseClick(event: NSEvent) -> NSEvent? {
-        guard UserDefaults.standard.isQuickOverlayEnabled else { return event }
+        guard UserDefaults.standard.isQuickOverlayShortcutEnabled else { return event }
         
         // This is a placeholder for actual click handling logic if implemented
         return event
     }
     @MainActor
     private func handleFlagsChanged(event: NSEvent) {
-        guard UserDefaults.standard.isQuickOverlayEnabled else { return }
+        guard UserDefaults.standard.isQuickOverlayShortcutEnabled else { return }
         
         let flags = event.modifierFlags.intersection([.command, .option, .control, .shift])
         let rawFlags = Int(flags.rawValue)
@@ -100,7 +100,7 @@ class QuickOverlayManager: ObservableObject {
         // キーが押された待機時間の間にビューを先行構築・レイアウト完了させておく
         QuickOverlayWindowController.shared.prepareOverlay(type: type)
         
-        let delay = UserDefaults.standard.quickOverlayDelay
+        let delay = UserDefaults.standard.quickOverlayShortcutDelay
         let nanoseconds = UInt64(delay * 1_000_000_000)
         
         delayTask = Task {

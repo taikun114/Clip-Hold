@@ -6,7 +6,7 @@ struct ShortcutsSettingsView: View {
     @StateObject private var presetManager = StandardPhrasePresetManager.shared
     @EnvironmentObject var clipboardManager: ClipboardManager
     @AppStorage("useFilteredHistoryForShortcuts") private var useFilteredHistoryForShortcuts: Bool = false
-    @AppStorage("isQuickOverlayEnabled") private var isQuickOverlayEnabled: Bool = false
+    @AppStorage("isQuickOverlayShortcutEnabled") private var isQuickOverlayShortcutEnabled: Bool = false
     
     @AppStorage("historyQuickOverlayModifiers") private var historyQuickOverlayModifiers: Int = 0
     @AppStorage("standardPhraseQuickOverlayModifiers") private var standardPhraseQuickOverlayModifiers: Int = 0
@@ -16,18 +16,18 @@ struct ShortcutsSettingsView: View {
             Section(header: Text("クイックオーバーレイ").font(.headline)) {
                 HStack {
                     Text("定型文オーバーレイ")
-                        .foregroundColor(isQuickOverlayEnabled ? .primary : .secondary)
+                        .foregroundColor(isQuickOverlayShortcutEnabled ? .primary : .secondary)
                     Spacer()
                     ModifierKeyPickerView(modifiers: $standardPhraseQuickOverlayModifiers)
                 }
                 HStack {
                     Text("履歴オーバーレイ")
-                        .foregroundColor(isQuickOverlayEnabled ? .primary : .secondary)
+                        .foregroundColor(isQuickOverlayShortcutEnabled ? .primary : .secondary)
                     Spacer()
                     ModifierKeyPickerView(modifiers: $historyQuickOverlayModifiers)
                 }
             }
-            .disabled(!isQuickOverlayEnabled)
+            .disabled(!isQuickOverlayShortcutEnabled)
             
             Section(header: Text("ウィンドウ操作").font(.headline)) {
                 HStack {

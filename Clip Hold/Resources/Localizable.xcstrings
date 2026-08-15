@@ -12191,6 +12191,40 @@
         }
       }
     },
+    "ショートカットキーで表示" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Tastenkombination anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show with Shortcut Key"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar con atajo de teclado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher avec un raccourci clavier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ショートカットキーで表示"
+          }
+        }
+      }
+    },
     "スキップ" : {
       "comment" : "プリセットと定型文のインポート時に、既に登録されたものと同じ項目があった場合に、追加をスキップするオプション名。",
       "localizations" : {

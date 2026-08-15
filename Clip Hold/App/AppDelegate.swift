@@ -590,25 +590,25 @@ extension UserDefaults {
     }
     
     // Quick Overlay Settings
-    @objc dynamic var isQuickOverlayEnabled: Bool {
-        get { bool(forKey: "isQuickOverlayEnabled") }
-        set { set(newValue, forKey: "isQuickOverlayEnabled") }
+    @objc dynamic var isQuickOverlayShortcutEnabled: Bool {
+        get { bool(forKey: "isQuickOverlayShortcutEnabled") }
+        set { set(newValue, forKey: "isQuickOverlayShortcutEnabled") }
     }
-    @objc dynamic var quickOverlayDelay: Double {
+    @objc dynamic var quickOverlayShortcutDelay: Double {
         get { 
-            if object(forKey: "quickOverlayDelay") == nil {
+            if object(forKey: "quickOverlayShortcutDelay") == nil {
                 return 0.0 // Default to 0.0s if not set
             }
-            return double(forKey: "quickOverlayDelay")
+            return double(forKey: "quickOverlayShortcutDelay")
         }
-        set { set(newValue, forKey: "quickOverlayDelay") }
+        set { set(newValue, forKey: "quickOverlayShortcutDelay") }
     }
-    @objc dynamic var quickOverlayPosition: String {
+    @objc dynamic var quickOverlayShortcutPosition: String {
         get { 
-            let val = string(forKey: "quickOverlayPosition")
+            let val = string(forKey: "quickOverlayShortcutPosition")
             return val ?? "cursor"
         }
-        set { set(newValue, forKey: "quickOverlayPosition") }
+        set { set(newValue, forKey: "quickOverlayShortcutPosition") }
     }
     @objc dynamic var historyQuickOverlayModifiers: Int {
         get { integer(forKey: "historyQuickOverlayModifiers") }

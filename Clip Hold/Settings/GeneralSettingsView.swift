@@ -92,9 +92,9 @@ struct GeneralSettingsView: View {
     @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
     
-    @AppStorage("isQuickOverlayEnabled") var isQuickOverlayEnabled: Bool = false
-    @AppStorage("quickOverlayDelay") var quickOverlayDelay: Double = 0.0
-    @AppStorage("quickOverlayPosition") var quickOverlayPosition: String = "cursor"
+    @AppStorage("isQuickOverlayShortcutEnabled") var isQuickOverlayShortcutEnabled: Bool = false
+    @AppStorage("quickOverlayShortcutDelay") var quickOverlayShortcutDelay: Double = 0.0
+    @AppStorage("quickOverlayShortcutPosition") var quickOverlayShortcutPosition: String = "cursor"
     
     @AppStorage("showCurrentPresetIcon") var showCurrentPresetIcon: Bool = false
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
@@ -265,14 +265,14 @@ struct GeneralSettingsView: View {
             ) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("クイックオーバーレイ")
+                        Text("ショートカットキーで表示")
                         Text("設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Toggle(isOn: $isQuickOverlayEnabled) {
-                        Text("クイックオーバーレイ")
+                    Toggle(isOn: $isQuickOverlayShortcutEnabled) {
+                        Text("ショートカットキーで表示")
                         Text("オンにすると、設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。この機能はVoiceOverでの操作に最適化されていないため、VoiceOverをご利用の方は、クイックオーバーレイの代わりに履歴ウィンドウや定型文ウィンドウをご利用ください。")
                     }
                     .toggleStyle(.switch)
@@ -283,36 +283,36 @@ struct GeneralSettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("表示までの時間")
-                            .foregroundStyle(isQuickOverlayEnabled ? .primary : .secondary)
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .primary : .secondary)
                         Text("クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。")
                             .font(.caption)
-                            .foregroundStyle(isQuickOverlayEnabled ? .secondary : .tertiary)
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
                     }
                     Spacer()
-                    Slider(value: $quickOverlayDelay, in: 0.0...2.0, step: 0.1) {
+                    Slider(value: $quickOverlayShortcutDelay, in: 0.0...2.0, step: 0.1) {
                         Text("表示までの時間")
                         Text("クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。")
                     }
                     .frame(width: 150)
                     .labelsHidden()
-                    .disabled(!isQuickOverlayEnabled)
+                    .disabled(!isQuickOverlayShortcutEnabled)
                     
-                    Text(String(format: "%.1f秒", quickOverlayDelay))
+                    Text(String(format: "%.1f秒", quickOverlayShortcutDelay))
                         .frame(width: 40, alignment: .trailing)
-                        .foregroundStyle(isQuickOverlayEnabled ? .secondary : .tertiary)
+                        .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
                 HStack {
                     VStack(alignment: .leading) {
                         Text("表示場所")
-                            .foregroundStyle(isQuickOverlayEnabled ? .primary : .secondary)
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .primary : .secondary)
                         Text("クイックオーバーレイが表示される画面上の場所を選択します。")
                             .font(.caption)
-                            .foregroundStyle(isQuickOverlayEnabled ? .secondary : .tertiary)
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
                     }
                     Spacer()
-                    Picker("クイックオーバーレイの表示場所", selection: $quickOverlayPosition) {
+                    Picker("クイックオーバーレイの表示場所", selection: $quickOverlayShortcutPosition) {
                         Label("ポインタ付近", systemImage: "contextualmenu.and.cursorarrow").tag("cursor")
                         
                         Divider()
@@ -333,7 +333,7 @@ struct GeneralSettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .labelsHidden()
-                    .disabled(!isQuickOverlayEnabled)
+                    .disabled(!isQuickOverlayShortcutEnabled)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: クイックオーバーレイ
