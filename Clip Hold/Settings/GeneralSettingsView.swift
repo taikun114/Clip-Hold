@@ -95,6 +95,7 @@ struct GeneralSettingsView: View {
     @AppStorage("isQuickOverlayShortcutEnabled") var isQuickOverlayShortcutEnabled: Bool = false
     @AppStorage("quickOverlayShortcutDelay") var quickOverlayShortcutDelay: Double = 0.0
     @AppStorage("quickOverlayShortcutPosition") var quickOverlayShortcutPosition: String = "cursor"
+    @AppStorage("dateDisplayFormatInQuickOverlay") var dateDisplayFormatInQuickOverlay: String = "both_rel_abs_paren"
     
     @AppStorage("showCurrentPresetIcon") var showCurrentPresetIcon: Bool = false
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
@@ -292,50 +293,7 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 // 日付と時刻の表示方法
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("日付と時刻の表示方法")
-                        
-                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
-                        let exampleText: String = {
-                            let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
-                            let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
-                            
-                            switch dateDisplayFormatInMenu {
-                            case "absolute":
-                                return absolutePart
-                            case "relative":
-                                return relativePart
-                            case "both_abs_rel_paren":
-                                return "\(absolutePart) (\(relativePart))"
-                            case "both_abs_rel_hyphen":
-                                return "\(absolutePart) - \(relativePart)"
-                            case "both_rel_abs_paren":
-                                return "\(relativePart) (\(absolutePart))"
-                            case "both_rel_abs_hyphen":
-                                return "\(relativePart) - \(absolutePart)"
-                            default:
-                                return absolutePart
-                            }
-                        }()
-                        
-                        Text("コピーされた日付の表示方法を変更します。\n例: \(exampleText)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInMenu) {
-                        Text("絶対的").tag("absolute")
-                        Text("相対的").tag("relative")
-                        Text("両方: 絶対的 (相対的)").tag("both_abs_rel_paren")
-                        Text("両方: 絶対的 - 相対的").tag("both_abs_rel_hyphen")
-                        Text("両方: 相対的 (絶対的)").tag("both_rel_abs_paren")
-                        Text("両方: 相対的 - 絶対的").tag("both_rel_abs_hyphen")
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                DateDisplayFormatPickerRow(selection: $dateDisplayFormatInMenu)
                 
                 HStack {
                     VStack(alignment: .leading) {
@@ -520,6 +478,9 @@ struct GeneralSettingsView: View {
                     .disabled(!isQuickOverlayShortcutEnabled)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                // 日付と時刻の表示方法
+                DateDisplayFormatPickerRow(selection: $dateDisplayFormatInQuickOverlay)
             } // End of Section: クイックオーバーレイ
         } // End of Form
         .formStyle(.grouped)

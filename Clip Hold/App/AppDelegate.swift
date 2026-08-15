@@ -30,7 +30,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // デフォルト設定を登録
         UserDefaults.standard.register(defaults: [
             "historyQuickOverlayModifiers": Int(NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.option.rawValue),
-            "standardPhraseQuickOverlayModifiers": Int(NSEvent.ModifierFlags.control.rawValue | NSEvent.ModifierFlags.command.rawValue)
+            "standardPhraseQuickOverlayModifiers": Int(NSEvent.ModifierFlags.control.rawValue | NSEvent.ModifierFlags.command.rawValue),
+            "dateDisplayFormatInQuickOverlay": "both_rel_abs_paren"
         ])
         
         frontmostAppMonitor.startMonitoring()

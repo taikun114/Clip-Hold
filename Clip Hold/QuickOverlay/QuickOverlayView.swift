@@ -26,7 +26,7 @@ struct QuickOverlayView: View {
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = true
-    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
+    @AppStorage("dateDisplayFormatInQuickOverlay") var dateDisplayFormatInQuickOverlay: String = "both_rel_abs_paren"
     
     let type: QuickOverlayType
     
@@ -604,7 +604,7 @@ struct QuickOverlayView: View {
             showColorCodeIcon: showColorCodeIcon,
             showAppIconOverlay: showAppIconOverlay,
             showCharacterCount: showCharacterCount,
-            dateDisplayFormatInHistoryWindow: dateDisplayFormatInHistoryWindow,
+            dateDisplayFormatInQuickOverlay: dateDisplayFormatInQuickOverlay,
             rowIconStore: rowIconStore,
             shortcut: shortcut,
             dateReloader: dateReloader,
@@ -618,7 +618,7 @@ struct QuickOverlayView: View {
             onItemTooltipShow: {
                 tooltipTask?.cancel()
                 let displayTitle = item.displayTitle
-                let formattedDate = item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now)
+                let formattedDate = item.date.formatted(for: dateDisplayFormatInQuickOverlay, currentDate: dateReloader.now)
                 let sourceAppPath = item.sourceAppPath
                 let filePath = item.filePath?.path
                 let fileSize = item.fileSize
@@ -934,7 +934,7 @@ private struct QuickOverlayHistoryItemRow: View {
     let showColorCodeIcon: Bool
     let showAppIconOverlay: Bool
     let showCharacterCount: Bool
-    let dateDisplayFormatInHistoryWindow: String
+    let dateDisplayFormatInQuickOverlay: String
     let rowIconStore: RowIconStore
     let shortcut: String
 
@@ -1027,7 +1027,7 @@ private struct QuickOverlayHistoryItemRow: View {
                         .transition(.opacity)
                 } else {
                     HStack(spacing: 4) {
-                        Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
+                        Text(item.date.formatted(for: dateDisplayFormatInQuickOverlay, currentDate: dateReloader.now))
                             .lineLimit(1)
 
                         if showCharacterCount {

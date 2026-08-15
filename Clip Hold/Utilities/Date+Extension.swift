@@ -23,6 +23,12 @@ extension Date {
         }
     }
     
+    /// 設定画面などで使用するサンプルテキスト（5分前）のフォーマット結果を返す
+    static func sampleFormatted(for format: String, currentDate: Date) -> String {
+        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: currentDate) ?? currentDate
+        return fiveMinutesAgo.formatted(for: format, currentDate: currentDate)
+    }
+    
     func formattedAsAbsolute() -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
