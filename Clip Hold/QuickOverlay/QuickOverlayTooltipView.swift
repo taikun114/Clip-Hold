@@ -4,6 +4,7 @@ import QuickLookThumbnailing
 struct QuickOverlayTooltipView: View {
     let text: String
     let maxVisualHeight: CGFloat
+    let calculatedTextHeight: CGFloat
     let sourceAppPath: String?
     let filePath: String?
     let fileSize: UInt64?
@@ -12,7 +13,6 @@ struct QuickOverlayTooltipView: View {
     let isCompact: Bool
     
     @State private var offset: CGFloat = 0
-    @State private var textHeight: CGFloat = 0
     @State private var hasStartedMarquee = false
     @State private var marqueeStartTask: Task<Void, Never>?
     @State private var spinnerDelayTask: Task<Void, Never>?
@@ -134,16 +134,6 @@ struct QuickOverlayTooltipView: View {
             .lineLimit(nil)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                GeometryReader { textGeo in
-                    Color.clear.onAppear {
-                        textHeight = textGeo.size.height
-                    }
-                    .onChange(of: textGeo.size.height) { _, new in
-                        textHeight = new
-                    }
-                }
-            )
             .offset(y: offset)
             .frame(height: max(visibleHeight, 20), alignment: .top)
             .clipped()
@@ -218,7 +208,7 @@ struct QuickOverlayTooltipView: View {
         
         let url = URL(fileURLWithPath: filePath)
         let request = QLThumbnailGenerator.Request(fileAt: url, size: CGSize(width: 256, height: 256), scale: NSScreen.main?.backingScaleFactor ?? 2, representationTypes: .all)
-        QLThumbnailGenerator.shared.generateRepresentations(for: request) { thumbnail, _, _ in
+        QLThumbnailGenerator.shared.generateBestRepresentation(for: request) { thumbnail, _ in
             DispatchQueue.main.async {
                 self.spinnerDelayTask?.cancel()
                 self.spinnerDelayTask = nil
@@ -245,10 +235,10 @@ struct QuickOverlayTooltipView: View {
         let contentPaddingH: CGFloat = 32
         let visibleHeight = maxVisualHeight - contentPaddingH - headerH - footerH - spacingH
 
-        guard textHeight > visibleHeight else { return }
+        guard calculatedTextHeight > visibleHeight else { return }
         hasStartedMarquee = true
         
-        let diff = textHeight - visibleHeight
+        let diff = calculatedTextHeight - visibleHeight
         // スクロール速度の計算（1秒間に約30pt進む程度の速度）
         let duration = Double(diff) / 30.0
         

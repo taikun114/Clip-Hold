@@ -617,24 +617,39 @@ struct QuickOverlayView: View {
             },
             onItemTooltipShow: {
                 tooltipTask?.cancel()
-                tooltipTask = Task {
+                let displayTitle = item.displayTitle
+                let formattedDate = item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now)
+                let sourceAppPath = item.sourceAppPath
+                let filePath = item.filePath?.path
+                let fileSize = item.fileSize
+                let fullText = item.text
+                let needCharCount = showCharacterCount
+
+                tooltipTask = Task.detached(priority: .userInitiated) {
+                    let characterCount = needCharCount ? fullText.count : nil
+                    let maxLength = 5000
+                    let truncatedText = displayTitle.count > maxLength ? String(displayTitle.prefix(maxLength)) + "..." : displayTitle
+
                     try? await Task.sleep(nanoseconds: 500_000_000)
-                    if !Task.isCancelled {
+                    guard !Task.isCancelled else { return }
+
+                    await MainActor.run {
                         var userInfo: [String: Any] = [
-                            "text": item.displayTitle,
-                            "dateString": item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now)
+                            "text": truncatedText,
+                            "rawText": displayTitle,
+                            "dateString": formattedDate
                         ]
-                        if let sourceAppPath = item.sourceAppPath {
+                        if let sourceAppPath {
                             userInfo["sourceAppPath"] = sourceAppPath
                         }
-                        if let filePath = item.filePath?.path {
+                        if let filePath {
                             userInfo["filePath"] = filePath
                         }
-                        if let fileSize = item.fileSize {
+                        if let fileSize {
                             userInfo["fileSize"] = fileSize
                         }
-                        if showCharacterCount {
-                            userInfo["characterCount"] = item.text.count
+                        if let characterCount {
+                            userInfo["characterCount"] = characterCount
                         }
                         NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: userInfo)
                     }
@@ -686,10 +701,19 @@ struct QuickOverlayView: View {
             },
             onItemTooltipShow: {
                 tooltipTask?.cancel()
-                tooltipTask = Task {
+                let phraseContent = phrase.content
+                tooltipTask = Task.detached(priority: .userInitiated) {
+                    let maxLength = 5000
+                    let truncatedText = phraseContent.count > maxLength ? String(phraseContent.prefix(maxLength)) + "..." : phraseContent
+
                     try? await Task.sleep(nanoseconds: 500_000_000)
-                    if !Task.isCancelled {
-                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: ["text": phrase.content])
+                    guard !Task.isCancelled else { return }
+
+                    await MainActor.run {
+                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
+                            "text": truncatedText,
+                            "rawText": phraseContent
+                        ])
                     }
                 }
             },

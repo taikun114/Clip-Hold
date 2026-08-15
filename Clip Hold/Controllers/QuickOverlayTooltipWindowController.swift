@@ -62,12 +62,9 @@ class QuickOverlayTooltipWindowController: NSWindowController {
     @objc private func showTooltip(_ notification: Notification) {
         guard let window = self.window,
               let userInfo = notification.userInfo,
-              let rawText = userInfo["text"] as? String else { return }
+              let text = userInfo["text"] as? String else { return }
         
-        // ツールチップの用途では数万文字を全てスクロールして読むことはないため、
-        // 深刻なパフォーマンス低下（フリーズ）を防ぐために5000文字で切り詰める
-        let maxLength = 5000
-        let text = rawText.count > maxLength ? String(rawText.prefix(maxLength)) + "..." : rawText
+        let rawText = (userInfo["rawText"] as? String) ?? text
         
         let sourceAppPath = userInfo["sourceAppPath"] as? String
         let filePath = userInfo["filePath"] as? String
@@ -324,9 +321,11 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
         let finalWindowHeight = finalVisualHeight + windowPadding
         
+        let calculatedTextHeight = ceil(textRect.height)
         let finalView = QuickOverlayTooltipView(
             text: text,
             maxVisualHeight: finalVisualHeight,
+            calculatedTextHeight: calculatedTextHeight,
             sourceAppPath: sourceAppPath,
             filePath: filePath,
             fileSize: fileSize,
