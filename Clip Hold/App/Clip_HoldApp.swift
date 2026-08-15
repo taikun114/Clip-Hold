@@ -704,8 +704,18 @@ struct ClipHoldApp: App {
                     }
                 }
             } else {
+                let title = String(localized: "履歴はピン留めされていません")
+                let body = String(localized: "ピン留めされた履歴をコピーするショートカットキーが押されましたが、現在何もピン留めされていません。")
+                
+                // 無音通知を送信
+                NotificationManager.shared.sendSilentNotification(
+                    title: title,
+                    body: body,
+                    identifier: "pinnedHistoryNotSet"
+                )
+                
 #if DEBUG
-                print("Pinned history shortcut pressed, but no item is pinned.")
+                print("Pinned history shortcut pressed, but no item is pinned. Silent notification sent.")
 #endif
             }
         }

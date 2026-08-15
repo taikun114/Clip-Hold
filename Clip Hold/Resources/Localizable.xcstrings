@@ -14828,6 +14828,40 @@
         }
       }
     },
+    "ピン留めされた履歴をコピーするショートカットキーが押されましたが、現在何もピン留めされていません。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Kurzbefehl zum Kopieren des angehefteten Verlaufs wurde gedrückt, aber derzeit ist nichts angeheftet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shortcut key to copy the pinned history was pressed, but nothing is currently pinned."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se presionó la tecla de acceso rápido para copiar el historial fijado, pero actualmente no hay nada fijado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le raccourci pour copier l'historique épinglé a été pressé, mais rien n'est actuellement épinglé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピン留めされた履歴をコピーするショートカットキーが押されましたが、現在何もピン留めされていません。"
+          }
+        }
+      }
+    },
     "ピン留めされた項目はありません" : {
       "localizations" : {
         "de" : {
@@ -21279,6 +21313,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "履歴はありません"
+          }
+        }
+      }
+    },
+    "履歴はピン留めされていません" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Verlauf ist angeheftet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No History Is Pinned"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ningún historial fijado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun historique n'est épinglé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴はピン留めされていません"
           }
         }
       }
