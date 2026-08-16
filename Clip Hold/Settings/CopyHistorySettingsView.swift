@@ -1036,7 +1036,6 @@ private struct HistoryWindowSettingsSection: View {
     @AppStorage("historyWindowAlwaysOnTop") var historyWindowAlwaysOnTop: Bool = false
     @AppStorage("historyWindowIsOverlay") var historyWindowIsOverlay: Bool = false
     @AppStorage("historyWindowOverlayTransparency") var historyWindowOverlayTransparency: Double = 0.5
-    @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
     @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
     @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
     @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
@@ -1100,22 +1099,6 @@ private struct HistoryWindowSettingsSection: View {
                 }
             }
             .disabled(!historyWindowIsOverlay)
-            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("アプリアイコンを表示")
-                    Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Toggle(isOn: $showAppIconOverlay) {
-                    Text("アプリアイコンを表示")
-                    Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
-                }
-                .toggleStyle(.switch)
-                .labelsHidden()
-            }
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             DateDisplayFormatPickerRow(selection: $dateDisplayFormatInHistoryWindow)
             HStack {

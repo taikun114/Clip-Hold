@@ -24,7 +24,6 @@ struct QuickOverlayView: View {
     @ObservedObject private var quickOverlayManager = QuickOverlayManager.shared
     
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
-    @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = true
     @AppStorage("dateDisplayFormatInQuickOverlay") var dateDisplayFormatInQuickOverlay: String = "both_rel_abs_paren"
     
@@ -602,7 +601,6 @@ struct QuickOverlayView: View {
             item: item,
             isSelected: isSelected,
             showColorCodeIcon: showColorCodeIcon,
-            showAppIconOverlay: showAppIconOverlay,
             showCharacterCount: showCharacterCount,
             dateDisplayFormatInQuickOverlay: dateDisplayFormatInQuickOverlay,
             rowIconStore: rowIconStore,
@@ -932,7 +930,6 @@ private struct QuickOverlayHistoryItemRow: View {
     @ObservedObject var item: ClipboardItem
     let isSelected: Bool
     let showColorCodeIcon: Bool
-    let showAppIconOverlay: Bool
     let showCharacterCount: Bool
     let dateDisplayFormatInQuickOverlay: String
     let rowIconStore: RowIconStore
@@ -1006,7 +1003,6 @@ private struct QuickOverlayHistoryItemRow: View {
             ClipboardItemIconView(
                 item: item,
                 showColorCodeIcon: showColorCodeIcon,
-                showAppIconOverlay: showAppIconOverlay,
                 rowIconStore: rowIconStore,
                 isSelected: isSelected
             )

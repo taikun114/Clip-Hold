@@ -5,7 +5,6 @@ struct ClipboardItemIconView: View {
     @EnvironmentObject var clipboardManager: ClipboardManager
     @ObservedObject var item: ClipboardItem
     let showColorCodeIcon: Bool
-    let showAppIconOverlay: Bool
     var rowIconStore: RowIconStore? = nil
     var isSelected: Bool = false
     
@@ -17,8 +16,8 @@ struct ClipboardItemIconView: View {
             // カラーコードが解析できた場合、専用のカラーアイコンを表示
             let baseIconView = ColorCodeIconView(color: color)
             
-            // カラーアイコンにもアプリアイコンを表示する (showAppIconOverlayがtrueの場合のみ)
-            if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
+            // カラーアイコンにもアプリアイコンを表示する
+            if let sourceAppPath = item.sourceAppPath {
                 let appName = clipboardManager.getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                 baseIconView
                     .overlay(
@@ -35,8 +34,8 @@ struct ClipboardItemIconView: View {
             // 既存のアイコン
             let baseIconView = generateBaseIcon()
             
-            // アプリアイコンをオーバーレイ表示 (showAppIconOverlayがtrueの場合のみ)
-            if showAppIconOverlay, let sourceAppPath = item.sourceAppPath {
+            // アプリアイコンをオーバーレイ表示
+            if let sourceAppPath = item.sourceAppPath {
                 let appName = clipboardManager.getLocalizedName(for: sourceAppPath) ?? "Unknown App"
                 baseIconView
                     .overlay(

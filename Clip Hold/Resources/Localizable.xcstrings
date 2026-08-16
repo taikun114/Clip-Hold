@@ -7953,41 +7953,6 @@
         }
       }
     },
-    "アプリアイコンを表示" : {
-      "comment" : "履歴ウィンドウの各項目にコピーされたアプリのアイコンを表示するかどうかを切り替えるトグルスイッチの設定項目名。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App-Symbole anzeigen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show App Icons"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar iconos de aplicaciones"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher les icônes des applications"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリアイコンを表示"
-          }
-        }
-      }
-    },
     "アプリではありません" : {
       "comment" : "除外するアプリや定型文プリセットの自動切り替え機能に割り当てるアプリでFinderから選択された項目がアプリではなかった場合に表示されるメッセージ。",
       "localizations" : {
@@ -11904,41 +11869,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コピーされた日付の表示方法を変更します。\n例: %@"
-          }
-        }
-      }
-    },
-    "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。" : {
-      "comment" : "一般設定の「アプリアイコンを表示」オプションを説明するテキスト。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zeigen Sie für jedes Element die App-Symbole an, die beim Kopieren im Vordergrund waren."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show app icons that were in the foreground when you copied them for each item."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar los iconos de las aplicaciones que estaban en primer plano cuando los copiaste para cada elemento."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Afficher les icônes des applications qui étaient au premier plan lorsque vous les avez copiées pour chaque élément."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コピーしたときに最前面にあったアプリアイコンを各項目に表示します。"
           }
         }
       }

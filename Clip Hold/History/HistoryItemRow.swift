@@ -44,7 +44,6 @@ struct HistoryItemRow<MenuContent: View>: View {
     let showCharacterCount: Bool
     @EnvironmentObject var dateReloader: DateReloader
     @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
-    @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
     
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
@@ -107,7 +106,6 @@ struct HistoryItemRow<MenuContent: View>: View {
             let iconView = ClipboardItemIconView(
                 item: item,
                 showColorCodeIcon: showColorCodeIcon,
-                showAppIconOverlay: showAppIconOverlay,
                 rowIconStore: rowIconStore
             )
             
