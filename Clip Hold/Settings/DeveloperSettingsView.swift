@@ -84,17 +84,23 @@ struct DeveloperSettingsView: View {
                     
                     if spotlightManager.isIndexing {
                         ProgressView(
-                            value: spotlightManager.totalCount > 0 ? Double(spotlightManager.indexedCount) : nil,
+                            value: (spotlightManager.totalCount > 0 && spotlightManager.indexedCount > 0) ? Double(spotlightManager.indexedCount) : nil,
                             total: Double(max(1, spotlightManager.totalCount))
                         ) {
                             EmptyView()
                         } currentValueLabel: {
                             if spotlightManager.totalCount > 0 {
                                 HStack {
-                                    let fraction = Double(spotlightManager.indexedCount) / Double(max(1, spotlightManager.totalCount))
-                                    Text(fraction, format: .percent.precision(.fractionLength(0)))
-                                    Spacer()
-                                    Text("\(spotlightManager.indexedCount) / \(spotlightManager.totalCount)個")
+                                    if spotlightManager.indexedCount > 0 {
+                                        let fraction = Double(spotlightManager.indexedCount) / Double(max(1, spotlightManager.totalCount))
+                                        Text(fraction, format: .percent.precision(.fractionLength(0)))
+                                        Spacer()
+                                        Text("\(spotlightManager.indexedCount) / \(spotlightManager.totalCount)個")
+                                    } else {
+                                        Text("インデックス準備中...")
+                                        Spacer()
+                                        Text("\(spotlightManager.totalCount)個")
+                                    }
                                 }
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)

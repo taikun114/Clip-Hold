@@ -25,6 +25,14 @@ struct ScreenEdgeSettingsView: View {
     @AppStorage(ScreenEdgePosition.rightCenter.rawValue) private var rightCenter: String = "none"
     @AppStorage(ScreenEdgePosition.rightBottom.rawValue) private var rightBottom: String = "none"
     
+    private var cardCornerRadius: CGFloat {
+        if #available(macOS 26.0, *) {
+            return 10
+        } else {
+            return 6
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 10) {
@@ -82,13 +90,17 @@ struct ScreenEdgeSettingsView: View {
                     .padding(.vertical, 8)
                 }
                 .background(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    RoundedRectangle(cornerRadius: cardCornerRadius, style: .continuous)
                         .fill(Color(nsColor: .quaternarySystemFill))
                 )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(Color.primary.opacity(0.08), lineWidth: 0.5)
-                )
+                .overlay {
+                    if #available(macOS 26.0, *) {
+                        EmptyView()
+                    } else {
+                        RoundedRectangle(cornerRadius: cardCornerRadius, style: .continuous)
+                            .stroke(.tertiary, lineWidth: 0.5)
+                    }
+                }
                 
                 // セクションフッター（説明文）
                 Text("マウスカーソルで画面の端に触れることでクイックオーバーレイを表示することができます。\nスクリーンエッジによって表示されるクイックオーバーレイでは、項目をクリックして選択・コピーしたり、ドラッグアンドドロップして特定の場所にペーストしたりできます。")
@@ -208,7 +220,11 @@ private struct ScreenEdgeVisualizerView: View {
             DisplayInnerEdgeSegments(
                 width: displayWidth,
                 height: displayHeight,
-                cornerMargin: 12
+                cornerMargin: 12,
+                topTargets: [topLeft, topCenter, topRight],
+                bottomTargets: [bottomLeft, bottomCenter, bottomRight],
+                leftTargets: [leftTop, leftCenter, leftBottom],
+                rightTargets: [rightTop, rightCenter, rightBottom]
             )
         }
         .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
@@ -235,12 +251,22 @@ private struct DisplayInnerEdgeSegments: View {
     let width: CGFloat
     let height: CGFloat
     let cornerMargin: CGFloat
+    let topTargets: [String]
+    let bottomTargets: [String]
+    let leftTargets: [String]
+    let rightTargets: [String]
+    
+    private func segmentColor(for target: String) -> Color {
+        if target == ScreenEdgeTarget.none.rawValue {
+            return Color.white.opacity(0.35)
+        } else {
+            return Color.white.opacity(0.8)
+        }
+    }
     
     var body: some View {
         Canvas { context, size in
             let strokeStyle = StrokeStyle(lineWidth: 2.0, lineCap: .round)
-            let color = Color.white.opacity(0.7)
-            
             let inset: CGFloat = 6.0
             
             // 上辺（3分割）
@@ -254,7 +280,8 @@ private struct DisplayInnerEdgeSegments: View {
                 let segEnd = topStartX + CGFloat(i + 1) * topSegWidth - 3
                 path.move(to: CGPoint(x: segStart, y: inset))
                 path.addLine(to: CGPoint(x: segEnd, y: inset))
-                context.stroke(path, with: .color(color), style: strokeStyle)
+                let segColor = i < topTargets.count ? segmentColor(for: topTargets[i]) : segmentColor(for: "none")
+                context.stroke(path, with: .color(segColor), style: strokeStyle)
             }
             
             // 下辺（3分割）
@@ -269,7 +296,8 @@ private struct DisplayInnerEdgeSegments: View {
                 let segEnd = botStartX + CGFloat(i + 1) * botSegWidth - 3
                 path.move(to: CGPoint(x: segStart, y: botY))
                 path.addLine(to: CGPoint(x: segEnd, y: botY))
-                context.stroke(path, with: .color(color), style: strokeStyle)
+                let segColor = i < bottomTargets.count ? segmentColor(for: bottomTargets[i]) : segmentColor(for: "none")
+                context.stroke(path, with: .color(segColor), style: strokeStyle)
             }
             
             // 左辺（3分割）
@@ -283,7 +311,8 @@ private struct DisplayInnerEdgeSegments: View {
                 let segEnd = leftStartY + CGFloat(i + 1) * leftSegHeight - 3
                 path.move(to: CGPoint(x: inset, y: segStart))
                 path.addLine(to: CGPoint(x: inset, y: segEnd))
-                context.stroke(path, with: .color(color), style: strokeStyle)
+                let segColor = i < leftTargets.count ? segmentColor(for: leftTargets[i]) : segmentColor(for: "none")
+                context.stroke(path, with: .color(segColor), style: strokeStyle)
             }
             
             // 右辺（3分割）
@@ -298,7 +327,8 @@ private struct DisplayInnerEdgeSegments: View {
                 let segEnd = rightStartY + CGFloat(i + 1) * rightSegHeight - 3
                 path.move(to: CGPoint(x: rightX, y: segStart))
                 path.addLine(to: CGPoint(x: rightX, y: segEnd))
-                context.stroke(path, with: .color(color), style: strokeStyle)
+                let segColor = i < rightTargets.count ? segmentColor(for: rightTargets[i]) : segmentColor(for: "none")
+                context.stroke(path, with: .color(segColor), style: strokeStyle)
             }
         }
     }

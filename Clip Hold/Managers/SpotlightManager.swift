@@ -11,7 +11,6 @@ class SpotlightManager: ObservableObject {
     @Published var indexedCount: Int = 0
     @Published var totalCount: Int = 0
     @Published var resetID = UUID()
-    @Published var progress = Progress(totalUnitCount: 0)
     
     private var indexingTask: Task<Void, Never>?
     
@@ -345,7 +344,6 @@ class SpotlightManager: ObservableObject {
             self.isIndexing = true
             self.indexedCount = 0
             self.totalCount = 0
-            self.progress = Progress(totalUnitCount: 0)
             self.resetID = UUID()
         }
         
@@ -463,7 +461,7 @@ class SpotlightManager: ObservableObject {
         indexingTask?.cancel()
         
         indexingTask = Task.detached {
-            // 定型文のインデックス (全プリセット)
+            // 定型文データを収集 (全プリセット)
             // MainActorでプリセット情報とアイコン画像を収集してから、バックグラウンドでバッチ処理する
             let allPresets = await MainActor.run { StandardPhrasePresetManager.shared.presets }
             let phraseBuildData: [(phrase: StandardPhrase, presetName: String, thumbnailData: Data?)] = await MainActor.run {
@@ -477,110 +475,160 @@ class SpotlightManager: ObservableObject {
             }
             
             let phraseCount = phraseBuildData.count
-            if phraseCount > 0 {
-                await MainActor.run {
-                    self.isIndexing = true
-                    self.totalCount = phraseCount
-                    self.indexedCount = 0
-                    self.resetID = UUID()
-                }
-                
-                await self._indexStandardPhrasesInBatch(phraseBuildData) { processedCount in
-                    await MainActor.run {
-                        self.indexedCount += processedCount
-                        if self.indexedCount >= self.totalCount {
-                            self.isIndexing = false
-                        }
-                    }
-                }
-            }
             
-            // 履歴のインデックス (全件インデックスを行うが、メモリ負荷を抑えるためにチャンクごとに分散処理する)
+            // 履歴のインデックスが必要か確認し、総数を計算
             // 今後のアップデート等でSpotlightのインデックス内容やフォーマットを大きく変更し、既存ユーザーに再インデックスを促したい場合は、
             // 以下のキー名のバージョン部分（"v1_7_0_full"など）を変更してください。キーが変わることで自動的に再インデックス処理が実行されます。
             let defaults = UserDefaults.standard
-            let hasIndexed = defaults.bool(forKey: "hasIndexedExistingHistoryForSpotlight_v1_7_0_full")
+            let hasIndexedHistory = defaults.bool(forKey: "hasIndexedExistingHistoryForSpotlight_v1_7_0_full")
             
-            if !hasIndexed {
-                // UI更新のためメインスレッドで状態を初期化
-                Task { @MainActor in
-                    self.isIndexing = true
+            var historyChunkCount = 0
+            var exactHistoryTotalCount = 0
+            var historyStartIndex = 0
+            
+            if !hasIndexedHistory {
+                do {
+                    historyChunkCount = try await ChunkedHistoryManager.shared.getChunkCount()
+                    if historyChunkCount > 0 {
+                        let lastChunk = try await ChunkedHistoryManager.shared.loadHistoryChunk(at: historyChunkCount - 1)
+                        exactHistoryTotalCount = (historyChunkCount - 1) * 100 + lastChunk.count
+                    }
+                    historyStartIndex = defaults.integer(forKey: "lastIndexedHistoryChunkForSpotlight_v1_7_0_full")
+                } catch {
+                    print("SpotlightManager: Failed to get history chunk count: \(error.localizedDescription)")
+                }
+            }
+            
+            let totalAllItems = phraseCount + (!hasIndexedHistory ? exactHistoryTotalCount : 0)
+            
+            if totalAllItems == 0 {
+                await MainActor.run {
+                    self.isIndexing = false
+                    self.totalCount = 0
                     self.indexedCount = 0
+                }
+                return
+            }
+            
+            // 途中再開の場合の初期進捗計算
+            let initialCompletedCount: Int
+            if !hasIndexedHistory && historyStartIndex > 0 {
+                if historyStartIndex >= historyChunkCount {
+                    initialCompletedCount = totalAllItems
+                } else {
+                    initialCompletedCount = phraseCount + (historyStartIndex * 100)
+                }
+            } else {
+                initialCompletedCount = 0
+            }
+            
+            // UIに全体の総数と初期進捗を反映
+            // 最初はindexedCount = 0（途中再開時はinitialCompletedCount）となり、最初のチャンク完了までProgressViewが往復アニメーションになる
+            await MainActor.run {
+                self.isIndexing = true
+                self.totalCount = totalAllItems
+                self.indexedCount = initialCompletedCount
+                self.resetID = UUID()
+            }
+            
+            var currentIndexedCount = initialCompletedCount
+            var pendingBatch: [CSSearchableItem] = []
+            
+            // 100件ごとにCSSearchableIndexに登録し、進捗を更新するヘルパー
+            func flushPendingBatch(force: Bool) async throws {
+                while pendingBatch.count >= 100 || (force && !pendingBatch.isEmpty) {
+                    if Task.isCancelled { return }
+                    
+                    let batchSize = min(100, pendingBatch.count)
+                    let itemsToIndex = Array(pendingBatch.prefix(batchSize))
+                    pendingBatch.removeFirst(batchSize)
+                    
+                    try await CSSearchableIndex.default().indexSearchableItems(itemsToIndex)
+                    currentIndexedCount += batchSize
+                    
+                    let capturedCount = currentIndexedCount
+                    await MainActor.run {
+                        self.indexedCount = capturedCount
+                    }
+                    
+                    // メモリ負荷軽減とUI更新のためのウェイト（0.1秒）
+                    try? await Task.sleep(nanoseconds: 100_000_000)
+                }
+            }
+            
+            // 1. 定型文アイテムをバッファに追加
+            if phraseCount > 0 {
+                if Task.isCancelled { return }
+                
+                for data in phraseBuildData {
+                    autoreleasepool {
+                        let item = self.createPhraseSearchableItem(
+                            for: data.phrase,
+                            presetName: data.presetName,
+                            thumbnailData: data.thumbnailData
+                        )
+                        pendingBatch.append(item)
+                    }
                 }
                 
                 do {
-                    let chunkCount = try await ChunkedHistoryManager.shared.getChunkCount()
-                    
-                    // 実際の総数を正確に計算する
-                    var exactTotalCount = 0
-                    if chunkCount > 0 {
-                        let lastChunk = try await ChunkedHistoryManager.shared.loadHistoryChunk(at: chunkCount - 1)
-                        exactTotalCount = (chunkCount - 1) * 100 + lastChunk.count
-                    }
-                    
-                    let startIndex = defaults.integer(forKey: "lastIndexedHistoryChunkForSpotlight_v1_7_0_full")
-                    var completedCount = 0
-                    if startIndex >= chunkCount {
-                        completedCount = exactTotalCount
-                    } else {
-                        completedCount = startIndex * 100 // 途中のチャンクまでは1チャンク100件で正確
-                    }
-                    
-                    let initialCompletedCount = completedCount
-                    Task { @MainActor in
-                        self.totalCount = exactTotalCount
-                        self.indexedCount = initialCompletedCount
-                        self.progress.totalUnitCount = Int64(exactTotalCount)
-                        self.progress.completedUnitCount = Int64(initialCompletedCount)
-                    }
-                    
-                    if startIndex < chunkCount {
-                        for index in startIndex..<chunkCount {
-                            if Task.isCancelled {
-                                print("SpotlightManager: Indexing task was cancelled.")
-                                return
-                            }
-                            
-                            let items = try await ChunkedHistoryManager.shared.loadHistoryChunk(at: index)
-                            let currentCount = items.count
-                            
-                            // 1チャンクずつバッチインデックスする
-                            await self._indexHistoryItemsQuietly(items)
-                            
-                            completedCount += currentCount
-                            
-                            let remainingChunks = chunkCount - (index + 1)
-                            let estimatedRemainingItems = remainingChunks * 100
-#if DEBUG
-                            print("SpotlightManager: [Indexing Progress] Completed: \(completedCount), Remaining (est.): \(estimatedRemainingItems) (Chunk \(index + 1)/\(chunkCount))")
-#endif
-                            
-                            let capturedCount = completedCount
-                            let nextChunkIndex = index + 1
-                            Task { @MainActor in
-                                self.indexedCount = capturedCount
-                                self.progress.completedUnitCount = Int64(capturedCount)
-                                // 進行状況を保存（途中でアプリが終了しても、次回ここから再開できる）
-                                UserDefaults.standard.set(nextChunkIndex, forKey: "lastIndexedHistoryChunkForSpotlight_v1_7_0_full")
-                            }
-                            
-                            // メモリのスパイクを防ぐため、少し待機する（4.8GBまで上がっていたため、待機時間を0.1秒に増加してGCを促す）
-                            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1秒
-                        }
-                    }
-                    
-                    await MainActor.run {
-                        UserDefaults.standard.set(true, forKey: "hasIndexedExistingHistoryForSpotlight_v1_7_0_full")
-                        self.isIndexing = false
-                    }
-                    print("SpotlightManager: Finished indexing all existing history chunks. Total completed: \(completedCount)")
+                    try await flushPendingBatch(force: false)
                 } catch {
-                    print("SpotlightManager: Failed to index all existing history chunks: \(error.localizedDescription)")
-                    Task { @MainActor in
-                        self.isIndexing = false
-                    }
+                    print("SpotlightManager: Error indexing phrase batch: \(error.localizedDescription)")
                 }
             }
+            
+            // 2. 履歴アイテムをチャンクごとに読み込んでバッファに追加し、100件単位でインデックス
+            if !hasIndexedHistory {
+                if historyStartIndex < historyChunkCount {
+                    for index in historyStartIndex..<historyChunkCount {
+                        if Task.isCancelled {
+                            print("SpotlightManager: Indexing task was cancelled.")
+                            return
+                        }
+                        
+                        do {
+                            let historyItems = try await ChunkedHistoryManager.shared.loadHistoryChunk(at: index)
+                            for item in historyItems {
+                                autoreleasepool {
+                                    let searchableItem = self.createSearchableItem(for: item)
+                                    pendingBatch.append(searchableItem)
+                                }
+                            }
+                            
+                            // 100件に達した分をインデックス登録
+                            try await flushPendingBatch(force: false)
+                            
+                            let nextChunkIndex = index + 1
+                            await MainActor.run {
+                                UserDefaults.standard.set(nextChunkIndex, forKey: "lastIndexedHistoryChunkForSpotlight_v1_7_0_full")
+                            }
+                        } catch {
+                            print("SpotlightManager: Error indexing history chunk \(index): \(error.localizedDescription)")
+                        }
+                    }
+                }
+                
+                await MainActor.run {
+                    UserDefaults.standard.set(true, forKey: "hasIndexedExistingHistoryForSpotlight_v1_7_0_full")
+                }
+                print("SpotlightManager: Finished indexing all existing history chunks.")
+            }
+            
+            // 3. 最後に残った端数（100件未満のバッファ）をフラッシュ
+            if Task.isCancelled { return }
+            do {
+                try await flushPendingBatch(force: true)
+            } catch {
+                print("SpotlightManager: Error indexing final batch: \(error.localizedDescription)")
+            }
+            
+            // 4. 完了処理
+            await MainActor.run {
+                self.isIndexing = false
+                self.indexedCount = self.totalCount
+            }
+            print("SpotlightManager: Finished indexing all existing items. Total completed: \(currentIndexedCount)/\(totalAllItems)")
         }
     }
 }
