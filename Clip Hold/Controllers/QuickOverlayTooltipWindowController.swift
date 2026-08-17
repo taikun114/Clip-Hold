@@ -167,86 +167,59 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let textPadding: CGFloat = 32 // テキストのパディング（上下16、左右16）
         let font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
         
-        let visualWidth: CGFloat
+        let gap: CGFloat = 12
+        let safeMinX = screenRect.minX + gap
+        let safeMaxX = screenRect.maxX - gap
+        let safeMinY = screenRect.minY + gap
+        let safeMaxY = screenRect.maxY - gap
+        
+        let initialVisualWidth: CGFloat
         if isCompact {
             // ボタンツールチップ等：内容に合わせて縮小する
             let naturalTextWidth = ceil((text as NSString).size(withAttributes: [.font: font]).width) + textPadding
-            visualWidth = min(maxVisualWidth, naturalTextWidth)
-        } else if filePath != nil {
-            // ファイルツールチップはサムネイル表示のため固定幅
-            visualWidth = maxVisualWidth
+            initialVisualWidth = min(maxVisualWidth, naturalTextWidth)
         } else {
-            // 通常のテキストツールチップは固定幅（元の挙動）
-            visualWidth = maxVisualWidth
+            initialVisualWidth = maxVisualWidth
         }
-        
-        // Measure natural text height reliably using NSString to avoid NSHostingView bugs
-        let textWidth = visualWidth - textPadding
-        let textRect = (text as NSString).boundingRect(
-            with: NSSize(width: textWidth, height: .greatestFiniteMagnitude),
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: [.font: font],
-            context: nil
-        )
-        // Add 32 for padding (16 top, 16 bottom).
-        // Since we now use .fixedSize in the view, it will never truncate with '...', so we don't need a buffer.
-        let hasHeader = sourceAppPath != nil
-        let hasFooter = dateString != nil || characterCount != nil
-        let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
-        let headerHeight: CGFloat = hasHeader ? 20 : 0
-        let footerHeight: CGFloat = hasFooter ? 14 : 0
-        let spacingHeight: CGFloat = spacingCount * 16
-        let paddingHeight: CGFloat = 32
-        let contentHeight: CGFloat = filePath != nil ? 256 : ceil(textRect.height)
-        let naturalVisualHeight: CGFloat = contentHeight + paddingHeight + headerHeight + footerHeight + spacingHeight
-        
-        // Cap max visual height at 500 (same as overlay)
-        let targetVisualHeight = min(naturalVisualHeight, 500)
-        
-        let gap: CGFloat = 12
-        let windowWidth = visualWidth + windowPadding
         
         enum Direction { case above, below, left, right }
         var newOrigin = NSPoint.zero
-        var finalVisualHeight = targetVisualHeight
+        var effectiveVisualWidth = initialVisualWidth
+        var finalVisualHeight = maxVisualWidth
         
         if let anchor = anchorPoint {
             // ボタン等の固定位置（スクリーン座標）に表示する場合
-            let effectiveMaxY = screen.frame.maxY
-            let effectiveMinY = screen.frame.minY
+            let effectiveMaxY = safeMaxY
+            let effectiveMinY = safeMinY
             let spaceAbove = effectiveMaxY - anchor.y - gap
             let spaceBelow = anchor.y - buttonHeight - effectiveMinY - gap
             
             var chosenDirection: Direction
-            if spaceAbove >= targetVisualHeight {
+            if spaceAbove >= 100 {
                 chosenDirection = .above
-            } else if spaceBelow >= targetVisualHeight {
+            } else if spaceBelow >= 100 {
                 chosenDirection = .below
             } else {
                 chosenDirection = spaceAbove > spaceBelow ? .above : .below
             }
             
+            let windowWidth = initialVisualWidth + windowPadding
             switch chosenDirection {
             case .above:
                 newOrigin.x = anchor.x - windowWidth / 2
                 newOrigin.y = anchor.y + gap - shadowPadding
-                finalVisualHeight = min(finalVisualHeight, spaceAbove)
+                finalVisualHeight = spaceAbove
             case .below:
                 newOrigin.x = anchor.x - windowWidth / 2
+                finalVisualHeight = spaceBelow
                 newOrigin.y = anchor.y - buttonHeight - gap + shadowPadding - (finalVisualHeight + windowPadding)
-                finalVisualHeight = min(finalVisualHeight, spaceBelow)
             default:
                 break
             }
             
             // 画面端からはみ出す場合はクランプする
-            if isCompact {
-                newOrigin.x = min(max(newOrigin.x, screen.frame.minX - shadowPadding), screen.frame.maxX - windowWidth + shadowPadding)
-                newOrigin.y = min(max(newOrigin.y, effectiveMinY - shadowPadding), effectiveMaxY - finalVisualHeight - shadowPadding)
-            } else {
-                newOrigin.x = min(max(newOrigin.x, screenRect.minX), screenRect.maxX - windowWidth)
-                newOrigin.y = min(max(newOrigin.y, screenRect.minY), screenRect.maxY - (finalVisualHeight + windowPadding))
-            }
+            newOrigin.x = min(max(newOrigin.x, safeMinX - shadowPadding), safeMaxX - windowWidth + shadowPadding)
+            newOrigin.y = min(max(newOrigin.y, safeMinY - shadowPadding), safeMaxY - finalVisualHeight - shadowPadding)
             
             tooltipDirection = chosenDirection == .above ? .above : .below
         } else {
@@ -255,10 +228,10 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             let visualMaxX = overlayFrame.maxX - 60
             let visualMaxY = overlayFrame.maxY - 60
             
-            let spaceAbove = screenRect.maxY - visualMaxY - gap
-            let spaceBelow = visualMinY - screenRect.minY - gap
-            let spaceLeft = visualMinX - screenRect.minX - gap
-            let spaceRight = screenRect.maxX - visualMaxX - gap
+            let spaceAbove = safeMaxY - visualMaxY - gap
+            let spaceBelow = visualMinY - safeMinY - gap
+            let spaceLeft = visualMinX - safeMinX - gap
+            let spaceRight = safeMaxX - visualMaxX - gap
             
             let position = UserDefaults.standard.quickOverlayShortcutPosition
             let preferAbove = ["bottom", "bottomLeft", "bottomRight"].contains(position)
@@ -266,46 +239,58 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             var chosenDirection: Direction = preferAbove ? .above : .below
             
             // Try preferred vertical
-            if chosenDirection == .above && spaceAbove < targetVisualHeight {
-                if spaceBelow >= targetVisualHeight { chosenDirection = .below }
-            } else if chosenDirection == .below && spaceBelow < targetVisualHeight {
-                if spaceAbove >= targetVisualHeight { chosenDirection = .above }
+            if chosenDirection == .above && spaceAbove < 200 {
+                if spaceBelow >= 200 { chosenDirection = .below }
+            } else if chosenDirection == .below && spaceBelow < 200 {
+                if spaceAbove >= 200 { chosenDirection = .above }
             }
             
             // If still doesn't fit, check horizontal
-            if (chosenDirection == .above && spaceAbove < targetVisualHeight) || (chosenDirection == .below && spaceBelow < targetVisualHeight) {
-                let neededWidth = windowWidth
-                if spaceRight >= neededWidth {
+            if (chosenDirection == .above && spaceAbove < 200) || (chosenDirection == .below && spaceBelow < 200) {
+                if spaceRight >= 300 {
                     chosenDirection = .right
-                } else if spaceLeft >= neededWidth {
+                } else if spaceLeft >= 300 {
                     chosenDirection = .left
                 } else {
-                    // Nowhere fits well, just pick vertical with most space
                     chosenDirection = spaceAbove > spaceBelow ? .above : .below
-                    finalVisualHeight = max(spaceAbove, spaceBelow)
                 }
             }
             
-            // Now compute actual bounds
+            // 画面端との余白を確保し、ツールチップが反対側にずれないよう幅を狭める
             switch chosenDirection {
-            case .above:
-                newOrigin.x = visualMinX - 60
-                finalVisualHeight = min(finalVisualHeight, spaceAbove)
-                newOrigin.y = visualMaxY + gap - 60
-            case .below:
-                newOrigin.x = visualMinX - 60
-                finalVisualHeight = min(finalVisualHeight, spaceBelow)
-                newOrigin.y = visualMinY - gap - finalVisualHeight - 60
-            case .left:
-                newOrigin.x = visualMinX - gap - windowWidth + 60
-                finalVisualHeight = min(finalVisualHeight, screenRect.maxY - visualMinY)
-                // Align bottom with overlay bottom
-                newOrigin.y = visualMinY - 60
             case .right:
-                newOrigin.x = visualMaxX + gap - 60
-                finalVisualHeight = min(finalVisualHeight, screenRect.maxY - visualMinY)
-                // Align bottom with overlay bottom
-                newOrigin.y = visualMinY - 60
+                let targetVisualMinX = visualMaxX + gap
+                let availableWidth = max(200, safeMaxX - targetVisualMinX)
+                effectiveVisualWidth = min(initialVisualWidth, availableWidth)
+                newOrigin.x = targetVisualMinX - shadowPadding
+                newOrigin.y = visualMinY - shadowPadding
+                finalVisualHeight = min(500, safeMaxY - visualMinY)
+                
+            case .left:
+                let targetVisualMaxX = visualMinX - gap
+                let availableWidth = max(200, targetVisualMaxX - safeMinX)
+                effectiveVisualWidth = min(initialVisualWidth, availableWidth)
+                newOrigin.x = targetVisualMaxX - effectiveVisualWidth - shadowPadding
+                newOrigin.y = visualMinY - shadowPadding
+                finalVisualHeight = min(500, safeMaxY - visualMinY)
+                
+            case .above:
+                let targetVisualMinX = visualMinX
+                if targetVisualMinX + initialVisualWidth > safeMaxX {
+                    effectiveVisualWidth = max(200, safeMaxX - targetVisualMinX)
+                }
+                newOrigin.x = targetVisualMinX - shadowPadding
+                finalVisualHeight = min(500, spaceAbove)
+                newOrigin.y = visualMaxY + gap - shadowPadding
+                
+            case .below:
+                let targetVisualMinX = visualMinX
+                if targetVisualMinX + initialVisualWidth > safeMaxX {
+                    effectiveVisualWidth = max(200, safeMaxX - targetVisualMinX)
+                }
+                newOrigin.x = targetVisualMinX - shadowPadding
+                finalVisualHeight = min(500, spaceBelow)
+                newOrigin.y = visualMinY - gap - finalVisualHeight - shadowPadding
             }
 
             tooltipDirection = switch chosenDirection {
@@ -316,9 +301,34 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             }
         }
         
-        // Ensure minimum height
+        // 確定した effectiveVisualWidth に基づいてテキストの高さを正確に計算
+        let textWidth = effectiveVisualWidth - textPadding
+        let textRect = (text as NSString).boundingRect(
+            with: NSSize(width: textWidth, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        )
+        let hasHeader = sourceAppPath != nil
+        let hasFooter = dateString != nil || characterCount != nil
+        let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
+        let headerHeight: CGFloat = hasHeader ? 20 : 0
+        let footerHeight: CGFloat = hasFooter ? 14 : 0
+        let spacingHeight: CGFloat = spacingCount * 16
+        let paddingHeight: CGFloat = 32
+        let contentHeight: CGFloat = filePath != nil ? 256 : ceil(textRect.height)
+        let naturalVisualHeight: CGFloat = contentHeight + paddingHeight + headerHeight + footerHeight + spacingHeight
+        
+        finalVisualHeight = min(finalVisualHeight, naturalVisualHeight)
         finalVisualHeight = max(finalVisualHeight, 50)
         
+        // 下配置（.below）の場合、高さ確定後にY原点を再調整
+        if anchorPoint == nil, tooltipDirection == .below {
+            let visualMinY = overlayFrame.minY + 60
+            newOrigin.y = visualMinY - gap - finalVisualHeight - shadowPadding
+        }
+        
+        let windowWidth = effectiveVisualWidth + windowPadding
         let finalWindowHeight = finalVisualHeight + windowPadding
         
         let calculatedTextHeight = ceil(textRect.height)
