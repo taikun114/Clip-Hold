@@ -3,7 +3,11 @@ import SwiftUI
 
 class UnconstrainedPanel: NSPanel {
     override var canBecomeKey: Bool {
-        return true
+        return false
+    }
+    
+    override var canBecomeMain: Bool {
+        return false
     }
     
     override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect {
@@ -40,13 +44,14 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             defer: false
         )
         
-        panel.level = .statusBar // オーバーレイ（.statusBar）の上に表示する
+        panel.level = .statusBar // オーバーレイ（.floating）の上に表示する
         panel.isFloatingPanel = true
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.backgroundColor = .clear
         panel.isOpaque = false
         panel.hasShadow = false
         panel.animationBehavior = .none
+        panel.ignoresMouseEvents = true
         
         super.init(window: panel)
         
