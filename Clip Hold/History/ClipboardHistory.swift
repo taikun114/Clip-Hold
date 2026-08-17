@@ -363,6 +363,15 @@ extension ClipboardManager {
                 return true // ファイルパスがない場合は常に有効とみなす
             }
             
+            // 読み込み中にメモリ上にアイテムが追加されていた場合（念のためのデータ保護）、安全にマージする
+            if !self.clipboardHistory.isEmpty {
+                for existingItem in self.clipboardHistory {
+                    if !validHistory.contains(where: { $0.id == existingItem.id }) {
+                        validHistory.append(existingItem)
+                    }
+                }
+            }
+            
             // 履歴を日付の新しい順に並べ替える（メモリ内でのみ）
             validHistory.sort { $0.date > $1.date }
             

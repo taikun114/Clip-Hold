@@ -71,7 +71,9 @@ struct ClipHoldApp: App {
     @StateObject var iconGenerator = PresetIconGenerator.shared
     let dateReloader = DateReloader.shared
     
-    @AppStorage("isClipboardMonitoringPaused") var isClipboardMonitoringPaused: Bool = false
+    var isClipboardMonitoringPaused: Bool {
+        clipboardManager.isClipboardMonitoringPaused
+    }
     @AppStorage("showCurrentPresetIcon") private var showCurrentPresetIcon = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
     
@@ -90,7 +92,7 @@ struct ClipHoldApp: App {
     }
     
     static func toggleClipboardMonitoring() {
-        guard !ClipboardManager.shared.isExporting else { return }
+        guard !ClipboardManager.shared.isExporting && ClipboardManager.shared.isHistoryLoaded else { return }
         let defaults = UserDefaults.standard
         let currentIsPaused = defaults.bool(forKey: "isClipboardMonitoringPaused")
         
@@ -452,7 +454,7 @@ struct ClipHoldApp: App {
                         .labelStyle(.titleAndIcon)
                 }
                 .applyKeyboardShortcut(for: .toggleClipboardMonitoring)
-                .disabled(clipboardManager.isExporting)
+                .disabled(clipboardManager.isExporting || !clipboardManager.isHistoryLoaded)
             } else {
                 Label("クリップボード監視: 動作中", systemImage: "play.fill")
                     .labelStyle(.titleAndIcon)
@@ -464,7 +466,7 @@ struct ClipHoldApp: App {
                         .labelStyle(.titleAndIcon)
                 }
                 .applyKeyboardShortcut(for: .toggleClipboardMonitoring)
-                .disabled(clipboardManager.isExporting)
+                .disabled(clipboardManager.isExporting || !clipboardManager.isHistoryLoaded)
             }
             
             Divider()

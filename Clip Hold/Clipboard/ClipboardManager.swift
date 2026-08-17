@@ -24,6 +24,14 @@ class ClipboardManager: ObservableObject {
         }
     }
     
+    @Published var isMonitoring: Bool = false
+    
+    /// 実際に監視が行われている状態でのみ false（動作中）を返し、
+    /// 監視開始前（履歴読み込み中など）や明示的一時停止中は true（一時停止中）を返す
+    var isClipboardMonitoringPaused: Bool {
+        return !isMonitoring
+    }
+    
     private var previousMonitoringState: Bool? = nil
     
     // 進行中のインポートタスクを保持し、クリア時にキャンセル可能にする
@@ -194,7 +202,6 @@ class ClipboardManager: ObservableObject {
     var lastChangeCount: Int = 0
     let historyFileName = "clipboardHistory.json"
     let filesDirectoryName = "ClipboardFiles"
-    @Published var isMonitoring: Bool = false
     
     private var internalCopyTimeoutTask: Task<Void, Never>?
     @Published var isPerformingInternalCopy: Bool = false {
@@ -294,6 +301,11 @@ class ClipboardManager: ObservableObject {
             await self.loadClipboardHistory()
             await MainActor.run {
                 self.isHistoryLoaded = true
+                let isPaused = UserDefaults.standard.bool(forKey: "isClipboardMonitoringPaused")
+                self.isMonitoring = !isPaused
+                if !isPaused {
+                    self.startMonitoringPasteboard()
+                }
             }
             print("ClipboardManager: Initialized with history count: \(self.clipboardHistory.count)")
         }
@@ -304,8 +316,8 @@ class ClipboardManager: ObservableObject {
             self.excludedAppIdentifiers = identifiers
         }
         
-        isClipboardMonitoringPausedObserver = UserDefaults.standard.observe(\.isClipboardMonitoringPaused, options: [.initial, .new]) { [weak self] defaults, change in
-            guard let self = self else { return }
+        isClipboardMonitoringPausedObserver = UserDefaults.standard.observe(\.isClipboardMonitoringPaused, options: [.new]) { [weak self] defaults, change in
+            guard let self = self, self.isHistoryLoaded else { return }
             let isPaused = defaults.isClipboardMonitoringPaused
             
             // @Published isMonitoring の状態を更新
