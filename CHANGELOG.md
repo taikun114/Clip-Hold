@@ -83,6 +83,7 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 - **Fix issue where the app might crash during Quick Paste**
 - **Fix issue where some sheets were not displayed correctly on macOS Golden Gate**
 - **Fix issue where some history and standard phrase settings were not applied until the app was restarted**
+- **Fix issue where the menu bar icon could become transparent on older macOS versions**
 - **Improve settings layout**
   - The "Standard Phrases Window" section and "History Window" section in the General settings have been moved to the Standard Phrases and Copy History settings, respectively.
 - **Improve icon display on macOS Golden Gate**

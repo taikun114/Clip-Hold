@@ -75,6 +75,14 @@ struct ClipHoldApp: App {
     @AppStorage("showCurrentPresetIcon") private var showCurrentPresetIcon = false
     @AppStorage("hideMenuBarExtra") private var hideMenuBarExtra = false
     
+    private var defaultMenubarIcon: NSImage {
+        let name = isClipboardMonitoringPaused ? "Menubar Icon Dimmed" : "Menubar Icon"
+        let icon = NSImage(named: name) ?? NSImage()
+        icon.isTemplate = true
+        icon.size = NSSize(width: 18, height: 18)
+        return icon
+    }
+    
     init() {
         print("ClipHoldApp: Initializing with ClipboardManager and StandardPhraseManager.")
         
@@ -483,7 +491,7 @@ struct ClipHoldApp: App {
                let iconImage = isClipboardMonitoringPaused ? iconGenerator.dimmedMiniIconCache[preset.id] : iconGenerator.miniIconCache[preset.id] {
                 Image(nsImage: iconImage)
             } else {
-                Image(isClipboardMonitoringPaused ? "Menubar Icon Dimmed" : "Menubar Icon")
+                Image(nsImage: defaultMenubarIcon)
             }
         }
         .environmentObject(clipboardManager)
