@@ -474,6 +474,7 @@ struct GeneralSettingsView: View {
                         Label("左上", systemImage: "arrow.up.left").tag("topLeft")
                     }
                     .pickerStyle(.menu)
+                    .labelStyle(.titleAndIcon)
                     .labelsHidden()
                     .disabled(!isQuickOverlayShortcutEnabled)
                 }
@@ -571,4 +572,5 @@ struct GeneralSettingsView: View {
 
 #Preview {
     GeneralSettingsView()
+        .environmentObject(DateReloader.shared)
 }
