@@ -353,7 +353,7 @@ private struct GuideLinesCanvas: View {
             let dispLeft = center.x - dispHalfW
             let dispRight = center.x + dispHalfW
             
-            let gap: CGFloat = 4.0
+            let gap: CGFloat = 0.0
             
             // 上側ピッカーのY座標とディスプレイ上辺の結線
             let topPickerY = dispTop - 24
@@ -437,13 +437,20 @@ private struct GuideLinesCanvas: View {
             }
             
             // 左右ピッカーの結線（完全水平）
-            let sideSegStep = displayHeight / 3.0
+            // 中央はcenter.yを維持し、上下の線はピッカー間隔に合わせて調整
+            let sideSpacingY: CGFloat = {
+                if #available(macOS 26.0, *) {
+                    return 32.0
+                } else {
+                    return 28.0
+                }
+            }()
             let leftPickerEdgeX = dispLeft - 32
             let rightPickerEdgeX = dispRight + 32
             
-            let sideTopY = center.y - sideSegStep
+            let sideTopY = center.y - sideSpacingY
             let sideMidY = center.y
-            let sideBotY = center.y + sideSegStep
+            let sideBotY = center.y + sideSpacingY
             
             // 左-上
             var pLeftT = Path()
