@@ -48,8 +48,9 @@ struct QuickOverlayView: View {
     @State private var showMenuShadow: Bool = false
     
     @State private var cachedHistoryItems: [ClipboardItem] = []
+    @State private var cachedPhraseItems: [StandardPhrase] = []
     
-    @State private var currentDisplayLimit: Int = 50
+    @State private var currentDisplayLimit: Int = 10
     @State private var isPaginating: Bool = false
     
     // Custom Tooltip State
@@ -84,23 +85,35 @@ struct QuickOverlayView: View {
         self.explicitHistoryItems = explicitHistoryItems
         self.explicitPhraseItems = explicitPhraseItems
         
-        let initialItems: [ClipboardItem]
+        let initialHistory: [ClipboardItem]
         if let explicit = explicitHistoryItems {
-            initialItems = explicit
+            initialHistory = explicit
         } else if type == .history {
             if !ClipboardManager.shared.quickOverlayHistoryItems.isEmpty {
-                initialItems = ClipboardManager.shared.quickOverlayHistoryItems
+                initialHistory = Array(ClipboardManager.shared.quickOverlayHistoryItems.prefix(10))
             } else {
-                initialItems = Self.fetchInitialHistoryItems(
+                initialHistory = Self.fetchInitialHistoryItems(
                     from: ClipboardManager.shared.clipboardHistory,
                     pinnedItemID: ClipboardManager.shared.pinnedItemID,
-                    limit: 50
+                    limit: 10
                 )
             }
         } else {
-            initialItems = []
+            initialHistory = []
         }
-        self._cachedHistoryItems = State(initialValue: initialItems)
+        self._cachedHistoryItems = State(initialValue: initialHistory)
+        
+        let initialPhrases: [StandardPhrase]
+        if let explicit = explicitPhraseItems {
+            initialPhrases = explicit
+        } else if type == .standardPhrase {
+            let all = StandardPhrasePresetManager.shared.selectedPreset?.phrases ?? StandardPhraseManager.shared.standardPhrases
+            initialPhrases = Array(all.prefix(10))
+        } else {
+            initialPhrases = []
+        }
+        self._cachedPhraseItems = State(initialValue: initialPhrases)
+        self._currentDisplayLimit = State(initialValue: 10)
     }
     
     private var mainLayout: some View {
@@ -229,6 +242,21 @@ struct QuickOverlayView: View {
             .onAppear {
                 if type == .history && cachedHistoryItems.isEmpty && !clipboardManager.clipboardHistory.isEmpty {
                     loadHistoryItems()
+                } else if type == .standardPhrase && cachedPhraseItems.isEmpty {
+                    loadPhraseItems()
+                }
+                
+                // 初回の超軽量10件で表示アニメーションが開始された直後、非同期で50件へ拡張
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 100_000_000)
+                    if currentDisplayLimit == 10 {
+                        currentDisplayLimit = 50
+                        if type == .history {
+                            loadHistoryItems()
+                        } else {
+                            loadPhraseItems()
+                        }
+                    }
                 }
             }
             .onChange(of: clipboardManager.quickOverlayHistoryItems) { _, newItems in
@@ -239,6 +267,19 @@ struct QuickOverlayView: View {
                         }
                     } else {
                         loadHistoryItems()
+                    }
+                }
+            }
+            .onChange(of: presetManager.selectedPresetId) { _, _ in
+                if type == .standardPhrase {
+                    currentDisplayLimit = 10
+                    loadPhraseItems()
+                    Task { @MainActor in
+                        try? await Task.sleep(nanoseconds: 100_000_000)
+                        if currentDisplayLimit == 10 {
+                            currentDisplayLimit = 50
+                            loadPhraseItems()
+                        }
                     }
                 }
             }
@@ -272,23 +313,27 @@ struct QuickOverlayView: View {
     }
     
     private func resetDisplayLimitAndReleaseMemory() {
-        guard type == .history && currentDisplayLimit > 50 else { return }
-        currentDisplayLimit = 50
-        if !clipboardManager.quickOverlayHistoryItems.isEmpty {
-            cachedHistoryItems = clipboardManager.quickOverlayHistoryItems
-        } else {
-            cachedHistoryItems = Array(cachedHistoryItems.prefix(50))
+        guard currentDisplayLimit > 10 else { return }
+        currentDisplayLimit = 10
+        if type == .history {
+            if !clipboardManager.quickOverlayHistoryItems.isEmpty {
+                cachedHistoryItems = Array(clipboardManager.quickOverlayHistoryItems.prefix(10))
+            } else {
+                cachedHistoryItems = Array(cachedHistoryItems.prefix(10))
+            }
+        } else if type == .standardPhrase {
+            cachedPhraseItems = Array(cachedPhraseItems.prefix(10))
         }
     }
     
     static func fetchInitialHistoryItems(
         from history: [ClipboardItem],
         pinnedItemID: UUID?,
-        limit: Int = 50
+        limit: Int = 10
     ) -> [ClipboardItem] {
         guard !history.isEmpty else { return [] }
         let allSortedHistory = history.sorted { $0.date > $1.date }
-        let effectiveLimit = limit > 0 ? limit : 50
+        let effectiveLimit = limit > 0 ? limit : 10
         var raw = Array(allSortedHistory.prefix(effectiveLimit))
         
         if let pinnedID = pinnedItemID,
@@ -307,11 +352,14 @@ struct QuickOverlayView: View {
             if currentDisplayLimit == 50 && !clipboardManager.quickOverlayHistoryItems.isEmpty {
                 cachedHistoryItems = clipboardManager.quickOverlayHistoryItems
                 return
+            } else if currentDisplayLimit == 10 && !clipboardManager.quickOverlayHistoryItems.isEmpty {
+                cachedHistoryItems = Array(clipboardManager.quickOverlayHistoryItems.prefix(10))
+                return
             }
         }
         
         let allSortedHistory = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
-        let limit = currentDisplayLimit > 0 ? currentDisplayLimit : 50
+        let limit = currentDisplayLimit > 0 ? currentDisplayLimit : 10
         var raw = Array(allSortedHistory.prefix(limit))
         
         if let pinnedID = clipboardManager.pinnedItemID,
@@ -333,6 +381,32 @@ struct QuickOverlayView: View {
             await MainActor.run {
                 currentDisplayLimit += 50
                 loadHistoryItems(isPagination: true)
+                isPaginating = false
+            }
+        }
+    }
+    
+    private func loadPhraseItems(isPagination: Bool = false) {
+        if let explicit = explicitPhraseItems {
+            cachedPhraseItems = explicit
+            return
+        }
+        let allPhrases = getPhrasesForSelectedPreset()
+        let limit = currentDisplayLimit > 0 ? currentDisplayLimit : 10
+        cachedPhraseItems = Array(allPhrases.prefix(limit))
+    }
+    
+    private func loadMorePhraseItems() {
+        let totalCount = (explicitPhraseItems ?? getPhrasesForSelectedPreset()).count
+        guard !isPaginating && currentDisplayLimit < totalCount else { return }
+        if explicitPhraseItems != nil { return }
+        
+        isPaginating = true
+        Task {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            await MainActor.run {
+                currentDisplayLimit += 50
+                loadPhraseItems(isPagination: true)
                 isPaginating = false
             }
         }
@@ -368,9 +442,19 @@ struct QuickOverlayView: View {
                             }
                         } else {
                             // Standard phrase items (Preview用に明示的なアイテムがあればそれを使用)
-                            let phrases = explicitPhraseItems ?? getPhrasesForSelectedPreset()
-                            ForEach(Array(phrases.enumerated()), id: \.element.id) { index, phrase in
+                            ForEach(Array(cachedPhraseItems.enumerated()), id: \.element.id) { index, phrase in
                                 standardPhraseItemRow(phrase, index: index)
+                                    .onAppear {
+                                        if index == cachedPhraseItems.count - 1 {
+                                            loadMorePhraseItems()
+                                        }
+                                    }
+                            }
+                            if isPaginating {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle())
+                                    .scaleEffect(0.8)
+                                    .padding(.vertical, 8)
                             }
                         }
                     }
