@@ -293,7 +293,9 @@ struct ClipHoldApp: App {
             Label("コピー履歴", systemImage: "clock")
                 .font(.headline)
                 .labelStyle(.titleAndIcon)
-            if clipboardManager.clipboardHistory.isEmpty {
+            if !clipboardManager.isHistoryLoaded {
+                Text("履歴を読み込み中...")
+            } else if clipboardManager.clipboardHistory.isEmpty {
                 Text("履歴はありません")
             } else {
                 let sortedHistory: [ClipboardItem] = {
