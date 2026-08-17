@@ -319,6 +319,7 @@ struct QuickOverlayView: View {
             raw.insert(pinnedItem.createPinnedDuplicate(), at: 0)
         }
         cachedHistoryItems = raw
+        clipboardManager.prefetchThumbnails(for: raw)
     }
     
     private func loadMoreHistoryItems() {

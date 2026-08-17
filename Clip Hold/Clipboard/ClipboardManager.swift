@@ -134,6 +134,42 @@ class ClipboardManager: ObservableObject {
             raw.insert(pinnedItem.createPinnedDuplicate(), at: 0)
         }
         quickOverlayHistoryItems = raw
+        
+        // 最新アイテムのサムネイルを先行生成
+        prefetchThumbnails(for: raw)
+    }
+    
+    /// 指定されたアイテムリストに含まれる画像・PDFのサムネイルをバックグラウンドで先行生成（プリフェッチ）する
+    func prefetchThumbnails(for items: [ClipboardItem]) {
+        let itemsNeedingThumbnail = items.filter { item in
+            item.cachedThumbnailImage == nil && item.filePath != nil && (item.isImage || item.isPDF)
+        }
+        guard !itemsNeedingThumbnail.isEmpty else { return }
+        
+        Task.detached(priority: .utility) {
+            for item in itemsNeedingThumbnail {
+                guard let filePath = item.filePath, item.cachedThumbnailImage == nil else { continue }
+                let thumbnailSize = CGSize(width: 40, height: 40)
+                let request = QLThumbnailGenerator.Request(fileAt: filePath, size: thumbnailSize, scale: NSScreen.main?.backingScaleFactor ?? 1.0, representationTypes: .all)
+                
+                do {
+                    let thumbnail = try await QLThumbnailGenerator.shared.generateBestRepresentation(for: request)
+                    let paddedImage = ClipboardManager.shared.padToSquare(thumbnail.nsImage, size: thumbnailSize)
+                    await MainActor.run {
+                        item.cachedThumbnailImage = paddedImage
+                    }
+                } catch {
+                    if item.isImage {
+                        if let image = NSImage(contentsOf: filePath) {
+                            let paddedImage = ClipboardManager.shared.padToSquare(image, size: thumbnailSize)
+                            await MainActor.run {
+                                item.cachedThumbnailImage = paddedImage
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     // History Window States

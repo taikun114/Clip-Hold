@@ -124,9 +124,9 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         }
     }
     
-    // Codableではないため @Published にできない。
-    // UIの自動更新は、このプロパティの変更後に親のObservableObject (ClipboardManager) の変更を通知することで実現
-    var cachedThumbnailImage: NSImage?
+    // Codableではないため CodingKeys には含めない。
+    // @Published にすることで、サムネイルの非同期生成完了時にビュー（ClipboardItemIconView）へ即時再描画を通知
+    @Published var cachedThumbnailImage: NSImage?
     
     static func == (lhs: ClipboardItem, rhs: ClipboardItem) -> Bool {
         lhs.id == rhs.id

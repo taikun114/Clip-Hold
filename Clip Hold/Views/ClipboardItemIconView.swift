@@ -33,6 +33,7 @@ struct ClipboardItemIconView: View {
         } else {
             // 既存のアイコン
             let baseIconView = generateBaseIcon()
+                .animation(.easeInOut(duration: 0.2), value: item.cachedThumbnailImage != nil)
             
             // アプリアイコンをオーバーレイ表示
             if let sourceAppPath = item.sourceAppPath {
@@ -63,10 +64,12 @@ struct ClipboardItemIconView: View {
             Image(nsImage: cachedIcon)
                 .resizable()
                 .scaledToFit()
+                .transition(.opacity)
         } else if let filePath = item.filePath {
             Image(nsImage: NSWorkspace.shared.icon(forFile: filePath.path))
                 .resizable()
                 .scaledToFit()
+                .transition(.opacity)
                 .task(id: item.id) {
                     if item.cachedThumbnailImage == nil && (item.isImage || item.isPDF) {
                         await generateThumbnailAsync(for: filePath)
