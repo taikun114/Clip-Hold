@@ -209,12 +209,22 @@ struct QuickOverlayView: View {
         .frame(width: 500 + leftInset + rightInset, height: 500 + topInset + bottomInset)
         .background(backgroundMaterial)
         .clipShape(UnevenRoundedRectangle(cornerRadii: overlayCornerRadii))
+        .contentShape(UnevenRoundedRectangle(cornerRadii: overlayCornerRadii))
         .overlay(
             UnevenRoundedRectangle(cornerRadii: overlayCornerRadii)
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 10)
         .padding(60) // Provide space for the shadow to render inside the window
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            Color.white.opacity(0.0001)
+                .onHover { hovering in
+                    if hovering {
+                        clearAllHoverStates()
+                    }
+                }
+        )
         .allowsHitTesting(!quickOverlayManager.isPeeking)
             .onAppear {
                 if type == .history && cachedHistoryItems.isEmpty && !clipboardManager.clipboardHistory.isEmpty {
@@ -250,6 +260,16 @@ struct QuickOverlayView: View {
     }
     
     // MARK: - Subviews
+    
+    private func clearAllHoverStates() {
+        currentSelection = nil
+        QuickOverlayManager.shared.hoveredItemId = nil
+        QuickOverlayManager.shared.hoveredPhraseId = nil
+        QuickOverlayManager.shared.hoveredAction = nil
+        QuickOverlayManager.shared.hoveredCopyAsPlainText = false
+        QuickOverlayManager.shared.hoveredEditAndCopy = false
+        QuickOverlayManager.shared.hoveredCancelCopy = false
+    }
     
     private func resetDisplayLimitAndReleaseMemory() {
         guard type == .history && currentDisplayLimit > 50 else { return }
