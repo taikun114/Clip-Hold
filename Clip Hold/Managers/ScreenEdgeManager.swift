@@ -190,6 +190,25 @@ final class ScreenEdgeManager {
         guard target != .none else { return }
         let overlayType: QuickOverlayType = (target == .standardPhrase) ? .standardPhrase : .history
         
+        let delay = UserDefaults.standard.screenEdgeDelay
+        
+        if delay <= 0.0 {
+            // 0.0秒の場合：ピーク表示を挟まずに即座にフルオープン展開
+            isPeeking = false
+            isFullyTriggered = true
+            peakMouseLocation = mouseLocation
+            
+            Task { @MainActor in
+                QuickOverlayManager.shared.showOverlayFromScreenEdge(
+                    type: overlayType,
+                    position: position,
+                    mouseLocation: mouseLocation
+                )
+            }
+            return
+        }
+        
+        // 0.1秒以上の場合：従来通り24pxのピーク表示を行い、遅延時間経過後にフルオープン
         isPeeking = true
         isFullyTriggered = false
         peakMouseLocation = mouseLocation
@@ -203,7 +222,6 @@ final class ScreenEdgeManager {
             )
         }
         
-        let delay = UserDefaults.standard.screenEdgeDelay
         let nanoseconds = UInt64(delay * 1_000_000_000)
         
         triggerTask = Task { @MainActor in

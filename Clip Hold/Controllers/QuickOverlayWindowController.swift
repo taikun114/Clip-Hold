@@ -184,6 +184,55 @@ class QuickOverlayWindowController: NSWindowController {
         })
     }
     
+    /// スクリーンエッジ展開時のオーバーシュート付きキーフレームアニメーションを作成する共通ヘルパー
+    private func createScreenEdgeExpandAnimation(
+        edgeSide: ScreenEdgeSide,
+        fromOffset: CGFloat,
+        duration: TimeInterval = 0.4
+    ) -> (group: CAAnimationGroup, startTx: CGFloat, startTy: CGFloat) {
+        let txValues: [CGFloat]
+        let tyValues: [CGFloat]
+        
+        switch edgeSide {
+        case .top:
+            txValues = [0.0, 0.0, 0.0]
+            tyValues = [fromOffset, -4.0, 0.0]
+        case .bottom:
+            txValues = [0.0, 0.0, 0.0]
+            tyValues = [-fromOffset, 4.0, 0.0]
+        case .left:
+            txValues = [-fromOffset, 4.0, 0.0]
+            tyValues = [0.0, 0.0, 0.0]
+        case .right:
+            txValues = [fromOffset, -4.0, 0.0]
+            tyValues = [0.0, 0.0, 0.0]
+        }
+        
+        let keyTimes: [NSNumber] = [0.0, 0.75, 1.0]
+        let timingFuncs = [
+            CAMediaTimingFunction(controlPoints: 0.2, 0.8, 0.3, 1.0),
+            CAMediaTimingFunction(controlPoints: 0.25, 1.0, 0.5, 1.0)
+        ]
+        
+        let txAnim = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        txAnim.values = txValues
+        txAnim.keyTimes = keyTimes
+        txAnim.timingFunctions = timingFuncs
+        
+        let tyAnim = CAKeyframeAnimation(keyPath: "transform.translation.y")
+        tyAnim.values = tyValues
+        tyAnim.keyTimes = keyTimes
+        tyAnim.timingFunctions = timingFuncs
+        
+        let group = CAAnimationGroup()
+        group.animations = [txAnim, tyAnim]
+        group.duration = duration
+        group.isRemovedOnCompletion = false
+        group.fillMode = .forwards
+        
+        return (group, txValues[0], tyValues[0])
+    }
+    
     /// ピーク状態から完全表示（フルオープン）への展開アニメーション
     @objc private func expandPeekOverlay(_ notification: NSNotification) {
         guard let window = self.window,
@@ -198,54 +247,15 @@ class QuickOverlayWindowController: NSWindowController {
         } else {
             mode = QuickOverlayManager.shared.presentationMode
         }
-        let txValues: [CGFloat]
-        let tyValues: [CGFloat]
         
+        let edgeSide: ScreenEdgeSide
         if case .screenEdge(let edge, _, _, _) = mode {
-            let offset: CGFloat = 476.0
-            switch edge.edgeSide {
-            case .top:
-                txValues = [0.0, 0.0, 0.0]
-                tyValues = [offset, -4.0, 0.0]
-            case .bottom:
-                txValues = [0.0, 0.0, 0.0]
-                tyValues = [-offset, 4.0, 0.0]
-            case .left:
-                txValues = [-offset, 4.0, 0.0]
-                tyValues = [0.0, 0.0, 0.0]
-            case .right:
-                txValues = [offset, -4.0, 0.0]
-                tyValues = [0.0, 0.0, 0.0]
-            }
+            edgeSide = edge.edgeSide
         } else {
-            txValues = [0.0, 0.0, 0.0]
-            tyValues = [0.0, 0.0, 0.0]
+            edgeSide = .left
         }
         
-        // アニメーションオブジェクトをトランザクション外で事前に作成する
-        let keyTimes: [NSNumber] = [0.0, 0.52, 1.0]
-        let timingFuncs = [
-            CAMediaTimingFunction(controlPoints: 0.16, 1.0, 0.3, 1.0),
-            CAMediaTimingFunction(controlPoints: 0.25, 1.0, 0.5, 1.0)
-        ]
-        
-        let txAnim = CAKeyframeAnimation(keyPath: "transform.translation.x")
-        txAnim.values = txValues
-        txAnim.keyTimes = keyTimes
-        txAnim.timingFunctions = timingFuncs
-        
-        let tyAnim = CAKeyframeAnimation(keyPath: "transform.translation.y")
-        tyAnim.values = tyValues
-        tyAnim.keyTimes = keyTimes
-        tyAnim.timingFunctions = timingFuncs
-        
-        let animDuration: TimeInterval = 0.38
-        
-        let group = CAAnimationGroup()
-        group.animations = [txAnim, tyAnim]
-        group.duration = animDuration
-        group.isRemovedOnCompletion = false
-        group.fillMode = .forwards
+        let anim = createScreenEdgeExpandAnimation(edgeSide: edgeSide, fromOffset: 476.0)
         
         let expandGeneration = animationGeneration
         let animDelegate = AnimationCompletionDelegate { [weak self, weak animationContainerView] in
@@ -260,7 +270,7 @@ class QuickOverlayWindowController: NSWindowController {
             self.expandAnimationDelegate = nil
         }
         self.expandAnimationDelegate = animDelegate
-        group.delegate = animDelegate
+        anim.group.delegate = animDelegate
         
         // window.makeKey()はウィンドウサーバーとの通信が発生するため、
         // CAアニメーション開始前に完了させておく
@@ -275,10 +285,10 @@ class QuickOverlayWindowController: NSWindowController {
         animationContainerView.layer?.removeAllAnimations()
         animationContainerView.layer?.anchorPoint = CGPoint(x: 0.0, y: 0.0)
         animationContainerView.layer?.position = CGPoint(x: 0.0, y: 0.0)
-        animationContainerView.layer?.setValue(txValues[0], forKeyPath: "transform.translation.x")
-        animationContainerView.layer?.setValue(tyValues[0], forKeyPath: "transform.translation.y")
+        animationContainerView.layer?.setValue(anim.startTx, forKeyPath: "transform.translation.x")
+        animationContainerView.layer?.setValue(anim.startTy, forKeyPath: "transform.translation.y")
         animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
-        animationContainerView.layer?.add(group, forKey: "expandAnimation")
+        animationContainerView.layer?.add(anim.group, forKey: "expandAnimation")
         CATransaction.commit()
     }
     
@@ -307,92 +317,97 @@ class QuickOverlayWindowController: NSWindowController {
         
         let mode = QuickOverlayManager.shared.presentationMode
         
-        let txFrom: CGFloat
-        let tyFrom: CGFloat
-        let scaleFrom: CGFloat
-        let animDuration: TimeInterval
-        let timingFunc: CAMediaTimingFunction
-        
         switch mode {
-        case .screenEdge(let edge, _, _, _):
-            scaleFrom = 1.0
-            animDuration = 0.26
-            timingFunc = CAMediaTimingFunction(controlPoints: 0.16, 1.0, 0.3, 1.0)
-            switch edge.edgeSide {
-            case .top:
-                txFrom = 0.0
-                tyFrom = 80.0
-            case .bottom:
-                txFrom = 0.0
-                tyFrom = -80.0
-            case .left:
-                txFrom = -80.0
-                tyFrom = 0.0
-            case .right:
-                txFrom = 80.0
-                tyFrom = 0.0
-            }
-        case .shortcut:
-            scaleFrom = 1.05
-            // 左下(0,0)アンカーでスケールする際、中心を不動に保つための補正移動量: (1.0 - S) * (W / 2)
-            let halfWidth = rootContainer.bounds.width / 2.0
-            let halfHeight = rootContainer.bounds.height / 2.0
-            txFrom = (1.0 - scaleFrom) * halfWidth
-            tyFrom = (1.0 - scaleFrom) * halfHeight
-            animDuration = 0.15
-            timingFunc = CAMediaTimingFunction(name: .easeOut)
-        }
-        
-        // 1. モデル値をアニメーションの「開始値」に設定する（開始時のフラッシュを防ぐ）
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        animationContainerView.layer?.setValue(scaleFrom, forKeyPath: "transform.scale")
-        animationContainerView.layer?.setValue(txFrom, forKeyPath: "transform.translation.x")
-        animationContainerView.layer?.setValue(tyFrom, forKeyPath: "transform.translation.y")
-        CATransaction.commit()
-        
-        // 2. アニメーションを作成
-        let scaleAnim = CABasicAnimation(keyPath: "transform.scale")
-        scaleAnim.fromValue = scaleFrom
-        scaleAnim.toValue = 1.0
-        
-        let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
-        txAnim.fromValue = txFrom
-        txAnim.toValue = 0.0
-        
-        let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
-        tyAnim.fromValue = tyFrom
-        tyAnim.toValue = 0.0
-        
-        let group = CAAnimationGroup()
-        group.animations = [scaleAnim, txAnim, tyAnim]
-        group.duration = animDuration
-        group.timingFunction = timingFunc
-        // アニメーション完了後も最終状態を維持する（モデル値更新時のフラッシュを防ぐ）
-        group.isRemovedOnCompletion = false
-        group.fillMode = .forwards
-        
-        animationContainerView.layer?.add(group, forKey: "showAnimation")
-        
-        window.orderFrontRegardless()
-        window.makeKey()
-        
-        // 3. ウインドウのフェードインと同時に実行し、完了後にモデル値を「終了値」へ更新する
-        NSAnimationContext.runAnimationGroup({ context in
-            context.duration = animDuration
-            context.timingFunction = timingFunc
-            window.animator().alphaValue = 1
-        }, completionHandler: { [weak self, weak animationContainerView] in
-            guard let self, self.animationGeneration == currentGeneration,
-                  let animationContainerView = animationContainerView else { return }
+        case .screenEdge(let edge, _, _, let edgeInset):
+            let outOffset = 500.0 + edgeInset
+            let anim = createScreenEdgeExpandAnimation(edgeSide: edge.edgeSide, fromOffset: outOffset)
+            
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
-            animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
-            animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
+            animationContainerView.layer?.setValue(anim.startTx, forKeyPath: "transform.translation.x")
+            animationContainerView.layer?.setValue(anim.startTy, forKeyPath: "transform.translation.y")
             CATransaction.commit()
-            animationContainerView.layer?.removeAllAnimations()
-        })
+            
+            let animDelegate = AnimationCompletionDelegate { [weak self, weak animationContainerView] in
+                guard let self, self.animationGeneration == currentGeneration,
+                      let animationContainerView = animationContainerView else { return }
+                CATransaction.begin()
+                CATransaction.setDisableActions(true)
+                animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
+                animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
+                CATransaction.commit()
+                animationContainerView.layer?.removeAllAnimations()
+            }
+            anim.group.delegate = animDelegate
+            
+            animationContainerView.layer?.add(anim.group, forKey: "showAnimation")
+            
+            window.level = .floating
+            window.orderFrontRegardless()
+            window.makeKey()
+            
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = 0.15
+                window.animator().alphaValue = 1
+            })
+            
+        case .shortcut:
+            let scaleFrom: CGFloat = 1.05
+            let halfWidth = rootContainer.bounds.width / 2.0
+            let halfHeight = rootContainer.bounds.height / 2.0
+            let txFrom = (1.0 - scaleFrom) * halfWidth
+            let tyFrom = (1.0 - scaleFrom) * halfHeight
+            let animDuration: TimeInterval = 0.15
+            let timingFunc = CAMediaTimingFunction(name: .easeOut)
+            
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            animationContainerView.layer?.setValue(scaleFrom, forKeyPath: "transform.scale")
+            animationContainerView.layer?.setValue(txFrom, forKeyPath: "transform.translation.x")
+            animationContainerView.layer?.setValue(tyFrom, forKeyPath: "transform.translation.y")
+            CATransaction.commit()
+            
+            let scaleAnim = CABasicAnimation(keyPath: "transform.scale")
+            scaleAnim.fromValue = scaleFrom
+            scaleAnim.toValue = 1.0
+            
+            let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
+            txAnim.fromValue = txFrom
+            txAnim.toValue = 0.0
+            
+            let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
+            tyAnim.fromValue = tyFrom
+            tyAnim.toValue = 0.0
+            
+            let group = CAAnimationGroup()
+            group.animations = [scaleAnim, txAnim, tyAnim]
+            group.duration = animDuration
+            group.timingFunction = timingFunc
+            group.isRemovedOnCompletion = false
+            group.fillMode = .forwards
+            
+            animationContainerView.layer?.add(group, forKey: "showAnimation")
+            
+            window.orderFrontRegardless()
+            window.makeKey()
+            
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = animDuration
+                context.timingFunction = timingFunc
+                window.animator().alphaValue = 1
+            }, completionHandler: { [weak self, weak animationContainerView] in
+                guard let self, self.animationGeneration == currentGeneration,
+                      let animationContainerView = animationContainerView else { return }
+                CATransaction.begin()
+                CATransaction.setDisableActions(true)
+                animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
+                animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
+                animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
+                CATransaction.commit()
+                animationContainerView.layer?.removeAllAnimations()
+            })
+        }
     }
     
     @objc private func hideOverlay() {

@@ -75,7 +75,7 @@ struct ScreenEdgeSettingsView: View {
                         
                         Spacer()
                         
-                        Slider(value: $screenEdgeDelay, in: 0.5...2.0, step: 0.1) {
+                        Slider(value: $screenEdgeDelay, in: 0.0...2.0, step: 0.1) {
                             Text("表示までの時間")
                             Text("クイックオーバーレイが表示されるまでマウスカーソルを画面の端に触れ続ける時間を指定します。")
                         }

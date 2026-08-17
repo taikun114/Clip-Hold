@@ -628,9 +628,9 @@ extension UserDefaults {
                 return 0.5
             }
             let val = double(forKey: "screenEdgeDelay")
-            return max(val, 0.5)
+            return max(val, 0.0)
         }
-        set { set(max(newValue, 0.5), forKey: "screenEdgeDelay") }
+        set { set(max(newValue, 0.0), forKey: "screenEdgeDelay") }
     }
     
     func getScreenEdgeTarget(for position: ScreenEdgePosition) -> ScreenEdgeTarget {
