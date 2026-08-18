@@ -137,6 +137,7 @@ struct TextReplacementSectionView: View {
                             .disabled(matches.isEmpty)
                             .help("次の一致へ移動")
                         }
+                        .fixedSize()
                         
                         // マッチ件数表示
                         Text(matches.isEmpty ? "0/0" : "\(currentMatchIndex + 1)/\(matches.count)")
