@@ -37,6 +37,7 @@ struct HistoryItemRow<MenuContent: View>: View {
     
     @Environment(\.colorScheme) var colorScheme
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
+    @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
     
     // アイコンビューの参照を格納するクラス
     let rowIconStore: RowIconStore
@@ -72,9 +73,12 @@ struct HistoryItemRow<MenuContent: View>: View {
     }
     
     private var itemDisplayText: Text {
-        let title = item.displayTitle.replacingNewlinesWithSpaces()
-        let truncatedTitle = title.count > 1000 ? String(title.prefix(1000)) + "..." : title
-        return Text(verbatim: truncatedTitle)
+        let truncatedTitle = item.displayTitle.truncate(maxLength: 1000)
+        if showInvisibleCharacters {
+            return Text(truncatedTitle.formatWithInvisibleSymbols(singleLine: true))
+        } else {
+            return Text(verbatim: truncatedTitle.replacingNewlinesWithSpaces())
+        }
     }
     
     var body: some View {

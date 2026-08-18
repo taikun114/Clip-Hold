@@ -12,6 +12,7 @@ struct QuickOverlayTooltipView: View {
     let characterCount: Int?
     let isCompact: Bool
     
+    @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
     @State private var offset: CGFloat = 0
     @State private var hasStartedMarquee = false
     @State private var marqueeStartTask: Task<Void, Never>?
@@ -129,7 +130,15 @@ struct QuickOverlayTooltipView: View {
         let contentPaddingH: CGFloat = 32
         let visibleHeight = maxVisualHeight - contentPaddingH - headerH - footerH - spacingH
 
-        return Text(text)
+        let displayText: Text = {
+            if showInvisibleCharacters {
+                return Text(text.formatWithInvisibleSymbols(singleLine: false))
+            } else {
+                return Text(text)
+            }
+        }()
+
+        return displayText
             .font(.body)
             .lineLimit(nil)
             .fixedSize(horizontal: false, vertical: true)

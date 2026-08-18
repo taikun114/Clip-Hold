@@ -521,30 +521,8 @@ struct TextReplacementSectionView: View {
         updateMatches()
     }
     
-    /// 空白・改行文字をターシャリーカラーの記号（半角: ␣, 全角: □, 改行: ↵）で可視化した AttributedString を生成
+    /// 空白・改行文字をターシャリーカラーの記号（半角: ␣, 全角: □, タブ: ⇥, 改行: ↵）で可視化した AttributedString を生成
     private func visibleWhitespaceAttributedString(for text: String) -> AttributedString {
-        var result = AttributedString()
-        let normalized = text.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
-        
-        for char in normalized {
-            switch char {
-            case " ": // 半角スペース (U+0020)
-                var attr = AttributedString("␣")
-                attr.foregroundColor = .tertiaryLabelColor
-                result.append(attr)
-            case "\u{3000}": // 全角スペース (U+3000)
-                var attr = AttributedString("□")
-                attr.foregroundColor = .tertiaryLabelColor
-                result.append(attr)
-            case "\n": // 改行 (LF)
-                var attr = AttributedString("↵")
-                attr.foregroundColor = .tertiaryLabelColor
-                result.append(attr)
-            default:
-                let attr = AttributedString(String(char))
-                result.append(attr)
-            }
-        }
-        return result
+        text.formatWithInvisibleSymbols(singleLine: true)
     }
 }

@@ -25,6 +25,8 @@ struct AddEditPhraseView: View {
     }
     
     
+    @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
+    
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
     private var isSheet: Bool = false
@@ -122,6 +124,17 @@ struct AddEditPhraseView: View {
                 }
                 .disabled(!useCustomTitle)
                 .overlay {
+                    if showInvisibleCharacters && !title.isEmpty {
+                        InvisibleSymbolsOverlayView(
+                            text: title,
+                            font: .systemFont(ofSize: NSFont.systemFontSize),
+                            paddingLeading: 7
+                        )
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                    }
+                }
+                .overlay {
                     if colorSchemeContrast == .increased {
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.primary, lineWidth: 1)
@@ -138,10 +151,8 @@ struct AddEditPhraseView: View {
             }
             
             if !showingAddPresetSheet {
-                TextEditor(text: $content)
-                    .font(.system(.body).monospaced())
+                HighlightableTextEditor(text: $content)
                     .frame(minHeight: 100)
-                    .scrollContentBackground(.hidden)
                     .padding(.vertical, 8)
                     .padding(.horizontal, 4)
                     .focused($focusedField, equals: .content)

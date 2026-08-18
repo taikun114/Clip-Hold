@@ -61,6 +61,8 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 - **Add a "Quick Paste to Previous Text Field" option to the General settings**
   - When this setting is used, when you copy, copy as plain text, or change and copy from the History or Standard Phrase window, the focus is returned to the previously focused app before executing Quick Paste. If you are focused on a text field, you can easily copy and paste into the previous text field.
   - You can temporarily disable Quick Paste by holding down the `⌥ (Option)` key.
+- **Add "Show Whitespace and Newline Symbols" setting to Developer settings**
+  - When this setting is enabled, half-width spaces, full-width spaces, newlines, and tabs included in history and standard phrases will be displayed faintly with symbols.
 
 #### Copy History
 - **Add the New Copy feature**

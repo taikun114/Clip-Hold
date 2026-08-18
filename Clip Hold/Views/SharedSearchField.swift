@@ -5,6 +5,7 @@ struct SharedSearchField: View {
     @Binding var searchText: String
     var isSearchFieldFocused: FocusState<Bool>.Binding
     @Environment(\.colorSchemeContrast) var colorSchemeContrast
+    @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
     
     var body: some View {
         TextField(
@@ -20,6 +21,19 @@ struct SharedSearchField: View {
         .cornerRadius(10)
         .controlSize(.large)
         .focused(isSearchFieldFocused)
+        .overlay(
+            Group {
+                if showInvisibleCharacters && !searchText.isEmpty {
+                    InvisibleSymbolsOverlayView(
+                        text: searchText,
+                        font: NSFont.preferredFont(forTextStyle: .title3),
+                        paddingLeading: 30
+                    )
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+                }
+            }
+        )
         .overlay(
             HStack {
                 Image(systemName: "magnifyingglass")

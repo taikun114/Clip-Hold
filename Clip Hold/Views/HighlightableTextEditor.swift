@@ -76,10 +76,12 @@ final class EditorTextController: ObservableObject {
 /// 検索・正規表現のマッチ箇所をハイライト表示可能なテキストエディタ
 struct HighlightableTextEditor: NSViewRepresentable {
     @Binding var text: String
-    var matches: [NSRange]
-    var currentMatchIndex: Int?
-    var controller: EditorTextController?
-    var onCommandF: (() -> Void)?
+    var matches: [NSRange] = []
+    var currentMatchIndex: Int? = nil
+    var controller: EditorTextController? = nil
+    var onCommandF: (() -> Void)? = nil
+    
+    @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -104,6 +106,7 @@ struct HighlightableTextEditor: NSViewRepresentable {
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.isAutomaticTextReplacementEnabled = false
         textView.isAutomaticSpellingCorrectionEnabled = false
+        textView.showInvisibleCharacters = showInvisibleCharacters
         
         textView.textContainer?.containerSize = NSSize(width: scrollView.contentSize.width, height: CGFloat.greatestFiniteMagnitude)
         textView.textContainer?.widthTracksTextView = true
@@ -127,6 +130,7 @@ struct HighlightableTextEditor: NSViewRepresentable {
     func updateNSView(_ nsView: NSScrollView, context: Context) {
         guard let textView = nsView.documentView as? CustomEditorTextView else { return }
         controller?.textView = textView
+        textView.showInvisibleCharacters = showInvisibleCharacters
         
         // テキストの同期（外部からの変更時のみ）
         if textView.string != text {
@@ -234,6 +238,13 @@ struct HighlightableTextEditor: NSViewRepresentable {
 
 class CustomEditorTextView: NSTextView {
     var onCommandF: (() -> Void)?
+    var showInvisibleCharacters: Bool = false {
+        didSet {
+            if oldValue != showInvisibleCharacters {
+                needsDisplay = true
+            }
+        }
+    }
     var zeroWidthMatches: [(range: NSRange, isCurrent: Bool)] = [] {
         didSet {
             needsDisplay = true
@@ -252,6 +263,69 @@ class CustomEditorTextView: NSTextView {
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         
+        drawInvisibleCharacters(dirtyRect)
+        drawZeroWidthMatches(dirtyRect)
+    }
+    
+    /// 不可視文字（半角スペース、全角スペース、タブ、改行）をターシャリーカラーで描画する
+    private func drawInvisibleCharacters(_ dirtyRect: NSRect) {
+        guard showInvisibleCharacters,
+              let layoutManager = layoutManager,
+              let textContainer = textContainer else { return }
+        
+        let nsString = string as NSString
+        let textLength = nsString.length
+        guard textLength > 0 else { return }
+        
+        let editorFont = font ?? NSFont.monospacedSystemFont(ofSize: 13, weight: .regular)
+        let symbolAttributes: [NSAttributedString.Key: Any] = [
+            .font: editorFont,
+            .foregroundColor: NSColor.tertiaryLabelColor
+        ]
+        
+        let origin = textContainerOrigin
+        
+        for i in 0..<textLength {
+            let char = nsString.character(at: i)
+            let symbol: String
+            switch char {
+            case 0x0020: // 半角スペース
+                symbol = "␣"
+            case 0x3000: // 全角スペース
+                symbol = "□"
+            case 0x0009: // タブ
+                symbol = "⇥"
+            case 0x000A: // LF 改行
+                symbol = "↵"
+            default:
+                continue
+            }
+            
+            let glyphIndex = layoutManager.glyphIndexForCharacter(at: i)
+            guard glyphIndex < layoutManager.numberOfGlyphs else { continue }
+            
+            let glyphBounds = layoutManager.boundingRect(forGlyphRange: NSRange(location: glyphIndex, length: 1), in: textContainer)
+            let lineRect = layoutManager.lineFragmentRect(forGlyphAt: glyphIndex, effectiveRange: nil)
+            let symbolSize = (symbol as NSString).size(withAttributes: symbolAttributes)
+            
+            let point: NSPoint
+            if char == 0x000A {
+                let glyphLocation = layoutManager.location(forGlyphAt: glyphIndex)
+                point = NSPoint(x: lineRect.origin.x + glyphLocation.x + origin.x, y: lineRect.origin.y + origin.y)
+            } else {
+                // タブやスペースなど、グリフ幅の中央にシンボルを配置
+                let xOffset = max(0, (glyphBounds.width - symbolSize.width) / 2)
+                point = NSPoint(x: glyphBounds.origin.x + origin.x + xOffset, y: glyphBounds.origin.y + origin.y)
+            }
+            
+            let symbolRect = NSRect(origin: point, size: NSSize(width: max(glyphBounds.width, 16), height: lineRect.height))
+            if dirtyRect.intersects(symbolRect) || dirtyRect.contains(point) {
+                (symbol as NSString).draw(at: point, withAttributes: symbolAttributes)
+            }
+        }
+    }
+    
+    private func drawZeroWidthMatches(_ dirtyRect: NSRect) {
         guard !zeroWidthMatches.isEmpty,
               let layoutManager = layoutManager,
               let textContainer = textContainer else { return }

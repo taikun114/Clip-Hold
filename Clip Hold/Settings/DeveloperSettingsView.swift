@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DeveloperSettingsView: View {
     @AppStorage("showCharacterCount") var showCharacterCount: Bool = false
+    @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
     @AppStorage("enableColorCodeFilter") var enableColorCodeFilter: Bool = false
     
@@ -27,6 +28,23 @@ struct DeveloperSettingsView: View {
                     Toggle(isOn: $showCharacterCount) {
                         Text("文字数カウントを表示")
                         Text("履歴ウィンドウとメニューの日付の後に、文字数カウントを表示します。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("空白・改行記号を表示")
+                        Text("半角スペース、全角スペース、改行、タブを記号で表示します。テキスト置換の履歴では、この設定に関わらず常に表示されます。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $showInvisibleCharacters) {
+                        Text("空白・改行記号を表示")
+                        Text("半角スペース、全角スペース、改行、タブを記号で表示します。テキスト置換の履歴では、この設定に関わらず常に表示されます。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()

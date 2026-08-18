@@ -19290,6 +19290,40 @@
         }
       }
     },
+    "半角スペース、全角スペース、改行、タブを記号で表示します。テキスト置換の履歴では、この設定に関わらず常に表示されます。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt Halbbreiten-Leerzeichen, Vollbreiten-Leerzeichen, Zeilenumbrüche und Tabulatoren als Symbole an. Im Verlauf der Textersetzung werden sie unabhängig von dieser Einstellung immer angezeigt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Displays half-width spaces, full-width spaces, newlines, and tabs with symbols. In text replacement history, they are always displayed regardless of this setting."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra espacios de ancho medio, espacios de ancho completo, saltos de línea y tabulaciones con símbolos. En el historial de reemplazo de texto, siempre se muestran independientemente de esta configuración."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affiche les demi-espaces, les espaces pleins, les sauts de ligne et les tabulations avec des symboles. Dans l'historique de remplacement de texte, ils sont toujours affichés quel que soit ce paramètre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "半角スペース、全角スペース、改行、タブを記号で表示します。テキスト置換の履歴では、この設定に関わらず常に表示されます。"
+          }
+        }
+      }
+    },
     "単語単位で一致" : {
       "localizations" : {
         "de" : {
@@ -24579,6 +24613,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "移動"
+          }
+        }
+      }
+    },
+    "空白・改行記号を表示" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leerzeichen- und Zeilenumbruchsymbole anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Whitespace and Newline Symbols"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar símbolos de espacios y saltos de línea"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher les symboles d'espaces et de sauts de ligne"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "空白・改行記号を表示"
           }
         }
       }

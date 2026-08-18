@@ -21,6 +21,7 @@ struct StandardPhraseItemRow<MenuContent: View>: View {
     let index: Int
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
+    @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
     
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
@@ -59,16 +60,29 @@ struct StandardPhraseItemRow<MenuContent: View>: View {
             }
             
             VStack(alignment: .leading) {
-                Text(phrase.title.replacingNewlinesWithSpaces())
-                    .font(.body)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .foregroundStyle(.primary)
-                Text(phrase.content.replacingNewlinesWithSpaces())
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                if showInvisibleCharacters {
+                    Text(phrase.title.formatWithInvisibleSymbols(singleLine: true))
+                        .font(.body)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .foregroundStyle(.primary)
+                    Text(phrase.content.formatWithInvisibleSymbols(singleLine: true))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                } else {
+                    Text(phrase.title.replacingNewlinesWithSpaces())
+                        .font(.body)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .foregroundStyle(.primary)
+                    Text(phrase.content.replacingNewlinesWithSpaces())
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
             }
             
             Spacer()

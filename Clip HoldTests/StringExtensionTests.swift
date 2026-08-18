@@ -48,5 +48,39 @@ struct StringExtensionTests {
         // 空文字の場合
         #expect("".replacingNewlinesWithSpaces() == "")
     }
+    
+    @Test
+    func testFormatWithInvisibleSymbolsPlainSingleLine() {
+        let input = " Hello\tWorld\u{3000}\nTest\r\nDone\r "
+        let formatted = input.formatWithInvisibleSymbolsPlain(singleLine: true)
+        #expect(formatted == "␣Hello⇥World□↵Test↵Done↵␣")
+        
+        // 空文字
+        #expect("".formatWithInvisibleSymbolsPlain(singleLine: true) == "")
+        
+        // 不可視文字を含まない
+        #expect("ABC".formatWithInvisibleSymbolsPlain(singleLine: true) == "ABC")
+    }
+    
+    @Test
+    func testFormatWithInvisibleSymbolsPlainMultiLine() {
+        let input = "Line1\nLine2\tTab"
+        let formatted = input.formatWithInvisibleSymbolsPlain(singleLine: false)
+        #expect(formatted == "Line1↵\nLine2⇥Tab")
+    }
+    
+    @Test
+    func testFormatWithInvisibleSymbolsAttributedString() {
+        let input = " A\tB\u{3000}C\nD "
+        let attr = input.formatWithInvisibleSymbols(singleLine: true)
+        let plainString = String(attr.characters)
+        #expect(plainString == "␣A⇥B□C↵D␣")
+        
+        // 複数行モード
+        let multiAttr = "A\nB".formatWithInvisibleSymbols(singleLine: false)
+        let multiPlain = String(multiAttr.characters)
+        #expect(multiPlain == "A↵\nB")
+    }
 }
+
 
