@@ -195,7 +195,7 @@ struct ClipHoldApp: App {
                     let shortcutName = element.shortcutName
                     
                     let displayText: String = {
-                        let displayContent = phrase.title.replacingOccurrences(of: "\n", with: " ")
+                        let displayContent = phrase.title.replacingNewlinesWithSpaces()
                         if displayContent.count > 40 {
                             return String(displayContent.prefix(40)) + "..."
                         }
@@ -338,7 +338,7 @@ struct ClipHoldApp: App {
                     let displayText: String = {
                         let content = item.displayTitle
                         
-                        var displayContent = content.replacingOccurrences(of: "\n", with: " ")
+                        var displayContent = content.replacingNewlinesWithSpaces()
                         let dateString = item.date.formatted(for: dateDisplayFormatInMenu, currentDate: dateReloader.now)
                         
                         let characterCountText = showCharacterCount ? String(localized:" - \(item.text.count)文字") : ""

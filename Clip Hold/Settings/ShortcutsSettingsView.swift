@@ -219,7 +219,7 @@ struct ShortcutsSettingsView: View {
                     VStack(alignment: .leading) {
                         Text("ピン留めされた項目をコピーする")
                         if let pinnedItem = clipboardManager.pinnedItem {
-                            Text("「\(pinnedItem.text.replacingOccurrences(of: "\n", with: " "))」")
+                            Text("「\(pinnedItem.text.replacingNewlinesWithSpaces())」")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(1)

@@ -72,7 +72,7 @@ struct HistoryItemRow<MenuContent: View>: View {
     }
     
     private var itemDisplayText: Text {
-        let title = item.displayTitle
+        let title = item.displayTitle.replacingNewlinesWithSpaces()
         let truncatedTitle = title.count > 1000 ? String(title.prefix(1000)) + "..." : title
         return Text(verbatim: truncatedTitle)
     }

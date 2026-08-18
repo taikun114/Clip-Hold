@@ -28,4 +28,25 @@ struct StringExtensionTests {
         let empty = ""
         #expect(empty.truncate(maxLength: 5) == "")
     }
+    
+    @Test
+    func testReplacingNewlinesWithSpaces() {
+        // 改行のみの場合
+        #expect("\n".replacingNewlinesWithSpaces() == " ")
+        #expect("\n\n".replacingNewlinesWithSpaces() == "  ")
+        #expect("\r\n".replacingNewlinesWithSpaces() == " ")
+        #expect("\r".replacingNewlinesWithSpaces() == " ")
+        
+        // 複数行テキストの場合
+        let multiline = "Hello\nWorld\r\nTest\rDone"
+        #expect(multiline.replacingNewlinesWithSpaces() == "Hello World Test Done")
+        
+        // 改行を含まない場合
+        let singleLine = "Hello World"
+        #expect(singleLine.replacingNewlinesWithSpaces() == "Hello World")
+        
+        // 空文字の場合
+        #expect("".replacingNewlinesWithSpaces() == "")
+    }
 }
+

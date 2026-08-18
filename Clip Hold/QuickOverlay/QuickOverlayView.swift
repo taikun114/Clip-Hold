@@ -1077,7 +1077,7 @@ private struct QuickOverlayHistoryItemRow: View {
     }
 
     private var itemDisplayText: Text {
-        let title = item.displayTitle
+        let title = item.displayTitle.replacingNewlinesWithSpaces()
         let truncatedTitle = title.count > 1000 ? String(title.prefix(1000)) + "..." : title
         return Text(verbatim: truncatedTitle)
     }
@@ -1511,12 +1511,12 @@ private struct QuickOverlayStandardPhraseItemRow: View {
             .frame(width: 30, height: 30)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(phrase.title)
+                Text(phrase.title.replacingNewlinesWithSpaces())
                     .font(.body)
                     .foregroundColor(isSelected ? .white : .primary)
                     .lineLimit(1)
 
-                Text(phrase.content)
+                Text(phrase.content.replacingNewlinesWithSpaces())
                     .font(.caption)
                     .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
                     .lineLimit(1)

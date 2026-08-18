@@ -36,7 +36,7 @@ struct ClipboardItemEntity: AppEntity, IndexedEntity {
         dateFormatter.timeStyle = .short
         let dateStr = dateFormatter.string(from: date)
         
-        let cleanText = contentText.replacingOccurrences(of: "\n", with: " ").replacingOccurrences(of: "\r", with: "")
+        let cleanText = contentText.replacingNewlinesWithSpaces()
         
         if isFile, let filename = filename {
             let iconName: String

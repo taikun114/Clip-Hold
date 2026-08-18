@@ -59,12 +59,12 @@ struct StandardPhraseItemRow<MenuContent: View>: View {
             }
             
             VStack(alignment: .leading) {
-                Text(phrase.title)
+                Text(phrase.title.replacingNewlinesWithSpaces())
                     .font(.body)
                     .lineLimit(1)
                     .truncationMode(.tail)
                     .foregroundStyle(.primary)
-                Text(phrase.content)
+                Text(phrase.content.replacingNewlinesWithSpaces())
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)

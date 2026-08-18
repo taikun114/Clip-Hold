@@ -37,7 +37,7 @@ class SpotlightManager: ObservableObject {
             
             let actualPresetName = actualPreset?.name ?? "Default"
             
-            let cleanPhraseContent = phrase.content.replacingOccurrences(of: "\n", with: " ").replacingOccurrences(of: "\r", with: "")
+            let cleanPhraseContent = phrase.content.replacingNewlinesWithSpaces()
             let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
             
             let truncatedTitle = phrase.title.count > 150 ? "\(phrase.title.prefix(150))…" : phrase.title
@@ -86,7 +86,7 @@ class SpotlightManager: ObservableObject {
         presetName: String,
         thumbnailData: Data?
     ) -> CSSearchableItem {
-        let cleanPhraseContent = phrase.content.replacingOccurrences(of: "\n", with: " ").replacingOccurrences(of: "\r", with: "")
+        let cleanPhraseContent = phrase.content.replacingNewlinesWithSpaces()
         let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
         
         let truncatedTitle = phrase.title.count > 150 ? "\(phrase.title.prefix(150))…" : phrase.title
@@ -113,7 +113,7 @@ class SpotlightManager: ObservableObject {
         dateFormatter.timeStyle = .medium
         let dateStr = dateFormatter.string(from: item.date)
         
-        let cleanText = item.text.replacingOccurrences(of: "\n", with: " ").replacingOccurrences(of: "\r", with: "")
+        let cleanText = item.text.replacingNewlinesWithSpaces()
         
         let truncatedContent = cleanText.count > 200 ? "\(cleanText.prefix(200))…" : cleanText
         
