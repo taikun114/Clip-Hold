@@ -56,6 +56,8 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 - **Add the "Quick Overlay" feature**
   - Added a Quick Overlay feature that allows you to easily copy history and standard phrases by appearing while holding down a shortcut key or touching the screen edge with the mouse cursor. When displayed while holding down a shortcut key, actions are executed simply by moving the mouse cursor and releasing the shortcut key, designed for effortless operation without having to click.
   - You can enable Quick Overlay from the "Quick Overlay" section of the General settings. For detailed instructions on how to use it, click the "How to Use Quick Overlay..." button in the "Quick Overlay" section of the General settings.
+- **Add text replacement feature to "Change Item and Copy"**
+  - You can open the text replacement panel by clicking the "Text Replacement" button below the input field in "Change Item and Copy" or by pressing `⌘ (Command)` + `F` to search and replace recurring text or replace patterns using regular expressions.
 - **Add a "Quick Paste to Previous Text Field" option to the General settings**
   - When this setting is used, when you copy, copy as plain text, or change and copy from the History or Standard Phrase window, the focus is returned to the previously focused app before executing Quick Paste. If you are focused on a text field, you can easily copy and paste into the previous text field.
   - You can temporarily disable Quick Paste by holding down the `⌥ (Option)` key.
