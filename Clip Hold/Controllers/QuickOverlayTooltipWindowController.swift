@@ -169,7 +169,9 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let maxVisualWidth: CGFloat = 500
         let shadowPadding: CGFloat = isCompact ? 20 : 60
         let windowPadding: CGFloat = shadowPadding * 2
-        let textPadding: CGFloat = 32 // テキストのパディング（上下16、左右16）
+        let textPadding: CGFloat = 32
+        let showInvisible = UserDefaults.standard.bool(forKey: "showInvisibleCharacters")
+        let layoutText = showInvisible ? text.formatWithInvisibleSymbolsPlain(singleLine: isCompact) : text
         let font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
         
         let gap: CGFloat = 12
@@ -181,7 +183,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let initialVisualWidth: CGFloat
         if isCompact {
             // ボタンツールチップ等：内容に合わせて縮小する
-            let naturalTextWidth = ceil((text as NSString).size(withAttributes: [.font: font]).width) + textPadding
+            let naturalTextWidth = ceil((layoutText as NSString).size(withAttributes: [.font: font]).width) + textPadding
             initialVisualWidth = min(maxVisualWidth, naturalTextWidth)
         } else {
             initialVisualWidth = maxVisualWidth
@@ -308,7 +310,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
         // 確定した effectiveVisualWidth に基づいてテキストの高さを正確に計算
         let textWidth = effectiveVisualWidth - textPadding
-        let textRect = (text as NSString).boundingRect(
+        let textRect = (layoutText as NSString).boundingRect(
             with: NSSize(width: textWidth, height: .greatestFiniteMagnitude),
             options: [.usesLineFragmentOrigin, .usesFontLeading],
             attributes: [.font: font],

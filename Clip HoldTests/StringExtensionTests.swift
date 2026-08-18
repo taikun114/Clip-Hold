@@ -66,7 +66,7 @@ struct StringExtensionTests {
     func testFormatWithInvisibleSymbolsPlainMultiLine() {
         let input = "Line1\nLine2\tTab"
         let formatted = input.formatWithInvisibleSymbolsPlain(singleLine: false)
-        #expect(formatted == "Line1↵\nLine2⇥Tab")
+        #expect(formatted == "Line1↵\nLine2⇥\u{200B}Tab")
     }
     
     @Test

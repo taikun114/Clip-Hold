@@ -22,19 +22,20 @@ extension String {
     func formatWithInvisibleSymbols(singleLine: Bool = false) -> AttributedString {
         var result = AttributedString()
         let normalized = self.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
+        let breakOpportunity = singleLine ? "" : "\u{200B}"
         
         for char in normalized {
             switch char {
             case " ": // 半角スペース (U+0020)
-                var attr = AttributedString("␣")
+                var attr = AttributedString("␣" + breakOpportunity)
                 attr.foregroundColor = .tertiaryLabelColor
                 result.append(attr)
             case "\u{3000}": // 全角スペース (U+3000)
-                var attr = AttributedString("□")
+                var attr = AttributedString("□" + breakOpportunity)
                 attr.foregroundColor = .tertiaryLabelColor
                 result.append(attr)
             case "\t": // タブ (U+0009)
-                var attr = AttributedString("⇥")
+                var attr = AttributedString("⇥" + breakOpportunity)
                 attr.foregroundColor = .tertiaryLabelColor
                 result.append(attr)
             case "\n": // 改行 (LF)
@@ -57,15 +58,16 @@ extension String {
     func formatWithInvisibleSymbolsPlain(singleLine: Bool = false) -> String {
         var result = ""
         let normalized = self.replacingOccurrences(of: "\r\n", with: "\n").replacingOccurrences(of: "\r", with: "\n")
+        let breakOpportunity = singleLine ? "" : "\u{200B}"
         
         for char in normalized {
             switch char {
             case " ":
-                result.append("␣")
+                result.append("␣" + breakOpportunity)
             case "\u{3000}":
-                result.append("□")
+                result.append("□" + breakOpportunity)
             case "\t":
-                result.append("⇥")
+                result.append("⇥" + breakOpportunity)
             case "\n":
                 result.append("↵")
                 if !singleLine {
