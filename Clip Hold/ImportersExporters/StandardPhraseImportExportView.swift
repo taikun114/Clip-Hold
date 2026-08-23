@@ -293,7 +293,11 @@ struct StandardPhraseImportExportView: View {
                 }
             )
         }
-        .sheet(isPresented: $showingImportConflictSheet) {
+        .sheet(isPresented: $showingImportConflictSheet, onDismiss: {
+            // シートが完全に閉じた後に状態を安全にリセット
+            presetConflicts.removeAll()
+            currentPresetIndexForConflictResolution = 0
+        }) {
             ImportConflictSheet(
                 presetConflicts: $presetConflicts,
                 currentPresetIndex: $currentPresetIndexForConflictResolution
@@ -305,9 +309,6 @@ struct StandardPhraseImportExportView: View {
                         toPresetId: presetConflict.preset.id
                     )
                 }
-                // 状態をリセット
-                presetConflicts.removeAll()
-                currentPresetIndexForConflictResolution = 0
                 
                 restoreSelectionAfterImport()
             }

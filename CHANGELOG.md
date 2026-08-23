@@ -114,6 +114,7 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
   - To prevent the saved folder capacity from unexpectedly expanding, the capacity threshold before displaying the alert has been reduced.
 
 #### Standard Phrases
+- **Fix issue where the app might crash when completing import conflict resolution**
 - **Changes to the preset icon picker package**
   - Icon names are now displayed, and you can filter by specific categories using the category picker.
 
