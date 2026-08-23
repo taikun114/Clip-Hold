@@ -97,6 +97,7 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 - **Improve to display currently configured shortcut keys in the menu**
 
 #### Copy History
+- **Fix issue where the app might crash when detecting clipboard changes**
 - **Fix issue where processing stopped while the large file copy alert was displayed**
   - With native alerts, all processing stopped while the alert was displayed due to OS constraints. To fix this, a custom alert was implemented. As a result, processing no longer stops even when the alert is displayed, and the alert is always displayed in the foreground.
 - **Fix issue where correct thumbnail images were not displayed when copying images from web browsers or other apps**
