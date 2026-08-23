@@ -40,7 +40,7 @@ struct LicenseInfoModalView: View {
     private let keyboardShortcutsVersionString: String = "3.0.1"
     
     // create-dmgの使用バージョン
-    private let createDmgVersionString: String = "1.2.2"
+    private let createDmgVersionString: String = "1.3.0"
     
     var body: some View {
         // メインのコンテンツ（スクロール可能な部分）を定義
