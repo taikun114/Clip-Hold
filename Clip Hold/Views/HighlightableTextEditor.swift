@@ -132,19 +132,24 @@ struct HighlightableTextEditor: NSViewRepresentable {
         controller?.textView = textView
         textView.showInvisibleCharacters = showInvisibleCharacters
         
-        // テキストの同期（外部からの変更時のみ）
-        if textView.string != text {
+        // 音声入力や日本語入力の未確定テキスト（Marked Text）入力中は外部同期・ハイライト更新をスキップ
+        let hasMarked = textView.hasMarkedText()
+        
+        // テキストの同期（外部からの変更時のみ、かつ未確定テキスト入力中でない場合）
+        if !hasMarked && textView.string != text {
             let selectedRanges = textView.selectedRanges
             textView.string = text
             textView.selectedRanges = selectedRanges
         }
         
-        // ハイライトの適用
-        context.coordinator.updateHighlights(
-            textView: textView,
-            matches: matches,
-            currentMatchIndex: currentMatchIndex
-        )
+        // ハイライトの適用（未確定テキスト入力中でない場合）
+        if !hasMarked {
+            context.coordinator.updateHighlights(
+                textView: textView,
+                matches: matches,
+                currentMatchIndex: currentMatchIndex
+            )
+        }
     }
     
     // MARK: - Coordinator
@@ -160,18 +165,40 @@ struct HighlightableTextEditor: NSViewRepresentable {
         }
         
         func textDidChange(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else { return }
+            guard let textView = notification.object as? CustomEditorTextView else { return }
             if parent.text != textView.string {
                 parent.text = textView.string
+            }
+            
+            // 未確定テキストが確定したタイミングでハイライトを反映
+            if !textView.hasMarkedText() && !parent.matches.isEmpty {
+                updateHighlights(
+                    textView: textView,
+                    matches: parent.matches,
+                    currentMatchIndex: parent.currentMatchIndex
+                )
             }
         }
         
         func updateHighlights(textView: CustomEditorTextView, matches: [NSRange], currentMatchIndex: Int?) {
+            // 未確定テキスト入力中はハイライト更新をスキップして入力セッションの中断を防ぐ
+            if textView.hasMarkedText() {
+                return
+            }
+            
+            // 前回も今回もマッチがない場合は属性クリアなどの余計な処理をスキップ
+            if matches.isEmpty && lastAppliedMatches.isEmpty {
+                if !textView.zeroWidthMatches.isEmpty {
+                    textView.zeroWidthMatches = []
+                }
+                return
+            }
+            
             guard let layoutManager = textView.layoutManager else { return }
             let textLength = (textView.string as NSString).length
             
             let fullRange = NSRange(location: 0, length: textLength)
-            if textLength > 0 {
+            if textLength > 0 && !lastAppliedMatches.isEmpty {
                 layoutManager.removeTemporaryAttribute(.backgroundColor, forCharacterRange: fullRange)
                 layoutManager.removeTemporaryAttribute(.foregroundColor, forCharacterRange: fullRange)
             }
