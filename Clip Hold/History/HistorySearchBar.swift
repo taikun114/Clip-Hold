@@ -81,7 +81,34 @@ struct HistorySearchBar: View {
                     }
                     .pickerStyle(.menu)
                     
-                    // ファイルピッカーを「リンクのみ」の下に配置
+                    // コードピッカーを「テキストのみ」の下に配置
+                    Picker(selection: $selectedFilter) {
+                        Label(ItemFilter.codeAll.displayName, systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27().tag(ItemFilter.codeAll)
+                        Divider()
+                        Label(ItemFilter.codeSwift.displayName, systemImage: "swift").forceIconOnMacOS27().tag(ItemFilter.codeSwift)
+                        Label(ItemFilter.codeJavaScript.displayName, systemImage: "curlybraces").forceIconOnMacOS27().tag(ItemFilter.codeJavaScript)
+                        Label(ItemFilter.codePython.displayName, systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27().tag(ItemFilter.codePython)
+                        Label(ItemFilter.codeHTML.displayName, systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27().tag(ItemFilter.codeHTML)
+                        Label(ItemFilter.codeCSS.displayName, systemImage: "paintbrush").forceIconOnMacOS27().tag(ItemFilter.codeCSS)
+                        Label(ItemFilter.codeJSON.displayName, systemImage: "curlybraces.square").forceIconOnMacOS27().tag(ItemFilter.codeJSON)
+                        Label(ItemFilter.codeYAML.displayName, systemImage: "doc.text").forceIconOnMacOS27().tag(ItemFilter.codeYAML)
+                        Label(ItemFilter.codeTOML.displayName, systemImage: "doc.plaintext").forceIconOnMacOS27().tag(ItemFilter.codeTOML)
+                        Label(ItemFilter.codeMarkdown.displayName, systemImage: "text.alignleft").forceIconOnMacOS27().tag(ItemFilter.codeMarkdown)
+                        Label(ItemFilter.codeGraphQL.displayName, systemImage: "circle.grid.cross").forceIconOnMacOS27().tag(ItemFilter.codeGraphQL)
+                        Label(ItemFilter.codeEnv.displayName, systemImage: "slider.horizontal.3").forceIconOnMacOS27().tag(ItemFilter.codeEnv)
+                        Label(ItemFilter.codeRust.displayName, systemImage: "gearshape").forceIconOnMacOS27().tag(ItemFilter.codeRust)
+                        Label(ItemFilter.codeGo.displayName, systemImage: "shippingbox").forceIconOnMacOS27().tag(ItemFilter.codeGo)
+                        Label(ItemFilter.codeCPP.displayName, systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27().tag(ItemFilter.codeCPP)
+                        Label(ItemFilter.codeJavaKotlin.displayName, systemImage: "cup.and.saucer").forceIconOnMacOS27().tag(ItemFilter.codeJavaKotlin)
+                        Label(ItemFilter.codeSQL.displayName, systemImage: "cylinder").forceIconOnMacOS27().tag(ItemFilter.codeSQL)
+                        Label(ItemFilter.codeShell.displayName, systemImage: "terminal").forceIconOnMacOS27().tag(ItemFilter.codeShell)
+                        Label(ItemFilter.codeOther.displayName, systemImage: "ellipsis.curlybraces").forceIconOnMacOS27().tag(ItemFilter.codeOther)
+                    } label: {
+                        Label("コードのみ", systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27()
+                    }
+                    .pickerStyle(.menu)
+                    
+                    // ファイルピッカーを「コードのみ」の下に配置
                     Picker(selection: $selectedFilter) {
                         // 「すべてのファイル」を最初に表示
                         if #available(macOS 15.0, *) {

@@ -2947,6 +2947,40 @@
         }
       }
     },
+    "C / C++" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C / C++"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C / C++"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C / C++"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C / C++"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C / C++"
+          }
+        }
+      }
+    },
     "Case Sensitive" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3018,6 +3052,38 @@
       }
     },
     "Clip Hold" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clip Hold"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Clip Hold 1.6.3またはそれ以前のバージョンに復元するにはチェックを外す必要があります。" : {
@@ -3915,6 +3981,38 @@
       }
     },
     "create-dmg by Andrey Tarantsov and Andrew Janke" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmg by Andrey Tarantsov and Andrew Janke"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmg by Andrey Tarantsov and Andrew Janke"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmg by Andrey Tarantsov and Andrew Janke"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmg by Andrey Tarantsov and Andrew Janke"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "create-dmg by Andrey Tarantsov and Andrew Janke"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "create-dmgのGitHubページへのリンクを開きます。" : {
@@ -4017,6 +4115,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "提供されたテキストから新しい定型文を作成します。"
+          }
+        }
+      }
+    },
+    "CSS" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSS"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSS"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSS"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSS"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSS"
           }
         }
       }
@@ -4364,6 +4496,38 @@
       }
     },
     "Gemini CLI by Google" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLI by Google"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLI by Google"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLI by Google"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLI by Google"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemini CLI by Google"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Gemini CLIのGitHubページへのリンクを開きます。" : {
@@ -5162,6 +5326,74 @@
         }
       }
     },
+    "Go" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go"
+          }
+        }
+      }
+    },
+    "GraphQL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GraphQL"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GraphQL"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GraphQL"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GraphQL"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GraphQL"
+          }
+        }
+      }
+    },
     "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。" : {
       "comment" : "開発者向け機能設定の「カラーコードに基づくカラーアイコンを表示」機能を説明するテキスト。",
       "localizations" : {
@@ -5193,6 +5425,145 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "HEX、HSL / HSLA、RGB / RGBA形式のカラーコードをコピーすると、履歴・定型文ウィンドウとメニューにその色のアイコンが表示されるようになります。"
+          }
+        }
+      }
+    },
+    "HighlighterSwift by Tony Smith and Juan Pablo Illanes" : {
+      "comment" : "HighlighterSwiftのライブラリ名と作者名を表すテキスト。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HighlighterSwift by Tony Smith and Juan Pablo Illanes"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HighlighterSwift by Tony Smith and Juan Pablo Illanes"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HighlighterSwift by Tony Smith and Juan Pablo Illanes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HighlighterSwift by Tony Smith and Juan Pablo Illanes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HighlighterSwift by Tony Smith and Juan Pablo Illanes"
+          }
+        }
+      }
+    },
+    "HighlighterSwiftのGitHubページへのリンクを開きます。" : {
+      "comment" : "HighlighterSwiftのGitHubページへのリンクを開くボタンのツールチップテキスト。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link zur HighlighterSwift GitHub-Seite öffnen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open link to the HighlighterSwift GitHub page."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir enlace a la página de GitHub de HighlighterSwift."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le lien vers la page GitHub de HighlighterSwift."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HighlighterSwiftのGitHubページへのリンクを開きます。"
+          }
+        }
+      }
+    },
+    "HighlighterSwiftのGitHubページを開いてもよろしいですか？" : {
+      "comment" : "ユーザに、HighlighterSwiftのGitHubページを開いても良いかどうかを尋ねるアラートメッセージ。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Möchten Sie die HighlighterSwift GitHub-Seite wirklich öffnen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to open the HighlighterSwift GitHub page?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Está seguro de que quiere abrir la página de GitHub de HighlighterSwift?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voulez-vous vraiment ouvrir la page GitHub de HighlighterSwift ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HighlighterSwiftのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "HTML / XML" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTML / XML"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTML / XML"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTML / XML"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTML / XML"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTML / XML"
           }
         }
       }
@@ -5300,7 +5671,141 @@
         }
       }
     },
+    "Java / Kotlin" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Java / Kotlin"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Java / Kotlin"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Java / Kotlin"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Java / Kotlin"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Java / Kotlin"
+          }
+        }
+      }
+    },
+    "JavaScript / TypeScript" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript / TypeScript"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript / TypeScript"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript / TypeScript"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript / TypeScript"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JavaScript / TypeScript"
+          }
+        }
+      }
+    },
+    "JSON" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "JSON"
+          }
+        }
+      }
+    },
     "KeyboardShortcuts by Sindre Sorhus" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KeyboardShortcuts by Sindre Sorhus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KeyboardShortcuts by Sindre Sorhus"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KeyboardShortcuts by Sindre Sorhus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KeyboardShortcuts by Sindre Sorhus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "KeyboardShortcuts by Sindre Sorhus"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "KeyboardShortcutsのGitHubページへのリンクを開きます。" : {
@@ -5477,6 +5982,40 @@
         }
       }
     },
+    "Markdown" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markdown"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markdown"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markdown"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markdown"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Markdown"
+          }
+        }
+      }
+    },
     "megabytes_unit" : {
       "comment" : "メガバイト単位の容量を表す単位。例：5 MB",
       "localizations" : {
@@ -5616,6 +6155,12 @@
     },
     "OK" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5623,6 +6168,18 @@
           }
         },
         "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -6050,6 +6607,40 @@
         }
       }
     },
+    "Python" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Python"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Python"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Python"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Python"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Python"
+          }
+        }
+      }
+    },
     "QRコード" : {
       "comment" : "QRコード表示画面のタイトルテキスト。",
       "localizations" : {
@@ -6295,6 +6886,38 @@
       }
     },
     "Qwen Code by Qwen" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen Code by Qwen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen Code by Qwen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen Code by Qwen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen Code by Qwen"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qwen Code by Qwen"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "Qwen CodeのGitHubページへのリンクを開きます。" : {
@@ -6397,6 +7020,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再開"
+          }
+        }
+      }
+    },
+    "Rust" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rust"
           }
         }
       }
@@ -7150,6 +7807,40 @@
         }
       }
     },
+    "Spotlight" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spotlight"
+          }
+        }
+      }
+    },
     "Spotlightインデックスをリセット" : {
       "localizations" : {
         "de" : {
@@ -7218,6 +7909,40 @@
         }
       }
     },
+    "SQL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SQL"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SQL"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SQL"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SQL"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SQL"
+          }
+        }
+      }
+    },
     "Standard Phrase" : {
       "localizations" : {
         "de" : {
@@ -7282,6 +8007,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "状態"
+          }
+        }
+      }
+    },
+    "Swift" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swift"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swift"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swift"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swift"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Swift"
           }
         }
       }
@@ -7797,7 +8556,73 @@
         }
       }
     },
+    "TOML" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TOML"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TOML"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TOML"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TOML"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "TOML"
+          }
+        }
+      }
+    },
     "UniversalSFSymbolsPicker by Taiga Imaura" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UniversalSFSymbolsPicker by Taiga Imaura"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UniversalSFSymbolsPicker by Taiga Imaura"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UniversalSFSymbolsPicker by Taiga Imaura"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UniversalSFSymbolsPicker by Taiga Imaura"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UniversalSFSymbolsPicker by Taiga Imaura"
+          }
+        }
+      },
       "shouldTranslate" : false
     },
     "UniversalSFSymbolsPickerのGitHubページへのリンクを開きます。" : {
@@ -7866,6 +8691,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "UniversalSFSymbolsPickerのGitHubページを開いてもよろしいですか？"
+          }
+        }
+      }
+    },
+    "YAML" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YAML"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YAML"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YAML"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YAML"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YAML"
           }
         }
       }
@@ -11336,6 +12195,143 @@
         }
       }
     },
+    "コードのみ" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur Code"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code Only"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code uniquement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードのみ"
+          }
+        }
+      }
+    },
+    "コード検出" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code-Erkennung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code Detection"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detección de código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Détection du code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コード検出"
+          }
+        }
+      }
+    },
+    "コード検出インデックスをリセット" : {
+      "comment" : "開発者向け設定にある、コピー履歴のコード検出インデックスをリセットする項目のタイトルテキスト。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code-Erkennungsindex zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Code Detection Index"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer índice de detección de código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser l'index de détection du code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コード検出インデックスをリセット"
+          }
+        }
+      }
+    },
+    "コード検出インデックス状況" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code-Erkennungsindex-Status"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code Detection Index Status"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estado del índice de detección de código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statut de l'index de détection du code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コード検出インデックス状況"
+          }
+        }
+      }
+    },
     "ここで設定した容量よりも大きいファイルをコピーしようとした際に、コピーしたファイルを履歴に保存するかどうかを求めるアラートが表示されます。" : {
       "comment" : "コピー履歴設定の「コピーアラートを表示する容量」オフションを説明するテキスト。",
       "localizations" : {
@@ -12310,6 +13306,41 @@
         }
       }
     },
+    "コピー履歴のコード検出インデックスをリセットして、再判定します。" : {
+      "comment" : "開発者向け設定の「コード検出インデックスをリセット」オプションを説明するテキスト。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setzt den Code-Erkennungsindex des Kopierverlaufs zurück und bewertet ihn neu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset the code detection index of the clipboard history and re-evaluate."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablece el índice de detección de código del historial de copias y vuelve a evaluar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialise l'index de détection du code de l'historique du presse-papiers et réévalue."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピー履歴のコード検出インデックスをリセットして、再判定します。"
+          }
+        }
+      }
+    },
     "コミュニティ" : {
       "comment" : "コミュニティーページにアクセスするためのコミュニティーボタン。",
       "localizations" : {
@@ -12411,6 +13442,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サポートとフィードバック"
+          }
+        }
+      }
+    },
+    "シェルスクリプト" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shell-Skript"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shell Script"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Script de shell"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Script shell"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "シェルスクリプト"
           }
         }
       }
@@ -13038,6 +14103,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべてのクリップボード履歴を本当に削除しますか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
+    "すべてのコード" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Codes"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo el código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのコード"
           }
         }
       }
@@ -13939,6 +15038,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "そのままにする"
+          }
+        }
+      }
+    },
+    "その他のコード" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anderer Code"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other Code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otro código"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autre code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他のコード"
           }
         }
       }
@@ -22126,6 +23259,41 @@
         }
       }
     },
+    "履歴や定型文の数によっては、再判定が完全に終わるまでに時間がかかることがあります。よろしいですか？" : {
+      "comment" : "開発者向け設定の「コード検出インデックスをリセット」ボタンをクリックしたときに表示されるアラートメッセージ。",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je nach Anzahl der Verlaufselemente und Standardfloskeln kann die vollständige Neubewertung einige Zeit in Anspruch nehmen. Möchten Sie fortfahren?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depending on the number of history items and standard phrases, re-evaluating may take some time to complete. Are you sure you want to continue?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Según la cantidad de elementos del historial y frases estándar, la reevaluación puede tardar un tiempo en completarse. ¿Deseas continuar?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selon le nombre d'éléments d'historique et de phrases standard, la réévaluation peut prendre un certain temps. Voulez-vous continuer ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "履歴や定型文の数によっては、再判定が完全に終わるまでに時間がかかることがあります。よろしいですか？"
+          }
+        }
+      }
+    },
     "履歴リスト" : {
       "comment" : "そのリストがコピー履歴リストであることを表すアクセシビリティテキスト。",
       "localizations" : {
@@ -24334,6 +25502,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "現在のプリセットアイコンを表示する"
+          }
+        }
+      }
+    },
+    "環境変数 (.env)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umgebungsvariablen (.env)"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Environment Variables (.env)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables de entorno (.env)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variables d'environnement (.env)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "環境変数 (.env)"
           }
         }
       }

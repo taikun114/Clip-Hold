@@ -1136,6 +1136,12 @@ private struct QuickOverlayHistoryItemRow: View {
                         Text(item.date.formatted(for: dateDisplayFormatInQuickOverlay, currentDate: dateReloader.now))
                             .lineLimit(1)
 
+                        if item.isCode, let language = item.detectedLanguage {
+                            Text("-")
+                            Text(language.displayName)
+                                .lineLimit(1)
+                        }
+
                         if showCharacterCount {
                             Text("-")
                             Text("\(item.text.count)文字")

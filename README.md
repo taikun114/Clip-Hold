@@ -49,11 +49,12 @@
     - [Buy Me a Coffee](#buy-me-a-coffee)
     - [PayPal.Me](#paypalme)
 - [Credits](#credits)
-  - [Google Gemini by Google](#google-gemini-by-google)
-  - [Gemini CLI by Google](#gemini-cli-by-google)
+  - [Antigravity and Gemini CLI by Google](#antigravity-and-gemini-cli-by-google)
   - [Qwen Code by Qwen](#qwen-code-by-qwen)
   - [KeyboardShortcuts by Sindre Sorhus](#keyboardshortcuts-by-sindre-sorhus)
   - [SFSymbolsPicker by Kenny Wang](#sfsymbolspicker-by-kenny-wang)
+  - [UniversalSFSymbolsPicker by Taiga Imaura](#universalsfsymbolspicker-by-taiga-imaura)
+  - [HighlighterSwift by Tony Smith and Juan Pablo Illanes](#highlighterswift-by-tony-smith-and-juan-pablo-illanes)
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
 ## What is Clip Hold?
@@ -173,20 +174,23 @@ You can support me at [**Buy Me a Coffee**](https://www.buymeacoffee.com/i_am_ta
 If you have a PayPal account, you can also donate directly at [**PayPal**](https://paypal.me/taikun114).
 
 ## Credits
-### [Google Gemini](https://gemini.google.com/) by Google
-Clip Hold was developed using Google's generative AI, Google Gemini (2.5 Flash). As I have no knowledge of programming, including Swift, I would not have been able to complete this app without the help of the generative AI.
-
-### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google
-Gemini CLI has been very helpful in integrating Google Gemini into development. It automatically rewrites the code files, builds them, and even fixes them automatically, which has greatly reduced the amount of work I have to do when developing.
+### [Antigravity](https://antigravity.google/) and [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google
+These wonderful generative AI tools were used in the development of Clip Hold. As a person with a physical disability that makes keyboard input difficult, I would not have been able to complete this app without the power of generative AI.
 
 ### [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen
-In addition to Google Gemini, Clip Hold 1.3.0 and later were developed using Qwen Code, which was developed by Qwen, the Alibaba AI development team. Qwen Code offers an advanced coding model (Qwen3 Coder Plus at the time of development of Clip Hold 1.3.0) and a very generous usage limit of up to 2000 requests per day for free, which allowed me to continue developing smoothly and without interruption.
+In addition to these tools, Clip Hold 1.3.0 and later were developed using Qwen Code, which was developed by Qwen, the Alibaba AI development team.
 
 ### [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) by Sindre Sorhus
 The KeyboardShortcuts package was used to implement the global shortcut keys for Clip Hold. Thanks to this package, I was able to implement the shortcut functionality very smoothly.
 
 ### [SFSymbolsPicker](https://github.com/jaywcjlove/SFSymbolsPicker) by Kenny Wang
-The SFSymbolsPicker package was used to implement the symbol picker for presets added in Clip Hold 1.6.0. Thanks to this package, I was able to easily implement a symbol picker that allows users to select icons.
+The SFSymbolsPicker package was used to implement the symbol picker for presets implemented in Clip Hold 1.6.0 to 1.6.3. Thanks to this package, I was able to easily implement a symbol picker that allows users to select icons.
+
+### [UniversalSFSymbolsPicker](https://github.com/taikun114/UniversalSFSymbolsPicker) by Taiga Imaura
+The UniversalSFSymbolsPicker package was used in Clip Hold 1.7.0 to enhance the symbol picker.
+
+### [HighlighterSwift](https://github.com/smittytone/HighlighterSwift) by Tony Smith and Juan Pablo Illanes
+The HighlighterSwift package was used for syntax highlighting of code in the Quick Overlay tooltip added in Clip Hold 1.7.0. Thanks to this package, I was able to easily implement beautiful syntax highlighting.
 
 ### [create-dmg](https://github.com/create-dmg/create-dmg) by Andrey Tarantsov and Andrew Janke
 The create-dmg shell script was used to create a disk image to distribute the free version. Thanks to this shell script, I was able to easily create a customized disk image.

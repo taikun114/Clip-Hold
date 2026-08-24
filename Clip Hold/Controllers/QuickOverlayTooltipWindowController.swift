@@ -172,7 +172,10 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let textPadding: CGFloat = 32
         let showInvisible = UserDefaults.standard.bool(forKey: "showInvisibleCharacters")
         let layoutText = showInvisible ? text.formatWithInvisibleSymbolsPlain(singleLine: isCompact) : text
-        let font = NSFont.systemFont(ofSize: NSFont.systemFontSize)
+        let isCode = (filePath == nil) && CodeDetector.isCode(text)
+        let font = isCode
+            ? (NSFont(name: "Menlo", size: NSFont.systemFontSize) ?? NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular))
+            : NSFont.systemFont(ofSize: NSFont.systemFontSize)
         
         let gap: CGFloat = 12
         let safeMinX = screenRect.minX + gap
@@ -317,7 +320,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             context: nil
         )
         let hasHeader = sourceAppPath != nil
-        let hasFooter = dateString != nil || characterCount != nil
+        let hasFooter = dateString != nil || characterCount != nil || (isCode && CodeDetector.detectLanguage(text) != nil)
         let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
         let headerHeight: CGFloat = hasHeader ? 20 : 0
         let footerHeight: CGFloat = hasFooter ? 14 : 0

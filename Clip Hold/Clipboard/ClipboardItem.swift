@@ -17,6 +17,10 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     @Published var isPartialSize: Bool = false
     @Published var isSizeCalculated: Bool = false
     
+    // コード検出結果および検出エンジンバージョンの保持（Codable対応・事前計算）
+    var codeDetectorVersion: Int? = nil
+    var detectedLanguage: CodeLanguage? = nil
+    
     // 非同期コピー関連のプロパティ (これらはCodableには含めない)
     @Published var isCopying: Bool = false
     @Published var isProgressBarVisible: Bool = false
@@ -53,6 +57,8 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         copy.richText = self.richText
         copy.cachedThumbnailImage = self.cachedThumbnailImage
         copy.originalPinnedItemID = self.id
+        copy.codeDetectorVersion = self.codeDetectorVersion
+        copy.detectedLanguage = self.detectedLanguage
         // 元のUUIDの最初のバイトを反転して決定論的な新しいUUIDを作成
         var uuidBytes = self.id.uuid
         uuidBytes.0 = uuidBytes.0 ^ ClipboardItem.pinnedNamespaceBytes
@@ -111,6 +117,37 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         }
         // URLスキームがhttpまたはhttpsであることを確認
         return url.scheme == "http" || url.scheme == "https"
+    }
+    
+    // テキストがソースコードであるかどうかを判断するヘルパープロパティ
+    var isCode: Bool {
+        guard filePath == nil,
+              !isURL,
+              ColorCodeParser.parseColor(from: text) == nil else {
+            return false
+        }
+        if codeDetectorVersion == CodeDetector.currentDetectorVersion {
+            return detectedLanguage != nil
+        }
+        // 未判定（または旧バージョン）時の即時計算＆キャッシュ
+        let lang = CodeDetector.detectLanguage(text)
+        self.detectedLanguage = lang
+        self.codeDetectorVersion = CodeDetector.currentDetectorVersion
+        return lang != nil
+    }
+    
+    /// コード検出結果とバージョンを事前計算して更新する
+    func updateCodeDetection(targetVersion: Int = CodeDetector.currentDetectorVersion) {
+        guard filePath == nil,
+              !isURL,
+              ColorCodeParser.parseColor(from: text) == nil else {
+            self.detectedLanguage = nil
+            self.codeDetectorVersion = targetVersion
+            return
+        }
+        let lang = CodeDetector.detectLanguage(text)
+        self.detectedLanguage = lang
+        self.codeDetectorVersion = targetVersion
     }
     
     // 表示用のタイトル（必要に応じてローカライズされる）
@@ -191,6 +228,8 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.sourceAppPath = try container.decodeIfPresent(String.self, forKey: .sourceAppPath)
         self.isPartialSize = try container.decodeIfPresent(Bool.self, forKey: .isPartialSize) ?? false
         self.isSizeCalculated = try container.decodeIfPresent(Bool.self, forKey: .isSizeCalculated) ?? false
+        self.codeDetectorVersion = try container.decodeIfPresent(Int.self, forKey: .codeDetectorVersion)
+        self.detectedLanguage = try container.decodeIfPresent(CodeLanguage.self, forKey: .detectedLanguage)
     }
     
     // CodableのためのEncoded関数
@@ -207,10 +246,12 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         try container.encodeIfPresent(sourceAppPath, forKey: .sourceAppPath)
         try container.encode(isPartialSize, forKey: .isPartialSize)
         try container.encode(isSizeCalculated, forKey: .isSizeCalculated)
+        try container.encodeIfPresent(codeDetectorVersion, forKey: .codeDetectorVersion)
+        try container.encodeIfPresent(detectedLanguage, forKey: .detectedLanguage)
     }
     
     enum CodingKeys: String, CodingKey {
-        case id, text, richText, date, filePath, fileSize, fileHash, qrCodeContent, sourceAppPath, isPartialSize, isSizeCalculated
+        case id, text, richText, date, filePath, fileSize, fileHash, qrCodeContent, sourceAppPath, isPartialSize, isSizeCalculated, codeDetectorVersion, detectedLanguage
     }
 }
 

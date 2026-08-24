@@ -136,6 +136,11 @@ struct HistoryItemRow<MenuContent: View>: View {
                     HStack(spacing: 4) {
                         Text(item.date.formatted(for: dateDisplayFormatInHistoryWindow, currentDate: dateReloader.now))
                         
+                        if item.isCode, let language = item.detectedLanguage {
+                            Text("-")
+                            Text(language.displayName)
+                        }
+                        
                         if showCharacterCount {
                             Text("-")
                             Text("\(item.text.count)文字")

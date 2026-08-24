@@ -12,6 +12,7 @@ struct QuickOverlayTooltipView: View {
     let characterCount: Int?
     let isCompact: Bool
     
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
     @State private var offset: CGFloat = 0
     @State private var hasStartedMarquee = false
@@ -90,11 +91,27 @@ struct QuickOverlayTooltipView: View {
         }
     }
 
+    private var isCode: Bool {
+        filePath == nil && CodeDetector.isCode(text)
+    }
+    
+    private var detectedLanguage: CodeLanguage? {
+        isCode ? CodeDetector.detectLanguage(text) : nil
+    }
+    
+    private var hasHeader: Bool {
+        sourceAppPath != nil
+    }
+    
+    private var hasFooter: Bool {
+        dateString != nil || characterCount != nil || detectedLanguage != nil
+    }
+
     private var textTooltip: some View {
         VStack(alignment: .leading, spacing: 16) {
             appHeaderView
             textBody
-            if dateString != nil || characterCount != nil {
+            if hasFooter {
                 metadataFooterView
             }
         }
@@ -103,14 +120,20 @@ struct QuickOverlayTooltipView: View {
 
     @ViewBuilder
     private var metadataFooterView: some View {
-        if dateString != nil || characterCount != nil {
+        if hasFooter {
             HStack {
                 if let dateString {
                     Text(dateString)
                         .lineLimit(1)
                 }
                 Spacer()
-                if let characterCount {
+                if let detectedLanguage, let characterCount {
+                    (Text(verbatim: "\(detectedLanguage.localizedName) - ") + Text("\(characterCount)文字"))
+                        .lineLimit(1)
+                } else if let detectedLanguage {
+                    Text(detectedLanguage.localizedName)
+                        .lineLimit(1)
+                } else if let characterCount {
                     Text("\(characterCount)文字")
                         .lineLimit(1)
                 }
@@ -121,8 +144,6 @@ struct QuickOverlayTooltipView: View {
     }
 
     private var textBody: some View {
-        let hasHeader = sourceAppPath != nil
-        let hasFooter = dateString != nil || characterCount != nil
         let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
         let spacingH: CGFloat = spacingCount * 16
         let headerH: CGFloat = hasHeader ? 20 : 0
@@ -133,13 +154,16 @@ struct QuickOverlayTooltipView: View {
         let displayText: Text = {
             if showInvisibleCharacters {
                 return Text(text.formatWithInvisibleSymbols(singleLine: false))
+            } else if isCode {
+                let highlighted = CodeHighlighter.shared.highlight(text, as: detectedLanguage?.highlighterLanguageName, isDark: colorScheme == .dark)
+                return Text(highlighted)
             } else {
                 return Text(text)
             }
         }()
 
         return displayText
-            .font(.body)
+            .font(isCode ? .system(.body, design: .monospaced) : .body)
             .lineLimit(nil)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -235,8 +259,6 @@ struct QuickOverlayTooltipView: View {
     private func startMarquee() {
         guard !hasStartedMarquee else { return }
         
-        let hasHeader = sourceAppPath != nil
-        let hasFooter = dateString != nil || characterCount != nil
         let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
         let spacingH: CGFloat = spacingCount * 16
         let headerH: CGFloat = hasHeader ? 20 : 0

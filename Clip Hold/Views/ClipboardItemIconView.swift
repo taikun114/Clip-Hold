@@ -60,6 +60,12 @@ struct ClipboardItemIconView: View {
                 .scaledToFit()
                 .padding(4)
                 .foregroundStyle(isSelected ? .white : .secondary)
+        } else if item.isCode {
+            Image(systemName: "chevron.left.forwardslash.chevron.right")
+                .resizable()
+                .scaledToFit()
+                .padding(4)
+                .foregroundStyle(isSelected ? .white : .secondary)
         } else if let cachedIcon = item.cachedThumbnailImage {
             Image(nsImage: cachedIcon)
                 .resizable()

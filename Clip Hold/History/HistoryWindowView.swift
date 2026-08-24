@@ -134,6 +134,44 @@ struct HistoryWindowView: View {
                     matchesFilter = item.filePath == nil && item.richText == nil
                 case .linkOnly:
                     matchesFilter = item.isURL
+                case .codeAll:
+                    matchesFilter = item.isCode
+                case .codeSwift:
+                    matchesFilter = item.isCode && item.detectedLanguage == .swift
+                case .codeJavaScript:
+                    matchesFilter = item.isCode && item.detectedLanguage == .javascript
+                case .codePython:
+                    matchesFilter = item.isCode && item.detectedLanguage == .python
+                case .codeHTML:
+                    matchesFilter = item.isCode && item.detectedLanguage == .html
+                case .codeCSS:
+                    matchesFilter = item.isCode && item.detectedLanguage == .css
+                case .codeJSON:
+                    matchesFilter = item.isCode && item.detectedLanguage == .json
+                case .codeYAML:
+                    matchesFilter = item.isCode && item.detectedLanguage == .yaml
+                case .codeTOML:
+                    matchesFilter = item.isCode && item.detectedLanguage == .toml
+                case .codeMarkdown:
+                    matchesFilter = item.isCode && item.detectedLanguage == .markdown
+                case .codeGraphQL:
+                    matchesFilter = item.isCode && item.detectedLanguage == .graphql
+                case .codeEnv:
+                    matchesFilter = item.isCode && item.detectedLanguage == .env
+                case .codeRust:
+                    matchesFilter = item.isCode && item.detectedLanguage == .rust
+                case .codeGo:
+                    matchesFilter = item.isCode && item.detectedLanguage == .go
+                case .codeCPP:
+                    matchesFilter = item.isCode && item.detectedLanguage == .cpp
+                case .codeJavaKotlin:
+                    matchesFilter = item.isCode && item.detectedLanguage == .javaKotlin
+                case .codeSQL:
+                    matchesFilter = item.isCode && item.detectedLanguage == .sql
+                case .codeShell:
+                    matchesFilter = item.isCode && item.detectedLanguage == .shell
+                case .codeOther:
+                    matchesFilter = item.isCode && (item.detectedLanguage == .other || item.detectedLanguage == nil)
                 case .fileOnly:
                     matchesFilter = item.filePath != nil
                 case .folderOnly:

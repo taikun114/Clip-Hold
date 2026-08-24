@@ -37,7 +37,10 @@ struct HistoryFilterSortTests {
         
         let colorItem = ClipboardItem(text: "#FF5733")
         
-        let allItems = [plainItem, richItem, imageItem, videoItem, pdfItem, urlItem, colorItem]
+        let swiftCodeItem = ClipboardItem(text: "func calculateTotal() -> Int { return 100 }")
+        let pythonCodeItem = ClipboardItem(text: "def calculate_total():\n    return 100")
+        
+        let allItems = [plainItem, richItem, imageItem, videoItem, pdfItem, urlItem, colorItem, swiftCodeItem, pythonCodeItem]
         
         // .textPlain フィルタ（ファイルなし＆リッチテキストなし）
         let plainFiltered = allItems.filter { $0.filePath == nil && $0.richText == nil }
@@ -51,6 +54,24 @@ struct HistoryFilterSortTests {
         let richFiltered = allItems.filter { $0.filePath == nil && $0.richText != nil }
         #expect(richFiltered.contains(richItem))
         #expect(!richFiltered.contains(plainItem))
+        
+        // .codeAll フィルタ
+        let codeFiltered = allItems.filter { $0.isCode }
+        #expect(codeFiltered.contains(swiftCodeItem))
+        #expect(codeFiltered.contains(pythonCodeItem))
+        #expect(!codeFiltered.contains(plainItem))
+        #expect(!codeFiltered.contains(urlItem))
+        #expect(!codeFiltered.contains(colorItem))
+        
+        // .codeSwift フィルタ
+        let swiftFiltered = allItems.filter { $0.isCode && $0.detectedLanguage == .swift }
+        #expect(swiftFiltered.contains(swiftCodeItem))
+        #expect(!swiftFiltered.contains(pythonCodeItem))
+        
+        // .codePython フィルタ
+        let pythonFiltered = allItems.filter { $0.isCode && $0.detectedLanguage == .python }
+        #expect(pythonFiltered.contains(pythonCodeItem))
+        #expect(!pythonFiltered.contains(swiftCodeItem))
         
         // .imageOnly フィルタ
         let imageFiltered = allItems.filter { $0.isImage }

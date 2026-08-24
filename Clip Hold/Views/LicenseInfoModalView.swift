@@ -19,6 +19,9 @@ struct LicenseInfoModalView: View {
     @State private var showingUniversalSFSymbolsPickerLinkAlert = false
     @State private var isUniversalSFSymbolsPickerLinkHovered: Bool = false
     
+    @State private var showingHighlighterLinkAlert = false
+    @State private var isHighlighterLinkHovered: Bool = false
+    
     private var appVersionString: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
     }
@@ -35,6 +38,9 @@ struct LicenseInfoModalView: View {
     
     // UniversalSFSymbolsPickerの使用バージョン
     private let universalSFSymbolsPickerVersionString: String = "1.0.1"
+    
+    // HighlighterSwiftの使用バージョン
+    private let highlighterVersionString: String = "3.1.0"
     
     // KeyboardShortcutsの使用バージョン
     private let keyboardShortcutsVersionString: String = "3.0.1"
@@ -164,6 +170,57 @@ struct LicenseInfoModalView: View {
                         }
                         
                         Text(verbatim: "MIT License\n\nCopyright (c) 2026 Taiga Imaura\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.")
+                            .font(.callout.monospaced())
+                    }
+                    
+                    // MARK: - HighlighterSwift by Tony Smith and Juan Pablo Illanes
+                    VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Button(action: {
+                                showingHighlighterLinkAlert = true
+                            }) {
+                                Text("HighlighterSwift by Tony Smith and Juan Pablo Illanes")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(Color.accentColor)
+                                    .underline(isHighlighterLinkHovered)
+                            }
+                            .buttonStyle(.plain)
+                            .help("HighlighterSwiftのGitHubページへのリンクを開きます。")
+                            .onHover { hovered in
+                                isHighlighterLinkHovered = hovered
+                            }
+                            
+                            Text("バージョン: \(highlighterVersionString)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            
+                            Text(verbatim: "MIT License")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                        }
+                        
+                        .alert("リンクを開きますか？", isPresented: $showingHighlighterLinkAlert) {
+                            Button("開く") {
+                                if let url = URL(string: "https://github.com/smittytone/HighlighterSwift") {
+                                    openURL(url)
+                                }
+                            }
+                            Button("キャンセル", role: .cancel) {
+                                // 何もしない
+                            }
+                        } message: {
+                            Text("HighlighterSwiftのGitHubページを開いてもよろしいですか？")
+                        }
+                        
+                        Text(verbatim: "MIT License\n\nCopyright © 2026, Tony Smith (@smittytone)\nPortions copyright © 2016, Juan Pablo Illanes\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.")
+                            .font(.callout.monospaced())
+                        
+                        Text(verbatim: "BSD 3-Clause License")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                        
+                        Text(verbatim: "BSD 3-Clause License (highlight.js)\n\nCopyright © 2006-2026, Josh Goebel and Other Contributors\n\nRedistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.\n2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.\n3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.")
                             .font(.callout.monospaced())
                     }
                     

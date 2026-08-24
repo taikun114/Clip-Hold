@@ -9,6 +9,7 @@ struct DeveloperSettingsView: View {
     @State private var showingResetConfirmation = false
     @State private var showingResetComplete = false
     @State private var showingSpotlightResetConfirmation = false
+    @State private var showingCodeDetectorResetConfirmation = false
     
     @ObservedObject var spotlightManager = SpotlightManager.shared
     @EnvironmentObject var clipboardManager: ClipboardManager
@@ -88,9 +89,8 @@ struct DeveloperSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: カラーコード
             
-            // MARK: - デバッグ
-            Section(header: Text("デバッグ").font(.headline)) {
-                
+            // MARK: - Spotlight
+            Section(header: Text("Spotlight").font(.headline)) {
                 // Spotlight Index Status
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
@@ -141,9 +141,70 @@ struct DeveloperSettingsView: View {
                     Button("リセット...") {
                         showingSpotlightResetConfirmation = true
                     }
+                    .disabled(spotlightManager.isIndexing)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            } // End of Section: Spotlight
+            
+            // MARK: - コード検出
+            Section(header: Text("コード検出").font(.headline)) {
+                // Code Detection Index Status
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text("コード検出インデックス状況")
+                        Spacer()
+                        Text(clipboardManager.isIndexingCodeDetection ? "インデックス中..." : "インデックス済み")
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    if clipboardManager.isIndexingCodeDetection {
+                        ProgressView(
+                            value: (clipboardManager.codeDetectionTotalCount > 0 && clipboardManager.codeDetectionIndexedCount > 0) ? Double(clipboardManager.codeDetectionIndexedCount) : nil,
+                            total: Double(max(1, clipboardManager.codeDetectionTotalCount))
+                        ) {
+                            EmptyView()
+                        } currentValueLabel: {
+                            if clipboardManager.codeDetectionTotalCount > 0 {
+                                HStack {
+                                    if clipboardManager.codeDetectionIndexedCount > 0 {
+                                        let fraction = Double(clipboardManager.codeDetectionIndexedCount) / Double(max(1, clipboardManager.codeDetectionTotalCount))
+                                        Text(fraction, format: .percent.precision(.fractionLength(0)))
+                                        Spacer()
+                                        Text("\(clipboardManager.codeDetectionIndexedCount) / \(clipboardManager.codeDetectionTotalCount)個")
+                                    } else {
+                                        Text("インデックス準備中...")
+                                        Spacer()
+                                        Text("\(clipboardManager.codeDetectionTotalCount)個")
+                                    }
+                                }
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            }
+                        }
+                        .progressViewStyle(.linear)
+                        .id(clipboardManager.codeDetectionResetID)
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("コード検出インデックスをリセット")
+                        Text("コピー履歴のコード検出インデックスをリセットして、再判定します。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("リセット...") {
+                        showingCodeDetectorResetConfirmation = true
+                    }
+                    .disabled(clipboardManager.isIndexingCodeDetection)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            } // End of Section: コード検出
+            
+            // MARK: - デバッグ
+            Section(header: Text("デバッグ").font(.headline)) {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("すべての設定をリセット")
@@ -197,6 +258,16 @@ struct DeveloperSettingsView: View {
             Button("キャンセル", role: .cancel) {}
         } message: {
             Text("履歴や定型文の数によっては、再インデックスが完全に終わるまでに時間がかかる事があります。よろしいですか？")
+        }
+        .alert("コード検出インデックスをリセット", isPresented: $showingCodeDetectorResetConfirmation) {
+            Button("リセット", role: .destructive) {
+                Task {
+                    await clipboardManager.resetCodeDetectionIndex()
+                }
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("履歴や定型文の数によっては、再判定が完全に終わるまでに時間がかかることがあります。よろしいですか？")
         }
     }
     

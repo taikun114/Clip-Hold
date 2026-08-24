@@ -84,6 +84,7 @@ extension ClipboardManager {
 #endif
         }
         
+        newItem.updateCodeDetection()
         self.objectWillChange.send()
         // 履歴を末尾に追加するように変更
         clipboardHistory.append(newItem)
@@ -386,9 +387,109 @@ extension ClipboardManager {
             
             print("ClipboardManager: Clipboard history loaded from new system. Count: \(self.clipboardHistory.count)")
             
-            // 起動時の履歴読み込み後に孤立ファイルのクリーンアップをトリガー
+            // 起動時の履歴読み込み後にコード検出インデックス更新と孤立ファイルのクリーンアップをトリガー
+            #if DEBUG
+            // 起動時引数に -reset-code-detection-index または --reset-code-detection-index が渡されている場合は強制リセット＆再インデックスを実行
+            if ProcessInfo.processInfo.arguments.contains("-reset-code-detection-index") ||
+               ProcessInfo.processInfo.arguments.contains("--reset-code-detection-index") {
+                print("ClipboardManager: Launch argument (-reset-code-detection-index) detected. Force resetting code detection index on launch...")
+                Task {
+                    await self.resetCodeDetectionIndex()
+                }
+            } else {
+                self.triggerCodeDetectionIndexUpdateIfNeeded()
+            }
+            #else
+            self.triggerCodeDetectionIndexUpdateIfNeeded()
+            #endif
             self.triggerOrphanedFilesCleanup()
         }
+    }
+    
+    // MARK: - Code Detection Index Management
+    
+    /// バックグラウンドで古いバージョンまたは未判定のアイテムのコード検出インデックスを更新します。
+    func triggerCodeDetectionIndexUpdateIfNeeded() {
+        guard !self.isIndexingCodeDetection else { return }
+        
+        let hasOutdatedItems = self.clipboardHistory.contains { $0.codeDetectorVersion != CodeDetector.currentDetectorVersion }
+        guard hasOutdatedItems else { return }
+        
+        self.isIndexingCodeDetection = true
+        self.codeDetectionTotalCount = self.clipboardHistory.count
+        self.codeDetectionIndexedCount = 0
+        self.codeDetectionResetID = UUID()
+        
+        self.codeDetectionIndexingTask?.cancel()
+        self.codeDetectionIndexingTask = Task.detached(priority: .utility) { [weak self] in
+            guard let self = self else { return }
+            
+            // メモリ上のアイテムを並行して更新
+            for item in self.clipboardHistory {
+                if Task.isCancelled { return }
+                if item.codeDetectorVersion != CodeDetector.currentDetectorVersion {
+                    item.updateCodeDetection()
+                }
+            }
+            
+            // ディスク上のチャンクファイルにも更新を永続化
+            do {
+                try await ChunkedHistoryManager.shared.updateCodeDetectionIndex(forceAll: false) { progress, total in
+                    await MainActor.run {
+                        self.codeDetectionIndexedCount = progress
+                        self.codeDetectionTotalCount = total
+                    }
+                }
+            } catch {
+                print("ClipboardManager: Error updating code detection index on disk: \(error.localizedDescription)")
+            }
+            
+            await MainActor.run {
+                self.isIndexingCodeDetection = false
+                self.codeDetectionIndexedCount = self.codeDetectionTotalCount
+            }
+        }
+    }
+    
+    /// コード検出インデックスをリセットして、すべての履歴アイテムを再判定します。
+    func resetCodeDetectionIndex() async {
+        await MainActor.run {
+            self.isIndexingCodeDetection = true
+            self.codeDetectionTotalCount = self.clipboardHistory.count
+            self.codeDetectionIndexedCount = 0
+            self.codeDetectionResetID = UUID()
+        }
+        
+        self.codeDetectionIndexingTask?.cancel()
+        self.codeDetectionIndexingTask = Task.detached(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            
+            // メモリ上の全アイテムを再判定
+            for item in self.clipboardHistory {
+                if Task.isCancelled { return }
+                item.updateCodeDetection()
+            }
+            
+            // ディスク上の全チャンクを強制再判定して永続化
+            do {
+                try await ChunkedHistoryManager.shared.updateCodeDetectionIndex(forceAll: true) { progress, total in
+                    await MainActor.run {
+                        self.codeDetectionIndexedCount = progress
+                        self.codeDetectionTotalCount = total
+                    }
+                }
+            } catch {
+                print("ClipboardManager: Error resetting code detection index on disk: \(error.localizedDescription)")
+            }
+            
+            await MainActor.run {
+                self.isIndexingCodeDetection = false
+                self.codeDetectionIndexedCount = self.codeDetectionTotalCount
+                self.objectWillChange.send()
+            }
+        }
+        
+        await self.codeDetectionIndexingTask?.value
     }
     
     // MARK: - Orphaned Files Cleanup

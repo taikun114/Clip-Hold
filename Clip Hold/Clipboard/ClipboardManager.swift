@@ -239,6 +239,13 @@ class ClipboardManager: ObservableObject {
     let historyFileName = "clipboardHistory.json"
     let filesDirectoryName = "ClipboardFiles"
     
+    // コード検出インデックスの状況
+    @Published var isIndexingCodeDetection: Bool = false
+    @Published var codeDetectionIndexedCount: Int = 0
+    @Published var codeDetectionTotalCount: Int = 0
+    @Published var codeDetectionResetID = UUID()
+    var codeDetectionIndexingTask: Task<Void, Never>?
+    
     private var internalCopyTimeoutTask: Task<Void, Never>?
     @Published var isPerformingInternalCopy: Bool = false {
         didSet {

@@ -401,6 +401,8 @@ struct ClipHoldApp: App {
                                 Image(nsImage: clipboardManager.createColorIcon(color: color, size: CGSize(width: 16, height: 16)))
                             } else if item.isURL { // URLの場合
                                 Image(systemName: "paperclip")
+                            } else if item.isCode { // ソースコードの場合
+                                Image(systemName: "chevron.left.forwardslash.chevron.right")
                             } else if let cachedImage = item.cachedThumbnailImage {
                                 Image(nsImage: cachedImage)
                                     .resizable()

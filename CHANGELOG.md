@@ -65,6 +65,9 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
   - When this setting is enabled, half-width spaces, full-width spaces, newlines, and tabs included in history and standard phrases will be displayed faintly with symbols.
 
 #### Copy History
+- **Support for code detection**
+  - The app can now detect whether a history item is code. While detection accuracy is not 100%, it is designed to determine code with high precision. If you notice any misclassifications, please send feedback.
+  - The supported code languages are as follows: `Swift`, `JavaScript`, `Python`, `HTML / XML`, `CSS`, `JSON`, `YAML`, `TOML`, `Markdown`, `GraphQL`, `Environment Variables (.env)`, `Rust`, `Go`, `C / C++`, `Java / Kotlin`, `SQL`, `Shell Script`
 - **Add the New Copy feature**
   - By default, you can press `⌥ (Option)` + `⌘ (Command)` + `A` to enter your favorite text and create a new copy. You no longer need to enter it into a note, etc. when you want to copy a specific string.
 - **Add a pin feature to the copy history**

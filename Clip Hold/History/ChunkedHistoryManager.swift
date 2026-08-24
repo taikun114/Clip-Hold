@@ -394,4 +394,52 @@ actor ChunkedHistoryManager {
             print("ChunkedHistoryManager: Error clearing all history: \(error.localizedDescription)")
         }
     }
+    
+    // MARK: - Code Detection Index Persistence
+    
+    /// コード検出インデックスを一括更新し、各チャンクをディスクに保存します。
+    /// - Parameters:
+    ///   - forceAll: true の場合は全アイテムを強制再判定。false の場合は未判定または旧バージョンのアイテムのみ更新。
+    ///   - onProgress: チャンク単位で (進捗件数, 総件数) を通知するクロージャ。
+    func updateCodeDetectionIndex(
+        forceAll: Bool,
+        onProgress: (@Sendable (Int, Int) async -> Void)? = nil
+    ) async throws {
+        let chunkCount = try getChunkCount()
+        var totalItemsCount = 0
+        
+        // まず総アイテム数を集計
+        for index in 0..<chunkCount {
+            if Task.isCancelled { return }
+            let items = try loadHistoryChunk(at: index)
+            totalItemsCount += items.count
+        }
+        
+        guard totalItemsCount > 0 else { return }
+        
+        var processedCount = 0
+        
+        for index in 0..<chunkCount {
+            if Task.isCancelled { return }
+            let items = try loadHistoryChunk(at: index)
+            var chunkModified = false
+            
+            for i in 0..<items.count {
+                if Task.isCancelled { return }
+                if forceAll || items[i].codeDetectorVersion != CodeDetector.currentDetectorVersion {
+                    items[i].updateCodeDetection()
+                    chunkModified = true
+                }
+                processedCount += 1
+            }
+            
+            if chunkModified {
+                try saveChunk(items, at: index)
+            }
+            
+            if let onProgress = onProgress {
+                await onProgress(processedCount, totalItemsCount)
+            }
+        }
+    }
 }

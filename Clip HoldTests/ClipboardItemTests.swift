@@ -46,6 +46,8 @@ struct ClipboardItemTests {
             isSizeCalculated: true
         )
         item.richText = "<p>HTML内容</p>"
+        item.codeDetectorVersion = 1
+        item.detectedLanguage = .swift
         
         let duplicate = item.createPinnedDuplicate()
         
@@ -59,6 +61,8 @@ struct ClipboardItemTests {
         #expect(duplicate.sourceAppPath == item.sourceAppPath)
         #expect(duplicate.isPartialSize == item.isPartialSize)
         #expect(duplicate.isSizeCalculated == item.isSizeCalculated)
+        #expect(duplicate.codeDetectorVersion == item.codeDetectorVersion)
+        #expect(duplicate.detectedLanguage == item.detectedLanguage)
     }
     
     // MARK: - ファイル種別判定ロジック検証
@@ -122,6 +126,29 @@ struct ClipboardItemTests {
         #expect(!ftpItem.isURL)
     }
     
+    // MARK: - コード判定ロジック検証
+    
+    @Test
+    func testCodeDetection() {
+        let codeItem1 = ClipboardItem(text: "func hello() -> String { return \"world\" }")
+        #expect(codeItem1.isCode)
+        
+        let codeItem2 = ClipboardItem(text: "const data = await fetch('/api/user');")
+        #expect(codeItem2.isCode)
+        
+        let codeItem3 = ClipboardItem(text: "<html><body><p>Hello</p></body></html>")
+        #expect(codeItem3.isCode)
+        
+        let plainTextItem = ClipboardItem(text: "こんにちは、お元気ですか？")
+        #expect(!plainTextItem.isCode)
+        
+        let urlItem = ClipboardItem(text: "https://example.com")
+        #expect(!urlItem.isCode)
+        
+        let colorItem = ClipboardItem(text: "#FFFFFF")
+        #expect(!colorItem.isCode)
+    }
+    
     // MARK: - Codable シリアライズ / デシリアライズ整合性検証
     
     @Test
@@ -138,6 +165,8 @@ struct ClipboardItemTests {
             isSizeCalculated: true
         )
         originalItem.richText = "{\\rtf1\\ansi リッチテキスト}"
+        originalItem.codeDetectorVersion = 1
+        originalItem.detectedLanguage = .json
         
         let encoder = JSONEncoder()
         let data = try encoder.encode(originalItem)
@@ -156,6 +185,37 @@ struct ClipboardItemTests {
         #expect(decodedItem.sourceAppPath == originalItem.sourceAppPath)
         #expect(decodedItem.isPartialSize == originalItem.isPartialSize)
         #expect(decodedItem.isSizeCalculated == originalItem.isSizeCalculated)
+        #expect(decodedItem.codeDetectorVersion == originalItem.codeDetectorVersion)
+        #expect(decodedItem.detectedLanguage == originalItem.detectedLanguage)
+    }
+    
+    @Test
+    func testBackwardCompatibilityWithoutCodeFields() throws {
+        let originalItem = ClipboardItem(text: "guard let name = userName else { return }")
+        originalItem.codeDetectorVersion = 1
+        originalItem.detectedLanguage = .swift
+        
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(originalItem)
+        
+        // JSONオブジェクトから codeDetectorVersion と detectedLanguage を削除して旧形式データをシミュレート
+        var jsonDict = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
+        jsonDict.removeValue(forKey: "codeDetectorVersion")
+        jsonDict.removeValue(forKey: "detectedLanguage")
+        
+        let legacyData = try JSONSerialization.data(withJSONObject: jsonDict)
+        
+        let decoder = JSONDecoder()
+        let decodedItem = try decoder.decode(ClipboardItem.self, from: legacyData)
+        
+        #expect(decodedItem.text == "guard let name = userName else { return }")
+        #expect(decodedItem.codeDetectorVersion == nil)
+        #expect(decodedItem.detectedLanguage == nil)
+        
+        // 初回 isCode 呼び出し時にフォールバック計算されてキャッシュされること
+        #expect(decodedItem.isCode)
+        #expect(decodedItem.codeDetectorVersion == CodeDetector.currentDetectorVersion)
+        #expect(decodedItem.detectedLanguage == .swift)
     }
     
     // MARK: - displayTitle の検証
