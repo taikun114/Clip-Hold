@@ -17,6 +17,32 @@ extension String {
             .replacingOccurrences(of: "\n", with: " ")
     }
     
+    /// 1行表示用（履歴一覧やクイックオーバーレイなど）に、最初の非空行を抽出する。
+    /// 後続に有効な行が存在する場合は末尾に "..." を付与する。
+    /// 改行や空白のみで構成されている場合は空文字列を返す。
+    func firstNonEmptyLine(appendEllipsisIfMultiLine: Bool = true) -> String {
+        let lines = self.components(separatedBy: .newlines)
+        
+        guard let firstIndex = lines.firstIndex(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty }) else {
+            return ""
+        }
+        
+        let firstLine = lines[firstIndex]
+        
+        if appendEllipsisIfMultiLine {
+            let hasRemainingLines = lines[(firstIndex + 1)...].contains(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty })
+            if hasRemainingLines {
+                if firstLine.hasSuffix("...") || firstLine.hasSuffix("…") {
+                    return firstLine
+                } else {
+                    return firstLine + "..."
+                }
+            }
+        }
+        
+        return firstLine
+    }
+    
     /// 不可視文字（半角スペース、全角スペース、タブ、改行）をターシャリーカラーの記号で可視化した AttributedString を生成する
     /// - Parameter singleLine: true の場合、改行文字を1行の記号（↵）に置換して複数行にならないようにする
     func formatWithInvisibleSymbols(singleLine: Bool = false) -> AttributedString {

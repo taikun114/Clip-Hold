@@ -81,6 +81,38 @@ struct StringExtensionTests {
         let multiPlain = String(multiAttr.characters)
         #expect(multiPlain == "A↵\nB")
     }
+    
+    @Test
+    func testFirstNonEmptyLine() {
+        // 通常の複数行テキスト（後続行があるため末尾に...が付与される）
+        #expect("Hello\nWorld".firstNonEmptyLine() == "Hello...")
+        #expect("Line 1\r\nLine 2\nLine 3".firstNonEmptyLine() == "Line 1...")
+        
+        // 先頭に空行がある複数行テキスト
+        #expect("\n\nHello\nWorld".firstNonEmptyLine() == "Hello...")
+        #expect("   \n\t\nHello\nWorld".firstNonEmptyLine() == "Hello...")
+        
+        // 1行のみのテキスト
+        #expect("Hello World".firstNonEmptyLine() == "Hello World")
+        
+        // 末尾にのみ空行があるテキスト（実質1行のため...は付かない）
+        #expect("Hello\n\n".firstNonEmptyLine() == "Hello")
+        #expect("Hello\r\n   \n".firstNonEmptyLine() == "Hello")
+        
+        // 改行のみ・空白のみのテキスト
+        #expect("\n".firstNonEmptyLine() == "")
+        #expect("\n\n\n".firstNonEmptyLine() == "")
+        #expect("\r\n\r\n".firstNonEmptyLine() == "")
+        #expect("   \n\t\n   ".firstNonEmptyLine() == "")
+        #expect("".firstNonEmptyLine() == "")
+        
+        // 既に三項省略記号などで終わっている複数行テキスト
+        #expect("Hello...\nWorld".firstNonEmptyLine() == "Hello...")
+        #expect("Hello…\nWorld".firstNonEmptyLine() == "Hello…")
+        
+        // 省略記号付与を無効にした場合
+        #expect("Hello\nWorld".firstNonEmptyLine(appendEllipsisIfMultiLine: false) == "Hello")
+    }
 }
 
 

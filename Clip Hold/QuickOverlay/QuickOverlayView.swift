@@ -1079,11 +1079,13 @@ private struct QuickOverlayHistoryItemRow: View {
     @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
 
     private var itemDisplayText: Text {
-        let truncatedTitle = item.displayTitle.truncate(maxLength: 1000)
         if showInvisibleCharacters {
+            let truncatedTitle = item.displayTitle.truncate(maxLength: 1000)
             return Text(truncatedTitle.formatWithInvisibleSymbols(singleLine: true))
         } else {
-            return Text(verbatim: truncatedTitle.replacingNewlinesWithSpaces())
+            let line = item.displayTitle.firstNonEmptyLine()
+            let truncatedTitle = line.truncate(maxLength: 1000)
+            return Text(verbatim: truncatedTitle)
         }
     }
 
@@ -1534,12 +1536,12 @@ private struct QuickOverlayStandardPhraseItemRow: View {
                         .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
                         .lineLimit(1)
                 } else {
-                    Text(phrase.title.replacingNewlinesWithSpaces())
+                    Text(phrase.title.firstNonEmptyLine())
                         .font(.body)
                         .foregroundColor(isSelected ? .white : .primary)
                         .lineLimit(1)
 
-                    Text(phrase.content.replacingNewlinesWithSpaces())
+                    Text(phrase.content.firstNonEmptyLine())
                         .font(.caption)
                         .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
                         .lineLimit(1)

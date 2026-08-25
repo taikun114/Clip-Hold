@@ -73,11 +73,13 @@ struct HistoryItemRow<MenuContent: View>: View {
     }
     
     private var itemDisplayText: Text {
-        let truncatedTitle = item.displayTitle.truncate(maxLength: 1000)
         if showInvisibleCharacters {
+            let truncatedTitle = item.displayTitle.truncate(maxLength: 1000)
             return Text(truncatedTitle.formatWithInvisibleSymbols(singleLine: true))
         } else {
-            return Text(verbatim: truncatedTitle.replacingNewlinesWithSpaces())
+            let line = item.displayTitle.firstNonEmptyLine()
+            let truncatedTitle = line.truncate(maxLength: 1000)
+            return Text(verbatim: truncatedTitle)
         }
     }
     

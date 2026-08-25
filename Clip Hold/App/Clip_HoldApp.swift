@@ -200,7 +200,7 @@ struct ClipHoldApp: App {
                         if showInvisibleCharacters {
                             displayContent = phrase.title.formatWithInvisibleSymbolsPlain(singleLine: true)
                         } else {
-                            displayContent = phrase.title.replacingNewlinesWithSpaces()
+                            displayContent = phrase.title.firstNonEmptyLine()
                         }
                         if displayContent.count > 40 {
                             return String(displayContent.prefix(40)) + "..."
@@ -348,7 +348,7 @@ struct ClipHoldApp: App {
                         if showInvisibleCharacters {
                             displayContent = content.formatWithInvisibleSymbolsPlain(singleLine: true)
                         } else {
-                            displayContent = content.replacingNewlinesWithSpaces()
+                            displayContent = content.firstNonEmptyLine()
                         }
                         let dateString = item.date.formatted(for: dateDisplayFormatInMenu, currentDate: dateReloader.now)
                         

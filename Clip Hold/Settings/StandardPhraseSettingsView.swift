@@ -653,8 +653,8 @@ private struct PhraseSettingsSection: View {
                 ForEach(currentPhrases) { phrase in
                     HStack {
                         VStack(alignment: .leading) {
-                            Text(phrase.title.replacingNewlinesWithSpaces()).font(.headline).lineLimit(1)
-                            Text(phrase.content.replacingNewlinesWithSpaces()).font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
+                            Text(phrase.title.firstNonEmptyLine()).font(.headline).lineLimit(1)
+                            Text(phrase.content.firstNonEmptyLine()).font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
                         }
                         Spacer()
                     }
