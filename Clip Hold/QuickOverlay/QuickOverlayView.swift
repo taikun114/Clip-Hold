@@ -334,7 +334,18 @@ struct QuickOverlayView: View {
         guard !history.isEmpty else { return [] }
         let allSortedHistory = history.sorted { $0.date > $1.date }
         let effectiveLimit = limit > 0 ? limit : 10
-        var raw = Array(allSortedHistory.prefix(effectiveLimit))
+        
+        var raw: [ClipboardItem] = []
+        var seenIDs = Set<UUID>()
+        for item in allSortedHistory {
+            if !seenIDs.contains(item.id) {
+                seenIDs.insert(item.id)
+                raw.append(item)
+                if raw.count >= effectiveLimit {
+                    break
+                }
+            }
+        }
         
         if let pinnedID = pinnedItemID,
            let pinnedItem = history.first(where: { $0.id == pinnedID }) {
@@ -360,7 +371,17 @@ struct QuickOverlayView: View {
         
         let allSortedHistory = clipboardManager.clipboardHistory.sorted { $0.date > $1.date }
         let limit = currentDisplayLimit > 0 ? currentDisplayLimit : 10
-        var raw = Array(allSortedHistory.prefix(limit))
+        var raw: [ClipboardItem] = []
+        var seenIDs = Set<UUID>()
+        for item in allSortedHistory {
+            if !seenIDs.contains(item.id) {
+                seenIDs.insert(item.id)
+                raw.append(item)
+                if raw.count >= limit {
+                    break
+                }
+            }
+        }
         
         if let pinnedID = clipboardManager.pinnedItemID,
            let pinnedItem = clipboardManager.clipboardHistory.first(where: { $0.id == pinnedID }) {
@@ -1489,14 +1510,6 @@ private struct QuickOverlayStandardPhraseItemRow: View {
         max(rowContentHeight, 44)
     }
 
-    private var isURL: Bool {
-        guard !phrase.content.isEmpty,
-              let url = URL(string: phrase.content) else {
-            return false
-        }
-        return url.scheme == "http" || url.scheme == "https"
-    }
-
     var body: some View {
         HStack(spacing: 0) {
             leftContent
@@ -1514,8 +1527,20 @@ private struct QuickOverlayStandardPhraseItemRow: View {
             Group {
                 if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
                     ColorCodeIconView(color: color)
+                } else if phrase.isURL {
+                    Image(systemName: "paperclip")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(4)
+                        .foregroundStyle(isSelected ? .white : .secondary)
+                } else if phrase.isCode {
+                    Image(systemName: "chevron.left.forwardslash.chevron.right")
+                        .resizable()
+                        .scaledToFit()
+                        .padding(4)
+                        .foregroundStyle(isSelected ? .white : .secondary)
                 } else {
-                    Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
+                    Image(systemName: "list.bullet.rectangle.portrait")
                         .resizable()
                         .scaledToFit()
                         .padding(4)

@@ -235,10 +235,42 @@ class StandardPhrasePresetManager: ObservableObject {
         
         do {
             let data = try Data(contentsOf: fileURL)
-            let phrases = try JSONDecoder().decode([StandardPhrase].self, from: data)
+            var phrases = try JSONDecoder().decode([StandardPhrase].self, from: data)
+            var needsSave = false
+            for i in 0..<phrases.count {
+                if phrases[i].codeDetectorVersion != CodeDetector.currentDetectorVersion {
+                    phrases[i].updateCodeDetection()
+                    needsSave = true
+                }
+            }
             presets[presetIndex].phrases = phrases
+            if needsSave {
+                savePresetToFile(presets[presetIndex])
+            }
         } catch {
             print("Error loading phrases for preset \(presetId): \(error.localizedDescription)")
+        }
+    }
+    
+    /// 全プリセットに含まれる定型文の総数を返します。
+    var totalPhrasesCount: Int {
+        let count = presets.reduce(0) { $0 + $1.phrases.count }
+        return count > 0 ? count : StandardPhraseManager.shared.standardPhrases.count
+    }
+    
+    /// 全プリセットの定型文のコード検出インデックスを更新します。
+    func updateCodeDetectionIndex(forceAll: Bool = false) {
+        for i in 0..<presets.count {
+            var presetNeedsSave = false
+            for j in 0..<presets[i].phrases.count {
+                if forceAll || presets[i].phrases[j].codeDetectorVersion != CodeDetector.currentDetectorVersion {
+                    presets[i].phrases[j].updateCodeDetection()
+                    presetNeedsSave = true
+                }
+            }
+            if presetNeedsSave {
+                savePresetToFile(presets[i])
+            }
         }
     }
     

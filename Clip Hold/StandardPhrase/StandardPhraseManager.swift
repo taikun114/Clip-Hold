@@ -126,7 +126,18 @@ class StandardPhraseManager: ObservableObject {
             let data = try Data(contentsOf: actualFileURL)
             let decoder = JSONDecoder()
             
-            self.standardPhrases = try decoder.decode([StandardPhrase].self, from: data)
+            var loaded = try decoder.decode([StandardPhrase].self, from: data)
+            var needsSave = false
+            for i in 0..<loaded.count {
+                if loaded[i].codeDetectorVersion != CodeDetector.currentDetectorVersion {
+                    loaded[i].updateCodeDetection()
+                    needsSave = true
+                }
+            }
+            self.standardPhrases = loaded
+            if needsSave {
+                saveStandardPhrases()
+            }
             print("StandardPhraseManager: Standard phrases loaded from file. Count: \(standardPhrases.count), Size: \(data.count) bytes.")
         } catch {
             print("StandardPhraseManager: Error loading standard phrases from file: \(error.localizedDescription)")
@@ -135,7 +146,8 @@ class StandardPhraseManager: ObservableObject {
     
     func addPhrase(title: String, content: String) {
         guard !ClipboardManager.shared.isExporting else { return }
-        let newPhrase = StandardPhrase(title: title, content: content)
+        var newPhrase = StandardPhrase(title: title, content: content)
+        newPhrase.updateCodeDetection()
         standardPhrases.append(newPhrase)
         SpotlightManager.shared.indexStandardPhrase(newPhrase)
     }
@@ -146,6 +158,7 @@ class StandardPhraseManager: ObservableObject {
             var phrase = standardPhrases[index]
             phrase.title = newTitle
             phrase.content = newContent
+            phrase.updateCodeDetection()
             standardPhrases[index] = phrase
             SpotlightManager.shared.indexStandardPhrase(phrase)
         }

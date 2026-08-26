@@ -779,6 +779,65 @@ struct CodeDetectorTests {
         #expect(CodeDetector.isCode(shellCode8))
         #expect(CodeDetector.detectLanguage(shellCode8) == .shell)
         
+        // 1行のcdコマンド
+        let cdCommand1 = "cd ~/Documents/Project"
+        #expect(CodeDetector.isCode(cdCommand1))
+        #expect(CodeDetector.detectLanguage(cdCommand1) == .shell)
+        
+        let cdCommand2 = "cd .."
+        #expect(CodeDetector.isCode(cdCommand2))
+        #expect(CodeDetector.detectLanguage(cdCommand2) == .shell)
+        
+        let cdCommand3 = "cd \"/path/to/folder\""
+        #expect(CodeDetector.isCode(cdCommand3))
+        #expect(CodeDetector.detectLanguage(cdCommand3) == .shell)
+        
+        // pwd 単体および pwd + パス出力
+        let pwdCommand1 = "pwd"
+        #expect(CodeDetector.isCode(pwdCommand1))
+        #expect(CodeDetector.detectLanguage(pwdCommand1) == .shell)
+        
+        let pwdCommand2 = """
+        pwd
+        /Users/sampleuser/Projects
+        """
+        #expect(CodeDetector.isCode(pwdCommand2))
+        #expect(CodeDetector.detectLanguage(pwdCommand2) == .shell)
+        
+        let whoamiCommand = "whoami"
+        #expect(CodeDetector.isCode(whoamiCommand))
+        #expect(CodeDetector.detectLanguage(whoamiCommand) == .shell)
+        
+        // ls 単体およびオプション付き
+        let lsCommand1 = "ls"
+        #expect(CodeDetector.isCode(lsCommand1))
+        #expect(CodeDetector.detectLanguage(lsCommand1) == .shell)
+        
+        let lsCommand2 = "ls -la"
+        #expect(CodeDetector.isCode(lsCommand2))
+        #expect(CodeDetector.detectLanguage(lsCommand2) == .shell)
+        
+        let lsCommand3 = "ls -lh /var/log"
+        #expect(CodeDetector.isCode(lsCommand3))
+        #expect(CodeDetector.detectLanguage(lsCommand3) == .shell)
+        
+        // その他の日常シェルコマンド（open, df, uname, gh）
+        let openCommand = "open ."
+        #expect(CodeDetector.isCode(openCommand))
+        #expect(CodeDetector.detectLanguage(openCommand) == .shell)
+        
+        let dfCommand = "df -h"
+        #expect(CodeDetector.isCode(dfCommand))
+        #expect(CodeDetector.detectLanguage(dfCommand) == .shell)
+        
+        let unameCommand = "uname -a"
+        #expect(CodeDetector.isCode(unameCommand))
+        #expect(CodeDetector.detectLanguage(unameCommand) == .shell)
+        
+        let ghCommand = "gh pr create --title \"Update\" --body \"Details\""
+        #expect(CodeDetector.isCode(ghCommand))
+        #expect(CodeDetector.detectLanguage(ghCommand) == .shell)
+        
         let shellCode9 = "echo \"export PATH=$PATH:/opt/bin\" >> ~/.zshrc"
         #expect(CodeDetector.isCode(shellCode9))
         #expect(CodeDetector.detectLanguage(shellCode9) == .shell)
@@ -1742,4 +1801,391 @@ struct CodeDetectorTests {
         #expect(CodeDetector.isCode(singleBadge))
         #expect(CodeDetector.detectLanguage(singleBadge) == .markdown)
     }
+    
+    @Test("Markdownインラインコードを含むテキストの検出")
+    func testMarkdownInlineCodeDetection() {
+        // 日本語のインラインコードを含む文章
+        let japaneseDoc1 = "`print()`文で出力されるデバッグログやコンソール出力は"
+        #expect(CodeDetector.isCode(japaneseDoc1))
+        #expect(CodeDetector.detectLanguage(japaneseDoc1) == .markdown)
+        
+        let japaneseDoc2 = "「`print()`文で出力されるデバッグログやコンソール出力は」"
+        #expect(CodeDetector.isCode(japaneseDoc2))
+        #expect(CodeDetector.detectLanguage(japaneseDoc2) == .markdown)
+        
+        let japaneseDoc3 = "この機能は`CodeDetector.isCode(text)`を呼び出して判定を行います。"
+        #expect(CodeDetector.isCode(japaneseDoc3))
+        #expect(CodeDetector.detectLanguage(japaneseDoc3) == .markdown)
+        
+        // 英語のインラインコードを含む文章
+        let englishDoc1 = "Please run `npm install` before starting the development server."
+        #expect(CodeDetector.isCode(englishDoc1))
+        #expect(CodeDetector.detectLanguage(englishDoc1) == .markdown)
+        
+        let englishDoc2 = "Use `guard let self = self else { return }` in closures to prevent memory leaks."
+        #expect(CodeDetector.isCode(englishDoc2))
+        #expect(CodeDetector.detectLanguage(englishDoc2) == .markdown)
+        
+        // インラインコード単体
+        let singleInlineCode = "`CodeDetector.swift`"
+        #expect(CodeDetector.isCode(singleInlineCode))
+        #expect(CodeDetector.detectLanguage(singleInlineCode) == .markdown)
+        
+        // 複数インラインコード
+        let multiInlineCode = "The `isCode` method returns `true` when a valid `Swift` snippet is analyzed."
+        #expect(CodeDetector.isCode(multiInlineCode))
+        #expect(CodeDetector.detectLanguage(multiInlineCode) == .markdown)
+        
+        // ダブルバッククォート
+        let doubleBackticks = "Use double backticks `` `code` `` to escape single backticks."
+        #expect(CodeDetector.isCode(doubleBackticks))
+        #expect(CodeDetector.detectLanguage(doubleBackticks) == .markdown)
+    }
+    
+    @Test("Markdownタスクリスト（チェックボックス）の検出")
+    func testMarkdownTaskListsAndCheckboxes() {
+        let taskListDoc = """
+        - [ ] 未完了のタスク項目
+        - [x] 完了済みのタスク項目
+        - [X] 大文字チェック済み項目
+        """
+        #expect(CodeDetector.isCode(taskListDoc))
+        #expect(CodeDetector.detectLanguage(taskListDoc) == .markdown)
+        
+        let singleTask = "- [ ] 1つの未完了タスク項目"
+        #expect(CodeDetector.isCode(singleTask))
+        #expect(CodeDetector.detectLanguage(singleTask) == .markdown)
+    }
+    
+    @Test("Markdown取り消し線の検出")
+    func testMarkdownStrikethrough() {
+        let strikethroughJa = "この機能は~~非推奨になりました~~削除されました。"
+        #expect(CodeDetector.isCode(strikethroughJa))
+        #expect(CodeDetector.detectLanguage(strikethroughJa) == .markdown)
+        
+        let strikethroughEn = "This is a ~~deprecated method~~ in the new version of the API."
+        #expect(CodeDetector.isCode(strikethroughEn))
+        #expect(CodeDetector.detectLanguage(strikethroughEn) == .markdown)
+    }
+    
+    @Test("フロントマター付きMarkdownおよび水平線の検出")
+    func testMarkdownFrontmatterAndThematicBreaks() {
+        let frontmatterDoc = """
+        ---
+        title: "ドキュメント概要"
+        date: 2026-08-25
+        tags: [Swift, macOS]
+        ---
+        # ドキュメントタイトル
+        本文の内容がここに記述されます。
+        """
+        #expect(CodeDetector.isCode(frontmatterDoc))
+        #expect(CodeDetector.detectLanguage(frontmatterDoc) == .markdown)
+        
+        let horizontalRuleDoc = """
+        # 第1章
+        概要説明です。
+        
+        ---
+        
+        # 第2章
+        詳細説明です。
+        """
+        #expect(CodeDetector.isCode(horizontalRuleDoc))
+        #expect(CodeDetector.detectLanguage(horizontalRuleDoc) == .markdown)
+    }
+    
+    @Test("Markdown脚注記法の検出")
+    func testMarkdownFootnotes() {
+        let footnoteDoc = """
+        詳細については仕様書を参照してください[^1]。
+        
+        [^1]: 仕様書第3章 25ページ
+        """
+        #expect(CodeDetector.isCode(footnoteDoc))
+        #expect(CodeDetector.detectLanguage(footnoteDoc) == .markdown)
+        
+        let footnoteEn = """
+        Please consult the official documentation[^ref] for details.
+        
+        [^ref]: Section 4.1 on page 120.
+        """
+        #expect(CodeDetector.isCode(footnoteEn))
+        #expect(CodeDetector.detectLanguage(footnoteEn) == .markdown)
+    }
+    
+    @Test("Markdownバックスラッシュエスケープの検出")
+    func testMarkdownBackslashEscapes() {
+        let escapeJa = "Markdownでは\\*アスタリスク\\*や\\[ブラケット\\]、\\`バッククォート\\`をエスケープできます。"
+        #expect(CodeDetector.isCode(escapeJa))
+        #expect(CodeDetector.detectLanguage(escapeJa) == .markdown)
+        
+        let escapeEn = "Use \\*literal asterisks\\*, \\[brackets\\], and \\# hashes in Markdown."
+        #expect(CodeDetector.isCode(escapeEn))
+        #expect(CodeDetector.detectLanguage(escapeEn) == .markdown)
+    }
+    
+    @Test("正規表現パターンの検出（その他コードとしての判定）")
+    func testRegexPatternDetection() {
+        let regexCapture = #"\[entity_code: (\d{6}), token: "([A-F0-9]{16})", scope: (READ|WRITE|ADMIN)\]"#
+        #expect(CodeDetector.isCode(regexCapture))
+        #expect(CodeDetector.detectLanguage(regexCapture) == .other)
+        
+        let regexEmail = #"(?i)^([a-z0-9_.-]+)@([a-z0-9_.-]+)\.([a-z.]{2,6})$"#
+        #expect(CodeDetector.isCode(regexEmail))
+        #expect(CodeDetector.detectLanguage(regexEmail) == .other)
+    }
+    
+    @Test("コメント付きシェルコマンドの検出")
+    func testCommentedShellCommandsDetection() {
+        let shellScript1 = """
+        # 一時ビルド生成物をクリーンアップ
+        /usr/bin/clean-artifacts --target build-output --recursive
+        """
+        #expect(CodeDetector.isCode(shellScript1))
+        #expect(CodeDetector.detectLanguage(shellScript1) == .shell)
+        
+        let shellScript2 = """
+        # 依存パッケージの検証を実行
+        cargo check --all-targets --workspace
+        """
+        #expect(CodeDetector.isCode(shellScript2))
+        #expect(CodeDetector.detectLanguage(shellScript2) == .shell)
+        
+        let shellScript3 = """
+        # 1. ログ出力ディレクトリの作成と権限設定
+        mkdir -p /var/log/custom-app && chmod 755 /var/log/custom-app
+        
+        # 2. サービス設定の反映
+        systemctl restart custom-worker.service
+        """
+        #expect(CodeDetector.isCode(shellScript3))
+        #expect(CodeDetector.detectLanguage(shellScript3) == .shell)
+    }
+    
+    @Test("番号付きコメントを含むPythonコードの検出")
+    func testPythonWithNumberedCommentsDetection() {
+        let pythonCode = """
+        import ctypes
+        
+        # 仮想デバイス通信用の構造体
+        class VirtualSensorPacket(ctypes.Structure):
+            _fields_ = [("sensor_id", ctypes.c_int), ("reading_val", ctypes.c_double)]
+        
+        if is_connected:
+            threshold_limit = 50
+            ratio_multiplier = 0.85
+            
+            lib_handler = ctypes.cdll.LoadLibrary("libvirtualdevice.so")
+            packet_data = VirtualSensorPacket()
+            lib_handler.ReadDeviceBuffer(ctypes.byref(packet_data))
+        
+        # 1. 動作モードの切り替え判定
+        if is_emergency_stop:
+            system_status = False
+            if not system_status:
+                lib_handler.HaltOperation()
+        
+        # 2. センサー値の正規化処理
+        if system_status:
+            norm_val = packet_data.reading_val * ratio_multiplier
+            final_output = max(0.0, min(100.0, norm_val))
+        """
+        #expect(CodeDetector.isCode(pythonCode))
+        #expect(CodeDetector.detectLanguage(pythonCode) == .python)
+    }
+    
+    @Test("コマンド行を含むYAML設定ファイルの検出")
+    func testYamlWithEmbeddedCommandsDetection() {
+        let yamlWithCommentsAndCommands = ##"""
+        # 1. 仮想メトリクスの収集タスク設定
+        - command: >-
+            /opt/mocktools/bin/mock-collector telemetry --format=json | /usr/bin/jq -r '.metrics[] | "\(.metric_name),\(.metric_value)"'
+          scan_interval: 45
+          separator: ","
+          sensors:
+            - type: number
+              name: 仮想負荷率
+              key: mock_load_factor
+              dynamic: true
+              unit_of_measurement: "%"
+              value_template: "{{ value | float * 10 }}"
+        
+        # 2. 定期クリーンアップタスク
+        - command: >-
+            /opt/mocktools/bin/mock-collector cleanup --dry-run | /usr/bin/jq -r '.deleted_count'
+          scan_interval: 300
+          sensors:
+            - type: text
+              name: 削除件数
+              key: purged_records
+        """##
+        #expect(CodeDetector.isCode(yamlWithCommentsAndCommands))
+        #expect(CodeDetector.detectLanguage(yamlWithCommentsAndCommands) == .yaml)
+        
+        let yamlPureList = ##"""
+        - command: >-
+            /usr/local/bin/status-checker --json | /usr/bin/jq -r '.status'
+          scan_interval: 30
+          sensors:
+            - type: text
+              name: サーバーステータス
+              key: srv_status
+        """##
+        #expect(CodeDetector.isCode(yamlPureList))
+        #expect(CodeDetector.detectLanguage(yamlPureList) == .yaml)
+    }
+    
+    @Test("Xcodeプレビューエラーログ・診断ログの検出（その他コードとしての判定）")
+    func testXcodePreviewErrorLogDetection() {
+        let previewLog = """
+        == DATE:
+        
+            Monday, Oct 12, 2026 at 10:15:00 Japan Standard Time
+            
+            2026-10-12T01:15:00Z
+        
+        
+        
+        == PREVIEW UPDATE ERROR:
+        
+            GroupRecordingError
+            
+            Error encountered during mock render operation #42
+            
+            ==================================
+            
+            |  TimeoutError: Timed out waiting for render completion after 15.0 seconds.
+        
+        
+        
+        == VERSION INFO:
+        
+            Tools: 18A100
+            OS:    26A100
+            PID:   99999
+            Model: Mac Virtual
+            Arch:  arm64
+        
+        
+        
+        == ENVIRONMENT:
+        
+            openFiles = [
+                /Users/mockdeveloper/Projects/MockApp/SampleComponent.swift
+            ]
+            wantsNewBuildSystem = true
+        """
+        #expect(CodeDetector.isCode(previewLog))
+        #expect(CodeDetector.detectLanguage(previewLog) == .other)
+    }
+    
+    @Test("Pythonデータクラスの検出（YAML誤認防止）")
+    func testPythonDataclassDetection() {
+        let pyCode = """
+        from dataclasses import dataclass
+        from typing import Optional
+        
+        @dataclass
+        class MockItem:
+            name: str
+            price: float
+            quantity: int = 1
+        
+            def total_cost(self) -> float:
+                return self.price * self.quantity
+        """
+        #expect(CodeDetector.isCode(pyCode))
+        #expect(CodeDetector.detectLanguage(pyCode) == .python)
+    }
+    
+    @Test("Rust構造体とimplブロックの検出（C++誤認防止）")
+    func testRustStructAndImplDetection() {
+        let rustCode = """
+        use std::fmt;
+        
+        #[derive(Debug)]
+        struct MockVector {
+            x: f64,
+            y: f64,
+        }
+        
+        impl MockVector {
+            fn origin() -> Self {
+                MockVector { x: 0.0, y: 0.0 }
+            }
+        }
+        """
+        #expect(CodeDetector.isCode(rustCode))
+        #expect(CodeDetector.detectLanguage(rustCode) == .rust)
+    }
+    
+    @Test("Kotlinデータクラスの検出（Swift誤認防止）")
+    func testKotlinDataClassDetection() {
+        let kotlinCode = """
+        package com.example.service
+        
+        data class MockTask(
+            val id: Long,
+            val title: String,
+            var isCompleted: Boolean = false
+        ) {
+            fun toggle(): MockTask {
+                return this.copy(isCompleted = !isCompleted)
+            }
+        }
+        """
+        #expect(CodeDetector.isCode(kotlinCode))
+        #expect(CodeDetector.detectLanguage(kotlinCode) == .javaKotlin)
+    }
+    
+    @Test("複数行SQLクエリの検出（テキスト誤認防止）")
+    func testMultilineSQLQueryDetection() {
+        let sqlQuery = """
+        SELECT 
+            records.id,
+            records.name,
+            COUNT(logs.id) AS total_logs,
+            SUM(logs.duration) AS total_time
+        FROM records
+        LEFT JOIN logs ON records.id = logs.record_id
+        WHERE records.is_valid = TRUE
+        GROUP BY records.id, records.name
+        ORDER BY total_time DESC
+        LIMIT 20;
+        """
+        #expect(CodeDetector.isCode(sqlQuery))
+        #expect(CodeDetector.detectLanguage(sqlQuery) == .sql)
+    }
+    
+    @Test("コメント付きTOML設定ファイルの検出（Markdown誤認防止）")
+    func testCommentedTOMLDetection() {
+        let tomlContent = """
+        # 開発環境用のモックサーバー設定
+        title = "Mock Service Settings"
+        
+        [database]
+        server = "192.168.1.100"
+        ports = [ 9001, 9002, 9003 ]
+        connection_max = 2000
+        enabled = true
+        """
+        #expect(CodeDetector.isCode(tomlContent))
+        #expect(CodeDetector.detectLanguage(tomlContent) == .toml)
+    }
+    
+    @Test("コメント付きEnv環境変数ファイルの検出（Markdown誤認防止）")
+    func testCommentedEnvDetection() {
+        let envContent = """
+        # バックエンドデータベース設定
+        DB_CONNECTION_STRING=postgres://mockuser:mockpass@localhost:5432/mock_db
+        CACHE_EXPIRE_SECONDS=7200
+        MOCK_DEBUG_FLAG=0
+        CORS_ALLOWED_DOMAINS="http://localhost:8080,https://app.mockdomain.internal"
+        """
+        #expect(CodeDetector.isCode(envContent))
+        #expect(CodeDetector.detectLanguage(envContent) == .env)
+    }
 }
+
+

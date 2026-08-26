@@ -132,7 +132,7 @@ public struct CodeDetector {
     
     /// YAMLキーパターン（小文字/ハイフン/数字キー + コロン + 値またはインデント）
     private static let yamlKeyRegex = try? NSRegularExpression(
-        pattern: #"(?m)^\s*[a-z0-9_-]+\s*:\s*(["'\d{\[]|true\b|false\b|>|\||\s*$)"#,
+        pattern: #"(?m)^\s*[a-zA-Z0-9_-]+\s*:\s*(["'\d{\[]|true\b|false\b|>|\||\S|\s*$)"#,
         options: []
     )
     
@@ -190,6 +190,42 @@ public struct CodeDetector {
         options: []
     )
     
+    /// Markdownインラインコードパターン（`code` または ``code``）
+    private static let markdownInlineCodeRegex = try? NSRegularExpression(
+        pattern: #"`+[^`\n]+`+"#,
+        options: []
+    )
+    
+    /// Markdown取り消し線パターン（~~text~~）
+    private static let markdownStrikethroughRegex = try? NSRegularExpression(
+        pattern: #"~~[^~\n]+~~"#,
+        options: []
+    )
+    
+    /// Markdown脚注参照・定義パターン（[^1] または [^1]: ...）
+    private static let markdownFootnoteRegex = try? NSRegularExpression(
+        pattern: #"(?m)(\[\^[a-zA-Z0-9_-]+\]|^\s*\[\^[a-zA-Z0-9_-]+\]:\s*\S+)"#,
+        options: []
+    )
+    
+    /// Markdownタスクリストパターン（- [ ] または - [x]）
+    private static let markdownTaskListRegex = try? NSRegularExpression(
+        pattern: #"(?m)^\s*[-*+]\s+\[[ xX]\]\s+\S+"#,
+        options: []
+    )
+    
+    /// Markdownバックスラッシュエスケープパターン（\*、\[、\]、\#、\~、\`等）
+    private static let markdownBackslashEscapeRegex = try? NSRegularExpression(
+        pattern: #"\\([\\`\*_{}\[\]<>()#+-\.!~|])"#,
+        options: []
+    )
+    
+    /// 正規表現メタ構文パターン（\d, \w, \s, [^...], (?...)等）
+    private static let regexMetaRegex = try? NSRegularExpression(
+        pattern: #"(\\[dDwWsSbB]|\\p\{[^}]+\}|\[\^[^\]\n:]+\]|\(\?[<=!:]|\(\?[a-zA-Z0-9_-]+\)|\(\?#[^)]+\))"#,
+        options: []
+    )
+    
     /// Markdown引用・コールアウトパターン（行頭 > ）
     private static let markdownBlockquoteRegex = try? NSRegularExpression(
         pattern: #"(?m)^\s*>\s+\S+"#,
@@ -210,7 +246,7 @@ public struct CodeDetector {
     
     /// Rust特有の構文パターン
     private static let rustSpecificRegex = try? NSRegularExpression(
-        pattern: #"(\b(fn\s+[a-z_][a-z0-9_]*\s*\(|let\s+mut\s+|impl\s+[A-Za-z0-9_]+|match\s+[a-z_][a-z0-9_]*\s*\{|println!|eprintln!|vec!|Result<|Option<)|(?m)^\s*(pub\s+)?(use|mod|struct|enum|trait)\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\{)"#,
+        pattern: #"(\b(fn\s+[a-z_][a-z0-9_]*\s*\(|let\s+mut\s+|impl(\s*<[^>]+>)?\s+[A-Za-z0-9_:]+|match\s+[a-z_][a-z0-9_]*\s*\{|println!|eprintln!|vec!|Result<|Option<|#\[derive\([^)]*\)\]|->\s*Self\b)|(?m)^\s*(pub\s+)?(use\s+[a-zA-Z0-9_:]+|mod\s+[a-zA-Z0-9_]+|(struct|enum|trait)\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\{))"#,
         options: []
     )
     
@@ -222,19 +258,19 @@ public struct CodeDetector {
     
     /// C / C++特有の構文パターン
     private static let cppSpecificRegex = try? NSRegularExpression(
-        pattern: #"((?m)^\s*#include\s*[<"][a-zA-Z0-9_./]+[>"]|\b(std::|nullptr|cout\s*<<|cin\s*>>|template\s*<|int\s+main\s*\()|\bnamespace\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\{)"#,
+        pattern: #"((?m)^\s*#include\s*[<"][a-zA-Z0-9_./]+[>"]|\b(std::(cout|cin|cerr|endl|vector|string|map|set|unique_ptr|shared_ptr|make_unique|make_shared|move|forward|thread|mutex|chrono|array|pair|tuple|optional|variant|any|function|atomic)|nullptr|cout\s*<<|cin\s*>>|template\s*<|int\s+main\s*\()|\bnamespace\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\{)"#,
         options: []
     )
     
     /// Java / Kotlin特有の構文パターン
     private static let javaKotlinSpecificRegex = try? NSRegularExpression(
-        pattern: #"((?m)^\s*package\s+[a-z0-9_.]+\s*;|\b(public\s+class\s+[A-Za-z0-9_]+|private\s+class\s+[A-Za-z0-9_]+|System\.(out|err)\.print|public\s+static\s+void\s+main|fun\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\(|val\s+[a-zA-Z_][a-zA-Z0-9_]*\s*:\s*[A-Z]|override\s+fun\s+|data\s+class\s+[A-Z]|suspend\s+fun\s+))"#,
+        pattern: #"((?m)^\s*package\s+[a-z0-9_.]+\s*(?:;|\n|\r|$)|\b(public\s+class\s+[A-Za-z0-9_]+|private\s+class\s+[A-Za-z0-9_]+|System\.(out|err)\.print|public\s+static\s+void\s+main|fun\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\(|val\s+[a-zA-Z_][a-zA-Z0-9_]*\s*:\s*[A-Z]|override\s+fun\s+|data\s+class\s+[A-Z]|suspend\s+fun\s+))"#,
         options: []
     )
     
     /// SQL文の判定パターン（行頭からのSQL文、または大文字キーワード）
     private static let sqlRegex = try? NSRegularExpression(
-        pattern: #"(?m)^\s*(SELECT\s+[^;\n]+\s+FROM|INSERT\s+INTO\s+[^;\n]+|UPDATE\s+[^;\n]+\s+SET|DELETE\s+FROM\s+[^;\n]+|CREATE\s+TABLE|ALTER\s+TABLE|DROP\s+TABLE)\b"#,
+        pattern: #"(?i)((?s)^\s*(SELECT\s+[\s\S]+?\s+FROM|INSERT\s+INTO\s+[\s\S]+?\s+VALUES|UPDATE\s+[\s\S]+?\s+SET|DELETE\s+FROM\s+[\s\S]+?\s+WHERE|CREATE\s+TABLE|ALTER\s+TABLE|DROP\s+TABLE)\b|(?m)^\s*(SELECT|INSERT\s+INTO|UPDATE|DELETE\s+FROM)\b[\s\S]*?\b(FROM|WHERE|JOIN|GROUP\s+BY|ORDER\s+BY|LIMIT|HAVING|VALUES|SET)\b)"#,
         options: [.caseInsensitive]
     )
     
@@ -256,21 +292,26 @@ public struct CodeDetector {
         options: []
     )
     
+    /// 単独の1単語（引数や記号なし）でも明確にシェルコマンドとして扱われるコマンド一覧
+    private static let standaloneShellCommands: Set<String> = [
+        "ls", "pwd", "whoami", "uptime", "clear", "top", "htop", "history", "df", "du", "id", "uname", "hostname", "sw_vers", "neofetch", "fastfetch", "btop", "arch"
+    ]
+    
     /// 明確なコード宣言や構文で始まる場合のキーワードプレフィックス一覧
     private static let codeLeadingPrefixes = [
         "import ", "#include", "package ", "func ", "function ", "def ", "class ", "struct ", "enum ",
         "let ", "var ", "const ", "public ", "private ", "fileprivate ", "internal ", "open ", "override ",
         "static ", "final ", "guard ", "if ", "for ", "while ", "switch ", "case ", "typealias ",
         "interface ", "protocol ", "extension ", "dependencies:", "targets:", "products:",
-        "<!DOCTYPE", "<?xml", "<!--", "//", "/*", "#!/", "#", "{", "[", "SELECT ", "INSERT ", "UPDATE ", "DELETE ",
-        "curl ", "git ", "npm ", "pnpm ", "yarn ", "cargo ", "brew ", "sudo ", "cd ", "mkdir ", "echo ",
-        "cat ", "grep ", "export ", "chmod ", "chown ", "find ", "sed ", "awk ", "tar ", "kill ", "ps ",
+        "<!DOCTYPE", "<?xml", "<!--", "//", "/*", "#!/", "#", "{", "[", "SELECT ", "INSERT ", "UPDATE ", "DELETE ", "from ", "use ", "package ", "data class ", "@",
+        "curl ", "git ", "npm ", "pnpm ", "yarn ", "cargo ", "brew ", "sudo ", "cd ", "pwd ", "ls ", "mkdir ", "echo ",
+        "cat ", "grep ", "export ", "chmod ", "chown ", "find ", "sed ", "awk ", "tar ", "kill ", "ps ", "open ",
         "systemctl ", "xcodebuild ", "python ", "node ", "with ", "try", "except", "catch", "print("
     ]
     
     /// Python特有の構文パターン（from...import、import...as、標準モジュールimport、def、class、elif、if __name__、with open等）
     private static let pythonSpecificRegex = try? NSRegularExpression(
-        pattern: #"((?m)^\s*from\s+[a-zA-Z0-9_.]+\s+import\s+[a-zA-Z0-9_.*]+|(?m)^\s*import\s+[a-zA-Z0-9_.]+\s+as\s+[a-zA-Z0-9_]+|(?m)^\s*import\s+(os|sys|json|math|re|time|datetime|random|typing|collections|itertools|functools|subprocess|pathlib|shutil|logging|threading|asyncio|numpy|pandas|scipy|matplotlib|torch|tensorflow|sklearn|requests|flask|django|fastapi|pydantic|pytest|pygame)\b|\bdef\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\([^)\n]*\)\s*:|(?m)^\s*class\s+[a-zA-Z_][a-zA-Z0-9_]*(\([a-zA-Z0-9_., ]*\))?\s*:\s*(?:$|#|\n|\r)|(?m)^\s*elif\s+[^:\n]+:|\bif\s+__name__\s*==\s*['"]__main__['"]|(?m)^\s*with\s+open\s*\([^)\n]*\)\s*|\bctypes\.)"#,
+        pattern: #"((?m)^\s*from\s+[a-zA-Z0-9_.]+\s+import\s+[a-zA-Z0-9_.*, ]+|(?m)^\s*import\s+[a-zA-Z0-9_.]+\s+as\s+[a-zA-Z0-9_]+|(?m)^\s*import\s+(os|sys|json|math|re|time|datetime|random|typing|collections|itertools|functools|subprocess|pathlib|shutil|logging|threading|asyncio|numpy|pandas|scipy|matplotlib|torch|tensorflow|sklearn|requests|flask|django|fastapi|pydantic|pytest|pygame)\b|(?m)^\s*@(dataclass|classmethod|staticmethod|property|abstractmethod|override|wraps|lru_cache|cached_property|fixture)\b|(?m)^\s*@[a-zA-Z0-9_.]+(\([^)]*\))?\s*(?:\n|\r)\s*(?:async\s+)?(?:def|class)\b|\bdef\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\([^)\n]*\)\s*(?:->\s*[^:\n]+)?\s*:|(?m)^\s*class\s+[a-zA-Z_][a-zA-Z0-9_]*(\([a-zA-Z0-9_., ]*\))?\s*:\s*(?:$|#|\n|\r)|(?m)^\s*elif\s+[^:\n]+:|\bif\s+__name__\s*==\s*['"]__main__['"]|(?m)^\s*with\s+open\s*\([^)\n]*\)\s*|\bctypes\.)"#,
         options: []
     )
     
@@ -282,7 +323,7 @@ public struct CodeDetector {
     
     /// シェルコマンド・ターミナルセッション特有の構文パターン（フルパス実行、for/whileループ、環境変数設定、zshプロンプト等）
     private static let shellSpecificRegex = try? NSRegularExpression(
-        pattern: #"(^#!\s*/(bin|usr)/(bash|zsh|sh)|^Last login:\s+|(?m)^\s*([a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+[^#$%\n]*[#$%>]|[$➜%])\s+|(?m)^\s*(/(opt|usr|bin|sbin|etc|Library|System)/[a-zA-Z0-9_./-]+)\s+|(?m)^\s*[A-Za-z_][A-Za-z0-9_]*=[^;\n]+\s*(&&|;)\s*|\bfor\s+[a-zA-Z_][a-zA-Z0-9_]*\s+in\s+[^;]+;\s*do\b|\bwhile\s+[^;]+;\s*do\b|\bif\s+\[\[?\s+[^;]+;\s*then\b|(?m)^\s*(sudo|chmod|chown|mkdir|grep|cat|curl|wget|npm|yarn|pnpm|cargo|xcodebuild|brew|git|docker|kubectl|systemctl|lspci|lsof|netstat|ps|kill|ssh|scp|tar|find|export|source|echo|uptime|apt|apt-get|dnf|pacman|yum|pip|pip3|python|node|deno|bun|sed|awk|df|du|top|htop|journalctl|rsync|touch|cp|mv|rm|alias|smartctl)\b|(?m)^\s*echo\s+.*?(>>|>|\|)\s*|\b\|\s*(grep|jq|awk|sed|cat|tee|xargs|tr|cut|sort|uniq|head|tail|wc)\b)"#,
+        pattern: #"(^#!\s*/(bin|usr)/(bash|zsh|sh)|^Last login:\s+|(?m)^\s*([a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+[^#\$%\n]*[#\$%>]|(?:\$|➜|%))\s+|(?m)^\s*(/(opt|usr|bin|sbin|etc|Library|System)/[a-zA-Z0-9_./-]+)\s+|(?m)^\s*[A-Za-z_][A-Za-z0-9_]*=[^;\n]+\s*(&&|;)\s*|\bfor\s+[a-zA-Z_][a-zA-Z0-9_]*\s+in\s+[^;]+;\s*do\b|\bwhile\s+[^;]+;\s*do\b|\bif\s+\[\[?\s+[^;]+;\s*then\b|(?m)^\s*(sudo|chmod|chown|chgrp|mkdir|cd|pwd|ls|open|pbcopy|pbpaste|launchctl|plutil|codesign|security|softwareupdate|diskutil|mdfind|mdls|sw_vers|uname|hostname|env|history|head|tail|wc|diff|sort|uniq|tr|cut|make|cmake|ninja|gcc|g\+\+|clang|clang\+\+|rustc|javac|kotlinc|swiftc|nvm|pyenv|rbenv|nodenv|goenv|rustup|ping|traceroute|dig|nslookup|host|ifconfig|ip|tar|zip|unzip|gzip|gunzip|bzip2|xz|ssh-keygen|ssh-add|gh|glab|aws|gcloud|az|firebase|supabase|vercel|netlify|flyctl|fly|heroku|pipenv|poetry|uv|conda|mamba|bundle|gem|composer|dotnet|mvn|gradle|sbt|tmux|screen|neofetch|fastfetch|btop|pod|carthage|tuist|mint|grep|egrep|fgrep|cat|curl|wget|npm|npx|yarn|pnpm|bun|cargo|xcrun|simctl|xcodebuild|defaults|memtester|networksetup|scutil|systemctl|journalctl|service|ufw|iptables|brew|git|docker|docker-compose|kubectl|helm|terraform|ansible|lspci|lsof|netstat|ss|ps|kill|killall|pkill|ssh|scp|find|export|source|echo|uptime|whoami|clear|apt|apt-get|dnf|pacman|yum|pip|pip3|python|node|deno|sed|awk|df|du|top|htop|rsync|touch|cp|mv|rm|alias|unalias|which|whereis|less|more|tee|xargs|smartctl)\b|(?m)^\s*ip\s+(addr|route|link|neigh)\b|(?m)^\s*echo\s+.*?(>>|>|\|)\s*|\b\|\s*(grep|jq|awk|sed|cat|tee|xargs|tr|cut|sort|uniq|head|tail|wc|less)\b)"#,
         options: []
     )
     
@@ -348,11 +389,19 @@ public struct CodeDetector {
     public static func isCode(_ text: String) -> Bool {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // 短すぎる文字列はコードとみなさない（3文字以下は除外）
+        // 短すぎる文字列はコードとみなさない（2文字未満は除外）
+        guard trimmed.count >= 2 else { return false }
+        
+        // 代表的な単独実行シェルコマンド（ls, pwd, whoami, uptime, clear, top, htop, df, du, id, uname, hostname, history等）は1単語でもコードとして扱う
+        if standaloneShellCommands.contains(trimmed) {
+            return true
+        }
+        
+        // 2文字以下でスタンドアロンコマンド以外は非コード
         guard trimmed.count >= 3 else { return false }
         
         // 1単語のみ（空白・改行・コード特有記号を含まない英数字単体（型名や変数名単体））は非コード
-        if !trimmed.contains("\n") && !trimmed.contains(" ") && !trimmed.contains("(") && !trimmed.contains(")") && !trimmed.contains("=") && !trimmed.contains(";") && !trimmed.contains("{") && !trimmed.contains("}") && !trimmed.contains("<") && !trimmed.contains(">") && !trimmed.contains(".") && !trimmed.contains(":") && !trimmed.contains("[") && !trimmed.contains("]") && !trimmed.contains("->") && !trimmed.contains("$") && !trimmed.contains("\"") && !trimmed.contains("'") && !trimmed.contains("/") && !trimmed.contains("`") && !trimmed.contains("#") {
+        if !trimmed.contains("\n") && !trimmed.contains(" ") && !trimmed.contains("(") && !trimmed.contains(")") && !trimmed.contains("=") && !trimmed.contains(";") && !trimmed.contains("{") && !trimmed.contains("}") && !trimmed.contains("<") && !trimmed.contains(">") && !trimmed.contains(".") && !trimmed.contains(":") && !trimmed.contains("[") && !trimmed.contains("]") && !trimmed.contains("->") && !trimmed.contains("$") && !trimmed.contains("\"") && !trimmed.contains("'") && !trimmed.contains("/") && !trimmed.contains("`") && !trimmed.contains("#") && !trimmed.contains("~") && !trimmed.contains("\\") {
             return false
         }
         
@@ -377,6 +426,11 @@ public struct CodeDetector {
         // パフォーマンス最優先：先頭500文字のみをサンプリング
         let sample = trimmed.count > 500 ? String(trimmed.prefix(500)) : trimmed
         let sampleRange = NSRange(sample.startIndex..., in: sample)
+        
+        // 正規表現メタ構文（\d, \w, [^...] 等）を含む場合はコード
+        if let regexMeta = regexMetaRegex, regexMeta.numberOfMatches(in: sample, options: [], range: sampleRange) >= 1 {
+            return true
+        }
         
         // コンパイルエラーログ・ビルドログの判定（ソースコードではないため非コード）
         if let compilerErrorRegex = compilerErrorRegex, compilerErrorRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
@@ -431,6 +485,9 @@ public struct CodeDetector {
         
         // 5. クラッシュレポート・診断ログ（その他のコードとして扱う）
         if trimmed.contains("Translated Report") ||
+           trimmed.contains("== PREVIEW UPDATE ERROR:") ||
+           trimmed.contains("GroupRecordingError") ||
+           (trimmed.contains("== DATE:") && trimmed.contains("== VERSION INFO:")) ||
            (trimmed.contains("Process:") && trimmed.contains("Path:") && trimmed.contains("Identifier:")) ||
            trimmed.contains("Crashed Thread:") ||
            trimmed.contains("Exception Type:") ||
@@ -549,69 +606,69 @@ public struct CodeDetector {
             return .go
         }
         
-        // 6. C / C++（#include <...> を HTMLタグより先に検出）
-        if let cppRegex = cppSpecificRegex, cppRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
-            return .cpp
-        }
-        
-        // 7. Swift（Swift特有構文・SwiftUIモディファイア・マクロ・import・.swiftコメント・SPM）
-        if let swiftSpecificRegex = swiftSpecificRegex, swiftSpecificRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
-            return .swift
-        }
-        
-        // 8. シェルスクリプト・ターミナルセッション（curl+出力、echoパイプ、ターミナルログ、コマンド列）
-        if let shellSpecificRegex = shellSpecificRegex, shellSpecificRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
-            return .shell
-        }
-        
-        // 9. Python（from...import, def...:, class...:, import numpy/os/sys等）
-        if let pythonSpecificRegex = pythonSpecificRegex, pythonSpecificRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
-            return .python
-        }
-        
-        // 10. JavaScript / TypeScript（ブラウザAPI、DOM、ESモジュール等）
-        if let jsRegex = javascriptSpecificRegex, jsRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
-            return .javascript
-        }
-        
-        // 11. Java / Kotlin
-        if let javaKotlinRegex = javaKotlinSpecificRegex, javaKotlinRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
-            return .javaKotlin
-        }
-        
-        // 12. Rust
+        // 6. Rust（use std::, impl, #[derive], fn 等）
         if let rustRegex = rustSpecificRegex, rustRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
             return .rust
         }
         
-        // 12. JavaScript / TypeScript
-        if let javascriptSpecificRegex = javascriptSpecificRegex, javascriptSpecificRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
+        // 7. Java / Kotlin（package, data class, fun 等を Swift より優先）
+        if let javaKotlinRegex = javaKotlinSpecificRegex, javaKotlinRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
+            return .javaKotlin
+        }
+        
+        // 8. Python（from...import, @dataclass, def...:, class...:, import 等を YAML より優先）
+        if let pythonRegex = pythonSpecificRegex, pythonRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
+            return .python
+        }
+        
+        // 9. C / C++（#include <...>, std::cout 等）
+        if let cppRegex = cppSpecificRegex, cppRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
+            return .cpp
+        }
+        
+        // 10. Swift（Swift特有構文・SwiftUIモディファイア・マクロ・import・.swiftコメント・SPM）
+        if let swiftSpecificRegex = swiftSpecificRegex, swiftSpecificRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
+            return .swift
+        }
+        
+        // 11. SQL
+        if let sqlRegex = sqlRegex, sqlRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
+            return .sql
+        }
+        
+        // 12. YAML（シェルコマンドを含むYAML設定ファイルを優先して検出）
+        if isYAML(trimmed) {
+            return .yaml
+        }
+        
+        // 13. シェルスクリプト・ターミナルセッション（curl+出力、echoパイプ、ターミナルログ、コマンド列）
+        if let shellRegex = shellSpecificRegex, shellRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
+            return .shell
+        }
+        
+        // 14. JavaScript / TypeScript（ブラウザAPI、DOM、ESモジュール等）
+        if let jsRegex = javascriptSpecificRegex, jsRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
             return .javascript
         }
         
-        // 13. HTML / XML（純粋なHTMLタグ構造）
+        // 14. HTML / XML（純粋なHTMLタグ構造）
         if let htmlTagRegex = htmlTagRegex, htmlTagRegex.numberOfMatches(in: sample, options: [], range: sampleRange) >= 1 {
             return .html
         }
         
-        // 14. GraphQL
+        // 15. GraphQL
         if isGraphQL(trimmed) {
             return .graphql
         }
         
-        // 15. 環境変数 (.env)
+        // 16. 環境変数 (.env)
         if isEnv(trimmed) {
             return .env
         }
         
-        // 16. CSS（YAMLより先に検出、HTML開始タグを除く）
+        // 17. CSS（HTML開始タグを除く）
         if !trimmed.hasPrefix("<"), let cssPropertyRegex = cssPropertyRegex, cssPropertyRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
             return .css
-        }
-        
-        // 17. YAML（Markdown/CSSがfalseの場合のみ検出）
-        if isYAML(trimmed) {
-            return .yaml
         }
         
         // 18. TOML
@@ -678,8 +735,7 @@ public struct CodeDetector {
     /// YAML形式であるかを判定
     private static func isYAML(_ text: String) -> Bool {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.hasPrefix("{") || trimmed.hasPrefix("[") || trimmed.hasPrefix("<") { return false }
-        if isMarkdown(trimmed) { return false }
+        if trimmed.hasPrefix("{") || trimmed.hasPrefix("[") || trimmed.hasPrefix("<") || trimmed.hasPrefix("from ") || trimmed.hasPrefix("@") || trimmed.hasPrefix("use ") || trimmed.hasPrefix("package ") || trimmed.hasPrefix("data class ") || trimmed.hasPrefix("SELECT ") { return false }
         if trimmed.contains("##") || trimmed.contains("###") || trimmed.contains("**") { return false }
         
         // クラッシュレポート・診断レポート・パニックレポートを除外（.other として扱う）
@@ -738,7 +794,12 @@ public struct CodeDetector {
     /// TOML形式であるかを判定
     private static func isTOML(_ text: String) -> Bool {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.hasPrefix("{") || trimmed.hasPrefix("[{") || trimmed.hasPrefix("<") { return false }
+        if trimmed.hasPrefix("{") || trimmed.hasPrefix("[{") || trimmed.hasPrefix("<") ||
+           trimmed.contains("== PREVIEW UPDATE ERROR:") ||
+           trimmed.contains("GroupRecordingError") ||
+           (trimmed.contains("== DATE:") && trimmed.contains("== VERSION INFO:")) {
+            return false
+        }
         // SDP (Session Description Protocol) 形式（v=0, o=, s=, t=, a=, m=）を除外
         if trimmed.hasPrefix("v=0\n") || (trimmed.contains("a=rtpmap:") && trimmed.contains("m=audio")) { return false }
         // HTMLの属性（data-xxx="yyy"）を除外
@@ -779,10 +840,28 @@ public struct CodeDetector {
     private static func isMarkdown(_ text: String) -> Bool {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.hasPrefix("{") || trimmed.hasPrefix("[{") || trimmed.hasPrefix("<?xml") || trimmed.hasPrefix("<!DOCTYPE") || trimmed.hasPrefix("#!/") || trimmed.hasPrefix("Last login:") { return false }
-        if trimmed.contains("Translated Report") || (trimmed.contains("Process:") && trimmed.contains("Path:")) { return false }
+        if trimmed.contains("Translated Report") ||
+           (trimmed.contains("Process:") && trimmed.contains("Path:")) ||
+           trimmed.contains("== PREVIEW UPDATE ERROR:") ||
+           trimmed.contains("GroupRecordingError") ||
+           (trimmed.contains("== DATE:") && trimmed.contains("== VERSION INFO:")) {
+            return false
+        }
         
         let sample = trimmed.count > 1000 ? String(trimmed.prefix(1000)) : trimmed
         let range = NSRange(sample.startIndex..., in: sample)
+        
+        // 脚注記法（[^1]: 等）を持たず、正規表現メタ構文（\d, \w, [^...] 等）を含む場合は Markdown ではない（正規表現パターン）
+        let hasFootnote = (markdownFootnoteRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0) >= 1
+        if !hasFootnote, let regexMeta = regexMetaRegex, regexMeta.numberOfMatches(in: sample, options: [], range: range) >= 1 {
+            return false
+        }
+        
+        // フロントマター（---で始まり、途中に再度---があり、その後にMarkdown本文がある場合）を除き、YAML形式のテキストはMarkdownではない
+        let isFrontmatter = trimmed.hasPrefix("---") && (trimmed.contains("\n---\n") || trimmed.contains("\n---")) && (trimmed.contains("\n#") || trimmed.contains("\n- ") || trimmed.contains("\n* ") || trimmed.contains("\n>"))
+        if !isFrontmatter && isYAML(trimmed) {
+            return false
+        }
         
         let headingMatches = markdownHeadingRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
         let listMatches = markdownListRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
@@ -791,6 +870,11 @@ public struct CodeDetector {
         let linkMatches = markdownLinkRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
         let tableMatches = markdownTableRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
         let blockquoteMatches = markdownBlockquoteRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
+        let inlineCodeMatches = markdownInlineCodeRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
+        let strikethroughMatches = markdownStrikethroughRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
+        let footnoteMatches = markdownFootnoteRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
+        let taskListMatches = markdownTaskListRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
+        let backslashEscapeMatches = markdownBackslashEscapeRegex?.numberOfMatches(in: sample, options: [], range: range) ?? 0
         
         // 文書の途中に埋め込まれたコードブロック（```）が存在するか（先頭から全体が```で始まっている単体コードブロックは除く）
         let hasEmbeddedCodeBlock = !trimmed.hasPrefix("```") && trimmed.contains("```")
@@ -804,34 +888,58 @@ public struct CodeDetector {
             }
         }
         
-        // 構造化されたMarkdownドキュメントの判定
-        let isStrongMarkdown = (headingMatches >= 2) ||
-                               (headingMatches >= 1 && (listMatches >= 1 || numListMatches >= 1 || boldMatches >= 1 || linkMatches >= 1 || blockquoteMatches >= 1)) ||
+        // 構造化されたMarkdownドキュメントの判定（見出し単独ではなく、Markdown構造要素が組み合わさっている場合）
+        let isStrongMarkdown = isFrontmatter || (footnoteMatches >= 1) ||
+                               (headingMatches >= 2 && (listMatches >= 1 || numListMatches >= 1 || boldMatches >= 1 || linkMatches >= 1 || blockquoteMatches >= 1 || hasEmbeddedCodeBlock)) ||
+                               (headingMatches >= 1 && (listMatches >= 1 || numListMatches >= 1 || boldMatches >= 1 || linkMatches >= 1 || blockquoteMatches >= 1 || strikethroughMatches >= 1 || footnoteMatches >= 1 || taskListMatches >= 1)) ||
                                (blockquoteMatches >= 1 && (boldMatches >= 1 || listMatches >= 1 || headingMatches >= 1)) ||
                                (hasEmbeddedCodeBlock && (boldMatches >= 1 || listMatches >= 1 || numListMatches >= 1 || headingMatches >= 1)) ||
                                (boldMatches >= 2 && (listMatches >= 1 || numListMatches >= 1)) ||
+                               (taskListMatches >= 1) ||
                                (tableMatches >= 2)
         
         if !isStrongMarkdown {
-            if let pyRegex = pythonSpecificRegex, pyRegex.numberOfMatches(in: sample, options: [], range: range) >= 1 {
+            if isTOML(trimmed) || isEnv(trimmed) {
                 return false
             }
-            if let swiftRegex = swiftSpecificRegex, swiftRegex.numberOfMatches(in: sample, options: [], range: range) >= 1 {
+            if !isFrontmatter && isYAML(trimmed) {
                 return false
             }
-            if let jsRegex = javascriptSpecificRegex, jsRegex.numberOfMatches(in: sample, options: [], range: range) >= 1 {
+            
+            // インラインコードを除去したテキストで各言語の特有構文を判定（インラインコード内のコード片による誤判定を防止）
+            let sampleWithoutInline = markdownInlineCodeRegex?.stringByReplacingMatches(
+                in: sample,
+                options: [],
+                range: range,
+                withTemplate: " "
+            ) ?? sample
+            let sampleWithoutInlineRange = NSRange(sampleWithoutInline.startIndex..., in: sampleWithoutInline)
+            
+            if let pyRegex = pythonSpecificRegex, pyRegex.numberOfMatches(in: sampleWithoutInline, options: [], range: sampleWithoutInlineRange) >= 1 {
+                return false
+            }
+            if let swiftRegex = swiftSpecificRegex, swiftRegex.numberOfMatches(in: sampleWithoutInline, options: [], range: sampleWithoutInlineRange) >= 1 {
+                return false
+            }
+            if let jsRegex = javascriptSpecificRegex, jsRegex.numberOfMatches(in: sampleWithoutInline, options: [], range: sampleWithoutInlineRange) >= 1 {
+                return false
+            }
+            if let shellRegex = shellSpecificRegex, shellRegex.numberOfMatches(in: sampleWithoutInline, options: [], range: sampleWithoutInlineRange) >= 1 {
                 return false
             }
         }
         
         if isStrongMarkdown { return true }
         
-        // YAMLの典型構造（apiVersion, metadata, spec等）を持つ場合は YAML
+        // YAMLの典型構造（インデントされたキーバリュー、リスト項目 - command: 等）を持つ場合は YAML
         let lines = trimmed.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
         let hasIndentedKeys = lines.contains { line in
             (line.hasPrefix("  ") || line.hasPrefix("\t")) && line.contains(":")
         }
-        if hasIndentedKeys && lines.contains(where: { $0.contains("apiVersion:") || $0.contains("spec:") || $0.contains("metadata:") }) {
+        let hasYamlListItems = lines.contains { line in
+            line.trimmingCharacters(in: .whitespaces).hasPrefix("- ") && line.contains(":")
+        }
+        if (hasIndentedKeys || hasYamlListItems) && lines.contains(where: { $0.contains("command:") || $0.contains("sensors:") || $0.contains("apiVersion:") || $0.contains("spec:") || $0.contains("metadata:") }) {
             return false
         }
         
@@ -840,8 +948,18 @@ public struct CodeDetector {
         if headingMatches >= 1 && (listMatches >= 1 || numListMatches >= 1 || boldMatches >= 1 || linkMatches >= 1) { return true }
         if (listMatches >= 1 || numListMatches >= 1) && boldMatches >= 1 { return true }
         if linkMatches >= 1 { return true }
+        if inlineCodeMatches >= 1 { return true }
+        if strikethroughMatches >= 1 { return true }
+        if footnoteMatches >= 1 { return true }
+        if taskListMatches >= 1 { return true }
+        if backslashEscapeMatches >= 2 { return true }
         if listMatches >= 2 && !hasIndentedKeys { return true } // リスト単独
-        if headingMatches >= 1 && !hasIndentedKeys { return true } // 行頭に # 見出し があれば Markdown
+        if headingMatches >= 1 && !hasIndentedKeys {
+            if isTOML(trimmed) || isEnv(trimmed) {
+                return false
+            }
+            return true
+        } // 行頭に # 見出し があれば Markdown
         if (trimmed.hasPrefix("```") && trimmed.hasSuffix("```")) || trimmed.contains("```") { return true } // Markdownコードブロック
         
         return false

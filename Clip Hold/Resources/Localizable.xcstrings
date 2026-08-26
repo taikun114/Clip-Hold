@@ -13306,41 +13306,6 @@
         }
       }
     },
-    "コピー履歴のコード検出インデックスをリセットして、再判定します。" : {
-      "comment" : "開発者向け設定の「コード検出インデックスをリセット」オプションを説明するテキスト。",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Setzt den Code-Erkennungsindex des Kopierverlaufs zurück und bewertet ihn neu."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reset the code detection index of the clipboard history and re-evaluate."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restablece el índice de detección de código del historial de copias y vuelve a evaluar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réinitialise l'index de détection du code de l'historique du presse-papiers et réévalue."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "コピー履歴のコード検出インデックスをリセットして、再判定します。"
-          }
-        }
-      }
-    },
     "コミュニティ" : {
       "comment" : "コミュニティーページにアクセスするためのコミュニティーボタン。",
       "localizations" : {
@@ -14624,6 +14589,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "すべての定型文を表示..."
+          }
+        }
+      }
+    },
+    "すべての履歴と定型文のコード検出インデックスをリセットして、再判定します。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setzt den Code-Erkennungsindex für alle Verläufe und Standardphrasen zurück und bewertet sie neu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset the code detection index for all history and standard phrases and re-evaluate."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablece el índice de detección de código para todo el historial y las frases estándar y vuelve a evaluar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialise l'index de détection de code pour tout l'historique et les phrases standard et réévalue."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべての履歴と定型文のコード検出インデックスをリセットして、再判定します。"
           }
         }
       }
@@ -26644,6 +26643,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "複製"
+          }
+        }
+      }
+    },
+    "計算中..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird berechnet..."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculating..."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculando..."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calcul en cours..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "計算中..."
           }
         }
       }

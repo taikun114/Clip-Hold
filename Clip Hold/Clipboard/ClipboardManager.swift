@@ -127,7 +127,17 @@ class ClipboardManager: ObservableObject {
         }
         
         let allSortedHistory = clipboardHistory.sorted { $0.date > $1.date }
-        var raw = Array(allSortedHistory.prefix(50))
+        var raw: [ClipboardItem] = []
+        var seenIDs = Set<UUID>()
+        for item in allSortedHistory {
+            if !seenIDs.contains(item.id) {
+                seenIDs.insert(item.id)
+                raw.append(item)
+                if raw.count >= 50 {
+                    break
+                }
+            }
+        }
         
         if let pinnedID = pinnedItemID,
            let pinnedItem = clipboardHistory.first(where: { $0.id == pinnedID }) {

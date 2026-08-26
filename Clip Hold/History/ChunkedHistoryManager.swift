@@ -267,8 +267,46 @@ actor ChunkedHistoryManager {
             // 日付降順でソート
             allItems.sort { $0.date > $1.date }
             
-            print("ChunkedHistoryManager: Loaded \(allItems.count) items from \(chunkCount) chunks.")
-            return allItems
+            // 重複チェック & 安全救出ロジック
+            var uniqueItems: [ClipboardItem] = []
+            var seenIDs = Set<UUID>()
+            
+            for item in allItems {
+                if !seenIDs.contains(item.id) {
+                    seenIDs.insert(item.id)
+                    uniqueItems.append(item)
+                } else {
+                    // IDが被っているアイテムを発見：内容が同一かどうかを判定
+                    let isIdentical = uniqueItems.contains { existing in
+                        existing.text == item.text &&
+                        existing.date == item.date &&
+                        existing.filePath == item.filePath &&
+                        existing.fileHash == item.fileHash
+                    }
+                    
+                    if isIdentical {
+                        // 内容も完全に同一（二重保存された複製）なのでスキップ
+                        #if DEBUG
+                        print("ChunkedHistoryManager: Skipped identical duplicate item (ID: \(item.id)).")
+                        #endif
+                    } else {
+                        // 万が一IDは同じだが内容が異なるアイテムだった場合は、新しいUUIDを採番して救出
+                        var newUUID = UUID()
+                        while seenIDs.contains(newUUID) {
+                            newUUID = UUID()
+                        }
+                        seenIDs.insert(newUUID)
+                        item.id = newUUID
+                        uniqueItems.append(item)
+                        #if DEBUG
+                        print("ChunkedHistoryManager: Recovered item with collided ID by assigning new UUID: \(newUUID).")
+                        #endif
+                    }
+                }
+            }
+            
+            print("ChunkedHistoryManager: Loaded \(uniqueItems.count) items from \(chunkCount) chunks.")
+            return uniqueItems
             
         } catch {
             print("ChunkedHistoryManager: Error loading history: \(error.localizedDescription)")
@@ -397,6 +435,75 @@ actor ChunkedHistoryManager {
     
     // MARK: - Code Detection Index Persistence
     
+    /// メモリ上で更新済みの履歴アイテムをチャンクファイルとしてディスクに高速保存します（二重判定なし）。
+    /// - Parameters:
+    ///   - items: メモリ上でコード検出更新済みの履歴アイテム配列。
+    ///   - onProgress: チャンク単位で (進捗件数, 総件数) を通知するクロージャ。
+    func persistHistoryChunks(
+        _ items: [ClipboardItem],
+        onProgress: (@Sendable (Int, Int) async -> Void)? = nil
+    ) async throws {
+        // 重複チェック & 安全救出ロジック
+        var uniqueItems: [ClipboardItem] = []
+        var seenIDs = Set<UUID>()
+        for item in items {
+            if !seenIDs.contains(item.id) {
+                seenIDs.insert(item.id)
+                uniqueItems.append(item)
+            } else {
+                let isIdentical = uniqueItems.contains { existing in
+                    existing.text == item.text &&
+                    existing.date == item.date &&
+                    existing.filePath == item.filePath &&
+                    existing.fileHash == item.fileHash
+                }
+                if !isIdentical {
+                    var newUUID = UUID()
+                    while seenIDs.contains(newUUID) {
+                        newUUID = UUID()
+                    }
+                    seenIDs.insert(newUUID)
+                    item.id = newUUID
+                    uniqueItems.append(item)
+                }
+            }
+        }
+        
+        // チャンクファイルは日付昇順（古い順）で保存
+        uniqueItems.sort { $0.date < $1.date }
+        
+        let totalItemsCount = uniqueItems.count
+        guard totalItemsCount > 0 else { return }
+        
+        let previousChunkCount = try getChunkCount()
+        
+        let chunks = stride(from: 0, to: totalItemsCount, by: itemsPerChunk).map {
+            Array(uniqueItems[$0..<Swift.min($0 + itemsPerChunk, totalItemsCount)])
+        }
+        
+        var processedCount = 0
+        for (index, chunk) in chunks.enumerated() {
+            if Task.isCancelled { return }
+            try saveChunk(chunk, at: index)
+            processedCount += chunk.count
+            if let onProgress = onProgress {
+                await onProgress(processedCount, totalItemsCount)
+            }
+        }
+        
+        // もし以前のチャンク数が新しいチャンク数より多かった場合、余分なチャンクファイルを削除
+        if previousChunkCount > chunks.count {
+            for extraIndex in chunks.count..<previousChunkCount {
+                if let historyFileURL = getHistoryFileURL(for: extraIndex), FileManager.default.fileExists(atPath: historyFileURL.path) {
+                    try? FileManager.default.removeItem(at: historyFileURL)
+                }
+                if let indexFileURL = getHistoryIndexFileURL(for: extraIndex), FileManager.default.fileExists(atPath: indexFileURL.path) {
+                    try? FileManager.default.removeItem(at: indexFileURL)
+                }
+            }
+        }
+    }
+    
     /// コード検出インデックスを一括更新し、各チャンクをディスクに保存します。
     /// - Parameters:
     ///   - forceAll: true の場合は全アイテムを強制再判定。false の場合は未判定または旧バージョンのアイテムのみ更新。
@@ -427,7 +534,9 @@ actor ChunkedHistoryManager {
             for i in 0..<items.count {
                 if Task.isCancelled { return }
                 if forceAll || items[i].codeDetectorVersion != CodeDetector.currentDetectorVersion {
-                    items[i].updateCodeDetection()
+                    autoreleasepool {
+                        items[i].updateCodeDetection()
+                    }
                     chunkModified = true
                 }
                 processedCount += 1

@@ -101,16 +101,19 @@ struct DeveloperSettingsView: View {
                     }
                     
                     if spotlightManager.isIndexing {
+                        let total = Double(max(1, spotlightManager.totalCount))
+                        let progress = Double(max(0, min(spotlightManager.indexedCount, spotlightManager.totalCount)))
+                        let fraction = progress / total
+                        
                         ProgressView(
-                            value: (spotlightManager.totalCount > 0 && spotlightManager.indexedCount > 0) ? Double(spotlightManager.indexedCount) : nil,
-                            total: Double(max(1, spotlightManager.totalCount))
+                            value: spotlightManager.indexedCount > 0 ? progress : nil,
+                            total: total
                         ) {
                             EmptyView()
                         } currentValueLabel: {
                             if spotlightManager.totalCount > 0 {
                                 HStack {
                                     if spotlightManager.indexedCount > 0 {
-                                        let fraction = Double(spotlightManager.indexedCount) / Double(max(1, spotlightManager.totalCount))
                                         Text(fraction, format: .percent.precision(.fractionLength(0)))
                                         Spacer()
                                         Text("\(spotlightManager.indexedCount) / \(spotlightManager.totalCount)個")
@@ -150,32 +153,42 @@ struct DeveloperSettingsView: View {
             Section(header: Text("コード検出").font(.headline)) {
                 // Code Detection Index Status
                 VStack(alignment: .leading, spacing: 4) {
+                    let total = Double(max(1, clipboardManager.codeDetectionTotalCount))
+                    let progress = Double(max(0, min(clipboardManager.codeDetectionIndexedCount, clipboardManager.codeDetectionTotalCount)))
+                    let fraction = progress / total
+                    
                     HStack {
                         Text("コード検出インデックス状況")
                         Spacer()
-                        Text(clipboardManager.isIndexingCodeDetection ? "インデックス中..." : "インデックス済み")
-                            .foregroundStyle(.secondary)
+                        if clipboardManager.isIndexingCodeDetection {
+                            if clipboardManager.codeDetectionIndexedCount > 0 {
+                                Text(fraction < 0.5 ? "計算中..." : "インデックス中...")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("計算中...")
+                                    .foregroundStyle(.secondary)
+                            }
+                        } else {
+                            Text("インデックス済み")
+                                .foregroundStyle(.secondary)
+                        }
                     }
                     
                     if clipboardManager.isIndexingCodeDetection {
+                        let halfTotal = max(1, clipboardManager.codeDetectionTotalCount / 2)
+                        let currentCount = min(halfTotal, fraction < 0.5 ? clipboardManager.codeDetectionIndexedCount : (clipboardManager.codeDetectionIndexedCount - halfTotal))
+                        
                         ProgressView(
-                            value: (clipboardManager.codeDetectionTotalCount > 0 && clipboardManager.codeDetectionIndexedCount > 0) ? Double(clipboardManager.codeDetectionIndexedCount) : nil,
-                            total: Double(max(1, clipboardManager.codeDetectionTotalCount))
+                            value: progress,
+                            total: total
                         ) {
                             EmptyView()
                         } currentValueLabel: {
                             if clipboardManager.codeDetectionTotalCount > 0 {
                                 HStack {
-                                    if clipboardManager.codeDetectionIndexedCount > 0 {
-                                        let fraction = Double(clipboardManager.codeDetectionIndexedCount) / Double(max(1, clipboardManager.codeDetectionTotalCount))
-                                        Text(fraction, format: .percent.precision(.fractionLength(0)))
-                                        Spacer()
-                                        Text("\(clipboardManager.codeDetectionIndexedCount) / \(clipboardManager.codeDetectionTotalCount)個")
-                                    } else {
-                                        Text("インデックス準備中...")
-                                        Spacer()
-                                        Text("\(clipboardManager.codeDetectionTotalCount)個")
-                                    }
+                                    Text(fraction, format: .percent.precision(.fractionLength(0)))
+                                    Spacer()
+                                    Text("\(currentCount) / \(halfTotal)個")
                                 }
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
@@ -190,7 +203,7 @@ struct DeveloperSettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("コード検出インデックスをリセット")
-                        Text("コピー履歴のコード検出インデックスをリセットして、再判定します。")
+                        Text("すべての履歴と定型文のコード検出インデックスをリセットして、再判定します。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

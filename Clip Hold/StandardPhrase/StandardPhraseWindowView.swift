@@ -29,15 +29,6 @@ struct StandardPhraseItemRow<MenuContent: View>: View {
     @ViewBuilder let menuItems: () -> MenuContent
     
     var body: some View {
-        // isURLをbodyのトップレベルで定義
-        let isURL: Bool = {
-            guard !phrase.content.isEmpty,
-                  let url = URL(string: phrase.content) else {
-                return false
-            }
-            return url.scheme == "http" || url.scheme == "https"
-        }()
-        
         HStack(spacing: 8) {
             if !hideNumbers {
                 Text("\(index + 1).")
@@ -50,8 +41,22 @@ struct StandardPhraseItemRow<MenuContent: View>: View {
             // アイコン表示ロジック
             if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
                 ColorCodeIconView(color: color)
+            } else if phrase.isURL {
+                Image(systemName: "paperclip")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(4)
+                    .frame(width: 30, height: 30)
+                    .foregroundStyle(.secondary)
+            } else if phrase.isCode {
+                Image(systemName: "chevron.left.forwardslash.chevron.right")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(4)
+                    .frame(width: 30, height: 30)
+                    .foregroundStyle(.secondary)
             } else {
-                Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
+                Image(systemName: "list.bullet.rectangle.portrait")
                     .resizable()
                     .scaledToFit()
                     .padding(4)

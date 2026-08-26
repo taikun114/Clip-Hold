@@ -230,18 +230,12 @@ struct ClipHoldApp: App {
                             // カラーコードアイコンの表示条件をチェック
                             if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
                                 Image(nsImage: clipboardManager.createColorIcon(color: color, size: CGSize(width: 16, height: 16)))
+                            } else if phrase.isURL {
+                                Image(systemName: "paperclip")
+                            } else if phrase.isCode {
+                                Image(systemName: "chevron.left.forwardslash.chevron.right")
                             } else {
-                                // 定型文がURLかどうかを判定
-                                let isURL: Bool = {
-                                    guard !phrase.content.isEmpty,
-                                          let url = URL(string: phrase.content) else {
-                                        return false
-                                    }
-                                    // URLスキームがhttpまたはhttpsであることを確認
-                                    return url.scheme == "http" || url.scheme == "https"
-                                }()
-                                
-                                Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
+                                Image(systemName: "list.bullet.rectangle.portrait")
                             }
                         }
                         .labelStyle(.titleAndIcon)

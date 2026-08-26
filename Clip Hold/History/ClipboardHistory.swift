@@ -408,15 +408,24 @@ extension ClipboardManager {
     
     // MARK: - Code Detection Index Management
     
-    /// バックグラウンドで古いバージョンまたは未判定のアイテムのコード検出インデックスを更新します。
+    /// バックグラウンドで古いバージョンまたは未判定のアイテムのコード検出インデックスをマルチスレッドで更新します。
+    @MainActor
     func triggerCodeDetectionIndexUpdateIfNeeded() {
-        guard !self.isIndexingCodeDetection else { return }
+        guard !isIndexingCodeDetection else { return }
         
-        let hasOutdatedItems = self.clipboardHistory.contains { $0.codeDetectorVersion != CodeDetector.currentDetectorVersion }
-        guard hasOutdatedItems else { return }
+        let items = self.clipboardHistory
+        let historyCount = items.count
+        let phraseCount = StandardPhrasePresetManager.shared.totalPhrasesCount
+        let totalItemsCount = historyCount + phraseCount
+        guard totalItemsCount > 0 else { return }
         
+        let needsUpdate = items.contains { $0.codeDetectorVersion != CodeDetector.currentDetectorVersion } ||
+                          StandardPhrasePresetManager.shared.presets.contains { $0.phrases.contains { $0.codeDetectorVersion != CodeDetector.currentDetectorVersion } }
+        guard needsUpdate else { return }
+        
+        let totalUnits = max(1, totalItemsCount * 2)
         self.isIndexingCodeDetection = true
-        self.codeDetectionTotalCount = self.clipboardHistory.count
+        self.codeDetectionTotalCount = totalUnits
         self.codeDetectionIndexedCount = 0
         self.codeDetectionResetID = UUID()
         
@@ -424,20 +433,50 @@ extension ClipboardManager {
         self.codeDetectionIndexingTask = Task.detached(priority: .utility) { [weak self] in
             guard let self = self else { return }
             
-            // メモリ上のアイテムを並行して更新
-            for item in self.clipboardHistory {
-                if Task.isCancelled { return }
-                if item.codeDetectorVersion != CodeDetector.currentDetectorVersion {
-                    item.updateCodeDetection()
+            // フェーズ 1: メモリ上のアイテムをマルチコアで並行判定・計算（0%〜50%）
+            let processorCount = max(1, ProcessInfo.processInfo.activeProcessorCount)
+            let chunkSize = max(1, (historyCount + processorCount - 1) / processorCount)
+            
+            let tracker = IndexProgressTracker(totalCount: historyCount, batchSize: 25) { count in
+                await MainActor.run {
+                    self.codeDetectionIndexedCount = count
                 }
             }
             
-            // ディスク上のチャンクファイルにも更新を永続化
+            await withTaskGroup(of: Void.self) { group in
+                for chunkStart in stride(from: 0, to: historyCount, by: chunkSize) {
+                    let chunkEnd = min(chunkStart + chunkSize, historyCount)
+                    let subItems = Array(items[chunkStart..<chunkEnd])
+                    
+                    group.addTask {
+                        for item in subItems {
+                            if Task.isCancelled { return }
+                            if item.codeDetectorVersion != CodeDetector.currentDetectorVersion {
+                                autoreleasepool {
+                                    item.updateCodeDetection()
+                                }
+                            }
+                            await tracker.increment()
+                        }
+                    }
+                }
+            }
+            
+            // 定型文のインデックス更新（フェーズ 1 の残り）
+            await MainActor.run {
+                StandardPhrasePresetManager.shared.updateCodeDetectionIndex(forceAll: false)
+                StandardPhraseManager.shared.loadStandardPhrases()
+                self.codeDetectionIndexedCount = totalItemsCount
+            }
+            
+            if Task.isCancelled { return }
+            
+            // フェーズ 2: 判定済みデータをそのままチャンクとして高速保存（50%〜100%）
             do {
-                try await ChunkedHistoryManager.shared.updateCodeDetectionIndex(forceAll: false) { progress, total in
+                try await ChunkedHistoryManager.shared.persistHistoryChunks(items) { progress, total in
                     await MainActor.run {
-                        self.codeDetectionIndexedCount = progress
-                        self.codeDetectionTotalCount = total
+                        self.codeDetectionIndexedCount = totalItemsCount + progress + phraseCount
+                        self.codeDetectionTotalCount = totalUnits
                     }
                 }
             } catch {
@@ -451,11 +490,18 @@ extension ClipboardManager {
         }
     }
     
-    /// コード検出インデックスをリセットして、すべての履歴アイテムを再判定します。
+    /// コード検出インデックスをリセットして、すべての履歴および定型文アイテムをマルチスレッドで再判定・保存します。
+    @MainActor
     func resetCodeDetectionIndex() async {
+        let items = self.clipboardHistory
+        let historyCount = items.count
+        let phraseCount = await MainActor.run { StandardPhrasePresetManager.shared.totalPhrasesCount }
+        let totalItemsCount = historyCount + phraseCount
+        let totalUnits = max(1, totalItemsCount * 2)
+        
         await MainActor.run {
             self.isIndexingCodeDetection = true
-            self.codeDetectionTotalCount = self.clipboardHistory.count
+            self.codeDetectionTotalCount = totalUnits
             self.codeDetectionIndexedCount = 0
             self.codeDetectionResetID = UUID()
         }
@@ -464,18 +510,48 @@ extension ClipboardManager {
         self.codeDetectionIndexingTask = Task.detached(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             
-            // メモリ上の全アイテムを再判定
-            for item in self.clipboardHistory {
-                if Task.isCancelled { return }
-                item.updateCodeDetection()
+            // フェーズ 1: メモリ上の全アイテムをマルチコアで並行判定・計算（0%〜50%）
+            let processorCount = max(1, ProcessInfo.processInfo.activeProcessorCount)
+            let chunkSize = max(1, (historyCount + processorCount - 1) / processorCount)
+            
+            let tracker = IndexProgressTracker(totalCount: historyCount, batchSize: 25) { count in
+                await MainActor.run {
+                    self.codeDetectionIndexedCount = count
+                }
             }
             
-            // ディスク上の全チャンクを強制再判定して永続化
+            await withTaskGroup(of: Void.self) { group in
+                for chunkStart in stride(from: 0, to: historyCount, by: chunkSize) {
+                    let chunkEnd = min(chunkStart + chunkSize, historyCount)
+                    let subItems = Array(items[chunkStart..<chunkEnd])
+                    
+                    group.addTask {
+                        for item in subItems {
+                            if Task.isCancelled { return }
+                            autoreleasepool {
+                                item.updateCodeDetection()
+                            }
+                            await tracker.increment()
+                        }
+                    }
+                }
+            }
+            
+            // 定型文のインデックス更新（フェーズ 1 の残り）
+            await MainActor.run {
+                StandardPhrasePresetManager.shared.updateCodeDetectionIndex(forceAll: true)
+                StandardPhraseManager.shared.loadStandardPhrases()
+                self.codeDetectionIndexedCount = totalItemsCount
+            }
+            
+            if Task.isCancelled { return }
+            
+            // フェーズ 2: 判定済みデータをそのままチャンクとして高速保存（50%〜100%）
             do {
-                try await ChunkedHistoryManager.shared.updateCodeDetectionIndex(forceAll: true) { progress, total in
+                try await ChunkedHistoryManager.shared.persistHistoryChunks(items) { progress, total in
                     await MainActor.run {
-                        self.codeDetectionIndexedCount = progress
-                        self.codeDetectionTotalCount = total
+                        self.codeDetectionIndexedCount = totalItemsCount + progress + phraseCount
+                        self.codeDetectionTotalCount = totalUnits
                     }
                 }
             } catch {
@@ -544,6 +620,29 @@ extension ClipboardManager {
             }
         } catch {
             print("ClipboardManager: Error cleaning up orphaned files: \(error.localizedDescription)")
+        }
+    }
+}
+
+// MARK: - Helper Actor for Safe Progress Tracking
+
+/// コード検出インデックス並行処理中の進捗をスレッドセーフに集計・通知するアクター
+private actor IndexProgressTracker {
+    private var processedCount: Int = 0
+    private let totalCount: Int
+    private let batchSize: Int
+    private let onProgress: @Sendable (Int) async -> Void
+    
+    init(totalCount: Int, batchSize: Int = 25, onProgress: @escaping @Sendable (Int) async -> Void) {
+        self.totalCount = totalCount
+        self.batchSize = batchSize
+        self.onProgress = onProgress
+    }
+    
+    func increment() async {
+        processedCount += 1
+        if processedCount % batchSize == 0 || processedCount == totalCount {
+            await onProgress(processedCount)
         }
     }
 }
