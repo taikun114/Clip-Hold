@@ -96,7 +96,7 @@ struct DeveloperSettingsView: View {
                     HStack {
                         Text("Spotlightインデックス状況")
                         Spacer()
-                        Text(spotlightManager.isIndexing ? "インデックス中..." : "インデックス済み")
+                        Text(spotlightManager.isIndexing ? (spotlightManager.indexedCount > 0 ? "インデックス中..." : "準備中...") : "インデックス済み")
                             .foregroundStyle(.secondary)
                     }
                     
