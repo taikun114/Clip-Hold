@@ -47,6 +47,11 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 -->
 
 ## 1.7.0
+
+> [!NOTE]
+> In this version, to support Spotlight search and code detection, indexing will run in the background when launched after updating. Depending on the number of history items and standard phrases, indexing may take a long time.\
+> A high load may occur until indexing is complete, but this is normal behavior, so please rest assured. You can continue to use Clip Hold features as usual even while indexing is in progress.
+
 ### New Features
 #### General
 - **Support for code detection**
