@@ -1,5 +1,5 @@
 {
-  "originHash" : "ae51545ff506f5ca006d3aef749f25ca0dfc40f40e4e824bd14ff129c8ba5f7a",
+  "originHash" : "50a79fff81e651ef8d59e8a8777a0470ba41b3f6d1a086abbcece3b8b9f1b5ed",
   "pins" : [
     {
       "identity" : "highlighterswift",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/taikun114/UniversalSFSymbolsPicker.git",
       "state" : {
-        "revision" : "dc2d9d59c3f8ddf988a0482e323c7b95a1c2001c",
-        "version" : "1.0.1"
+        "revision" : "42ae3e33c78fd2ed78b9647bcf34df09b3699a7c",
+        "version" : "1.1.1"
       }
     }
   ],
