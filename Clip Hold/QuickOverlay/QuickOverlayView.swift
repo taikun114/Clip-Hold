@@ -443,6 +443,12 @@ struct QuickOverlayView: View {
                     Spacer()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if type == .history && cachedHistoryItems.isEmpty {
+                SharedEmptyListView(message: "履歴はありません")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if type == .standardPhrase && cachedPhraseItems.isEmpty {
+                SharedEmptyListView(message: "定型文はありません")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 ScrollView {
                     LazyVStack(spacing: 4) {
@@ -1756,6 +1762,24 @@ private struct QuickOverlayStandardPhraseItemRow: View {
         ClipboardItem(text: "https://github.com/", date: Date().addingTimeInterval(-250000), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil),
         ClipboardItem(text: "お疲れ様です。", date: Date().addingTimeInterval(-300000), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil)
     ])
+        .environmentObject(ClipboardManager.shared)
+        .environmentObject(StandardPhraseManager.shared)
+        .environmentObject(StandardPhrasePresetManager.shared)
+        .environmentObject(DateReloader.shared)
+        .padding(40)
+}
+
+#Preview("履歴オーバーレイ (空)") {
+    QuickOverlayView(type: .history, initialPresetMenuOpen: false, explicitHistoryItems: [])
+        .environmentObject(ClipboardManager.shared)
+        .environmentObject(StandardPhraseManager.shared)
+        .environmentObject(StandardPhrasePresetManager.shared)
+        .environmentObject(DateReloader.shared)
+        .padding(40)
+}
+
+#Preview("定型文オーバーレイ (空)") {
+    QuickOverlayView(type: .standardPhrase, initialPresetMenuOpen: false, explicitPhraseItems: [])
         .environmentObject(ClipboardManager.shared)
         .environmentObject(StandardPhraseManager.shared)
         .environmentObject(StandardPhrasePresetManager.shared)
