@@ -75,7 +75,7 @@ struct HistoryWindowView: View {
         return text
     }
     
-    private func performUpdate(isPagination: Bool = false, isBackground: Bool = false) {
+    private func performUpdate(isPagination: Bool = false, isBackground: Bool = false, initialDelayMs: Int = 0) {
         if isPagination {
             isPaginating = true
         } else if isBackground {
@@ -215,8 +215,13 @@ struct HistoryWindowView: View {
             }
             finalHistoryToApply = finalHistory
             
+            if initialDelayMs > 0 {
+                // クイックオーバーレイの閉じるアニメーション（約0.15秒）完了まで待機
+                try? await Task.sleep(nanoseconds: UInt64(initialDelayMs) * 1_000_000)
+            }
+            
             await MainActor.run {
-                if isReduceMotion {
+                if isReduceMotion || initialDelayMs > 0 {
                     self.filteredHistory = finalHistoryToApply
                 } else {
                     withAnimation {
@@ -421,7 +426,7 @@ struct HistoryWindowView: View {
             clipboardManager.filteredHistoryForShortcuts = []
             
             if clipboardManager.isHistoryLoaded {
-                performUpdate()
+                performUpdate(initialDelayMs: 180)
             } else {
                 isLoading = true
             }
@@ -434,7 +439,7 @@ struct HistoryWindowView: View {
         }
         .onChange(of: clipboardManager.isHistoryLoaded) { _, loaded in
             if loaded {
-                performUpdate()
+                performUpdate(initialDelayMs: 180)
             }
         }
         .onDisappear {
