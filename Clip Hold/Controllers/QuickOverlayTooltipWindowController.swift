@@ -109,17 +109,30 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         contentView.wantsLayer = true
         contentView.layer?.removeAllAnimations()
         
-        // ツールチップが現れる方向へ少しスライドしながら表示する
+        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         window.alphaValue = 0
-        let slideDistance: CGFloat = 12
-        let initialTransform: CATransform3D
-        switch tooltipDirection {
-        case .above: initialTransform = CATransform3DMakeTranslation(0, -slideDistance, 0)
-        case .below: initialTransform = CATransform3DMakeTranslation(0, slideDistance, 0)
-        case .left: initialTransform = CATransform3DMakeTranslation(slideDistance, 0, 0)
-        case .right: initialTransform = CATransform3DMakeTranslation(-slideDistance, 0, 0)
+        if reduceMotion {
+            contentView.layer?.transform = CATransform3DIdentity
+        } else {
+            // ツールチップが現れる方向へ少しスライドしながら表示する
+            let slideDistance: CGFloat = 12
+            let initialTransform: CATransform3D
+            switch tooltipDirection {
+            case .above: initialTransform = CATransform3DMakeTranslation(0, -slideDistance, 0)
+            case .below: initialTransform = CATransform3DMakeTranslation(0, slideDistance, 0)
+            case .left: initialTransform = CATransform3DMakeTranslation(slideDistance, 0, 0)
+            case .right: initialTransform = CATransform3DMakeTranslation(-slideDistance, 0, 0)
+            }
+            contentView.layer?.transform = initialTransform
+            
+            let slideAnim = CABasicAnimation(keyPath: "transform")
+            slideAnim.fromValue = initialTransform
+            slideAnim.toValue = CATransform3DIdentity
+            slideAnim.duration = 0.15
+            slideAnim.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            contentView.layer?.add(slideAnim, forKey: "showSlide")
+            contentView.layer?.transform = CATransform3DIdentity
         }
-        contentView.layer?.transform = initialTransform
         window.orderFront(nil)
         
         NSAnimationContext.runAnimationGroup { context in
@@ -127,14 +140,6 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             context.timingFunction = CAMediaTimingFunction(name: .easeOut)
             window.animator().alphaValue = 1
         }
-        
-        let slideAnim = CABasicAnimation(keyPath: "transform")
-        slideAnim.fromValue = initialTransform
-        slideAnim.toValue = CATransform3DIdentity
-        slideAnim.duration = 0.15
-        slideAnim.timingFunction = CAMediaTimingFunction(name: .easeOut)
-        contentView.layer?.add(slideAnim, forKey: "showSlide")
-        contentView.layer?.transform = CATransform3DIdentity
     }
     
     @objc private func hideTooltip() {

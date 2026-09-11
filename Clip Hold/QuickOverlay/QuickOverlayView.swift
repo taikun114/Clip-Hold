@@ -20,6 +20,7 @@ struct QuickOverlayView: View {
     @EnvironmentObject var standardPhraseManager: StandardPhraseManager
     @EnvironmentObject var presetManager: StandardPhrasePresetManager
     @EnvironmentObject var dateReloader: DateReloader
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var quickOverlayManager = QuickOverlayManager.shared
     
@@ -199,9 +200,9 @@ struct QuickOverlayView: View {
                             if type == .standardPhrase {
                                 presetDropdownMenu
                                     .opacity(isPresetMenuOpen ? 1 : 0)
-                                    .scaleEffect(isPresetMenuOpen ? 1 : 0.95, anchor: .topTrailing)
+                                    .scaleEffect(reduceMotion ? 1.0 : (isPresetMenuOpen ? 1 : 0.95), anchor: .topTrailing)
                                     .allowsHitTesting(isPresetMenuOpen)
-                                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPresetMenuOpen)
+                                    .animation(reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.3, dampingFraction: 0.7), value: isPresetMenuOpen)
                             }
                         },
                         alignment: .topTrailing

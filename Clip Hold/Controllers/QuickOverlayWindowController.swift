@@ -117,6 +117,7 @@ class QuickOverlayWindowController: NSWindowController {
         window.orderFrontRegardless()
         window.displayIfNeeded()
         
+        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         let mode = QuickOverlayManager.shared.presentationMode
         let outTx: CGFloat
         let outTy: CGFloat
@@ -153,20 +154,26 @@ class QuickOverlayWindowController: NSWindowController {
         animationContainerView.layer?.opacity = 0.0
         CATransaction.commit()
         
-        let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
-        txAnim.fromValue = outTx
-        txAnim.toValue = peekTx
+        var animations: [CAAnimation] = []
         
-        let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
-        tyAnim.fromValue = outTy
-        tyAnim.toValue = peekTy
+        if !reduceMotion {
+            let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
+            txAnim.fromValue = outTx
+            txAnim.toValue = peekTx
+            
+            let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
+            tyAnim.fromValue = outTy
+            tyAnim.toValue = peekTy
+            animations.append(contentsOf: [txAnim, tyAnim])
+        }
         
         let opacityAnim = CABasicAnimation(keyPath: "opacity")
         opacityAnim.fromValue = 0.0
         opacityAnim.toValue = 1.0
+        animations.append(opacityAnim)
         
         let group = CAAnimationGroup()
-        group.animations = [txAnim, tyAnim, opacityAnim]
+        group.animations = animations
         group.duration = 0.18
         group.timingFunction = CAMediaTimingFunction(controlPoints: 0.16, 1.0, 0.3, 1.0)
         group.isRemovedOnCompletion = false
@@ -197,6 +204,16 @@ class QuickOverlayWindowController: NSWindowController {
         fromOffset: CGFloat,
         duration: TimeInterval = 0.4
     ) -> (group: CAAnimationGroup, startTx: CGFloat, startTy: CGFloat) {
+        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        if reduceMotion {
+            let group = CAAnimationGroup()
+            group.animations = []
+            group.duration = 0.15
+            group.isRemovedOnCompletion = false
+            group.fillMode = .forwards
+            return (group, 0.0, 0.0)
+        }
+        
         let txValues: [CGFloat]
         let tyValues: [CGFloat]
         
@@ -262,6 +279,54 @@ class QuickOverlayWindowController: NSWindowController {
             edgeSide = .left
         }
         
+        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        
+        if reduceMotion {
+            let expandGeneration = animationGeneration
+            let fadeDuration: TimeInterval = 0.2
+            
+            window.level = .floating
+            window.makeKey()
+            
+            // ピーク位置からフルオープン位置（0, 0）へ、位置を瞬時にワープさせずに
+            // ピーク位置でのフェードアウトとフルオープンでのフェードインを同一コンテナの透過度アニメーションでスムーズに実行する
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            animationContainerView.layer?.removeAllAnimations()
+            animationContainerView.layer?.anchorPoint = CGPoint(x: 0.0, y: 0.0)
+            animationContainerView.layer?.position = CGPoint(x: 0.0, y: 0.0)
+            animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
+            animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
+            animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
+            animationContainerView.layer?.opacity = 1.0
+            
+            let fadeIn = CABasicAnimation(keyPath: "opacity")
+            fadeIn.fromValue = 0.0
+            fadeIn.toValue = 1.0
+            fadeIn.duration = fadeDuration
+            fadeIn.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            fadeIn.isRemovedOnCompletion = false
+            fadeIn.fillMode = .forwards
+            
+            let animDelegate = AnimationCompletionDelegate { [weak self, weak animationContainerView] in
+                guard let self, self.animationGeneration == expandGeneration,
+                      let animationContainerView = animationContainerView else { return }
+                CATransaction.begin()
+                CATransaction.setDisableActions(true)
+                animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
+                animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
+                animationContainerView.layer?.opacity = 1.0
+                CATransaction.commit()
+                animationContainerView.layer?.removeAllAnimations()
+                self.expandAnimationDelegate = nil
+            }
+            self.expandAnimationDelegate = animDelegate
+            fadeIn.delegate = animDelegate
+            animationContainerView.layer?.add(fadeIn, forKey: "expandFadeIn")
+            CATransaction.commit()
+            return
+        }
+        
         let anim = createScreenEdgeExpandAnimation(edgeSide: edgeSide, fromOffset: 476.0)
         
         let expandGeneration = animationGeneration
@@ -272,6 +337,7 @@ class QuickOverlayWindowController: NSWindowController {
             CATransaction.setDisableActions(true)
             animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.x")
             animationContainerView.layer?.setValue(0.0, forKeyPath: "transform.translation.y")
+            animationContainerView.layer?.opacity = 1.0
             CATransaction.commit()
             animationContainerView.layer?.removeAllAnimations()
             self.expandAnimationDelegate = nil
@@ -295,6 +361,7 @@ class QuickOverlayWindowController: NSWindowController {
         animationContainerView.layer?.setValue(anim.startTx, forKeyPath: "transform.translation.x")
         animationContainerView.layer?.setValue(anim.startTy, forKeyPath: "transform.translation.y")
         animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
+        
         animationContainerView.layer?.add(anim.group, forKey: "expandAnimation")
         CATransaction.commit()
     }
@@ -322,6 +389,7 @@ class QuickOverlayWindowController: NSWindowController {
         
         window.level = .floating // メニューバーの下に潜り込ませる
         
+        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         let mode = QuickOverlayManager.shared.presentationMode
         
         switch mode {
@@ -334,13 +402,22 @@ class QuickOverlayWindowController: NSWindowController {
             opacityAnim.toValue = 1.0
             opacityAnim.duration = 0.15
             opacityAnim.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            anim.group.animations?.append(opacityAnim)
+            
+            if reduceMotion {
+                anim.group.animations = [opacityAnim]
+                anim.group.duration = 0.15
+            } else {
+                anim.group.animations?.append(opacityAnim)
+            }
+            
+            let initialTx = reduceMotion ? 0.0 : anim.startTx
+            let initialTy = reduceMotion ? 0.0 : anim.startTy
             
             CATransaction.begin()
             CATransaction.setDisableActions(true)
             animationContainerView.layer?.setValue(1.0, forKeyPath: "transform.scale")
-            animationContainerView.layer?.setValue(anim.startTx, forKeyPath: "transform.translation.x")
-            animationContainerView.layer?.setValue(anim.startTy, forKeyPath: "transform.translation.y")
+            animationContainerView.layer?.setValue(initialTx, forKeyPath: "transform.translation.x")
+            animationContainerView.layer?.setValue(initialTy, forKeyPath: "transform.translation.y")
             animationContainerView.layer?.opacity = 0.0
             CATransaction.commit()
             
@@ -366,7 +443,7 @@ class QuickOverlayWindowController: NSWindowController {
             window.makeKey()
             
         case .shortcut:
-            let scaleFrom: CGFloat = 1.05
+            let scaleFrom: CGFloat = reduceMotion ? 1.0 : 1.05
             let halfWidth = rootContainer.bounds.width / 2.0
             let halfHeight = rootContainer.bounds.height / 2.0
             let txFrom = (1.0 - scaleFrom) * halfWidth
@@ -382,24 +459,30 @@ class QuickOverlayWindowController: NSWindowController {
             animationContainerView.layer?.opacity = 0.0
             CATransaction.commit()
             
-            let scaleAnim = CABasicAnimation(keyPath: "transform.scale")
-            scaleAnim.fromValue = scaleFrom
-            scaleAnim.toValue = 1.0
+            var animations: [CAAnimation] = []
             
-            let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
-            txAnim.fromValue = txFrom
-            txAnim.toValue = 0.0
-            
-            let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
-            tyAnim.fromValue = tyFrom
-            tyAnim.toValue = 0.0
+            if !reduceMotion {
+                let scaleAnim = CABasicAnimation(keyPath: "transform.scale")
+                scaleAnim.fromValue = scaleFrom
+                scaleAnim.toValue = 1.0
+                
+                let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
+                txAnim.fromValue = txFrom
+                txAnim.toValue = 0.0
+                
+                let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
+                tyAnim.fromValue = tyFrom
+                tyAnim.toValue = 0.0
+                animations.append(contentsOf: [scaleAnim, txAnim, tyAnim])
+            }
             
             let opacityAnim = CABasicAnimation(keyPath: "opacity")
             opacityAnim.fromValue = 0.0
             opacityAnim.toValue = 1.0
+            animations.append(opacityAnim)
             
             let group = CAAnimationGroup()
-            group.animations = [scaleAnim, txAnim, tyAnim, opacityAnim]
+            group.animations = animations
             group.duration = animDuration
             group.timingFunction = timingFunc
             group.isRemovedOnCompletion = false
@@ -453,6 +536,7 @@ class QuickOverlayWindowController: NSWindowController {
         animationContainerView.layer?.opacity = currentOpacity
         CATransaction.commit()
         
+        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         let mode = QuickOverlayManager.shared.presentationMode
         let txTo: CGFloat
         let tyTo: CGFloat
@@ -465,7 +549,10 @@ class QuickOverlayWindowController: NSWindowController {
             scaleTo = 1.0
             animDuration = 0.16
             timingFunc = CAMediaTimingFunction(controlPoints: 0.7, 0.0, 0.84, 0.0)
-            if isPeeking {
+            if reduceMotion {
+                txTo = currentTx
+                tyTo = currentTy
+            } else if isPeeking {
                 // ピーク中から画面外へ引っ込める
                 let outOffset = 500.0 + edgeInset
                 switch edge.edgeSide {
@@ -484,7 +571,7 @@ class QuickOverlayWindowController: NSWindowController {
                 }
             }
         case .shortcut:
-            scaleTo = 1.05
+            scaleTo = reduceMotion ? 1.0 : 1.05
             // 左下(0,0)アンカーでスケールする際、中心を不動に保つための補正移動量: (1.0 - S) * (W / 2)
             let halfWidth = rootContainer.bounds.width / 2.0
             let halfHeight = rootContainer.bounds.height / 2.0
@@ -495,24 +582,30 @@ class QuickOverlayWindowController: NSWindowController {
         }
         
         // 2. アニメーションを作成（現在の途中値から目的値へスムーズに補間）
-        let scaleAnim = CABasicAnimation(keyPath: "transform.scale")
-        scaleAnim.fromValue = currentScale
-        scaleAnim.toValue = scaleTo
+        var animations: [CAAnimation] = []
         
-        let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
-        txAnim.fromValue = currentTx
-        txAnim.toValue = txTo
-        
-        let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
-        tyAnim.fromValue = currentTy
-        tyAnim.toValue = tyTo
+        if !reduceMotion {
+            let scaleAnim = CABasicAnimation(keyPath: "transform.scale")
+            scaleAnim.fromValue = currentScale
+            scaleAnim.toValue = scaleTo
+            
+            let txAnim = CABasicAnimation(keyPath: "transform.translation.x")
+            txAnim.fromValue = currentTx
+            txAnim.toValue = txTo
+            
+            let tyAnim = CABasicAnimation(keyPath: "transform.translation.y")
+            tyAnim.fromValue = currentTy
+            tyAnim.toValue = tyTo
+            animations.append(contentsOf: [scaleAnim, txAnim, tyAnim])
+        }
         
         let opacityAnim = CABasicAnimation(keyPath: "opacity")
         opacityAnim.fromValue = currentOpacity
         opacityAnim.toValue = 0.0
+        animations.append(opacityAnim)
         
         let group = CAAnimationGroup()
-        group.animations = [scaleAnim, txAnim, tyAnim, opacityAnim]
+        group.animations = animations
         group.duration = animDuration
         group.timingFunction = timingFunc
         group.isRemovedOnCompletion = false
