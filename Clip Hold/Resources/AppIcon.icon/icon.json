@@ -77,15 +77,20 @@
           "glass" : false,
           "hidden" : false,
           "image-name" : "h_Top_Shadow.png",
-          "name" : "h_Top_Shadow"
+          "name" : "h_Top_Shadow",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              -16
+            ]
+          }
         },
         {
           "fill-specializations" : [
             {
               "appearance" : "dark",
-              "value" : {
-                "solid" : "srgb:0.80392,0.85882,0.94902,1.00000"
-              }
+              "value" : "automatic"
             }
           ],
           "glass" : true,
@@ -96,7 +101,7 @@
             "scale" : 1,
             "translation-in-points" : [
               0,
-              -17
+              -16
             ]
           }
         }
@@ -132,6 +137,9 @@
     {
       "blend-mode-specializations" : [
         {
+          "value" : "normal"
+        },
+        {
           "appearance" : "dark",
           "value" : "normal"
         },
@@ -140,7 +148,7 @@
           "value" : "normal"
         }
       ],
-      "blur-material" : 0.5,
+      "blur-material" : 0.2,
       "layers" : [
         {
           "fill-specializations" : [
@@ -172,15 +180,15 @@
         ]
       },
       "refractivity" : {
-        "depth" : 0.1,
+        "depth" : 0,
         "enabled" : true,
-        "strength" : 0.05
+        "strength" : 0.1
       },
       "shadow-specializations" : [
         {
           "value" : {
             "kind" : "layer-color",
-            "opacity" : 0.5
+            "opacity" : 1
           }
         },
         {
@@ -221,9 +229,7 @@
           "fill-specializations" : [
             {
               "appearance" : "dark",
-              "value" : {
-                "solid" : "srgb:0.80534,0.85861,0.94902,1.00000"
-              }
+              "value" : "automatic"
             },
             {
               "appearance" : "tinted",
