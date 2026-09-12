@@ -66,7 +66,9 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
         self.window?.delegate = self
         self.applyTransparentBackground = applyTransparentBackground
         self.windowFrameAutosaveKey = windowFrameAutosaveKey
+#if DEBUG
         print("ClipHoldWindowController: Initialized with window \(wrappingWindow.identifier?.rawValue ?? "unknown").")
+#endif
         
         // ウィンドウのカスタマイズを適用
         applyWindowCustomizations(window: wrappingWindow)
@@ -143,13 +145,17 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
     
     func windowWillClose(_ notification: Notification) {
         if let window = notification.object as? NSWindow {
+#if DEBUG
             print("ClipHoldWindowController: Window will close: \(window.identifier?.rawValue ?? "unknown").")
+#endif
             if let key = self.windowFrameAutosaveKey {
                 saveCurrentFrame(of: window, for: key)
             }
             onWindowWillClose?()
         } else {
+#if DEBUG
             print("ClipHoldWindowController: Window will close (object unknown).")
+#endif
         }
     }
     
@@ -222,7 +228,9 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
             if let contentView = window.contentView {
                 contentView.wantsLayer = true
                 contentView.layer?.backgroundColor = NSColor.clear.cgColor
+#if DEBUG
                 print("ClipHoldWindowController: Set contentView layer backgroundColor to clear.")
+#endif
             }
         } else {
             window.isOpaque = true
@@ -231,13 +239,17 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
                 contentView.wantsLayer = true
                 contentView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
             }
+#if DEBUG
             print("ClipHoldWindowController: Set window and contentView background to opaque.")
+#endif
         }
     }
     private func saveCurrentFrame(of window: NSWindow, for key: String) {
         let frameString = NSStringFromRect(window.frame)
         UserDefaults.standard.set(frameString, forKey: key)
+#if DEBUG
         print("ClipHoldWindowController: Saved frame for key '\(key)': \(frameString)")
+#endif
     }
     
     private func loadSavedFrame(for key: String, to window: NSWindow) {
@@ -251,14 +263,20 @@ class ClipHoldWindowController: NSWindowController, NSWindowDelegate, QLPreviewP
                 let adjustedFrame = NSRect(x: adjustedOriginX, y: adjustedOriginY, width: savedFrame.width, height: savedFrame.height)
                 
                 window.setFrame(adjustedFrame, display: true)
+#if DEBUG
                 print("ClipHoldWindowController: Loaded and applied saved frame for key '\(key)': \(frameString) -> \(NSStringFromRect(adjustedFrame))")
+#endif
             } else {
                 // スクリーン情報が取得できない場合はそのまま適用
                 window.setFrame(savedFrame, display: true)
+#if DEBUG
                 print("ClipHoldWindowController: Loaded and applied saved frame (no screen check) for key '\(key)': \(frameString)")
+#endif
             }
         } else {
+#if DEBUG
             print("ClipHoldWindowController: No saved frame found for key '\(key)'.")
+#endif
             // 保存されたフレームがない場合は、デフォルトで中央に配置
             window.center() // 初回起動時や保存データがない場合に中央に表示
         }

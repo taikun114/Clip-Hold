@@ -5,9 +5,10 @@ import AppKit
 class PresetIconGenerator: ObservableObject {
     static let shared = PresetIconGenerator()
     
-    @Published private(set) var iconCache: [UUID: NSImage] = [:]
-    @Published private(set) var miniIconCache: [UUID: NSImage] = [:]
-    @Published private(set) var bigIconCache: [UUID: NSImage] = [:] // New cache for big icons
+    private(set) var iconCache: [UUID: NSImage] = [:]
+    private(set) var miniIconCache: [UUID: NSImage] = [:]
+    private(set) var dimmedMiniIconCache: [UUID: NSImage] = [:]
+    private(set) var bigIconCache: [UUID: NSImage] = [:] // New cache for big icons
     
     private var appearanceObserver: NSKeyValueObservation?
     
@@ -18,7 +19,7 @@ class PresetIconGenerator: ObservableObject {
             return
         }
         appearanceObserver = app.observe(\.effectiveAppearance) { [weak self] app, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.regenerateAllIcons()
             }
         }
@@ -32,6 +33,9 @@ class PresetIconGenerator: ObservableObject {
             
             let miniImage = createMiniImage(for: preset)
             miniIconCache[preset.id] = miniImage
+            
+            let dimmedMiniImage = createDimmedImage(from: miniImage)
+            dimmedMiniIconCache[preset.id] = dimmedMiniImage
             
             let bigImage = createBigImage(for: preset)
             bigIconCache[preset.id] = bigImage
@@ -52,6 +56,9 @@ class PresetIconGenerator: ObservableObject {
                 let bigImage = createBigImage(for: preset)
                 bigIconCache[preset.id] = bigImage
             }
+            if dimmedMiniIconCache[preset.id] == nil, let mini = miniIconCache[preset.id] {
+                dimmedMiniIconCache[preset.id] = createDimmedImage(from: mini)
+            }
             return cachedIcon
         }
         
@@ -61,9 +68,57 @@ class PresetIconGenerator: ObservableObject {
         let miniImage = createMiniImage(for: preset)
         miniIconCache[preset.id] = miniImage
         
+        let dimmedMiniImage = createDimmedImage(from: miniImage)
+        dimmedMiniIconCache[preset.id] = dimmedMiniImage
+        
         let bigImage = createBigImage(for: preset)
         bigIconCache[preset.id] = bigImage
         
+        return image
+    }
+    
+    func generateSpotlightIcon(for preset: StandardPhrasePreset) -> NSImage {
+        let size = CGSize(width: 64, height: 64)
+        let image = NSImage(size: size)
+        
+        image.lockFocus()
+        
+        let rect = NSRect(origin: .zero, size: size)
+        let nsColor = getColor(from: preset.color, with: preset.customColor)
+        
+        // 1. Draw the background circle
+        let path = NSBezierPath(ovalIn: rect)
+        nsColor.setFill()
+        path.fill()
+        
+        // 2. Prepare the symbol image
+        if let symbolImage = NSImage(systemSymbolName: preset.icon, accessibilityDescription: nil) {
+            let symbolConfig = NSImage.SymbolConfiguration(pointSize: 32, weight: .bold)
+            if let configuredSymbol = symbolImage.withSymbolConfiguration(symbolConfig) {
+                
+                // Determine symbol color based on preset color
+                let symbolForegroundColor = getSymbolColor(for: preset.color, with: preset.customColor, on: nsColor)
+                
+                // 3. Create a tinted version of the symbol
+                let tintedSymbol = NSImage(size: configuredSymbol.size, flipped: false) { (dstRect) -> Bool in
+                    // Draw the tint color
+                    symbolForegroundColor.drawSwatch(in: dstRect)
+                    // Draw the symbol image over it using destinationIn to mask
+                    configuredSymbol.draw(in: dstRect, from: .zero, operation: .destinationIn, fraction: 1.0)
+                    return true
+                }
+                
+                // 4. Draw the tinted symbol onto our main image
+                let symbolRect = NSRect(x: (size.width - tintedSymbol.size.width) / 2,
+                                        y: (size.height - tintedSymbol.size.height) / 2,
+                                        width: tintedSymbol.size.width,
+                                        height: tintedSymbol.size.height)
+                
+                tintedSymbol.draw(in: symbolRect)
+            }
+        }
+        
+        image.unlockFocus()
         return image
     }
     
@@ -74,6 +129,9 @@ class PresetIconGenerator: ObservableObject {
         let miniImage = createMiniImage(for: preset)
         miniIconCache[preset.id] = miniImage
         
+        let dimmedMiniImage = createDimmedImage(from: miniImage)
+        dimmedMiniIconCache[preset.id] = dimmedMiniImage
+        
         let bigImage = createBigImage(for: preset)
         bigIconCache[preset.id] = bigImage
         
@@ -83,6 +141,7 @@ class PresetIconGenerator: ObservableObject {
     func removeIcon(for presetId: UUID) {
         iconCache.removeValue(forKey: presetId)
         miniIconCache.removeValue(forKey: presetId)
+        dimmedMiniIconCache.removeValue(forKey: presetId)
         bigIconCache.removeValue(forKey: presetId) // Remove from big cache as well
         objectWillChange.send()
     }
@@ -90,6 +149,7 @@ class PresetIconGenerator: ObservableObject {
     func clearCache() {
         iconCache.removeAll()
         miniIconCache.removeAll()
+        dimmedMiniIconCache.removeAll()
         bigIconCache.removeAll() // Clear big cache as well
         objectWillChange.send()
     }
@@ -135,6 +195,15 @@ class PresetIconGenerator: ObservableObject {
             }
         }
         
+        image.unlockFocus()
+        return image
+    }
+    
+    private func createDimmedImage(from source: NSImage) -> NSImage {
+        let size = source.size
+        let image = NSImage(size: size)
+        image.lockFocus()
+        source.draw(in: NSRect(origin: .zero, size: size), from: .zero, operation: .sourceOver, fraction: 0.5)
         image.unlockFocus()
         return image
     }

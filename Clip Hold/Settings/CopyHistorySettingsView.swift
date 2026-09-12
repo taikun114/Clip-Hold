@@ -15,12 +15,13 @@ struct CopyHistorySettingsView: View {
     @State private var tempSelectedFileSizeOption: DataSizeOption
     @State private var initialFileSizeOption: DataSizeOption
     
-    @AppStorage("largeFileAlertThreshold") var largeFileAlertThreshold: Int = 1_000_000_000
+    @AppStorage("largeFileAlertThreshold") var largeFileAlertThreshold: Int = 100_000_000
     @State private var tempSelectedAlertOption: DataSizeAlertOption
     @State private var initialAlertOption: DataSizeAlertOption
     @State private var showingCustomAlertSheet = false
     
     @AppStorage("ignoreStandardPhrases") var ignoreStandardPhrases: Bool = false
+    @AppStorage("folderCalculationTimeout") var folderCalculationTimeout: Double = 3.0
     
     @State private var tempCustomAlertValue: Int = 1 // カスタム入力シート用の値
     @State private var tempCustomAlertUnit: DataSizeUnit = .gigabytes // カスタム入力シート用の単位
@@ -29,6 +30,10 @@ struct CopyHistorySettingsView: View {
     @State private var showingCustomFileSizeSheet = false
     @State private var showingClearHistoryConfirmation = false
     @State private var showingClearFilesConfirmation = false
+    @State private var showingDecreaseHistoryLimitAlertForPicker = false
+    @State private var showingDecreaseHistoryLimitAlertForSheet = false
+    @State private var pendingHistorySaveValue: Int? = nil
+    @State private var pendingHistorySaveOption: HistoryOption? = nil
     
     @State private var customSaveHistoryWasSaved = false
     @State private var customFileSizeWasSaved = false
@@ -40,10 +45,21 @@ struct CopyHistorySettingsView: View {
     
     @StateObject private var clipboardImporterExporter = ClipboardHistoryImporterExporter()
     @State private var isShowingImportSheet: Bool = false
-    @State private var isShowingExportSheet: Bool = false
+    @State private var showingExportConfigSheet: Bool = false
+    @State private var isShowingFileExporter: Bool = false
+    @State private var exportIncludeFiles: Bool = true
+    @State private var estimatedExportSizeMin: Int64 = 0
+    @State private var estimatedExportSizeMax: Int64 = 0
+    @State private var cachedSizeWithFiles: (min: Int64, max: Int64)? = nil
+    @State private var cachedSizeWithoutFiles: (min: Int64, max: Int64)? = nil
+    @State private var isCalculatingExportSize: Bool = false
     
     @State private var itemCount: Int = 0
     @State private var totalFolderSize: UInt64 = 0
+    
+    @State private var isCalculating: Bool = false
+    @State private var showingRecalculateConfirmation = false
+    @State private var hasUncalculatedFolders: Bool = false
     
     // MARK: - Initialization
     init() {
@@ -55,16 +71,18 @@ struct CopyHistorySettingsView: View {
         // maxHistoryToSaveは0が無制限を表すため、raw値をそのまま使用。nilの場合は0をデフォルトとする。
         let savedMaxHistoryToSave = savedMaxHistoryToSaveRaw ?? 0
         
-        // largeFileAlertThresholdは、UserDefaultsに値がない場合（nil）にAppStorageのデフォルト値（1GB）を使用。
+        // largeFileAlertThresholdは、UserDefaultsに値がない場合（nil）にAppStorageのデフォルト値（100MB）を使用。
         // 0が明示的に設定されている場合は0として扱う。
         let savedMaxFileSizeToSave = savedMaxFileSizeToSaveRaw ?? 0
-        let savedLargeFileAlertThreshold = savedLargeFileAlertThresholdRaw ?? 1_000_000_000
+        let savedLargeFileAlertThreshold = savedLargeFileAlertThresholdRaw ?? 100_000_000
         
         
         // DEBUG print for initial values from UserDefaults
+#if DEBUG
         print("DEBUG: init() - savedMaxHistoryToSaveRaw: \(savedMaxHistoryToSaveRaw ?? -1) (using \(savedMaxHistoryToSave))")
         print("DEBUG: init() - savedMaxFileSizeToSaveRaw: \(savedMaxFileSizeToSaveRaw ?? -1) (using \(savedMaxFileSizeToSave))")
         print("DEBUG: init() - savedLargeFileAlertThresholdRaw: \(savedLargeFileAlertThresholdRaw ?? -1) (using \(savedLargeFileAlertThreshold))")
+#endif
         
         // Initialize tempSelectedSaveOption and tempCustomSaveHistoryValue
         let determinedSaveOptions = Self.determineHistorySaveOptions(savedMaxHistoryToSave: savedMaxHistoryToSave)
@@ -169,8 +187,30 @@ struct CopyHistorySettingsView: View {
         }
     }
     
+    @ViewBuilder
+    private var folderSizeDisplayView: some View {
+        HStack {
+            Text("保存フォルダの総容量:")
+            Spacer()
+            if isCalculating {
+                Text("\(ByteCountFormatter.string(fromByteCount: Int64(totalFolderSize), countStyle: .file)) (計算中...)")
+                    .foregroundStyle(.secondary)
+            } else {
+                HStack(spacing: 8) {
+                    Text(ByteCountFormatter.string(fromByteCount: Int64(totalFolderSize), countStyle: .file))
+                        .foregroundStyle(.secondary)
+                    Button("再計算...") {
+                        showingRecalculateConfirmation = true
+                    }
+                }
+            }
+        }
+    }
+    
     var body: some View {
         Form {
+            HistoryWindowSettingsSection()
+
             // MARK: - 履歴の設定
             Section(header: Text("履歴の設定").font(.headline)) {
                 // 履歴の最大保存数
@@ -247,6 +287,26 @@ struct CopyHistorySettingsView: View {
                 
                 HStack {
                     VStack(alignment: .leading) {
+                        Text("フォルダ容量計算のタイムアウト")
+                        Text("フォルダがコピーされた時、容量の計算がここで設定した時間よりも長くかかったときに、コピーしたフォルダを履歴に保存するかどうかを求めるアラートが表示されます。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Picker("フォルダ容量計算のタイムアウト", selection: $folderCalculationTimeout) {
+                        Text("1秒").tag(1.0)
+                        Text("3秒").tag(3.0)
+                        Text("5秒").tag(5.0)
+                        Text("10秒").tag(10.0)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
+
+                HStack {
+                    VStack(alignment: .leading) {
                         Text("各ファイルの最大容量")
                         Text("ここで設定した容量よりも小さいファイルがコピーされた時だけ、履歴に保存されます。過去の履歴は影響を受けません。")
                             .font(.caption)
@@ -300,29 +360,31 @@ struct CopyHistorySettingsView: View {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("クリップボード履歴")
-                        Text("現在、インポートとエクスポートはテキストのみサポートしています。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
                     }
                     Spacer()
                     Button(action: {
+#if DEBUG
                         print("DEBUG: Import button tapped. isShowingImportSheet will be true.")
+#endif
                         self.isShowingImportSheet = true
                     }) {
                         HStack {
                             Image(systemName: "square.and.arrow.down")
-                            Text("インポート")
+                            Text("インポート...")
                         }
                     }
                     .buttonStyle(.bordered)
                     .help("書き出したクリップボード履歴のJSONファイルを読み込みます。")
                     
                     Button(action: {
-                        self.isShowingExportSheet = true
+                        self.cachedSizeWithFiles = nil
+                        self.cachedSizeWithoutFiles = nil
+                        self.showingExportConfigSheet = true
+                        updateEstimatedSize()
                     }) {
                         HStack {
                             Image(systemName: "square.and.arrow.up")
-                            Text("エクスポート")
+                            Text("エクスポート...")
                         }
                     }
                     .buttonStyle(.bordered)
@@ -340,7 +402,7 @@ struct CopyHistorySettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "trash")
-                            Text("すべての履歴を削除")
+                            Text("すべての履歴を削除...")
                         }
                         .if(!clipboardManager.clipboardHistory.isEmpty) { view in
                             view.foregroundStyle(.red)
@@ -363,15 +425,13 @@ struct CopyHistorySettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text("保存フォルダの総容量:")
-                        Spacer()
-                        Text(ByteCountFormatter.string(fromByteCount: Int64(totalFolderSize), countStyle: .file))
+                    folderSizeDisplayView
+                    
+                    if hasUncalculatedFolders {
+                        Text("一部のフォルダ容量が計算されていないため、実際にはさらに多くの容量が使用されている可能性があります。再計算すると正しい容量が表示されるようになります。")
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
-                    Text("各フォルダの容量は正しく計算されないため、実際にはさらに多くの容量が使用されている場合があります。")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
@@ -394,7 +454,7 @@ struct CopyHistorySettingsView: View {
                     }) {
                         HStack {
                             Image(systemName: "trash")
-                            Text("保存フォルダを空にする")
+                            Text("保存フォルダを空にする...")
                         }
                         .if(itemCount > 0) { view in
                             view.foregroundStyle(.red)
@@ -425,7 +485,9 @@ struct CopyHistorySettingsView: View {
         }
         // Updated onChange syntax to use a zero-parameter closure
         .onChange(of: clipboardManager.clipboardHistory) {
-            calculateStatistics()
+            if !clipboardImporterExporter.isExporting {
+                calculateStatistics()
+            }
         }
         .sheet(isPresented: $showingCustomSaveHistorySheet, onDismiss: {
             if !customSaveHistoryWasSaved {
@@ -439,6 +501,26 @@ struct CopyHistorySettingsView: View {
                 onSave: handleCustomSaveHistorySheetSave,
                 onCancel: {}
             )
+            .alert("古い履歴が削除されます", isPresented: $showingDecreaseHistoryLimitAlertForSheet) {
+                Button("キャンセル", role: .cancel) {
+                    pendingHistorySaveValue = nil
+                    pendingHistorySaveOption = nil
+                }
+                Button("設定", role: .destructive) {
+                    if let value = pendingHistorySaveValue, let option = pendingHistorySaveOption {
+                        applyHistoryLimitChange(newValue: value, option: option)
+                    }
+                    pendingHistorySaveValue = nil
+                    pendingHistorySaveOption = nil
+                    customSaveHistoryWasSaved = true
+                    showingCustomSaveHistorySheet = false
+                }
+            } message: {
+                if let newValue = pendingHistorySaveValue {
+                    let diff = clipboardManager.clipboardHistory.count - newValue
+                    Text("履歴の最大保存数を既に保存されている数よりも小さくしようとしています。これにより、次に履歴が更新されるときに、設定値を超えた\(diff)個の履歴が削除されます。よろしいですか？")
+                }
+            }
         }
         .sheet(isPresented: $showingCustomFileSizeSheet, onDismiss: {
             if !customFileSizeWasSaved {
@@ -468,28 +550,45 @@ struct CopyHistorySettingsView: View {
                 onCancel: {}
             )
         }
-        .fileExporter(
-            isPresented: $isShowingExportSheet,
-            document: ClipboardHistoryDocument(clipboardItems: clipboardManager.clipboardHistory),
-            contentType: .json,
-            defaultFilename: "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).json"
-        ) { result in
-            clipboardImporterExporter.handleExportResult(result, from: clipboardManager)
+        .sheet(isPresented: $showingExportConfigSheet) {
+            exportSheetContent
         }
         .fileImporter(
             isPresented: $isShowingImportSheet,
-            allowedContentTypes: [.json],
+            allowedContentTypes: [.json, .clipholdArchive],
             allowsMultipleSelection: false
         ) { result in
+#if DEBUG
             print("DEBUG: fileImporter closure called for history import.")
-            clipboardImporterExporter.handleImportResult(result, into: clipboardManager)
+#endif
+            clipboardImporterExporter.handleImportResult(result, into: clipboardManager) { newTotalSize in
+                self.totalFolderSize = newTotalSize
+                self.hasUncalculatedFolders = false
+                
+                // 再計算を確実に終わらせるため、もし内部で非同期処理が衝突していても最後に正しく反映させる
+                self.calculateStatistics()
+            }
             self.isShowingImportSheet = false
+        }
+        .sheet(isPresented: Binding(
+            get: { clipboardImporterExporter.isExporting && !clipboardImporterExporter.importStatusText.isEmpty },
+            set: { _ in }
+        )) {
+            importSheetContent
         }
         .alert(item: $clipboardImporterExporter.currentAlert) { alertContent in
             Alert(
                 title: alertContent.title,
                 message: alertContent.message,
-                dismissButton: .default(Text("OK"))
+                dismissButton: .default(Text("OK"), action: alertContent.onDismiss)
+            )
+        }
+        .alert(item: $clipboardImporterExporter.currentConfirmationAlert) { alertContent in
+            Alert(
+                title: alertContent.title,
+                message: alertContent.message,
+                primaryButton: .default(alertContent.primaryButtonTitle, action: alertContent.primaryAction),
+                secondaryButton: .cancel(alertContent.secondaryButtonTitle, action: alertContent.secondaryAction)
             )
         }
         .alert("すべてのクリップボード履歴を削除", isPresented: $showingClearHistoryConfirmation) {
@@ -512,6 +611,34 @@ struct CopyHistorySettingsView: View {
         } message: {
             Text("履歴に保存されたすべてのファイルとフォルダを削除しますか？関連する履歴も削除されます。この操作は元に戻せません。")
         }
+        .alert("保存フォルダの総容量を再計算", isPresented: $showingRecalculateConfirmation) {
+            Button("再計算") {
+                recalculateAllFolderSizes()
+            }
+            Button("キャンセル", role: .cancel) {
+                // 何もしない
+            }
+        } message: {
+            Text("保存フォルダに含まれているすべてのファイルとフォルダの容量を再計算します。項目の数が多いと時間がかかる場合があります。")
+        }
+        .alert("古い履歴が削除されます", isPresented: $showingDecreaseHistoryLimitAlertForPicker) {
+            Button("キャンセル", role: .cancel) {
+                cancelHistoryLimitChange()
+            }
+            Button("設定", role: .destructive) {
+                if let value = pendingHistorySaveValue, let option = pendingHistorySaveOption {
+                    applyHistoryLimitChange(newValue: value, option: option)
+                }
+                pendingHistorySaveValue = nil
+                pendingHistorySaveOption = nil
+                showingCustomSaveHistorySheet = false
+            }
+        } message: {
+            if let newValue = pendingHistorySaveValue {
+                let diff = clipboardManager.clipboardHistory.count - newValue
+                Text("履歴の最大保存数を既に保存されている数よりも小さくしようとしています。これにより、次に履歴が更新されるときに、設定値を超えた\(diff)個の履歴が削除されます。よろしいですか？")
+            }
+        }
     }
     
     // MARK: - Picker onChange Handlers
@@ -521,19 +648,54 @@ struct CopyHistorySettingsView: View {
             tempCustomSaveHistoryValue = maxHistoryToSave // 現在の値をカスタムシートの初期値に
             customSaveHistoryWasSaved = false // シート表示前にリセット
             showingCustomSaveHistorySheet = true
-        } else if newValue == .unlimited {
-            maxHistoryToSave = 0 // 無制限を0として保存
-        } else if let intValue = newValue.intValue {
-            maxHistoryToSave = intValue
+        } else {
+            let intValue = newValue == .unlimited ? 0 : (newValue.intValue ?? 0)
+            _ = checkAndApplyHistoryLimitChange(newValue: intValue, option: newValue, fromSheet: false)
         }
-        // 保存数の変更がメニュー表示数に影響する場合の処理（例：メニュー表示が「履歴の保存数に合わせる」の場合）
+    }
+    
+    private func checkAndApplyHistoryLimitChange(newValue: Int, option: HistoryOption, fromSheet: Bool) -> Bool {
+        let currentHistoryCount = clipboardManager.clipboardHistory.count
+        if newValue > 0 && newValue < currentHistoryCount {
+            pendingHistorySaveValue = newValue
+            pendingHistorySaveOption = option
+            if fromSheet {
+                showingDecreaseHistoryLimitAlertForSheet = true
+            } else {
+                showingDecreaseHistoryLimitAlertForPicker = true
+            }
+            return false
+        } else {
+            applyHistoryLimitChange(newValue: newValue, option: option)
+            if fromSheet {
+                customSaveHistoryWasSaved = true
+            }
+            return true
+        }
+    }
+    
+    private func applyHistoryLimitChange(newValue: Int, option: HistoryOption) {
+        maxHistoryToSave = newValue
+        tempSelectedSaveOption = option
+        
         if UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
             UserDefaults.standard.set(maxHistoryToSave, forKey: "maxHistoryInMenu")
         }
-        // ★修正: 保存数が無制限に設定された場合、かつメニュー表示が「保存数に合わせる」ならデフォルト値に戻す
-        if newValue == .unlimited && UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
+        if option == .unlimited && UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
             UserDefaults.standard.set(10, forKey: "maxHistoryInMenu")
         }
+    }
+    
+    private func cancelHistoryLimitChange() {
+        if maxHistoryToSave == 0 {
+            tempSelectedSaveOption = .unlimited
+        } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == maxHistoryToSave }) {
+            tempSelectedSaveOption = savedPreset
+        } else {
+            tempSelectedSaveOption = .custom(maxHistoryToSave)
+        }
+        pendingHistorySaveValue = nil
+        pendingHistorySaveOption = nil
     }
     
     // Modified to accept a single newValue parameter, as oldValue is not used in the logic
@@ -568,21 +730,18 @@ struct CopyHistorySettingsView: View {
     }
     
     // MARK: - Custom Sheet Save/Cancel Handlers
-    private func handleCustomSaveHistorySheetSave(newValue: Int) {
-        customSaveHistoryWasSaved = true // 保存されたことをマーク
-        maxHistoryToSave = newValue
+    private func handleCustomSaveHistorySheetSave(newValue: Int) -> Bool {
         
+        let newOption: HistoryOption
         if newValue == 0 {
-            tempSelectedSaveOption = .unlimited
+            newOption = .unlimited
         } else if let savedPreset = HistoryOption.presets.first(where: { $0.intValue == newValue }) {
-            tempSelectedSaveOption = savedPreset
+            newOption = savedPreset
         } else {
-            tempSelectedSaveOption = .custom(newValue)
+            newOption = .custom(newValue)
         }
         
-        if UserDefaults.standard.integer(forKey: "maxHistoryInMenu") == UserDefaults.standard.integer(forKey: "maxHistoryToSave") {
-            UserDefaults.standard.set(maxHistoryToSave, forKey: "maxHistoryInMenu")
-        }
+        return checkAndApplyHistoryLimitChange(newValue: newValue, option: newOption, fromSheet: true)
     }
     
     private func handleCustomSaveHistorySheetCancel() {
@@ -595,7 +754,7 @@ struct CopyHistorySettingsView: View {
         }
     }
     
-    private func handleCustomFileSizeSheetSave(newValue: Int) {
+    private func handleCustomFileSizeSheetSave(newValue: Int) -> Bool {
         customFileSizeWasSaved = true // 保存されたことをマーク
         let newByteValue = tempCustomFileSizeUnit.byteValue(for: newValue)
         maxFileSizeToSave = newByteValue
@@ -607,6 +766,7 @@ struct CopyHistorySettingsView: View {
         } else {
             tempSelectedFileSizeOption = .custom(newValue, tempCustomFileSizeUnit)
         }
+        return true
     }
     
     private func handleCustomFileSizeSheetCancel() {
@@ -623,7 +783,7 @@ struct CopyHistorySettingsView: View {
         }
     }
     
-    private func handleCustomAlertSheetSave(newValue: Int) {
+    private func handleCustomAlertSheetSave(newValue: Int) -> Bool {
         customAlertWasSaved = true // 保存されたことをマーク
         let newByteValue = tempCustomAlertUnit.byteValue(for: newValue)
         largeFileAlertThreshold = newByteValue
@@ -635,6 +795,7 @@ struct CopyHistorySettingsView: View {
         } else {
             tempSelectedAlertOption = .custom(newValue, tempCustomAlertUnit)
         }
+        return true
     }
     
     private func handleCustomAlertSheetCancel() {
@@ -661,7 +822,7 @@ struct CopyHistorySettingsView: View {
     
     private func clearAllSavedFiles() {
         // バックグラウンドスレッドで処理を実行
-        DispatchQueue.global(qos: .background).async {
+        Task.detached(priority: .background) {
             let fileManager = FileManager.default
             
             guard let appSpecificDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("ClipHold") else {
@@ -680,11 +841,14 @@ struct CopyHistorySettingsView: View {
                     try fileManager.removeItem(at: fileURL)
                 }
                 
+                await self.clipboardManager.loadClipboardHistory()
+                
                 // メインスレッドでUIを更新
-                DispatchQueue.main.async {
-                    self.clipboardManager.loadClipboardHistory()
+                await MainActor.run {
                     self.calculateStatistics()
+#if DEBUG
                     print("DEBUG: All saved files cleared and clipboard history reloaded.")
+#endif
                 }
             } catch {
                 print("Error clearing clipboard files: \(error.localizedDescription)")
@@ -693,11 +857,9 @@ struct CopyHistorySettingsView: View {
     }
     
     private func calculateStatistics() {
-        // バックグラウンドスレッドで処理を実行
-        DispatchQueue.global(qos: .background).async {
-            var itemCount: Int = 0
-            var totalFolderSize: UInt64 = 0
-            
+        let historyCopy = clipboardManager.clipboardHistory
+        
+        Task.detached(priority: .userInitiated) {
             let fileManager = FileManager.default
             
             guard let appSpecificDirectory = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("ClipHold") else {
@@ -706,36 +868,130 @@ struct CopyHistorySettingsView: View {
             let filesDirectory = appSpecificDirectory.appendingPathComponent("ClipboardFiles", isDirectory: true)
             
             guard fileManager.fileExists(atPath: filesDirectory.path) else {
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.itemCount = 0
                     self.totalFolderSize = 0
+                    self.hasUncalculatedFolders = false
                 }
                 return
             }
             
+            // 最適化: ファイル名からアイテムを高速検索するための辞書を作成 O(N)
+            var historyItemsDict: [String: ClipboardItem] = [:]
+            for item in historyCopy {
+                if let fileName = item.filePath?.lastPathComponent {
+                    historyItemsDict[fileName] = item
+                }
+            }
+            
             do {
-                // ファイルとフォルダの合計数をカウント
-                let fileURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
-                itemCount = fileURLs.count
+                // ファイルシステムからプロパティを一括取得して高速化
+                // .skipsHiddenFiles を使うと macOS の hidden 属性が付いた正当なファイルまで除外されてしまうため、
+                // すべて取得した上で、OSが自動生成する .DS_Store のみ手動で除外する
+                let allChildURLs = try fileManager.contentsOfDirectory(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey], options: [])
+                let childURLs = allChildURLs.filter { $0.lastPathComponent != ".DS_Store" }
                 
-                // フォルダ全体のサイズを再帰的に計算
-                if let enumerator = fileManager.enumerator(at: filesDirectory, includingPropertiesForKeys: [.fileSizeKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) {
-                    for case let fileURL as URL in enumerator {
-                        if let fileSize = (try? fileURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
-                            totalFolderSize += UInt64(fileSize)
+                var totalSize: UInt64 = 0
+                var foundUncalculatedFolder = false
+                
+                for childURL in childURLs {
+                    let fileName = childURL.lastPathComponent
+                    let isDirectory = (try? childURL.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+                    
+                    if let item = historyItemsDict[fileName] {
+                        if isDirectory && (!item.isSizeCalculated || item.isPartialSize) {
+                            foundUncalculatedFolder = true
+                        }
+                        
+                        if let size = item.fileSize, item.isSizeCalculated {
+                            totalSize += size
+                        } else if let fileSize = (try? childURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
+                            totalSize += UInt64(fileSize)
+                        }
+                    } else {
+                        if let fileSize = (try? childURL.resourceValues(forKeys: [.fileSizeKey]))?.fileSize {
+                            totalSize += UInt64(fileSize)
                         }
                     }
                 }
                 
-                DispatchQueue.main.async {
-                    self.itemCount = itemCount
-                    self.totalFolderSize = totalFolderSize
+                let finalItemCount = childURLs.count
+                await MainActor.run { [totalSize, foundUncalculatedFolder, finalItemCount] in
+                    self.itemCount = finalItemCount
+                    self.totalFolderSize = totalSize
+                    self.hasUncalculatedFolders = foundUncalculatedFolder
                 }
             } catch {
                 print("Error calculating clipboard file statistics: \(error.localizedDescription)")
             }
         }
     }
+    
+    private func updateEstimatedSize() {
+        Task {
+            isCalculatingExportSize = true
+            let currentIncludeFiles = exportIncludeFiles
+            
+            if currentIncludeFiles {
+                if let cached = cachedSizeWithFiles {
+                    if exportIncludeFiles == currentIncludeFiles {
+                        estimatedExportSizeMin = cached.min
+                        estimatedExportSizeMax = cached.max
+                        isCalculatingExportSize = false
+                    }
+                } else {
+                    let sizes = await clipboardImporterExporter.calculateEstimatedExportSize(clipboardManager: clipboardManager, includeFiles: true)
+                    cachedSizeWithFiles = sizes
+                    if exportIncludeFiles == currentIncludeFiles {
+                        estimatedExportSizeMin = sizes.min
+                        estimatedExportSizeMax = sizes.max
+                        isCalculatingExportSize = false
+                    }
+                }
+            } else {
+                if let cached = cachedSizeWithoutFiles {
+                    if exportIncludeFiles == currentIncludeFiles {
+                        estimatedExportSizeMin = cached.min
+                        estimatedExportSizeMax = cached.max
+                        isCalculatingExportSize = false
+                    }
+                } else {
+                    let sizes = await clipboardImporterExporter.calculateEstimatedExportSize(clipboardManager: clipboardManager, includeFiles: false)
+                    cachedSizeWithoutFiles = sizes
+                    if exportIncludeFiles == currentIncludeFiles {
+                        estimatedExportSizeMin = sizes.min
+                        estimatedExportSizeMax = sizes.max
+                        isCalculatingExportSize = false
+                    }
+                }
+            }
+        }
+    }
+    
+    private func recalculateAllFolderSizes() {
+        isCalculating = true
+        Task.detached(priority: .userInitiated) {
+            let newTotalSize = await self.clipboardManager.recalculateAllFolderSizes { _, currentSize in
+                await MainActor.run {
+                    self.totalFolderSize = currentSize
+                }
+            }
+            
+            await MainActor.run { [newTotalSize] in
+                self.totalFolderSize = newTotalSize
+                self.isCalculating = false
+                // UI再描画のため
+                self.clipboardManager.objectWillChange.send()
+                
+                // 本当に未計算のフォルダがなくなったかを再評価する
+                self.calculateStatistics()
+                
+                // 再計算完了後に孤立ファイルのクリーンアップをトリガー
+                self.clipboardManager.triggerOrphanedFilesCleanup()
+            }
+        }
+    }
+
 }
 
 // MARK: - DataSizeOption のヘルパー拡張
@@ -770,4 +1026,353 @@ extension Date {
 #Preview {
     CopyHistorySettingsView()
         .environmentObject(ClipboardManager.shared)
+}
+
+
+// MARK: - HistoryWindowSettingsSection
+private struct HistoryWindowSettingsSection: View {
+    @EnvironmentObject var dateReloader: DateReloader
+    
+    @AppStorage("historyWindowAlwaysOnTop") var historyWindowAlwaysOnTop: Bool = false
+    @AppStorage("historyWindowIsOverlay") var historyWindowIsOverlay: Bool = false
+    @AppStorage("historyWindowOverlayTransparency") var historyWindowOverlayTransparency: Double = 0.5
+    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
+    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
+    @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
+    @AppStorage("excludeClipHoldWindowsFromAutoFilter") var excludeClipHoldWindowsFromAutoFilter: Bool = false
+
+    var body: some View {
+        // MARK: - 履歴ウィンドウ
+        Section(header: Text("履歴ウィンドウ").font(.headline)) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("常に最前面に表示")
+                    Text("ウィンドウを常に最も手前に表示します。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $historyWindowAlwaysOnTop) {
+                    Text("履歴ウィンドウを常に最前面に表示")
+                    Text("オンにすると、履歴ウィンドウを常に最も手前に表示します。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("オーバーレイ表示")
+                    Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $historyWindowIsOverlay) {
+                    Text("オーバーレイ表示")
+                    Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                Text("オーバーレイ時の透明度")
+                    .foregroundStyle(historyWindowIsOverlay ? .primary : .secondary)
+                Spacer()
+                HStack {
+                    Slider(
+                        value: .init(
+                            get: {
+                                return 100 - (historyWindowOverlayTransparency * 100)
+                            },
+                            set: { sliderValue in
+                                historyWindowOverlayTransparency = (100 - sliderValue) / 100
+                            }
+                        ),
+                        in: 20...80,
+                        step: 10
+                    )
+                    Text(1 - historyWindowOverlayTransparency, format: .percent.precision(.fractionLength(0)))
+                        .foregroundStyle(historyWindowIsOverlay ? .secondary : .tertiary)
+                }
+            }
+            .disabled(!historyWindowIsOverlay)
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            DateDisplayFormatPickerRow(selection: $dateDisplayFormatInHistoryWindow)
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("自動スクロール")
+                    Text("リストが更新されたとき、リストを自動的に最も上にスクロールします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $scrollToTopOnUpdate) {
+                    Text("自動スクロール")
+                    Text("オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("番号を隠す")
+                    Text("各項目に表示される番号を非表示にします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $hideNumbersInHistoryWindow) {
+                    Text("履歴ウィンドウの番号を隠す")
+                    Text("オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("ダブルクリックでウィンドウを閉じる")
+                    Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $closeWindowOnDoubleClickInHistoryWindow) {
+                    Text("ダブルクリックで履歴ウィンドウを閉じる")
+                    Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("アプリの「自動」フィルタリングでClip Holdのウィンドウを除外")
+                    Text("アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $excludeClipHoldWindowsFromAutoFilter) {
+                    Text("アプリの「自動」フィルタリングでClip Holdのウィンドウを除外")
+                    Text("アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+        } // End of Section: 履歴ウィンドウ
+    }
+}
+
+extension CopyHistorySettingsView {
+    @ViewBuilder
+    private var exportSheetContent: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            if let alert = clipboardImporterExporter.sheetAlert {
+                alert.title
+                    .font(.headline)
+                    .foregroundStyle(alert.isSuccess ? Color.primary : Color.red)
+                
+                alert.message
+                
+                Spacer(minLength: 0)
+                
+                HStack {
+                    Spacer()
+                    Button("OK") {
+                        alert.onDismiss?()
+                        clipboardImporterExporter.sheetAlert = nil
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .controlSize(.large)
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 10) {
+                Text("履歴のエクスポート")
+                    .font(.headline)
+                
+                if !clipboardImporterExporter.isExporting {
+                    Toggle("ファイルやフォルダを含む", isOn: $exportIncludeFiles)
+                        .help("Clip Hold 1.6.3またはそれ以前のバージョンに復元するにはチェックを外す必要があります。")
+                        .onChange(of: exportIncludeFiles) {
+                            updateEstimatedSize()
+                        }
+                    
+                    if isCalculatingExportSize {
+                        Text("推定書き出しサイズ: 計算中...")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        let formattedMin = ByteCountFormatter.string(fromByteCount: estimatedExportSizeMin, countStyle: .file)
+                        let formattedMax = ByteCountFormatter.string(fromByteCount: estimatedExportSizeMax, countStyle: .file)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            if estimatedExportSizeMin == estimatedExportSizeMax {
+                                Text("推定書き出しサイズ: 約\(formattedMin)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text("推定書き出しサイズ: \(formattedMin) 〜 \(formattedMax)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text("履歴の内容や保存されているファイルによって、圧縮後のサイズが大きく変動する可能性があります。")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(nil)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if clipboardImporterExporter.isExporting {
+                ProgressView(
+                    clipboardImporterExporter.exportStatusText,
+                    value: clipboardImporterExporter.exportProgress < 0 ? nil : clipboardImporterExporter.exportProgress,
+                    total: 1.0
+                )
+                .id(clipboardImporterExporter.isCancelling ? "export-cancelling" : "export-normal")
+            }
+                
+            Spacer(minLength: 0)
+            
+            Text("エクスポート中はデータの整合性を保つため、ほぼすべての機能が一時的に無効化されます。エクスポートが完了すると再び利用できるようになります。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            
+            if clipboardImporterExporter.isExporting {
+                HStack {
+                    Spacer()
+                    Button("キャンセル") {
+                        clipboardImporterExporter.cancelExport()
+                    }
+                    .keyboardShortcut(.cancelAction)
+                    .controlSize(.large)
+                    .disabled(clipboardImporterExporter.isCancelling)
+                }
+            } else {
+                HStack {
+                    Button("キャンセル") {
+                        showingExportConfigSheet = false
+                    }
+                    .keyboardShortcut(.cancelAction)
+                    .controlSize(.large)
+                    
+                    Spacer()
+                    
+                    Button("エクスポート") {
+                        isShowingFileExporter = true
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .controlSize(.large)
+                }
+            }
+            }
+        }
+        .padding()
+        .frame(width: 350)
+        .fileExporter(
+            isPresented: $isShowingFileExporter,
+            document: ClipboardHistoryDocument(clipboardItems: clipboardManager.clipboardHistory),
+            contentType: exportIncludeFiles ? .clipholdArchive : .json,
+            defaultFilename: exportIncludeFiles ? "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).cliphold" : "Clip Hold Clipboard History \(Date().formattedLocalExportFilename()).json"
+        ) { result in
+            clipboardImporterExporter.handleExportResult(result, from: clipboardManager, includeFiles: exportIncludeFiles, estimatedFinalSize: estimatedExportSizeMax > 0 ? estimatedExportSizeMax : nil) {
+                showingExportConfigSheet = false
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var importSheetContent: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            if let alert = clipboardImporterExporter.sheetAlert {
+                alert.title
+                    .font(.headline)
+                    .foregroundStyle(alert.isSuccess ? Color.primary : Color.red)
+                
+                alert.message
+                
+                Spacer(minLength: 0)
+                
+                HStack {
+                    Spacer()
+                    Button("OK") {
+                        alert.onDismiss?()
+                        clipboardImporterExporter.sheetAlert = nil
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .controlSize(.large)
+                }
+            } else if let confirmation = clipboardImporterExporter.currentConfirmationAlert {
+                confirmation.title
+                    .font(.headline)
+                
+                confirmation.message
+                
+                Spacer(minLength: 0)
+                
+                HStack {
+                    Button(action: {
+                        confirmation.secondaryAction()
+                        clipboardImporterExporter.currentConfirmationAlert = nil
+                    }) {
+                        confirmation.secondaryButtonTitle
+                    }
+                    .keyboardShortcut(.cancelAction)
+                    .controlSize(.large)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        confirmation.primaryAction()
+                        clipboardImporterExporter.currentConfirmationAlert = nil
+                    }) {
+                        confirmation.primaryButtonTitle
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .controlSize(.large)
+                }
+            } else {
+                Text("履歴のインポート")
+                    .font(.headline)
+                
+                ProgressView(
+                    clipboardImporterExporter.importStatusText,
+                    value: clipboardImporterExporter.importProgress < 0 ? nil : clipboardImporterExporter.importProgress,
+                    total: 1.0
+                )
+                .progressViewStyle(.linear)
+                .id(clipboardImporterExporter.isCancelling ? "import-cancelling" : "import-normal")
+                
+                Spacer(minLength: 0)
+                
+                Text("インポート中はデータの整合性を保つため、ほぼすべての機能が一時的に無効化されます。インポートが完了すると再び利用できるようになります。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 4)
+                
+                HStack {
+                    Spacer()
+                    Button("キャンセル") {
+                        clipboardImporterExporter.cancelImport()
+                    }
+                    .keyboardShortcut(.cancelAction)
+                    .controlSize(.large)
+                    .disabled(clipboardImporterExporter.isCancelling)
+                }
+            }
+        }
+        .padding()
+        .frame(width: 350)
+    }
 }

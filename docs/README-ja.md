@@ -49,11 +49,12 @@
     - [Buy Me a Coffee](#buy-me-a-coffee)
     - [PayPal.Me](#paypalme)
 - [クレジット](#クレジット)
-  - [Google Gemini by Google](#google-gemini-by-google)
-  - [Gemini CLI by Google](#gemini-cli-by-google)
+  - [Antigravity と Gemini CLI by Google](#antigravity-と-gemini-cli-by-google)
   - [Qwen Code by Qwen](#qwen-code-by-qwen)
   - [KeyboardShortcuts by Sindre Sorhus](#keyboardshortcuts-by-sindre-sorhus)
   - [SFSymbolsPicker by Kenny Wang](#sfsymbolspicker-by-kenny-wang)
+  - [UniversalSFSymbolsPicker by Taiga Imaura](#universalsfsymbolspicker-by-taiga-imaura)
+  - [HighlighterSwift by Tony Smith and Juan Pablo Illanes](#highlighterswift-by-tony-smith-and-juan-pablo-illanes)
   - [create-dmg by Andrey Tarantsov and Andrew Janke](#create-dmg-by-andrey-tarantsov-and-andrew-janke)
 
 ## Clip Holdとは？
@@ -172,20 +173,23 @@ Clip Holdが気に入ったら寄付してくださると嬉しいです。開�
 PayPalアカウントをお持ちの方は、[**PayPal**](https://paypal.me/taikun114)で直接寄付していただくこともできます。
 
 ## クレジット
-### [Google Gemini](https://gemini.google.com/) by Google
-Clip Holdの開発には、Googleの生成AIであるGoogle Gemini（2.5 Flash）が使用されました。Swiftを含むプログラムの知識が一切ない自分にとって、生成AIの力がなければこのアプリを完成させることはできなかったでしょう。
-
-### [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google
-Google Geminiを開発に組み込む際、Gemini CLIが大変役に立ちました。自動でコードファイルを書き換えてビルドし、自動で修正までしてくれるため開発する際の作業量が大幅に減りました。
+### [Antigravity](https://antigravity.google/) と [Gemini CLI](https://github.com/google-gemini/gemini-cli) by Google
+Clip Holdの開発にはこれらの素晴らしい生成AIツールが使用されました。キーボードでの入力が難しい身体障害者の私にとって、生成AIの力がなければこのアプリを完成させることはできなかったでしょう。
 
 ### [Qwen Code](https://github.com/QwenLM/qwen-code) by Qwen
-Clip Hold 1.3.0以降の開発ではGoogle Geminiに加え、AlibabaのAI開発チームであるQwenによって開発されたQwen Codeが使用されました。Qwen Codeでは高度なコーディングモデル（Clip Hold 1.3.0の開発時点ではQwen3 Coder Plus）が利用でき、1日あたり最大2000リクエストまで無料で使用できるという大変寛大な利用制限のおかげで、開発を中断することなく、スムーズに開発し続けることができました。
+Clip Hold 1.3.0以降の開発ではこれらのツールに加え、AlibabaのAI開発チームであるQwenによって開発されたQwen Codeが使用されました。
 
 ### [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) by Sindre Sorhus
 Clip Holdのグローバルショートカットキーの実装にはKeyboardShortcutsパッケージが使用されました。このパッケージのおかげで、非常にスムーズにショートカット機能を実装することができました。
 
 ### [SFSymbolsPicker](https://github.com/jaywcjlove/SFSymbolsPicker) by Kenny Wang
-Clip Hold 1.6.0で追加されたプリセットのシンボルピッカーの実装にはSFSymbolsPickerパッケージが使用されました。このパッケージのおかげで、とても簡単にユーザーがアイコンを選べるシンボルピッカーを実装することができました。
+Clip Hold 1.6.0〜1.6.3で実装されたプリセットのシンボルピッカーの実装にはSFSymbolsPickerパッケージが使用されました。このパッケージのおかげで、とても簡単にユーザーがアイコンを選べるシンボルピッカーを実装することができました。
+
+### [UniversalSFSymbolsPicker](https://github.com/taikun114/UniversalSFSymbolsPicker) by Taiga Imaura
+Clip Hold 1.7.0ではシンボルピッカーを強化するためにUniversalSFSymbolsPickerパッケージが使用されました。
+
+### [HighlighterSwift](https://github.com/smittytone/HighlighterSwift) by Tony Smith and Juan Pablo Illanes
+Clip Hold 1.7.0で追加されたクイックオーバーレイのツールチップでコードのシンタックスハイライティングにはHighlighterSwiftパッケージが使用されました。このパッケージのおかげで、美しいシンタックスハイライティングを簡単に実装することができました。
 
 ### [create-dmg](https://github.com/create-dmg/create-dmg) by Andrey Tarantsov and Andrew Janke
 無料版を配布するためのディスクイメージを作成するのにcreate-dmgシェルスクリプトが使用されました。このシェルスクリプトのおかげで、カスタマイズされたディスクイメージを簡単に作成することができました。

@@ -27,8 +27,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     // MARK: - Application Lifecycle
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // デフォルト設定を登録
+        UserDefaults.standard.register(defaults: [
+            "historyQuickOverlayModifiers": Int(NSEvent.ModifierFlags.command.rawValue | NSEvent.ModifierFlags.option.rawValue),
+            "standardPhraseQuickOverlayModifiers": Int(NSEvent.ModifierFlags.control.rawValue | NSEvent.ModifierFlags.command.rawValue),
+            "dateDisplayFormatInQuickOverlay": "both_rel_abs_paren"
+        ])
+        
         frontmostAppMonitor.startMonitoring()
         print("AppDelegate: finished launching.")
+        
+        // Spotlightインデックスの初期化（既存のアイテムをすべてインデックス化）
+        SpotlightManager.shared.indexAllExistingItems()
+        
+        // App Intents (Shortcuts) の登録更新
+        if #available(macOS 14.0, *) {
+            ClipHoldAppShortcuts.updateAppShortcutParameters()
+        }
         
         NSApp.setActivationPolicy(.accessory)
         NSApp.delegate = self
@@ -61,16 +76,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         
         // 複数のカテゴリを一度に登録
         UNUserNotificationCenter.current().setNotificationCategories([category, migrationFailureCategory])
+#if DEBUG
         print("Registered notification category '\(clipboardPausedNotificationCategory)' and action '\(resumeMonitoringActionID)'.")
         print("Registered category for migration failure notification.")
+#endif
         
         if UserDefaults.standard.bool(forKey: "isClipboardMonitoringPaused") {
             NotificationManager.shared.scheduleClipboardPausedNotification()
             print("AppDelegate: Clipboard monitoring was paused at launch. Scheduled notification.")
         }
         
+        // Initialize Quick Overlay Singletons
+        _ = QuickOverlayManager.shared
+        _ = QuickOverlayWindowController.shared
+        _ = QuickOverlayTooltipWindowController.shared
+        ScreenEdgeManager.shared.startMonitoring()
+        
         historyWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.historyWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 guard let self = self, let alwaysOnTop = change.newValue else { return }
                 if let historyWindow = self.historyWindowController?.window {
                     historyWindow.level = alwaysOnTop ? .floating : .normal
@@ -79,7 +102,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
         
         standardPhraseWindowAlwaysOnTopObserver = UserDefaults.standard.observe(\.standardPhraseWindowAlwaysOnTop, options: [.new]) { [weak self] defaults, change in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 guard let self = self, let alwaysOnTop = change.newValue else { return }
                 if let standardPhraseWindow = self.standardPhraseWindowController?.window {
                     standardPhraseWindow.level = alwaysOnTop ? .floating : .normal
@@ -88,25 +111,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
         
         historyWindowOverlayTransparencyObserver = UserDefaults.standard.observe(\.historyWindowOverlayTransparency, options: [.new]) { [weak self] _, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.historyWindowController?.updateOverlay()
             }
         }
         
         standardPhraseWindowOverlayTransparencyObserver = UserDefaults.standard.observe(\.standardPhraseWindowOverlayTransparency, options: [.new]) { [weak self] _, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.standardPhraseWindowController?.updateOverlay()
             }
         }
         
         historyWindowIsOverlayObserver = UserDefaults.standard.observe(\.historyWindowIsOverlay, options: [.new]) { [weak self] _, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.historyWindowController?.updateOverlay()
             }
         }
         
         standardPhraseWindowIsOverlayObserver = UserDefaults.standard.observe(\.standardPhraseWindowIsOverlay, options: [.new]) { [weak self] _, _ in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.standardPhraseWindowController?.updateOverlay()
             }
         }
@@ -165,14 +188,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             historyWindowController?.onWindowWillClose = { [weak self] in
                 ClipboardManager.shared.resetHistoryViewFilters()
                 self?.historyWindowController = nil
+#if DEBUG
                 print("AppDelegate: History window closed and filters reset.")
+#endif
             }
             historyWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: History window created and shown.")
+#endif
         } else {
+#if DEBUG
             print("AppDelegate: History window already exists. Bringing to front.")
+#endif
             historyWindowController?.showWindow(nil)
             historyWindowController?.window?.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -181,7 +210,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let window = historyWindowController?.window {
             window.level = UserDefaults.standard.bool(forKey: "historyWindowAlwaysOnTop") ? .floating : .normal
             // ウィンドウがキー状態になった後にupdateOverlayを呼び出す
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.historyWindowController?.updateOverlay()
             }
         }
@@ -211,14 +240,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             standardPhraseWindowController = ClipHoldWindowController(wrappingWindow: window, windowType: .standardPhrase, applyTransparentBackground: true, windowFrameAutosaveKey: "StandardPhraseWindowFrame")
             standardPhraseWindowController?.onWindowWillClose = { [weak self] in
                 self?.standardPhraseWindowController = nil
+#if DEBUG
                 print("AppDelegate: Standard Phrase window closed.")
+#endif
             }
             standardPhraseWindowController?.showWindow(nil)
             
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: Static phrase window created and shown.")
+#endif
         } else {
+#if DEBUG
             print("AppDelegate: Static phrase window already exists. Bringing to front.")
+#endif
             standardPhraseWindowController?.showWindow(nil)
             standardPhraseWindowController?.window?.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
@@ -227,7 +262,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let window = standardPhraseWindowController?.window {
             window.level = UserDefaults.standard.bool(forKey: "standardPhraseWindowAlwaysOnTop") ? .floating : .normal
             // ウィンドウがキー状態になった後にupdateOverlayを呼び出す
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.standardPhraseWindowController?.updateOverlay()
             }
         }
@@ -235,6 +270,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     
     @MainActor
     func showAddPhraseWindow(withContent content: String) {
+        guard !ClipboardManager.shared.isExporting else { return }
         let windowType: WindowType = .addPhrase
         let title = String(localized: "定型文を追加")
         
@@ -242,7 +278,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let existingController = windowControllers[windowType] {
             existingController.showWindowAndCenter(false)
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: Reusing existing \(windowType) window.")
+#endif
             return
         }
         
@@ -258,11 +296,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
         
+#if DEBUG
         print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+#endif
     }
     
     @MainActor
     func showAddPresetWindow() {
+        guard !ClipboardManager.shared.isExporting else { return }
         let windowType: WindowType = .addPreset
         let title = String(localized: "プリセットを追加")
         
@@ -270,19 +311,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         if let existingController = windowControllers[windowType] {
             existingController.showWindowAndCenter(false)
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: Reusing existing \(windowType) window.")
+#endif
             return
         }
         
         let contentView = AddEditPresetView(isSheet: false, onDismiss: { [weak self] in
             // ウィンドウを閉じたときの後処理
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 if let controller = self.windowControllers[windowType] {
                     controller.close()
                 }
                 self.windowControllers.removeValue(forKey: windowType)
+#if DEBUG
                 print("AppDelegate: \(windowType) window removed from windowControllers asynchronously.")
+#endif
             }
         }, editingPreset: nil)
             .environmentObject(StandardPhrasePresetManager.shared)
@@ -295,26 +340,43 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
         
+#if DEBUG
         print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+#endif
     }
     
     @MainActor
-    func showEditHistoryWindow(withContent content: String) {
-        let windowType: WindowType = .editHistory
-        let title = String(localized: "履歴を変更してコピー")
+    func showChangeItemAndCopyWindow(withContent content: String) {
+        guard !ClipboardManager.shared.isExporting else { return }
+        let windowType: WindowType = .changeItemAndCopy
+        let title = String(localized: "項目を変更してコピー")
         
         // 既存のウィンドウコントローラーがあればそれを最前面に表示
         if let existingController = windowControllers[windowType] {
             existingController.showWindowAndCenter(false)
             NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
             print("AppDelegate: Reusing existing \(windowType) window.")
+#endif
             return
         }
         
-        let editView = EditHistoryItemView(content: content, onCopy: { editedContent in
+        let editView = ChangeItemAndCopyView(content: content, onCopy: { editedContent in
             // コピー処理を実装
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(editedContent, forType: .string)
+            let clipboardManager = ClipboardManager.shared
+            clipboardManager.isPerformingInternalCopy = true
+            clipboardManager.copyItemToClipboard(ClipboardItem(text: editedContent))
+            
+            // クイックペーストの処理
+            let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+            let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
+            
+            if currentQuickPaste && currentQuickPasteToPreviousApp {
+                if ModifierKeyMonitor.shared.currentOptionKeyPressed {
+                    return
+                }
+                ClipHoldApp.performPasteToPreviousApp()
+            }
         }, isSheet: false)
         
         // 新しいウィンドウコントローラーを作成
@@ -325,7 +387,56 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         windowController.showWindowAndCenter(true)
         NSApp.activate(ignoringOtherApps: true)
         
+#if DEBUG
         print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+#endif
+    }
+    
+    @MainActor
+    func showNewCopyWindow() {
+        guard !ClipboardManager.shared.isExporting else { return }
+        let windowType: WindowType = .newCopy
+        let title = String(localized: "テキストを入力して新規コピー")
+        
+        // 既存のウィンドウコントローラーがあればそれを最前面に表示
+        if let existingController = windowControllers[windowType] {
+            existingController.showWindowAndCenter(false)
+            NSApp.activate(ignoringOtherApps: true)
+#if DEBUG
+            print("AppDelegate: Reusing existing \(windowType) window.")
+#endif
+            return
+        }
+        
+        let editView = ChangeItemAndCopyView(content: "", title: title, onCopy: { editedContent in
+            // コピー処理を実装
+            let clipboardManager = ClipboardManager.shared
+            clipboardManager.isPerformingInternalCopy = true
+            clipboardManager.copyItemToClipboard(ClipboardItem(text: editedContent))
+            
+            // クイックペーストの処理
+            let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+            let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
+            
+            if currentQuickPaste && currentQuickPasteToPreviousApp {
+                if ModifierKeyMonitor.shared.currentOptionKeyPressed {
+                    return
+                }
+                ClipHoldApp.performPasteToPreviousApp()
+            }
+        }, isSheet: false)
+        
+        // 新しいウィンドウコントローラーを作成
+        let windowController = ClipHoldStandardWindowController(rootView: editView, title: title, windowType: windowType)
+        windowControllers[windowType] = windowController
+        
+        // ウィンドウを表示し、アプリをアクティブにする
+        windowController.showWindowAndCenter(true)
+        NSApp.activate(ignoringOtherApps: true)
+        
+#if DEBUG
+        print("AppDelegate: \(windowType) window created with ClipHoldStandardWindowController.")
+#endif
     }
     
     // MARK: - NSWindowDelegate
@@ -335,9 +446,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         // ウィンドウの種類ごとにウィンドウコントローラーを管理する
         for (type, controller) in windowControllers {
             if closedWindow == controller.window {
+#if DEBUG
                 print("AppDelegate: \(type) window will close. Removing from windowControllers.")
+#endif
                 windowControllers.removeValue(forKey: type)
+#if DEBUG
                 print("AppDelegate: \(type) window removed from windowControllers.")
+#endif
                 break
             }
         }
@@ -346,11 +461,56 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     // MARK: - Application Delegate Methods for Reopening
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         UserDefaults.standard.set(false, forKey: "hideMenuBarExtra")
+#if DEBUG
         print("AppDelegate: Set hideMenuBarExtra to false. Menu bar icon will be displayed.")
+#endif
         
         NSApp.activate(ignoringOtherApps: true)
         
         return true
+    }
+    
+    // MARK: - CoreSpotlight Handling
+    func application(_ application: NSApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([NSUserActivityRestoring]) -> Void) -> Bool {
+        if userActivity.activityType == "com.apple.corespotlightitem" {
+            if let identifier = userActivity.userInfo?["kCSSearchableItemActivityIdentifier"] as? String {
+                if identifier.hasPrefix("phrase_") {
+                    let idString = identifier.replacingOccurrences(of: "phrase_", with: "")
+                    if let id = UUID(uuidString: idString) {
+                        Task { @MainActor in
+                            let presetManager = StandardPhrasePresetManager.shared
+                            var foundPhrase: StandardPhrase? = nil
+                            for preset in presetManager.presets {
+                                if let phrase = preset.phrases.first(where: { $0.id == id }) {
+                                    foundPhrase = phrase
+                                    break
+                                }
+                            }
+                            if let phrase = foundPhrase {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(phrase.content, forType: .string)
+                                NotificationManager.shared.sendStandardNotification(title: "コピーしました", subtitle: phrase.title)
+                            }
+                        }
+                    }
+                } else if identifier.hasPrefix("history_") {
+                    let idString = identifier.replacingOccurrences(of: "history_", with: "")
+                    if let id = UUID(uuidString: idString) {
+                        Task {
+                            let history = await ChunkedHistoryManager.shared.loadHistory()
+                            if let item = history.first(where: { $0.id == id }) {
+                                await MainActor.run {
+                                    ClipboardManager.shared.copyItemToClipboard(item)
+                                    NotificationManager.shared.sendStandardNotification(title: "コピーしました", subtitle: item.text.prefix(20) + "...")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return true
+        }
+        return false
     }
     
     // MARK: - UNUserNotificationCenterDelegate (通知アクションのハンドリング)
@@ -359,16 +519,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         let notificationCategory = response.notification.request.content.categoryIdentifier
         
         if actionID == resumeMonitoringActionID {
+#if DEBUG
             print("Notification action: 'Resume' was selected.")
+#endif
             // NotificationManager を介して再開ロジックを実行
             NotificationManager.shared.resumeClipboardMonitoringAndSendNotification()
             
             // アプリをフォアグラウンドに表示
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 NSApp.activate(ignoringOtherApps: true)
             }
         } else if actionID == "OPEN_DOCUMENTATION_ACTION" && notificationCategory == "MIGRATION_FAILURE_CATEGORY" {
+#if DEBUG
             print("Notification action: 'Show Documentation...' was selected.")
+#endif
             
             // ドキュメントのURLを決定
             let documentationURL: String
@@ -384,7 +548,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
             
             // アプリをフォアグラウンドに表示
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 NSApp.activate(ignoringOtherApps: true)
             }
         }
@@ -425,5 +589,56 @@ extension UserDefaults {
     @objc dynamic var standardPhraseWindowOverlayTransparency: Double {
         get { double(forKey: "standardPhraseWindowOverlayTransparency") }
         set { set(newValue, forKey: "standardPhraseWindowOverlayTransparency") }
+    }
+    
+    // Quick Overlay Settings
+    @objc dynamic var isQuickOverlayShortcutEnabled: Bool {
+        get { bool(forKey: "isQuickOverlayShortcutEnabled") }
+        set { set(newValue, forKey: "isQuickOverlayShortcutEnabled") }
+    }
+    @objc dynamic var quickOverlayShortcutDelay: Double {
+        get { 
+            if object(forKey: "quickOverlayShortcutDelay") == nil {
+                return 0.0 // Default to 0.0s if not set
+            }
+            return double(forKey: "quickOverlayShortcutDelay")
+        }
+        set { set(newValue, forKey: "quickOverlayShortcutDelay") }
+    }
+    @objc dynamic var quickOverlayShortcutPosition: String {
+        get { 
+            let val = string(forKey: "quickOverlayShortcutPosition")
+            return val ?? "cursor"
+        }
+        set { set(newValue, forKey: "quickOverlayShortcutPosition") }
+    }
+    @objc dynamic var historyQuickOverlayModifiers: Int {
+        get { integer(forKey: "historyQuickOverlayModifiers") }
+        set { set(newValue, forKey: "historyQuickOverlayModifiers") }
+    }
+    @objc dynamic var standardPhraseQuickOverlayModifiers: Int {
+        get { integer(forKey: "standardPhraseQuickOverlayModifiers") }
+        set { set(newValue, forKey: "standardPhraseQuickOverlayModifiers") }
+    }
+    
+    // MARK: - Screen Edge Settings
+    @objc dynamic var screenEdgeDelay: Double {
+        get {
+            if object(forKey: "screenEdgeDelay") == nil {
+                return 0.5
+            }
+            let val = double(forKey: "screenEdgeDelay")
+            return max(val, 0.0)
+        }
+        set { set(max(newValue, 0.0), forKey: "screenEdgeDelay") }
+    }
+    
+    func getScreenEdgeTarget(for position: ScreenEdgePosition) -> ScreenEdgeTarget {
+        let raw = string(forKey: position.rawValue) ?? "none"
+        return ScreenEdgeTarget(rawValue: raw) ?? .none
+    }
+    
+    func setScreenEdgeTarget(_ target: ScreenEdgeTarget, for position: ScreenEdgePosition) {
+        set(target.rawValue, forKey: position.rawValue)
     }
 }

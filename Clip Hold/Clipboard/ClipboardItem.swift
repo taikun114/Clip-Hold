@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UniformTypeIdentifiers
 
 class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     var id: UUID
@@ -11,6 +12,59 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     @Published var fileHash: String? // 新しく追加
     @Published var qrCodeContent: String?
     @Published var sourceAppPath: String?
+    
+    // フォルダ容量計算のタイムアウト状態などを追跡するためのフラグ（JSONへ保存する）
+    @Published var isPartialSize: Bool = false
+    @Published var isSizeCalculated: Bool = false
+    
+    // コード検出結果および検出エンジンバージョンの保持（Codable対応・事前計算）
+    var codeDetectorVersion: Int? = nil
+    var detectedLanguage: CodeLanguage? = nil
+    
+    // 非同期コピー関連のプロパティ (これらはCodableには含めない)
+    @Published var isCopying: Bool = false
+    @Published var isProgressBarVisible: Bool = false
+    @Published var copyProgress: Double = 0.0
+    var copyTask: Task<Void, Never>? = nil
+    var isCopyCancelled: Bool = false
+    var sourceFileURL: URL? = nil // コピー元のファイルURL (セッション中のみ有効)
+    
+    func cancelCopy() {
+        isCopyCancelled = true
+        copyTask?.cancel()
+    }
+    
+    // ピン留め表示用の複製アイテムの場合、元のアイテムIDを保持
+    var originalPinnedItemID: UUID? = nil
+    
+    // ピン留め表示用の固定UUID名前空間（決定論的なUUID生成に使用）
+    private static let pinnedNamespaceBytes: UInt8 = 0xFF
+    
+    // ピン留めリスト最先頭表示用の複製アイテムを生成するメソッド
+    // 元のアイテムIDから決定論的にUUIDを生成するため、何度呼んでも同じIDになる
+    func createPinnedDuplicate() -> ClipboardItem {
+        let copy = ClipboardItem(
+            text: self.text,
+            date: self.date,
+            filePath: self.filePath,
+            fileSize: self.fileSize,
+            fileHash: self.fileHash,
+            qrCodeContent: self.qrCodeContent,
+            sourceAppPath: self.sourceAppPath,
+            isPartialSize: self.isPartialSize,
+            isSizeCalculated: self.isSizeCalculated
+        )
+        copy.richText = self.richText
+        copy.cachedThumbnailImage = self.cachedThumbnailImage
+        copy.originalPinnedItemID = self.id
+        copy.codeDetectorVersion = self.codeDetectorVersion
+        copy.detectedLanguage = self.detectedLanguage
+        // 元のUUIDの最初のバイトを反転して決定論的な新しいUUIDを作成
+        var uuidBytes = self.id.uuid
+        uuidBytes.0 = uuidBytes.0 ^ ClipboardItem.pinnedNamespaceBytes
+        copy.id = UUID(uuid: uuidBytes)
+        return copy
+    }
     
     // ファイルが画像かどうかを判断するヘルパープロパティ
     var isImage: Bool {
@@ -65,9 +119,51 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         return url.scheme == "http" || url.scheme == "https"
     }
     
-    // Codableではないため @Published にできない。
-    // UIの自動更新は、このプロパティの変更後に親のObservableObject (ClipboardManager) の変更を通知することで実現
-    var cachedThumbnailImage: NSImage?
+    // テキストがソースコードであるかどうかを判断するヘルパープロパティ
+    var isCode: Bool {
+        guard filePath == nil,
+              !isURL,
+              ColorCodeParser.parseColor(from: text) == nil else {
+            return false
+        }
+        if codeDetectorVersion == CodeDetector.currentDetectorVersion {
+            return detectedLanguage != nil
+        }
+        // 未判定（または旧バージョン）時の即時計算＆キャッシュ
+        let lang = CodeDetector.detectLanguage(text)
+        self.detectedLanguage = lang
+        self.codeDetectorVersion = CodeDetector.currentDetectorVersion
+        return lang != nil
+    }
+    
+    /// コード検出結果とバージョンを事前計算して更新する
+    func updateCodeDetection(targetVersion: Int = CodeDetector.currentDetectorVersion) {
+        guard filePath == nil,
+              !isURL,
+              ColorCodeParser.parseColor(from: text) == nil else {
+            self.detectedLanguage = nil
+            self.codeDetectorVersion = targetVersion
+            return
+        }
+        let lang = CodeDetector.detectLanguage(text)
+        self.detectedLanguage = lang
+        self.codeDetectorVersion = targetVersion
+    }
+    
+    // 表示用のタイトル（必要に応じてローカライズされる）
+    var displayTitle: String {
+        if text == "Image File" {
+            return String(localized: "Image File")
+        } else if text == "PDF File" {
+            return String(localized: "PDF File")
+        } else {
+            return text
+        }
+    }
+    
+    // Codableではないため CodingKeys には含めない。
+    // @Published にすることで、サムネイルの非同期生成完了時にビュー（ClipboardItemIconView）へ即時再描画を通知
+    @Published var cachedThumbnailImage: NSImage?
     
     static func == (lhs: ClipboardItem, rhs: ClipboardItem) -> Bool {
         lhs.id == rhs.id
@@ -84,10 +180,12 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.fileHash = nil // 新しく追加
         self.qrCodeContent = qrCodeContent
         self.sourceAppPath = sourceAppPath
+        self.isPartialSize = false
+        self.isSizeCalculated = false
     }
     
     // 新しいClipboardItemを作成するためのイニシャライザ (ファイルパス、サイズ、ハッシュあり)
-    init(text: String, date: Date = Date(), filePath: URL?, fileSize: UInt64?, fileHash: String? = nil, qrCodeContent: String? = nil, sourceAppPath: String? = nil) {
+    init(text: String, date: Date = Date(), filePath: URL?, fileSize: UInt64?, fileHash: String? = nil, qrCodeContent: String? = nil, sourceAppPath: String? = nil, isPartialSize: Bool = false, isSizeCalculated: Bool = false) {
         self.id = UUID()
         self.text = text
         self.richText = nil // リッチテキストは初期値nil
@@ -97,6 +195,8 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.fileHash = fileHash // 新しく追加
         self.qrCodeContent = qrCodeContent
         self.sourceAppPath = sourceAppPath
+        self.isPartialSize = isPartialSize
+        self.isSizeCalculated = isSizeCalculated
     }
     
     // 新しいClipboardItemを作成するためのイニシャライザ (リッチテキスト用)
@@ -110,6 +210,8 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.fileHash = nil
         self.qrCodeContent = qrCodeContent
         self.sourceAppPath = sourceAppPath
+        self.isPartialSize = false
+        self.isSizeCalculated = false
     }
     
     // CodableのためのDecodableイニシャライザ
@@ -124,6 +226,10 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         self.fileHash = try container.decodeIfPresent(String.self, forKey: .fileHash) // 新しく追加
         self.qrCodeContent = try container.decodeIfPresent(String.self, forKey: .qrCodeContent)
         self.sourceAppPath = try container.decodeIfPresent(String.self, forKey: .sourceAppPath)
+        self.isPartialSize = try container.decodeIfPresent(Bool.self, forKey: .isPartialSize) ?? false
+        self.isSizeCalculated = try container.decodeIfPresent(Bool.self, forKey: .isSizeCalculated) ?? false
+        self.codeDetectorVersion = try container.decodeIfPresent(Int.self, forKey: .codeDetectorVersion)
+        self.detectedLanguage = try container.decodeIfPresent(CodeLanguage.self, forKey: .detectedLanguage)
     }
     
     // CodableのためのEncoded関数
@@ -138,10 +244,62 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
         try container.encodeIfPresent(fileHash, forKey: .fileHash) // 新しく追加
         try container.encodeIfPresent(qrCodeContent, forKey: .qrCodeContent)
         try container.encodeIfPresent(sourceAppPath, forKey: .sourceAppPath)
+        try container.encode(isPartialSize, forKey: .isPartialSize)
+        try container.encode(isSizeCalculated, forKey: .isSizeCalculated)
+        try container.encodeIfPresent(codeDetectorVersion, forKey: .codeDetectorVersion)
+        try container.encodeIfPresent(detectedLanguage, forKey: .detectedLanguage)
     }
     
     enum CodingKeys: String, CodingKey {
-        case id, text, richText, date, filePath, fileSize, fileHash, qrCodeContent, sourceAppPath // richTextとfileHashを追加
+        case id, text, richText, date, filePath, fileSize, fileHash, qrCodeContent, sourceAppPath, isPartialSize, isSizeCalculated, codeDetectorVersion, detectedLanguage
+    }
+}
+
+// MARK: - ドラッグ＆ドロップ対応
+extension ClipboardItem {
+    /// ドラッグ＆ドロップ用の NSItemProvider を生成する
+    /// - Parameter forcePlainText: true の場合はリッチテキストを含めずプレーンテキスト（またはファイル）として提供する
+    func makeItemProvider(forcePlainText: Bool = false) -> NSItemProvider {
+        if let filePath = self.filePath {
+            return NSItemProvider(object: filePath as NSURL)
+        }
+        
+        let plainText = self.text
+        
+        if !forcePlainText, let richText = self.richText {
+            let provider = NSItemProvider()
+            
+            // HTML の場合
+            if richText.hasPrefix("<!DOCTYPE html") || richText.hasPrefix("<html") || richText.hasPrefix("<HTML") || richText.hasPrefix("<meta") {
+                if let htmlData = richText.data(using: .utf8) {
+                    provider.registerDataRepresentation(forTypeIdentifier: UTType.html.identifier, visibility: .all) { completion in
+                        completion(htmlData, nil)
+                        return nil
+                    }
+                }
+            } else {
+                // RTF の場合
+                if let rtfData = richText.data(using: .utf8) {
+                    provider.registerDataRepresentation(forTypeIdentifier: UTType.rtf.identifier, visibility: .all) { completion in
+                        completion(rtfData, nil)
+                        return nil
+                    }
+                }
+            }
+            
+            // プレーンテキスト（フォールバック用）も同時に登録
+            if let textData = plainText.data(using: .utf8) {
+                provider.registerDataRepresentation(forTypeIdentifier: UTType.plainText.identifier, visibility: .all) { completion in
+                    completion(textData, nil)
+                    return nil
+                }
+            }
+            
+            return provider
+        } else {
+            // プレーンテキストのみ
+            return NSItemProvider(object: plainText as NSString)
+        }
     }
 }
 

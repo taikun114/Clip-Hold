@@ -1,22 +1,31 @@
 {
-  "originHash" : "0aa51088f03d554487f6eedbba68d7ef83320a8d1f39060dd0594aa5d5f1759d",
+  "originHash" : "50a79fff81e651ef8d59e8a8777a0470ba41b3f6d1a086abbcece3b8b9f1b5ed",
   "pins" : [
+    {
+      "identity" : "highlighterswift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/smittytone/HighlighterSwift",
+      "state" : {
+        "revision" : "fe7aae9c9b31d3b296fd3d2dd575e1a207bb29e0",
+        "version" : "3.1.0"
+      }
+    },
     {
       "identity" : "keyboardshortcuts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sindresorhus/KeyboardShortcuts",
       "state" : {
-        "revision" : "1aef85578fdd4f9eaeeb8d53b7b4fc31bf08fe27",
-        "version" : "2.4.0"
+        "revision" : "49c3fc04ea827f816df67843bfcc57286b47ff06",
+        "version" : "3.0.1"
       }
     },
     {
-      "identity" : "sfsymbolspicker",
+      "identity" : "universalsfsymbolspicker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jaywcjlove/SFSymbolsPicker",
+      "location" : "https://github.com/taikun114/UniversalSFSymbolsPicker.git",
       "state" : {
-        "revision" : "a28f7a3b089c9b86d1dcc4b63817bfdf17b5bdef",
-        "version" : "1.0.6"
+        "revision" : "42ae3e33c78fd2ed78b9647bcf34df09b3699a7c",
+        "version" : "1.1.1"
       }
     }
   ],

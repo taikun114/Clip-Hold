@@ -1,0 +1,30 @@
+import SwiftUI
+
+struct SharedCopyConfirmationView: View {
+    let showCopyConfirmation: Bool
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+    
+    var body: some View {
+        VStack {
+            Spacer() // 下部に寄せる
+            if showCopyConfirmation {
+                ZStack { // グラデーションとテキストを重ねるZStack
+                    LinearGradient(gradient: Gradient(colors: [Color.black.opacity(0.0), Color.black.opacity(0.25)]), startPoint: .top, endPoint: .bottom)
+                        .frame(height: 60)
+                        .frame(maxWidth: .infinity) // 横幅を最大に
+                    
+                    Text("コピーしました！")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 0)
+                        .padding(.top, 15)
+                }
+                .frame(maxWidth: .infinity) // ZStack自体も横幅を最大に
+                .offset(y: 1) // 下にぴったりとくっつくように微調整
+                .transition(.opacity) // フェードイン/アウト
+            }
+        }
+        .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: showCopyConfirmation)
+        .allowsHitTesting(false) // クリックイベントを透過させる
+    }
+}

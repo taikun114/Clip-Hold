@@ -1,6 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
-import SFSymbolsPicker
+import UniversalSFSymbolsPicker
 
 
 // MARK: - StandardPhraseSettingsView
@@ -12,6 +12,7 @@ struct StandardPhraseSettingsView: View {
     
     var body: some View {
         Form {
+            StandardPhraseWindowSettingsSection()
             PresetSettingsSection()
             PresetAssignmentSection()
             PhraseSettingsSection()
@@ -32,9 +33,6 @@ private struct PresetSettingsSection: View {
     
     @State private var selectedPresetId: UUID? = nil
     @State private var showingAddPresetSheet = false
-    @State private var newPresetName = ""
-    @State private var newPresetIcon = "list.bullet.rectangle.portrait"
-    @State private var newPresetColor = "accent"
     @State private var editingPreset: StandardPhrasePreset?
     @State private var presetToDelete: StandardPhrasePreset?
     @State private var showingDeletePresetConfirmation = false
@@ -96,67 +94,38 @@ private struct PresetSettingsSection: View {
             .padding(.bottom, 24)
             .contextMenu(forSelectionType: UUID.self) { selection in
                 if let selectedId = selection.first {
-                    Button {
+                    SharedEditMenuItem {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             editingPreset = preset
-                            if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
-                                newPresetName = preset.displayName
-                            } else {
-                                newPresetName = preset.name
-                            }
-                            newPresetIcon = preset.icon
-                            newPresetColor = preset.color
                         }
-                    } label: { Label("編集...", systemImage: "pencil") }
-                    Button {
+                    }
+                    SharedDuplicateMenuItem {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             presetManager.duplicatePreset(preset)
                         }
-                    } label: { Label("複製", systemImage: "plus.square.on.square") }
+                    }
                     Divider()
-                    Button(role: .destructive) {
+                    SharedDeleteMenuItem {
                         if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                             presetToDelete = preset
                             showingDeletePresetConfirmation = true
                         }
-                    } label: { Label("削除...", systemImage: "trash") }
+                    }
                 }
             } primaryAction: { selection in
                 if let selectedId = selection.first {
                     if let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
-                        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
-                            newPresetName = preset.displayName
-                        } else {
-                            newPresetName = preset.name
-                        }
-                        newPresetIcon = preset.icon
-                        newPresetColor = preset.color
                     }
                 }
             }
             .overlay(alignment: .bottom) { bottomToolbar }
         }
-        .sheet(isPresented: $showingAddPresetSheet) { addPresetSheet }
+        .sheet(isPresented: $showingAddPresetSheet) {
+            AddEditPresetView(isSheet: true, editingPreset: nil)
+        }
         .sheet(item: $editingPreset) { preset in
-            PresetNameSheet(
-                name: $newPresetName,
-                icon: $newPresetIcon,
-                color: $newPresetColor,
-                editingPreset: preset,
-                title: String(localized: "プリセット名を編集")
-            ) { customColor in
-                updatePreset(preset, newName: newPresetName, newIcon: newPresetIcon, newColor: newPresetColor, customColor: customColor)
-                newPresetName = ""
-                newPresetIcon = "list.bullet.rectangle.portrait"
-                newPresetColor = "accent"
-                editingPreset = nil // シートを閉じる
-            } onCancel: {
-                newPresetName = ""
-                newPresetIcon = "list.bullet.rectangle.portrait"
-                newPresetColor = "accent"
-                editingPreset = nil // シートを閉じる
-            }
+            AddEditPresetView(isSheet: true, editingPreset: preset)
         }
         .alert("プリセットの削除", isPresented: $showingDeletePresetConfirmation) {
             Button("削除", role: .destructive) {
@@ -221,13 +190,6 @@ private struct PresetSettingsSection: View {
                 Button(action: {
                     if let selectedId = selectedPresetId, let preset = presetManager.presets.first(where: { $0.id == selectedId }) {
                         editingPreset = preset
-                        if preset.id.uuidString == "00000000-0000-0000-0000-000000000000" {
-                            newPresetName = preset.displayName
-                        } else {
-                            newPresetName = preset.name
-                        }
-                        newPresetIcon = preset.icon
-                        newPresetColor = preset.color
                     }
                 }) {
                     Image(systemName: "pencil")
@@ -251,45 +213,8 @@ private struct PresetSettingsSection: View {
             .padding(.horizontal, 4)
     }
     
-    private var addPresetSheet: some View {
-        PresetNameSheet(
-            name: $newPresetName,
-            icon: $newPresetIcon,
-            color: $newPresetColor,
-            title: String(localized: "プリセット名を入力")
-        ) { customColor in
-            addPreset(name: newPresetName, icon: newPresetIcon, color: newPresetColor, customColor: customColor)
-            newPresetName = ""
-            newPresetIcon = "list.bullet.rectangle.portrait"
-            newPresetColor = "accent"
-            showingAddPresetSheet = false
-        } onCancel: {
-            showingAddPresetSheet = false
-            newPresetName = ""
-            newPresetIcon = "list.bullet.rectangle.portrait"
-            newPresetColor = "accent"
-        }
-    }
-    
-    
-    
-    
-    
     private func isDefaultPreset(id: UUID?) -> Bool {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
-    }
-    
-    private func addPreset(name: String, icon: String, color: String, customColor: PresetCustomColor?) {
-        presetManager.addPreset(name: name, icon: icon, color: color, customColor: customColor)
-    }
-    
-    private func updatePreset(_ preset: StandardPhrasePreset, newName: String, newIcon: String, newColor: String, customColor: PresetCustomColor?) {
-        var updatedPreset = preset
-        updatedPreset.name = newName
-        updatedPreset.icon = newIcon
-        updatedPreset.color = newColor
-        updatedPreset.customColor = customColor
-        presetManager.updatePreset(updatedPreset)
     }
     
     private func deletePreset(id: UUID) {
@@ -470,7 +395,7 @@ private struct PresetAssignmentSection: View {
                                 return
                             }
                             
-                            DispatchQueue.main.async {
+                            Task { @MainActor in
                                 handleAppAssignment(for: selectedPresetId, bundleIdentifier: bundleIdentifier)
                             }
                         } else {
@@ -698,10 +623,7 @@ private struct PhraseSettingsSection: View {
     @State private var showingDeleteConfirmation = false
     @State private var showingClearAllPhrasesConfirmation = false
     @State private var showingAddPresetSheet = false
-    @State private var newPresetName = ""
-    @State private var newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
-    @State private var newPresetColorForPhraseSection = "accent"
-    @State private var showingMoveSheet = false
+
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
     
@@ -731,8 +653,8 @@ private struct PhraseSettingsSection: View {
                 ForEach(currentPhrases) { phrase in
                     HStack {
                         VStack(alignment: .leading) {
-                            Text(phrase.title).font(.headline).lineLimit(1)
-                            Text(phrase.content).font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
+                            Text(phrase.title.firstNonEmptyLine()).font(.headline).lineLimit(1)
+                            Text(phrase.content.firstNonEmptyLine()).font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
                         }
                         Spacer()
                     }
@@ -763,11 +685,11 @@ private struct PhraseSettingsSection: View {
         }
         .sheet(isPresented: $showingAddPhraseSheet) { addSheet }
         .sheet(item: $selectedPhrase) { phrase in editSheet(for: phrase) }
-        .sheet(isPresented: $showingAddPresetSheet) { addPresetSheet }
-        .sheet(isPresented: $showingMoveSheet) {
+        .sheet(isPresented: $showingAddPresetSheet) { AddEditPresetView(isSheet: true, editingPreset: nil) }
+        .sheet(item: $phraseToMove) { phrase in
             if let sourceId = presetManager.selectedPresetId {
                 MovePhrasePresetSelectionSheet(presetManager: StandardPhrasePresetManager.shared, sourcePresetId: sourceId, selectedPresetId: $destinationPresetId) {
-                    if let phrase = phraseToMove, let destinationId = destinationPresetId {
+                    if let destinationId = destinationPresetId {
                         presetManager.move(phrase: phrase, to: destinationId)
                     }
                 }
@@ -794,80 +716,25 @@ private struct PhraseSettingsSection: View {
     }
     
     private var presetPicker: some View {
-        Picker("", selection: Binding(
-            get: {
-                // プリセットが空の場合、特別なUUIDを返す
-                if presetManager.presets.isEmpty {
-                    return UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
-                }
-                return presetManager.selectedPresetId ?? UUID()
-            },
-            set: { newValue in
-                let newPresetUUID = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-                
-                // UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")は「プリセットがありません」のタグ
-                if newValue?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
-                    // プリセットがない場合は何もしない
-                    // 選択を元に戻す
-                    if let firstPreset = presetManager.presets.first {
-                        presetManager.selectedPresetId = firstPreset.id
-                    } else {
-                        // まだプリセットがない場合はnilのまま
-                        presetManager.selectedPresetId = nil
-                    }
-                } else if newValue == newPresetUUID {
-                    showingAddPresetSheet = true
-                } else if presetManager.presets.contains(where: { $0.id == newValue }) {
-                    presetManager.selectedPresetId = newValue
-                    presetManager.saveSelectedPresetId()
-                }
-            }
-        )) {
-            ForEach(presetManager.presets) { preset in
-                Label {
-                    Text(preset.truncatedDisplayName(maxLength: 50))
-                } icon: {
-                    if let iconImage = iconGenerator.miniIconCache[preset.id] { // Use miniIconCache
-                        Image(nsImage: iconImage)
-                    } else {
-                        Image(systemName: "star.fill") // Fallback
+        SharedPresetPicker(
+            title: "",
+            selectedPresetId: Binding(
+                get: { presetManager.selectedPresetId },
+                set: { newValue in
+                    if let newValue = newValue {
+                        presetManager.selectedPresetId = newValue
                     }
                 }
-                .tag(preset.id)
+            ),
+            onNewPresetSelected: {
+                showingAddPresetSheet = true
             }
-            
-            // プリセットがない場合の項目
-            if presetManager.presets.isEmpty {
-                Text("プリセットがありません")
-                    .tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")!)
-            }
-            
-            Divider()
-            Text("新規プリセット...").tag(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!)
-        }
+        )
         .pickerStyle(.menu)
-        .labelStyle(.titleAndIcon)
+        .labelsHidden()
     }
     
-    private var addPresetSheet: some View {
-        PresetNameSheet(
-            name: $newPresetName,
-            icon: $newPresetIconForPhraseSection,
-            color: $newPresetColorForPhraseSection,
-            title: String(localized: "プリセット名を入力")
-        ) { customColor in
-            addPreset(name: newPresetName, icon: newPresetIconForPhraseSection, color: newPresetColorForPhraseSection, customColor: customColor)
-            newPresetName = ""
-            newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
-            newPresetColorForPhraseSection = "accent"
-            showingAddPresetSheet = false
-        } onCancel: {
-            showingAddPresetSheet = false
-            newPresetName = ""
-            newPresetIconForPhraseSection = "list.bullet.rectangle.portrait"
-            newPresetColorForPhraseSection = "accent"
-        }
-    }
+
     
     private var bottomToolbar: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -943,38 +810,29 @@ private struct PhraseSettingsSection: View {
     @ViewBuilder
     private func contextMenuItems(for selection: Set<UUID>) -> some View {
         if !selection.isEmpty {
-            Button {
+            SharedEditMenuItem {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     selectedPhrase = phrase
                 }
-            } label: {
-                Label("編集...", systemImage: "pencil")
             }
-            Button {
+            SharedMoveMenuItem {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     phraseToMove = phrase
-                    showingMoveSheet = true
                 }
-            } label: {
-                Label("別のプリセットに移動...", systemImage: "folder")
             }
-            Button {
+            SharedDuplicateMenuItem {
                 if let id = selection.first,
                    let phrase = currentPhrases.first(where: { $0.id == id }),
                    let selectedPreset = presetManager.selectedPreset {
                     presetManager.duplicate(phrase: phrase, in: selectedPreset)
                 }
-            } label: {
-                Label("複製", systemImage: "plus.square.on.square")
             }
             Divider()
-            Button(role: .destructive) {
+            SharedDeleteMenuItem {
                 if let id = selection.first, let phrase = currentPhrases.first(where: { $0.id == id }) {
                     phraseToDelete = phrase
                     showingDeleteConfirmation = true
                 }
-            } label: {
-                Label("削除...", systemImage: "trash")
             }
         }
     }
@@ -1046,9 +904,7 @@ private struct PhraseSettingsSection: View {
         presetManager.updatePreset(p)
     }
     
-    private func addPreset(name: String, icon: String, color: String, customColor: PresetCustomColor?) {
-        presetManager.addPreset(name: name, icon: icon, color: color, customColor: customColor)
-    }
+
 }
 
 // MARK: - PhraseManagementSection
@@ -1079,7 +935,7 @@ private struct PhraseManagementSection: View {
                 }) {
                     HStack {
                         Image(systemName: "trash")
-                        Text("すべての定型文を削除")
+                        Text("すべての定型文を削除...")
                     }
                     .if(allPhrasesCount > 0) { view in
                         view.foregroundStyle(.red)
@@ -1098,7 +954,7 @@ private struct PhraseManagementSection: View {
                 }) {
                     HStack {
                         Image(systemName: "trash")
-                        Text("すべてのプリセットを削除")
+                        Text("すべてのプリセットを削除...")
                     }
                     .if(!presetManager.presets.isEmpty) { view in
                         view.foregroundStyle(.red)
@@ -1269,10 +1125,13 @@ struct PresetNameSheet: View {
     var editingPreset: StandardPhrasePreset? = nil
     
     @State private var showingIconPicker = false
+    @State private var selectedIcon: String?
     @State private var previousIcon: String = ""
     @State private var showingColorPicker = false
+    @State private var isIconHovered = false
     @State private var customBackgroundColor: Color
     @State private var customIconColor: Color
+    @State private var searchText = ""
     var title: String
     var onSave: (PresetCustomColor?) -> Void
     var onCancel: () -> Void
@@ -1288,6 +1147,7 @@ struct PresetNameSheet: View {
     ) {
         self._name = name
         self._icon = icon
+        self._selectedIcon = State(initialValue: icon.wrappedValue)
         self._color = color
         self.editingPreset = editingPreset
         self.title = title
@@ -1321,6 +1181,7 @@ struct PresetNameSheet: View {
                                 Circle()
                                     .fill(color == "custom" ? customBackgroundColor : getColor(from: color))
                                     .frame(width: 30, height: 30)
+                                
                                 Image(systemName: icon.isEmpty ? previousIcon : icon)
                                     .foregroundColor(
                                         color == "accent"
@@ -1328,19 +1189,48 @@ struct PresetNameSheet: View {
                                         : getSymbolColor(forPresetColor: color)
                                     )
                                     .font(.system(size: 14, weight: .bold))
+                                    .contentTransition(.symbolEffect(.replace))
+                                
+                                Circle()
+                                    .fill(Color.black.opacity(0.5))
+                                    .frame(width: 30, height: 30)
+                                    .opacity(isIconHovered ? 1 : 0)
+                                    
+                                Image(systemName: "pencil")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 14, weight: .bold))
+                                    .opacity(isIconHovered ? 1 : 0)
                             }
+                            .animation(.easeInOut(duration: 0.2), value: isIconHovered)
                         }
                         .buttonStyle(.plain)
-                        .sfSymbolsPicker(
-                            isPresented: $showingIconPicker,
-                            selection: $icon,
-                            prompt: String(localized: "シンボルを検索")
-                        )
-                        .onChange(of: icon) { oldValue, newValue in
-                            if newValue.isEmpty {
-                                icon = previousIcon
+                        .onHover { isHovered in
+                            isIconHovered = isHovered
+                            if isHovered {
+                                NSCursor.pointingHand.push()
                             } else {
-                                previousIcon = newValue
+                                NSCursor.pop()
+                            }
+                        }
+                        .popover(isPresented: $showingIconPicker, arrowEdge: .leading) {
+                            SFSymbolPicker(
+                                isPresented: $showingIconPicker,
+                                selection: $selectedIcon,
+                                showAs: .popover,
+                                controlBarPosition: .top,
+                                searchText: $searchText,
+                                iconScale: 4,
+                                iconSpacing: 3,
+                                showRecents: true
+                            )
+                            .frame(width: 350, height: 400)
+                        }
+                        .onChange(of: selectedIcon) { oldValue, newValue in
+                            if let newIcon = newValue, !newIcon.isEmpty {
+                                icon = newIcon
+                                previousIcon = newIcon
+                            } else {
+                                selectedIcon = previousIcon
                             }
                         }
                         
@@ -1497,4 +1387,107 @@ struct PresetNameSheet: View {
     .environmentObject(StandardPhrasePresetManager.shared)
     .environmentObject(PresetAppAssignmentManager.shared)
     .environmentObject(PresetIconGenerator.shared)
+}
+
+
+// MARK: - StandardPhraseWindowSettingsSection
+private struct StandardPhraseWindowSettingsSection: View {
+    @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
+    @AppStorage("standardPhraseWindowIsOverlay") var standardPhraseWindowIsOverlay: Bool = false
+    @AppStorage("standardPhraseWindowOverlayTransparency") var standardPhraseWindowOverlayTransparency: Double = 0.5
+    @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbersInStandardPhrasesWindow: Bool = false
+    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
+
+    var body: some View {
+        Section(header: Text("定型文ウィンドウ").font(.headline)) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("常に最前面に表示")
+                    Text("ウィンドウを常に最も手前に表示します。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $standardPhraseWindowAlwaysOnTop) {
+                    Text("定型文ウィンドウを常に最前面に表示")
+                    Text("オンにすると、定型文ウィンドウを常に最も手前に表示します。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("オーバーレイ表示")
+                    Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $standardPhraseWindowIsOverlay) {
+                    Text("オーバーレイ表示")
+                    Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                Text("オーバーレイ時の透明度")
+                    .foregroundStyle(standardPhraseWindowIsOverlay ? .primary : .secondary)
+                Spacer()
+                HStack {
+                    Slider(
+                        value: .init(
+                            get: {
+                                return 100 - (standardPhraseWindowOverlayTransparency * 100)
+                            },
+                            set: { sliderValue in
+                                standardPhraseWindowOverlayTransparency = (100 - sliderValue) / 100
+                            }
+                        ),
+                        in: 20...80,
+                        step: 10
+                    )
+                    Text(1 - standardPhraseWindowOverlayTransparency, format: .percent.precision(.fractionLength(0)))
+                        .foregroundStyle(standardPhraseWindowIsOverlay ? .secondary : .tertiary)
+                }
+            }
+            .disabled(!standardPhraseWindowIsOverlay)
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("番号を隠す")
+                    Text("各項目に表示される番号を非表示にします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $hideNumbersInStandardPhrasesWindow) {
+                    Text("定型文ウィンドウの番号を隠す")
+                    Text("オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("ダブルクリックでウィンドウを閉じる")
+                    Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Toggle(isOn: $closeWindowOnDoubleClickInStandardPhrasesWindow) {
+                    Text("ダブルクリックで定型文ウィンドウを閉じる")
+                    Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                }
+                .toggleStyle(.switch)
+                .labelsHidden()
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+        }
+    }
 }

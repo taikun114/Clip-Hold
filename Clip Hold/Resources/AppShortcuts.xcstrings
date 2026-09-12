@@ -1,0 +1,392 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add standard phrase in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Standardphrase in ${applicationName} erstellen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Add standard phrase in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Añadir una frase estándar en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Ajouter une phrase type dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で定型文を作成",
+              "${applicationName}に定型文を追加",
+              "${applicationName} で定型文を作成",
+              "${applicationName} に定型文を追加"
+            ]
+          }
+        }
+      }
+    },
+    "Copy history item in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Verlaufselement in ${applicationName} kopieren",
+              "Verlauf in ${applicationName} kopieren"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Copy history item in ${applicationName}",
+              "Copy history in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Copiar elemento del historial en ${applicationName}",
+              "Copiar historial en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Copier l'élément de l'historique dans ${applicationName}",
+              "Copier l'historique dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で履歴項目をコピー",
+              "${applicationName}で履歴をコピー"
+            ]
+          }
+        }
+      }
+    },
+    "Copy standard phrase in ${applicationName}" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Standardphrase in ${applicationName} kopieren",
+              "Standardphrase aus ${preset} in ${applicationName} kopieren"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Copy standard phrase in ${applicationName}",
+              "Copy standard phrase from ${preset} in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Copiar frase estándar en ${applicationName}",
+              "Copiar frase estándar de ${preset} en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Copier la phrase type dans ${applicationName}",
+              "Copier la phrase type de ${preset} dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で定型文をコピー",
+              "${applicationName}の${preset}から定型文をコピー"
+            ]
+          }
+        }
+      }
+    },
+    "Set active preset to ${preset} in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Aktives Preset in ${applicationName} auf ${preset} setzen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Set active preset to ${preset} in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Establecer preset activo a ${preset} en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Définir le préréglage actif sur ${preset} dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}でプリセットを${preset}に設定"
+            ]
+          }
+        }
+      }
+    },
+    "Set monitoring state in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Überwachungsstatus in ${applicationName} festlegen",
+              "Überwachungsstatus in ${applicationName} umschalten"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Set monitoring state in ${applicationName}",
+              "Toggle monitoring state in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Establecer estado de supervisión en ${applicationName}",
+              "Alternar estado de supervisión en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Définir l'état de surveillance dans ${applicationName}",
+              "Basculer l'état de surveillance dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で監視状態を設定",
+              "${applicationName}で監視状態を切り替え"
+            ]
+          }
+        }
+      }
+    },
+    "Set quick paste state in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Schnelles Einfügen in ${applicationName} festlegen",
+              "Schnelles Einfügen in ${applicationName} umschalten"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Set quick paste state in ${applicationName}",
+              "Toggle quick paste in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Establecer pegado rápido en ${applicationName}",
+              "Alternar pegado rápido en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Définir le collage rapide dans ${applicationName}",
+              "Basculer le collage rapide dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}でクイックペーストを設定",
+              "${applicationName}でクイックペーストを切り替え"
+            ]
+          }
+        }
+      }
+    },
+    "Show history window in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Verlaufsfenster in ${applicationName} anzeigen",
+              "Verlaufsfenster in ${applicationName} öffnen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Show history window in ${applicationName}",
+              "Open history window in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Mostrar ventana de historial en ${applicationName}",
+              "Abrir ventana de historial en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Afficher la fenêtre d'historique dans ${applicationName}",
+              "Ouvrir la fenêtre d'historique dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で履歴ウィンドウを表示",
+              "${applicationName}で履歴ウィンドウを開く"
+            ]
+          }
+        }
+      }
+    },
+    "Show standard phrase window in ${applicationName}" : {
+      "localizations" : {
+        "de" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Standardphrasenfenster in ${applicationName} anzeigen",
+              "Standardphrasenfenster in ${applicationName} öffnen"
+            ]
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Show standard phrase window in ${applicationName}",
+              "Open standard phrase window in ${applicationName}"
+            ]
+          }
+        },
+        "es" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Mostrar ventana de frases estándar en ${applicationName}",
+              "Abrir ventana de frases estándar en ${applicationName}"
+            ]
+          }
+        },
+        "fr" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "Afficher la fenêtre des phrases standard dans ${applicationName}",
+              "Ouvrir la fenêtre des phrases standard dans ${applicationName}"
+            ]
+          }
+        },
+        "ja" : {
+          "stringSet" : {
+            "state" : "translated",
+            "values" : [
+              "${applicationName}で定型文ウィンドウを表示",
+              "${applicationName}で定型文ウィンドウを開く"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.3"
+}

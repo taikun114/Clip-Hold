@@ -39,9 +39,27 @@ struct ImportConflictSheet: View {
     var onAllPresetsCompleted: ([PresetConflictInfo]) -> Void
     
     private var currentConflict: Binding<StandardPhraseDuplicate>? {
-        guard let currentPreset = currentPresetConflict,
-              currentConflictIndex < currentPreset.conflicts.count else { return nil }
-        return $presetConflicts[currentPresetIndex].conflicts[currentConflictIndex]
+        guard currentPresetIndex < presetConflicts.count,
+              currentConflictIndex < presetConflicts[currentPresetIndex].conflicts.count else { return nil }
+        
+        let presetIndex = currentPresetIndex
+        let conflictIndex = currentConflictIndex
+        
+        return Binding<StandardPhraseDuplicate>(
+            get: {
+                guard presetIndex < self.presetConflicts.count,
+                      conflictIndex < self.presetConflicts[presetIndex].conflicts.count else {
+                    let dummyPhrase = StandardPhrase(title: "", content: "")
+                    return StandardPhraseDuplicate(existingPhrase: dummyPhrase, newPhrase: dummyPhrase)
+                }
+                return self.presetConflicts[presetIndex].conflicts[conflictIndex]
+            },
+            set: { newValue in
+                guard presetIndex < self.presetConflicts.count,
+                      conflictIndex < self.presetConflicts[presetIndex].conflicts.count else { return }
+                self.presetConflicts[presetIndex].conflicts[conflictIndex] = newValue
+            }
+        )
     }
     
     private var isConflictUnresolved: Bool {

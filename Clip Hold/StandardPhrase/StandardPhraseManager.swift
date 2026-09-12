@@ -18,6 +18,10 @@ class StandardPhraseManager: ObservableObject {
         migrateToPresetDirectory()
         loadStandardPhrases()
         print("StandardPhraseManager: Initialized with phrase count: \(standardPhrases.count)")
+        
+        DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("ClipHoldDidUpdatePhrasesInBackground"), object: nil, queue: .main) { [weak self] _ in
+            self?.loadStandardPhrases()
+        }
     }
     
     // MARK: - Migration to Preset Directory
@@ -89,7 +93,7 @@ class StandardPhraseManager: ObservableObject {
     }
     
     // MARK: - Loading (ファイルシステムからロード)
-    private func loadStandardPhrases() {
+    func loadStandardPhrases() {
         guard let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
             print("StandardPhraseManager: Could not find Application Support directory (load).")
             return
@@ -122,7 +126,18 @@ class StandardPhraseManager: ObservableObject {
             let data = try Data(contentsOf: actualFileURL)
             let decoder = JSONDecoder()
             
-            self.standardPhrases = try decoder.decode([StandardPhrase].self, from: data)
+            var loaded = try decoder.decode([StandardPhrase].self, from: data)
+            var needsSave = false
+            for i in 0..<loaded.count {
+                if loaded[i].codeDetectorVersion != CodeDetector.currentDetectorVersion {
+                    loaded[i].updateCodeDetection()
+                    needsSave = true
+                }
+            }
+            self.standardPhrases = loaded
+            if needsSave {
+                saveStandardPhrases()
+            }
             print("StandardPhraseManager: Standard phrases loaded from file. Count: \(standardPhrases.count), Size: \(data.count) bytes.")
         } catch {
             print("StandardPhraseManager: Error loading standard phrases from file: \(error.localizedDescription)")
@@ -130,32 +145,48 @@ class StandardPhraseManager: ObservableObject {
     }
     
     func addPhrase(title: String, content: String) {
-        let newPhrase = StandardPhrase(title: title, content: content)
+        guard !ClipboardManager.shared.isExporting else { return }
+        var newPhrase = StandardPhrase(title: title, content: content)
+        newPhrase.updateCodeDetection()
         standardPhrases.append(newPhrase)
+        SpotlightManager.shared.indexStandardPhrase(newPhrase)
     }
     
     func updatePhrase(id: UUID, newTitle: String, newContent: String) {
+        guard !ClipboardManager.shared.isExporting else { return }
         if let index = standardPhrases.firstIndex(where: { $0.id == id }) {
             var phrase = standardPhrases[index]
             phrase.title = newTitle
             phrase.content = newContent
+            phrase.updateCodeDetection()
             standardPhrases[index] = phrase
+            SpotlightManager.shared.indexStandardPhrase(phrase)
         }
     }
     
     func deletePhrase(id: UUID) {
+        guard !ClipboardManager.shared.isExporting else { return }
         standardPhrases.removeAll { $0.id == id }
+        SpotlightManager.shared.removeStandardPhrase(id: id)
     }
     
     func deletePhrase(atOffsets offsets: IndexSet) {
+        guard !ClipboardManager.shared.isExporting else { return }
+        // Spotlightから削除
+        for index in offsets {
+            let phrase = standardPhrases[index]
+            SpotlightManager.shared.removeStandardPhrase(id: phrase.id)
+        }
         standardPhrases.remove(atOffsets: offsets)
     }
     
     func movePhrase(from source: IndexSet, to destination: Int) {
+        guard !ClipboardManager.shared.isExporting else { return }
         standardPhrases.move(fromOffsets: source, toOffset: destination)
     }
     
     func deleteAllPhrases() {
+        guard !ClipboardManager.shared.isExporting else { return }
         standardPhrases.removeAll()
     }
     
@@ -201,10 +232,12 @@ class StandardPhraseManager: ObservableObject {
     }
     
     @MainActor func addImportedPhrases(_ phrasesToAdd: [StandardPhrase], toPresetId presetId: UUID? = nil) {
+        guard !ClipboardManager.shared.isExporting else { return }
         if let presetId = presetId {
             // 指定されたプリセットに定型文を追加
             if var preset = StandardPhrasePresetManager.shared.presets.first(where: { $0.id == presetId }) {
                 var updatedPhrases = preset.phrases
+                var addedPhrases: [StandardPhrase] = []
                 
                 for newPhrase in phrasesToAdd {
                     // 同じIDの定型文が既に存在するかチェック
@@ -219,19 +252,31 @@ class StandardPhraseManager: ObservableObject {
                             // IDが一致するがコンテンツが異なる場合は、新しいUUIDを割り当てて追加
                             let phraseWithNewId = StandardPhrase(id: UUID(), title: newPhrase.title, content: newPhrase.content)
                             updatedPhrases.append(phraseWithNewId)
+                            addedPhrases.append(phraseWithNewId)
                         }
                     } else {
                         // 同じIDの定型文が存在しない場合は追加
                         updatedPhrases.append(newPhrase)
+                        addedPhrases.append(newPhrase)
                     }
                 }
                 
                 preset.phrases = updatedPhrases
                 StandardPhrasePresetManager.shared.updatePreset(preset)
+                
+                // 新しく追加された定型文をSpotlightにインデックス登録
+                if !addedPhrases.isEmpty {
+                    let capturedPreset = preset
+                    let capturedPhrases = addedPhrases
+                    Task {
+                        await SpotlightManager.shared.indexStandardPhrases(capturedPhrases, inPreset: capturedPreset)
+                    }
+                }
             }
         } else {
             // デフォルトの動作: 全定型文リストに追加
             var updatedPhrases = standardPhrases
+            var addedPhrases: [StandardPhrase] = []
             
             for newPhrase in phrasesToAdd {
                 // 同じIDの定型文が既に存在するかチェック
@@ -246,15 +291,25 @@ class StandardPhraseManager: ObservableObject {
                         // IDが一致するがコンテンツが異なる場合は、新しいUUIDを割り当てて追加
                         let phraseWithNewId = StandardPhrase(id: UUID(), title: newPhrase.title, content: newPhrase.content)
                         updatedPhrases.append(phraseWithNewId)
+                        addedPhrases.append(phraseWithNewId)
                     }
                 } else {
                     // 同じIDの定型文が存在しない場合は追加
                     updatedPhrases.append(newPhrase)
+                    addedPhrases.append(newPhrase)
                 }
             }
             
             standardPhrases = updatedPhrases
             print("Added imported phrases. Current standard phrases count: \(self.standardPhrases.count)")
+            
+            // 新しく追加された定型文をSpotlightにインデックス登録（プリセットなしのためアイコンはnil）
+            if !addedPhrases.isEmpty {
+                let capturedPhrases = addedPhrases
+                Task {
+                    await SpotlightManager.shared.indexStandardPhrases(capturedPhrases, inPreset: nil)
+                }
+            }
         }
     }
 }

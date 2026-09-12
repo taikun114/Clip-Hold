@@ -26,16 +26,29 @@ struct QRCodeView: View {
                     .border(Color.gray, width: 1)
                     .layoutPriority(1) // QRコード画像に高いレイアウト優先度を設定
                     .contextMenu {
-                        Button("画像をコピー") {
+                        Button {
+                            let clipboardManager = ClipboardManager.shared
+                            clipboardManager.isPerformingInternalCopy = true
+                            
+                            // 画像をクリップボードにセットする。ClipboardItemに画像を保持するプロパティがないため
+                            // ここだけは直接NSPasteboardを使用するが、フラグは正しく設定されている
                             let pasteboard = NSPasteboard.general
                             pasteboard.clearContents()
                             pasteboard.writeObjects([qrCodeImage])
+                        } label: {
+                            if #available(macOS 15.0, *) {
+                                Label("画像をコピー", systemImage: "document.on.document")
+                            } else {
+                                Label("画像をコピー", systemImage: "doc.on.doc")
+                            }
                         }
                         
-                        Button("画像を保存...") {
+                        Button {
                             self.imageToSave = qrCodeImage
                             self.suggestedFileName = createSafeFileName(from: text)
                             self.showingSavePanel = true
+                        } label: {
+                            Label("画像を保存...", systemImage: "square.and.arrow.down")
                         }
                     }
             } else {
@@ -87,7 +100,11 @@ struct QRCodeView: View {
         ) { result in
             switch result {
             case .success(let url):
+#if DEBUG
                 print("Image saved successfully to: \(url.path)")
+#else
+                print("Image saved successfully.")
+#endif
             case .failure(let error):
                 print("Error saving image: \(error.localizedDescription)")
             }

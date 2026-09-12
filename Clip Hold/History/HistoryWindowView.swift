@@ -20,26 +20,30 @@ struct HistoryWindowView: View {
     
     @State private var showingDeleteConfirmation = false
     @State private var itemToDelete: ClipboardItem?
+    @State private var deleteOnlyThisItem: Bool = false
     @State private var selectedItemID: UUID?
     @State private var isLoading: Bool = false
+    @State private var isPaginating: Bool = false
     @State private var showCopyConfirmation: Bool = false
     @State private var currentCopyConfirmationTask: Task<Void, Never>?
     
     @State private var copyConfirmationTask: Task<Void, Never>? = nil
     @State private var historyUpdateTask: Task<Void, Never>? = nil
     
-    @State private var showQRCodeSheet: Bool = false
-    @State private var selectedItemForQRCode: ClipboardItem?
+    @State private var selectedItemForQRCode: ClipboardItem? = nil
     
     @State private var itemForNewPhrase: ClipboardItem? = nil
     
-    @State private var previousClipboardHistoryCount: Int = 0
+    @State private var isChildSheetPresented: Bool = false
     
-    
+    @State private var displayLimit: Int = 100
     
     @State private var searchDebounceTask: Task<Void, Never>? = nil
     
+    @State private var searchTrigger: UUID = UUID()
+    
     @FocusState private var isSearchFieldFocused: Bool
+    @FocusState private var isListFocused: Bool
     
     @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
     @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
@@ -71,29 +75,35 @@ struct HistoryWindowView: View {
         return text
     }
     
-    // 検索、フィルタリング、並び替えを統合したタスク実行関数
-    private func performUpdate(isIncrementalUpdate: Bool = false) {
-        if !isIncrementalUpdate {
+    private func performUpdate(isPagination: Bool = false, isBackground: Bool = false, initialDelayMs: Int = 0) {
+        if isPagination {
+            isPaginating = true
+        } else if isBackground {
+            // バックグラウンドでの更新のためスピナーを表示しない
+        } else {
             isLoading = true
+            isPaginating = false
+            displayLimit = 100 // 新しい検索やフィルタの時は100件にリセット
             self.filteredHistory = []
             clipboardManager.filteredHistoryForShortcuts = []
         }
         
-        historyUpdateTask?.cancel()
+        let historyCopy = clipboardManager.clipboardHistory
+        let currentFilter = clipboardManager.historySelectedFilter
+        let currentSort = clipboardManager.historySelectedSort
+        let currentApp = clipboardManager.historySelectedApp
+        let currentSearchText = searchText
+        let currentDisplayLimit = displayLimit
+        let currentPinnedID = clipboardManager.pinnedItemID
+        let frontmostID = frontmostAppMonitor.frontmostAppBundleIdentifier
+        let isReduceMotion = reduceMotion
         
-        historyUpdateTask = Task { @MainActor in
-            guard !Task.isCancelled else {
-                isLoading = false
-                return
-            }
-            
-            let historyCopy = clipboardManager.clipboardHistory
-            
-            let filtered = historyCopy.filter { item in
+        Task.detached(priority: .userInitiated) {
+            let isMatch: (ClipboardItem) -> Bool = { item in
                 // App filter
                 let matchesApp: Bool
-                if clipboardManager.historySelectedApp == "auto_filter_mode" {
-                    if let frontmostID = frontmostAppMonitor.frontmostAppBundleIdentifier {
+                if currentApp == "auto_filter_mode" {
+                    if let frontmostID = frontmostID {
                         if let path = item.sourceAppPath, let itemBundle = Bundle(path: path) {
                             matchesApp = itemBundle.bundleIdentifier == frontmostID
                         } else {
@@ -102,30 +112,66 @@ struct HistoryWindowView: View {
                     } else {
                         matchesApp = false
                     }
-                } else if clipboardManager.historySelectedApp == nil {
+                } else if currentApp == nil {
                     matchesApp = true
                 } else {
-                    matchesApp = item.sourceAppPath == clipboardManager.historySelectedApp
+                    matchesApp = item.sourceAppPath == currentApp
                 }
                 
                 // Search text filter
-                let matchesSearchText = searchText.isEmpty || item.text.localizedCaseInsensitiveContains(searchText)
+                let matchesSearchText = currentSearchText.isEmpty || item.text.localizedCaseInsensitiveContains(currentSearchText)
                 
                 // Item type filter
                 let matchesFilter: Bool
-                switch clipboardManager.historySelectedFilter {
+                switch currentFilter {
                 case .all:
                     matchesFilter = true
                 case .textAll:
                     matchesFilter = item.filePath == nil
                 case .textRich:
-                    // リッチテキストの判定（richTextプロパティがnilでない場合）
                     matchesFilter = item.filePath == nil && item.richText != nil
                 case .textPlain:
-                    // 標準テキストのみ（richTextプロパティがnilの場合）
                     matchesFilter = item.filePath == nil && item.richText == nil
                 case .linkOnly:
                     matchesFilter = item.isURL
+                case .codeAll:
+                    matchesFilter = item.isCode
+                case .codeSwift:
+                    matchesFilter = item.isCode && item.detectedLanguage == .swift
+                case .codeJavaScript:
+                    matchesFilter = item.isCode && item.detectedLanguage == .javascript
+                case .codePython:
+                    matchesFilter = item.isCode && item.detectedLanguage == .python
+                case .codeHTML:
+                    matchesFilter = item.isCode && item.detectedLanguage == .html
+                case .codeCSS:
+                    matchesFilter = item.isCode && item.detectedLanguage == .css
+                case .codeJSON:
+                    matchesFilter = item.isCode && item.detectedLanguage == .json
+                case .codeYAML:
+                    matchesFilter = item.isCode && item.detectedLanguage == .yaml
+                case .codeTOML:
+                    matchesFilter = item.isCode && item.detectedLanguage == .toml
+                case .codeMarkdown:
+                    matchesFilter = item.isCode && item.detectedLanguage == .markdown
+                case .codeGraphQL:
+                    matchesFilter = item.isCode && item.detectedLanguage == .graphql
+                case .codeEnv:
+                    matchesFilter = item.isCode && item.detectedLanguage == .env
+                case .codeRust:
+                    matchesFilter = item.isCode && item.detectedLanguage == .rust
+                case .codeGo:
+                    matchesFilter = item.isCode && item.detectedLanguage == .go
+                case .codeCPP:
+                    matchesFilter = item.isCode && item.detectedLanguage == .cpp
+                case .codeJavaKotlin:
+                    matchesFilter = item.isCode && item.detectedLanguage == .javaKotlin
+                case .codeSQL:
+                    matchesFilter = item.isCode && item.detectedLanguage == .sql
+                case .codeShell:
+                    matchesFilter = item.isCode && item.detectedLanguage == .shell
+                case .codeOther:
+                    matchesFilter = item.isCode && (item.detectedLanguage == .other || item.detectedLanguage == nil)
                 case .fileOnly:
                     matchesFilter = item.filePath != nil
                 case .folderOnly:
@@ -133,13 +179,10 @@ struct HistoryWindowView: View {
                 case .imageOnly:
                     matchesFilter = item.isImage
                 case .videoOnly:
-                    // 動画ファイルの判定（isVideoプロパティを使用）
                     matchesFilter = item.isVideo
                 case .otherFiles:
-                    // その他のファイルの判定（画像、動画、PDF、フォルダではないファイル）
                     matchesFilter = item.filePath != nil && !item.isImage && !item.isVideo && !item.isPDF && !item.isFolder
                 case .pdfOnly:
-                    // PDFファイルの判定（isPDFプロパティを使用）
                     matchesFilter = item.isPDF
                 case .colorCodeOnly:
                     matchesFilter = item.filePath == nil && ColorCodeParser.parseColor(from: item.text) != nil
@@ -148,8 +191,12 @@ struct HistoryWindowView: View {
                 return matchesApp && matchesSearchText && matchesFilter
             }
             
+            let finalHistoryToApply: [ClipboardItem]
+            
+            // 全件フィルタリング後にソートを実行する元の実装に戻す（配列内の順序が保証されていないため）
+            let filtered = historyCopy.filter(isMatch)
             let sorted = filtered.sorted { item1, item2 in
-                switch clipboardManager.historySelectedSort {
+                switch currentSort {
                 case .newest:
                     return item1.date > item2.date
                 case .oldest:
@@ -161,15 +208,54 @@ struct HistoryWindowView: View {
                 }
             }
             
-            self.filteredHistory = sorted
-            clipboardManager.filteredHistoryForShortcuts = sorted
-            isLoading = false
+            var finalHistory = Array(sorted.prefix(currentDisplayLimit))
+            if let pinnedID = currentPinnedID,
+               let pinnedItem = sorted.first(where: { $0.id == pinnedID }) {
+                finalHistory.insert(pinnedItem.createPinnedDuplicate(), at: 0) // 先頭に追加
+            }
+            finalHistoryToApply = finalHistory
+            
+            if initialDelayMs > 0 {
+                // クイックオーバーレイの閉じるアニメーション（約0.15秒）完了まで待機
+                try? await Task.sleep(nanoseconds: UInt64(initialDelayMs) * 1_000_000)
+            }
+            
+            await MainActor.run {
+                if isReduceMotion || initialDelayMs > 0 {
+                    self.filteredHistory = finalHistoryToApply
+                } else {
+                    withAnimation {
+                        self.filteredHistory = finalHistoryToApply
+                    }
+                }
+                self.clipboardManager.filteredHistoryForShortcuts = finalHistoryToApply
+                
+                if self.selectedItemID == nil || !finalHistoryToApply.contains(where: { $0.id == self.selectedItemID }) {
+                    self.selectedItemID = finalHistoryToApply.first?.id
+                }
+                
+                // 明示的にリストへフォーカスを移す（検索中でない場合）
+                if !self.isSearchFieldFocused {
+                    self.isListFocused = true
+                }
+                
+                self.isLoading = false
+                self.isPaginating = false
+                
+                if !isPagination && !isBackground {
+                    self.searchTrigger = UUID()
+                }
+            }
         }
+    }
+    
+    private func handleSearchSubmit() {
+        isListFocused = true
     }
     
     var body: some View {
         ZStack {
-            HistoryWindowBackground()
+            SharedWindowBackground()
             
             ZStack {
                 VStack(spacing: 0) {
@@ -182,21 +268,25 @@ struct HistoryWindowView: View {
                         selectedSort: $clipboardManager.historySelectedSort,
                         selectedApp: $clipboardManager.historySelectedApp
                     )
+                    .onSubmit(of: .text) {
+                        handleSearchSubmit()
+                    }
                     
                     Spacer(minLength: 0)
                     
                     HistoryContentList(
                         filteredHistory: $filteredHistory,
                         isLoading: $isLoading,
+                        isPaginating: $isPaginating,
                         showingDeleteConfirmation: $showingDeleteConfirmation,
                         itemToDelete: $itemToDelete,
+                        deleteOnlyThisItem: $deleteOnlyThisItem,
                         selectedItemID: $selectedItemID,
                         showCopyConfirmation: $showCopyConfirmation,
                         currentCopyConfirmationTask: $currentCopyConfirmationTask,
-                        showQRCodeSheet: $showQRCodeSheet,
                         selectedItemForQRCode: $selectedItemForQRCode,
                         itemForNewPhrase: $itemForNewPhrase,
-                        previousClipboardHistoryCount: $previousClipboardHistoryCount,
+                        isChildSheetPresented: $isChildSheetPresented,
                         hideNumbersInHistoryWindow: hideNumbersInHistoryWindow,
                         closeWindowOnDoubleClickInHistoryWindow: closeWindowOnDoubleClickInHistoryWindow,
                         scrollToTopOnUpdate: scrollToTopOnUpdate,
@@ -204,22 +294,114 @@ struct HistoryWindowView: View {
                         lineNumberTextWidth: lineNumberTextWidth,
                         trailingPaddingForLineNumber: trailingPaddingForLineNumber,
                         searchText: searchText,
+                        searchTrigger: searchTrigger,
                         onCopyAction: { item in
+                            if item.isCopying { return }
                             // 内部コピーフラグをtrueに設定
                             clipboardManager.isPerformingInternalCopy = true
                             ClipboardManager.shared.copyItemToClipboard(item)
+                        },
+                        onLoadMore: {
+                            if displayLimit < clipboardManager.clipboardHistory.count {
+                                displayLimit += 100
+                                performUpdate(isPagination: true)
+                            }
                         }
                     )
+                    .focused($isListFocused)
+                    .defaultFocus($isListFocused, true)
                 }
             }
             
-            HistoryCopyConfirmation(showCopyConfirmation: $showCopyConfirmation)
-                .onAppear {
-                    currentCopyConfirmationTask?.cancel()
-                }
+            // コピー完了アニメーション
+            SharedCopyConfirmationView(showCopyConfirmation: showCopyConfirmation)
                 .onDisappear {
                     currentCopyConfirmationTask?.cancel()
                 }
+        }
+        .onKeyPress { press in
+            // シートが開かれている（または開こうとしている）間は検索欄への入力を無視する
+            if isChildSheetPresented || showingDeleteConfirmation || selectedItemForQRCode != nil || itemToDelete != nil || itemForNewPhrase != nil {
+                #if DEBUG
+                print("Keyboard blocked by state flag in History. child:\(isChildSheetPresented), delConf:\(showingDeleteConfirmation), qr:\(selectedItemForQRCode != nil), itemDel:\(itemToDelete != nil), newPhrase:\(itemForNewPhrase != nil)")
+                #endif
+                return .ignored
+            }
+            if let window = NSApp.keyWindow, window.attachedSheet != nil {
+                #if DEBUG
+                print("Keyboard blocked by attachedSheet in History.")
+                #endif
+                return .ignored
+            }
+            
+            guard press.modifiers.isEmpty || press.modifiers == .shift else { return .ignored }
+            
+            // バックスペースキーの処理
+            if press.key == .delete || press.key == .deleteForward || press.characters == "\u{7F}" || press.characters == "\u{08}" {
+                if !isSearchFieldFocused {
+                    if !searchText.isEmpty {
+                        searchText.removeLast()
+                        isSearchFieldFocused = true
+                        
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 50_000_000)
+                            if let window = NSApp.keyWindow,
+                               let textView = window.firstResponder as? NSTextView {
+                                let length = textView.string.count
+                                textView.setSelectedRange(NSRange(location: length, length: 0))
+                            }
+                        }
+                        return .handled
+                    }
+                }
+                return .ignored
+            }
+            
+            if press.key == .escape {
+                if !searchText.isEmpty {
+                    searchText = ""
+                    return .handled
+                } else {
+                    return .ignored
+                }
+            }
+            
+            let ignoredKeys: Set<KeyEquivalent> = [.return, .tab, .space, .upArrow, .downArrow, .leftArrow, .rightArrow, .home, .end, .pageUp, .pageDown, .clear]
+            if ignoredKeys.contains(press.key) {
+                return .ignored
+            }
+            guard let char = press.characters.first, !press.characters.isEmpty else { return .ignored }
+            
+            // 制御文字の入力を無視
+            if let scalar = char.unicodeScalars.first, CharacterSet.controlCharacters.contains(scalar) {
+                return .ignored
+            }
+            
+            if !isSearchFieldFocused {
+                searchText.append(char)
+                isSearchFieldFocused = true
+                
+                // 検索欄にフォーカスが移った後、文字が全選択されるのを防ぐためカーソルを末尾に移動させる
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                    if let window = NSApp.keyWindow,
+                       let textView = window.firstResponder as? NSTextView {
+                        let length = textView.string.count
+                        textView.setSelectedRange(NSRange(location: length, length: 0))
+                    }
+                }
+                
+                return .handled
+            }
+            return .ignored
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willCloseNotification)) { notification in
+            // ウィンドウが閉じられたときに表示上限をリセットしてメモリを解放
+            // 右クリックメニューなどが閉じられた時にも発火してしまうため、識別子を確認する
+            if let window = notification.object as? NSWindow, window.identifier?.rawValue == "HistoryWindow" {
+                displayLimit = 100
+                performUpdate(isBackground: true)
+            }
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
         .onChange(of: searchText) { _, _ in
@@ -233,26 +415,31 @@ struct HistoryWindowView: View {
         .onChange(of: clipboardManager.historySelectedFilter) { _, _ in performUpdate() }
         .onChange(of: clipboardManager.historySelectedSort) { _, _ in performUpdate() }
         .onChange(of: clipboardManager.historySelectedApp) { _, _ in performUpdate() }
+        .onChange(of: clipboardManager.pinnedItemID) { _, _ in performUpdate(isBackground: true) }
         .onChange(of: frontmostAppMonitor.frontmostAppBundleIdentifier) { _, _ in
             if clipboardManager.historySelectedApp == "auto_filter_mode" {
                 performUpdate()
             }
         }
-        .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isIncrementalUpdate: true) }
-        .onChange(of: clipboardManager.filteredHistoryForShortcuts) { _, newValue in
-            if reduceMotion {
-                filteredHistory = newValue ?? []
-            } else {
-                withAnimation {
-                    filteredHistory = newValue ?? []
-                }
-            }
-        }
+        .onChange(of: clipboardManager.clipboardHistory) { _, _ in performUpdate(isBackground: true) }
         .onAppear {
             clipboardManager.filteredHistoryForShortcuts = []
-            performUpdate()
-            DispatchQueue.main.async {
-                isSearchFieldFocused = true
+            
+            if clipboardManager.isHistoryLoaded {
+                performUpdate(initialDelayMs: 180)
+            } else {
+                isLoading = true
+            }
+            
+            // ウインドウ表示時は必ずリストにフォーカスを当てる
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                isListFocused = true
+            }
+        }
+        .onChange(of: clipboardManager.isHistoryLoaded) { _, loaded in
+            if loaded {
+                performUpdate(initialDelayMs: 180)
             }
         }
         .onDisappear {
@@ -271,8 +458,10 @@ struct HistoryWindowView: View {
         .alert("履歴の削除", isPresented: $showingDeleteConfirmation) {
             Button("削除", role: .destructive) {
                 if let item = itemToDelete {
-                    clipboardManager.deleteItem(id: item.id)
+                    clipboardManager.deleteItem(id: item.id, deleteOnlyThisItem: deleteOnlyThisItem)
+#if DEBUG
                     print("DEBUG: Item deleted.")
+#endif
                     itemToDelete = nil
                     selectedItemID = nil
                 }
@@ -281,18 +470,25 @@ struct HistoryWindowView: View {
                 itemToDelete = nil
             }
         } message: {
-            if let item = itemToDelete, item.filePath != nil {
+            if let item = itemToDelete, let filePath = item.filePath {
                 // ファイルパスがある場合
-                Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。")
+                if deleteOnlyThisItem {
+                    let hasOtherItems = clipboardManager.clipboardHistory.contains(where: { $0.filePath == filePath && $0.id != item.id })
+                    if hasOtherItems {
+                        Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？履歴からファイルは削除されず、このファイルに関連する他の履歴は影響を受けません。")
+                    } else {
+                        Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？他に関連する履歴がないため、履歴からこのファイルが削除されます。")
+                    }
+                } else {
+                    Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？履歴からファイルが削除され、このファイルに関連する他の履歴も削除されます。")
+                }
             } else {
                 // ファイルパスがない場合（テキストなど）
                 Text("「\(truncateString(itemToDelete?.text, maxLength: 50))」を本当に削除しますか？")
             }
         }
-        .sheet(isPresented: $showQRCodeSheet) {
-            if let item = selectedItemForQRCode {
-                QRCodeView(text: item.text)
-            }
+        .sheet(item: $selectedItemForQRCode) { item in
+            QRCodeView(text: item.text)
         }
         .sheet(item: $itemForNewPhrase) { item in
             AddEditPhraseView(mode: .add, initialContent: item.text, presetManager: presetManager, isSheet: true)

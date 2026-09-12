@@ -63,7 +63,7 @@ struct InfoSettingsView: View {
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         
-                        Text("Copyright ©︎ 2025 今浦大雅")
+                        Text("Copyright ©︎ 2026 今浦大雅")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         

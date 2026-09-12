@@ -1,11 +1,15 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+extension UTType {
+    static let clipholdArchive = UTType(exportedAs: "design.taikun.Clip-Hold.exports")
+}
+
 struct ClipboardHistoryDocument: FileDocument {
     var clipboardItems: [ClipboardItem]
     
-    static var readableContentTypes: [UTType] { [.json] }
-    static var writableContentTypes: [UTType] { [.json] }
+    static var readableContentTypes: [UTType] { [.json, .clipholdArchive] }
+    static var writableContentTypes: [UTType] { [.json, .clipholdArchive] }
     
     init(clipboardItems: [ClipboardItem] = []) {
         self.clipboardItems = clipboardItems

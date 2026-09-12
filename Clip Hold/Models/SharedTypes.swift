@@ -318,6 +318,8 @@ enum DataSizeAlertOption: Hashable, Identifiable, CaseIterable {
     }
     
     static let presets: [DataSizeAlertOption] = [
+        .preset(100, .megabytes),
+        .preset(500, .megabytes),
         .preset(1, .gigabytes),
         .preset(2, .gigabytes),
         .preset(5, .gigabytes),
@@ -367,6 +369,25 @@ enum ItemFilter: String, CaseIterable, Identifiable {
     case textPlain
     case textRich
     case linkOnly
+    case codeAll
+    case codeSwift
+    case codeJavaScript
+    case codePython
+    case codeHTML
+    case codeCSS
+    case codeJSON
+    case codeYAML
+    case codeTOML
+    case codeMarkdown
+    case codeGraphQL
+    case codeEnv
+    case codeRust
+    case codeGo
+    case codeCPP
+    case codeJavaKotlin
+    case codeSQL
+    case codeShell
+    case codeOther
     case folderOnly
     case fileOnly
     case imageOnly
@@ -384,6 +405,25 @@ enum ItemFilter: String, CaseIterable, Identifiable {
         case .textPlain: return "標準テキストのみ"
         case .textRich: return "リッチテキストのみ"
         case .linkOnly: return "リンクのみ"
+        case .codeAll: return "すべてのコード"
+        case .codeSwift: return "Swift"
+        case .codeJavaScript: return "JavaScript / TypeScript"
+        case .codePython: return "Python"
+        case .codeHTML: return "HTML / XML"
+        case .codeCSS: return "CSS"
+        case .codeJSON: return "JSON"
+        case .codeYAML: return "YAML"
+        case .codeTOML: return "TOML"
+        case .codeMarkdown: return "Markdown"
+        case .codeGraphQL: return "GraphQL"
+        case .codeEnv: return "環境変数 (.env)"
+        case .codeRust: return "Rust"
+        case .codeGo: return "Go"
+        case .codeCPP: return "C / C++"
+        case .codeJavaKotlin: return "Java / Kotlin"
+        case .codeSQL: return "SQL"
+        case .codeShell: return "シェルスクリプト"
+        case .codeOther: return "その他のコード"
         case .folderOnly: return "フォルダのみ"
         case .fileOnly: return "ファイルのみ"
         case .imageOnly: return "画像のみ"

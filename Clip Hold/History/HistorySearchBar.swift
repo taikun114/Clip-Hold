@@ -17,18 +17,6 @@ struct HistorySearchBar: View {
     // カラーコードフィルタリング設定のバインディング
     @AppStorage("enableColorCodeFilter") var enableColorCodeFilter: Bool = false
     
-    private func resizedAppIcon(for path: String) -> NSImage {
-        let originalIcon = NSWorkspace.shared.icon(forFile: path)
-        let resizedIcon = NSImage(size: CGSize(width: 16, height: 16))
-        resizedIcon.lockFocus()
-        originalIcon.draw(in: NSRect(origin: .zero, size: CGSize(width: 16, height: 16)),
-                          from: NSRect(origin: .zero, size: originalIcon.size),
-                          operation: .sourceOver,
-                          fraction: 1.0)
-        resizedIcon.unlockFocus()
-        return resizedIcon
-    }
-    
     @ViewBuilder
     private var appPickerLabel: some View {
         if let selectedAppPath = selectedApp {
@@ -39,7 +27,11 @@ struct HistorySearchBar: View {
                     Label {
                         Text(appName)
                     } icon: {
-                        Image(nsImage: resizedAppIcon(for: selectedAppPath))
+                        if let icon = clipboardManager.getResizedAppIcon(for: selectedAppPath) {
+                            Image(nsImage: icon)
+                        } else {
+                            Image(systemName: "app")
+                        }
                     }
                 } else {
                     Label {
@@ -58,95 +50,90 @@ struct HistorySearchBar: View {
     
     var body: some View {
         HStack {
-            TextField(
-                "履歴を検索",
-                text: $searchText
-            )
-            .textFieldStyle(.plain)
-            .font(.title3)
-            .padding(.vertical, 8)
-            .padding(.leading, 30)
-            .padding(.trailing, 10)
-            .background(Color.primary.opacity(colorSchemeContrast == .increased ? 0.05 : 0.1))
-            .cornerRadius(10)
-            .controlSize(.large)
-            .focused($isSearchFieldFocused)
-            .overlay(
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.secondary)
-                        .padding(.leading, 8)
-                        .offset(y: -1.0)
-                    Spacer()
-                    if !searchText.isEmpty {
-                        Button(action: {
-                            searchText = ""
-                        }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(.secondary)
-                        }
-                        .buttonStyle(BorderlessButtonStyle())
-                        .padding(.trailing, 8)
-                    }
-                }
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.primary, lineWidth: 1)
-                    .opacity(colorSchemeContrast == .increased ? 1 : 0)
+            SharedSearchField(
+                placeholder: "履歴を検索",
+                searchText: $searchText,
+                isSearchFieldFocused: $isSearchFieldFocused
             )
             // フィルターボタン
             Menu {
                 Picker("フィルター", selection: $selectedFilter) {
                     // 「すべての項目」を最初に表示
-                    Label(ItemFilter.all.displayName, systemImage: "list.clipboard").tag(ItemFilter.all)
+                    Label(ItemFilter.all.displayName, systemImage: "list.clipboard").forceIconOnMacOS27().tag(ItemFilter.all)
                     
                     // テキストピッカーを「すべての項目」の下に配置
                     Picker(selection: $selectedFilter) {
-                        Label(ItemFilter.textAll.displayName, systemImage: "textformat").tag(ItemFilter.textAll)
+                        Label(ItemFilter.textAll.displayName, systemImage: "textformat").forceIconOnMacOS27().tag(ItemFilter.textAll)
                         Divider()
                         if #available(macOS 15.0, *) {
-                            Label(ItemFilter.textPlain.displayName, systemImage: "text.page").tag(ItemFilter.textPlain)
+                            Label(ItemFilter.textPlain.displayName, systemImage: "text.page").forceIconOnMacOS27().tag(ItemFilter.textPlain)
                         } else {
-                            Label(ItemFilter.textPlain.displayName, systemImage: "doc.plaintext").tag(ItemFilter.textPlain)
+                            Label(ItemFilter.textPlain.displayName, systemImage: "doc.plaintext").forceIconOnMacOS27().tag(ItemFilter.textPlain)
                         }
                         if #available(macOS 15.0, *) {
-                            Label(ItemFilter.textRich.displayName, systemImage: "richtext.page").tag(ItemFilter.textRich)
+                            Label(ItemFilter.textRich.displayName, systemImage: "richtext.page").forceIconOnMacOS27().tag(ItemFilter.textRich)
                         } else {
-                            Label(ItemFilter.textRich.displayName, systemImage: "doc.richtext").tag(ItemFilter.textRich)
+                            Label(ItemFilter.textRich.displayName, systemImage: "doc.richtext").forceIconOnMacOS27().tag(ItemFilter.textRich)
                         }
-                        Label(ItemFilter.linkOnly.displayName, systemImage: "paperclip").tag(ItemFilter.linkOnly)
+                        Label(ItemFilter.linkOnly.displayName, systemImage: "paperclip").forceIconOnMacOS27().tag(ItemFilter.linkOnly)
                     } label: {
-                        Label("テキストのみ", systemImage: "textformat")
+                        Label("テキストのみ", systemImage: "textformat").forceIconOnMacOS27()
                     }
                     .pickerStyle(.menu)
                     
-                    // ファイルピッカーを「リンクのみ」の下に配置
+                    // コードピッカーを「テキストのみ」の下に配置
+                    Picker(selection: $selectedFilter) {
+                        Label(ItemFilter.codeAll.displayName, systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27().tag(ItemFilter.codeAll)
+                        Divider()
+                        Label(ItemFilter.codeSwift.displayName, systemImage: "swift").forceIconOnMacOS27().tag(ItemFilter.codeSwift)
+                        Label(ItemFilter.codeJavaScript.displayName, systemImage: "curlybraces").forceIconOnMacOS27().tag(ItemFilter.codeJavaScript)
+                        Label(ItemFilter.codePython.displayName, systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27().tag(ItemFilter.codePython)
+                        Label(ItemFilter.codeHTML.displayName, systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27().tag(ItemFilter.codeHTML)
+                        Label(ItemFilter.codeCSS.displayName, systemImage: "paintbrush").forceIconOnMacOS27().tag(ItemFilter.codeCSS)
+                        Label(ItemFilter.codeJSON.displayName, systemImage: "curlybraces.square").forceIconOnMacOS27().tag(ItemFilter.codeJSON)
+                        Label(ItemFilter.codeYAML.displayName, systemImage: "doc.text").forceIconOnMacOS27().tag(ItemFilter.codeYAML)
+                        Label(ItemFilter.codeTOML.displayName, systemImage: "doc.plaintext").forceIconOnMacOS27().tag(ItemFilter.codeTOML)
+                        Label(ItemFilter.codeMarkdown.displayName, systemImage: "text.alignleft").forceIconOnMacOS27().tag(ItemFilter.codeMarkdown)
+                        Label(ItemFilter.codeGraphQL.displayName, systemImage: "circle.grid.cross").forceIconOnMacOS27().tag(ItemFilter.codeGraphQL)
+                        Label(ItemFilter.codeEnv.displayName, systemImage: "slider.horizontal.3").forceIconOnMacOS27().tag(ItemFilter.codeEnv)
+                        Label(ItemFilter.codeRust.displayName, systemImage: "gearshape").forceIconOnMacOS27().tag(ItemFilter.codeRust)
+                        Label(ItemFilter.codeGo.displayName, systemImage: "shippingbox").forceIconOnMacOS27().tag(ItemFilter.codeGo)
+                        Label(ItemFilter.codeCPP.displayName, systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27().tag(ItemFilter.codeCPP)
+                        Label(ItemFilter.codeJavaKotlin.displayName, systemImage: "cup.and.saucer").forceIconOnMacOS27().tag(ItemFilter.codeJavaKotlin)
+                        Label(ItemFilter.codeSQL.displayName, systemImage: "cylinder").forceIconOnMacOS27().tag(ItemFilter.codeSQL)
+                        Label(ItemFilter.codeShell.displayName, systemImage: "terminal").forceIconOnMacOS27().tag(ItemFilter.codeShell)
+                        Label(ItemFilter.codeOther.displayName, systemImage: "ellipsis.curlybraces").forceIconOnMacOS27().tag(ItemFilter.codeOther)
+                    } label: {
+                        Label("コードのみ", systemImage: "chevron.left.forwardslash.chevron.right").forceIconOnMacOS27()
+                    }
+                    .pickerStyle(.menu)
+                    
+                    // ファイルピッカーを「コードのみ」の下に配置
                     Picker(selection: $selectedFilter) {
                         // 「すべてのファイル」を最初に表示
                         if #available(macOS 15.0, *) {
-                            Label("すべてのファイル", systemImage: "document").tag(ItemFilter.fileOnly)
+                            Label("すべてのファイル", systemImage: "document").forceIconOnMacOS27().tag(ItemFilter.fileOnly)
                         } else {
-                            Label("すべてのファイル", systemImage: "doc").tag(ItemFilter.fileOnly)
+                            Label("すべてのファイル", systemImage: "doc").forceIconOnMacOS27().tag(ItemFilter.fileOnly)
                         }
                         Divider()
-                        Label(ItemFilter.imageOnly.displayName, systemImage: "photo").tag(ItemFilter.imageOnly)
-                        Label(ItemFilter.videoOnly.displayName, systemImage: "movieclapper").tag(ItemFilter.videoOnly)
-                        Label(ItemFilter.pdfOnly.displayName, systemImage: "text.document").tag(ItemFilter.pdfOnly)
-                        Label(ItemFilter.folderOnly.displayName, systemImage: "folder").tag(ItemFilter.folderOnly)
-                        Label(ItemFilter.otherFiles.displayName, systemImage: "document.badge.ellipsis").tag(ItemFilter.otherFiles)
+                        Label(ItemFilter.imageOnly.displayName, systemImage: "photo").forceIconOnMacOS27().tag(ItemFilter.imageOnly)
+                        Label(ItemFilter.videoOnly.displayName, systemImage: "movieclapper").forceIconOnMacOS27().tag(ItemFilter.videoOnly)
+                        Label(ItemFilter.pdfOnly.displayName, systemImage: "text.document").forceIconOnMacOS27().tag(ItemFilter.pdfOnly)
+                        Label(ItemFilter.folderOnly.displayName, systemImage: "folder").forceIconOnMacOS27().tag(ItemFilter.folderOnly)
+                        Label(ItemFilter.otherFiles.displayName, systemImage: "document.badge.ellipsis").forceIconOnMacOS27().tag(ItemFilter.otherFiles)
                     } label: {
                         if #available(macOS 15.0, *) {
-                            Label("ファイルのみ", systemImage: "document")
+                            Label("ファイルのみ", systemImage: "document").forceIconOnMacOS27()
                         } else {
-                            Label("ファイルのみ", systemImage: "doc")
+                            Label("ファイルのみ", systemImage: "doc").forceIconOnMacOS27()
                         }
                     }
                     .pickerStyle(.menu)
                     
                     // カラーコードフィルターをファイルピッカーの下に配置
                     if enableColorCodeFilter {
-                        Label(ItemFilter.colorCodeOnly.displayName, systemImage: "paintpalette").tag(ItemFilter.colorCodeOnly)
+                        Label(ItemFilter.colorCodeOnly.displayName, systemImage: "paintpalette").forceIconOnMacOS27().tag(ItemFilter.colorCodeOnly)
                     }
                     
                     if !clipboardManager.appUsageHistory.isEmpty {
@@ -160,7 +147,11 @@ struct HistorySearchBar: View {
                                     Text(localizedName)
                                 } icon: {
                                     if FileManager.default.fileExists(atPath: path) {
-                                        Image(nsImage: resizedAppIcon(for: path))
+                                        if let icon = clipboardManager.getResizedAppIcon(for: path) {
+                                            Image(nsImage: icon)
+                                        } else {
+                                            Image(systemName: "app")
+                                        }
                                     } else {
                                         Image(systemName: "questionmark.app")
                                     }
@@ -175,6 +166,16 @@ struct HistorySearchBar: View {
                     }
                 }
                 .pickerStyle(.inline)
+                
+                if selectedFilter != .all || selectedApp != nil {
+                    Divider()
+                    Button {
+                        selectedFilter = .all
+                        selectedApp = nil
+                    } label: {
+                        Label("すべてのフィルターを解除", systemImage: "xmark.circle")
+                    }
+                }
             } label: {
                 Image(systemName: "line.3.horizontal.decrease")
                     .tint(selectedFilter != .all || selectedApp != nil ? .accentColor : .secondary)

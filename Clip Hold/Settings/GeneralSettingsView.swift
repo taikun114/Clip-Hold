@@ -15,7 +15,9 @@ class LoginItemManager: ObservableObject {
         // 初期化時に現在のログイン項目の状態を読み込む
         // SMAppService.mainApp.status は現在の登録状態を返します
         self.launchAtLogin = SMAppService.mainApp.status == .enabled
+#if DEBUG
         print("DEBUG: LoginItemManager init() - Initial login item status: \(self.launchAtLogin ? "Enabled" : "Disabled")")
+#endif
     }
     
     private func updateLoginItemStatus(_ enable: Bool) {
@@ -23,11 +25,13 @@ class LoginItemManager: ObservableObject {
             // ログイン項目として登録する
             do {
                 try SMAppService.mainApp.register() //
+#if DEBUG
                 print("DEBUG: App registered as login item.")
+#endif
             } catch {
                 print("ERROR: Failed to register app as login item: \(error.localizedDescription)")
                 // 登録に失敗した場合、UIの状態を元に戻すか、ユーザーに通知する
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.launchAtLogin = false // UIを元の状態に戻す
                 }
             }
@@ -35,11 +39,13 @@ class LoginItemManager: ObservableObject {
             // ログイン項目から登録解除する
             do {
                 try SMAppService.mainApp.unregister() //
+#if DEBUG
                 print("DEBUG: App unregistered from login items.")
+#endif
             } catch {
                 print("ERROR: Failed to unregister app from login items: \(error.localizedDescription)")
                 // 登録解除に失敗した場合、UIの状態を元に戻すか、ユーザーに通知する
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.launchAtLogin = true // UIを元の状態に戻す
                 }
             }
@@ -49,13 +55,17 @@ class LoginItemManager: ObservableObject {
     // ログイン項目の状態を強制的に更新し、UIに反映させるメソッド
     // アプリがフォアグラウンドになった時などに呼び出すと良い
     func refreshLoginItemStatus() {
-        DispatchQueue.main.async {
+        Task { @MainActor in
             let newStatus = SMAppService.mainApp.status == .enabled
             if self.launchAtLogin != newStatus {
                 self.launchAtLogin = newStatus
+#if DEBUG
                 print("DEBUG: Refreshed login item status: \(self.launchAtLogin ? "Enabled" : "Disabled")")
+#endif
             } else {
+#if DEBUG
                 print("DEBUG: Login item status unchanged during refresh.")
+#endif
             }
         }
     }
@@ -71,8 +81,6 @@ struct GeneralSettingsView: View {
     @EnvironmentObject var dateReloader: DateReloader
     
     @AppStorage("dateDisplayFormatInMenu") var dateDisplayFormatInMenu: String = "absolute"
-    @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
-    
     @AppStorage("maxHistoryInMenu") var maxHistoryInMenu: Int = 10
     @State private var tempSelectedMenuOption: MenuHistoryOption
     @State private var initialMenuOption: MenuHistoryOption
@@ -80,32 +88,24 @@ struct GeneralSettingsView: View {
     @AppStorage("maxPhrasesInMenu") var maxPhrasesInMenu: Int = 5
     @State private var tempSelectedPhraseMenuOption: HistoryOption
     @State private var initialPhraseMenuOption: HistoryOption
-    
-    @AppStorage("hideNumbersInHistoryWindow") var hideNumbersInHistoryWindow: Bool = false
-    @AppStorage("closeWindowOnDoubleClickInHistoryWindow") var closeWindowOnDoubleClickInHistoryWindow: Bool = false
-    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
-    @AppStorage("scrollToTopOnUpdate") var scrollToTopOnUpdate: Bool = true
-    @AppStorage("showAppIconOverlay") var showAppIconOverlay: Bool = true
-    
-    @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbersInStandardPhrasesWindow: Bool = false
-    @AppStorage("preventStandardPhraseWindowCloseOnDoubleClick") var preventStandardPhraseWindowCloseOnDoubleClick: Bool = false
-    @AppStorage("historyWindowAlwaysOnTop") var historyWindowAlwaysOnTop: Bool = false
-    @AppStorage("historyWindowIsOverlay") var historyWindowIsOverlay: Bool = false
-    @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
-    @AppStorage("standardPhraseWindowIsOverlay") var standardPhraseWindowIsOverlay: Bool = false
-    @AppStorage("historyWindowOverlayTransparency") var historyWindowOverlayTransparency: Double = 0.5
-    @AppStorage("standardPhraseWindowOverlayTransparency") var standardPhraseWindowOverlayTransparency: Double = 0.5
-    @AppStorage("excludeClipHoldWindowsFromAutoFilter") var excludeClipHoldWindowsFromAutoFilter: Bool = false
-    
     @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
     @AppStorage("textOnlyQuickPaste") var textOnlyQuickPaste: Bool = false
     
+    @AppStorage("isQuickOverlayShortcutEnabled") var isQuickOverlayShortcutEnabled: Bool = false
+    @AppStorage("quickOverlayShortcutDelay") var quickOverlayShortcutDelay: Double = 0.0
+    @AppStorage("quickOverlayShortcutPosition") var quickOverlayShortcutPosition: String = "cursor"
+    @AppStorage("dateDisplayFormatInQuickOverlay") var dateDisplayFormatInQuickOverlay: String = "both_rel_abs_paren"
+    
+    @AppStorage("showCurrentPresetIcon") var showCurrentPresetIcon: Bool = false
     @AppStorage("hideMenuBarExtra") var hideMenuBarExtra: Bool = true
     
     @State private var showingCustomMenuHistorySheet = false
     @State private var showingCustomPhraseMenuSheet = false
     @State private var customPhraseValueWasSaved = false
     @State private var customHistoryValueWasSaved = false
+    @State private var showingQuickOverlayTutorial = false
+    @State private var showingScreenEdgeSettings = false
     
     @State private var tempCustomMenuHistoryValue: Int = 10
     @State private var tempCustomPhrasesInMenuValue: Int = 5
@@ -114,9 +114,10 @@ struct GeneralSettingsView: View {
         let savedMaxHistoryInMenu = UserDefaults.standard.integer(forKey: "maxHistoryInMenu")
         let savedMaxPhrasesInMenu = UserDefaults.standard.integer(forKey: "maxPhrasesInMenu")
         
+#if DEBUG
         // DEBUG print for initial values from UserDefaults (accessing AppStorage directly here is fine)
         print("DEBUG: init() - savedMaxHistoryInMenu: \(savedMaxHistoryInMenu)")
-        
+#endif
         
         // MARK: - ローカル変数を宣言し、それらの値を決定するロジック
         // tempSelectedMenuOption の値を決定
@@ -137,7 +138,9 @@ struct GeneralSettingsView: View {
             determinedTempSelectedMenuOption = .custom(savedMaxHistoryInMenu)
             determinedTempCustomMenuHistoryValue = savedMaxHistoryInMenu
         }
+#if DEBUG
         print("DEBUG: init() - determinedTempSelectedMenuOption after logic: \(determinedTempSelectedMenuOption)") // ローカル変数をプリント
+#endif
         
         // tempSelectedPhraseMenuOption の値を決定
         let determinedTempSelectedPhraseMenuOption: HistoryOption
@@ -172,8 +175,8 @@ struct GeneralSettingsView: View {
     
     var body: some View {
         Form {
-            // MARK: - Clip Holdの設定
-            Section(header: Text("Clip Holdの設定").font(.headline)) {
+            // MARK: - 基本
+            Section(header: Text("基本").font(.headline)) {
                 HStack {
                     VStack(alignment: .leading) {
                         Text("ログイン時に開く")
@@ -190,44 +193,7 @@ struct GeneralSettingsView: View {
                     .labelsHidden()
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("クイックペースト")
-                        Text("定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $quickPaste) {
-                        Text("クイックペースト")
-                        Text("オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("クイックペーストをテキストに限定")
-                            .foregroundStyle(quickPaste ? .primary : .secondary)
-                        Text("履歴項目がテキストである場合のみクイックペーストを行うようにします。")
-                            .font(.caption)
-                            .foregroundStyle(quickPaste ? .secondary : .tertiary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $textOnlyQuickPaste) {
-                        Text("クイックペーストをテキストに限定")
-                        Text("オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                    // quickPasteがオフの時にグレイアウトする
-                    .disabled(!quickPaste)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            } // End of Section: Clip Holdの設定
+            } // End of Section: 基本
             
             // MARK: - メニュー
             Section(header: Text("メニュー").font(.headline)) {
@@ -327,50 +293,24 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
 
                 // 日付と時刻の表示方法
+                DateDisplayFormatPickerRow(selection: $dateDisplayFormatInMenu)
+                
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("日付と時刻の表示方法")
-                        
-                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
-                        let exampleText: String = {
-                            let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
-                            let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
-                            
-                            switch dateDisplayFormatInMenu {
-                            case "absolute":
-                                return absolutePart
-                            case "relative":
-                                return relativePart
-                            case "both_abs_rel_paren":
-                                return "\(absolutePart) (\(relativePart))"
-                            case "both_abs_rel_hyphen":
-                                return "\(absolutePart) - \(relativePart)"
-                            case "both_rel_abs_paren":
-                                return "\(relativePart) (\(absolutePart))"
-                            case "both_rel_abs_hyphen":
-                                return "\(relativePart) - \(absolutePart)"
-                            default:
-                                return absolutePart
-                            }
-                        }()
-                        
-                        Text("コピーされた日付の表示方法を変更します。\n例: \(exampleText)")
+                        Text("現在のプリセットアイコンを表示する")
+                        Text("メニューバーに、Clip Holdアイコンの代わりに現在選択されているプリセットのアイコンを表示します。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInMenu) {
-                        Text("絶対的").tag("absolute")
-                        Text("相対的").tag("relative")
-                        Text("両方: 絶対的 (相対的)").tag("both_abs_rel_paren")
-                        Text("両方: 絶対的 - 相対的").tag("both_abs_rel_hyphen")
-                        Text("両方: 相対的 (絶対的)").tag("both_rel_abs_paren")
-                        Text("両方: 相対的 - 絶対的").tag("both_rel_abs_hyphen")
+                    Toggle(isOn: $showCurrentPresetIcon) {
+                        Text("現在のプリセットアイコンを表示する")
+                        Text("メニューバーに、Clip Holdアイコンの代わりに現在選択されているプリセットのアイコンを表示します。")
                     }
+                    .toggleStyle(.switch)
                     .labelsHidden()
-                    .pickerStyle(.menu)
                 }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
                 HStack {
                     VStack(alignment: .leading) {
@@ -390,74 +330,19 @@ struct GeneralSettingsView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             } // End of Section: メニュー
             
-            // MARK: - 定型文ウィンドウ
-            Section(header: Text("定型文ウィンドウ").font(.headline)) {
+            // MARK: - クイックペースト
+            Section(header: Text("クイックペースト").font(.headline)) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("常に最前面に表示")
-                        Text("ウィンドウを常に最も手前に表示します。")
+                        Text("クイックペースト")
+                        Text("定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Toggle(isOn: $standardPhraseWindowAlwaysOnTop) {
-                        Text("定型文ウィンドウを常に最前面に表示")
-                        Text("オンにすると、定型文ウィンドウを常に最も手前に表示します。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("オーバーレイ表示")
-                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $standardPhraseWindowIsOverlay) {
-                        Text("オーバーレイ表示")
-                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    Text("オーバーレイ時の透明度")
-                        .foregroundStyle(standardPhraseWindowIsOverlay ? .primary : .secondary)
-                    Spacer()
-                    HStack {
-                        Slider(
-                            value: .init(
-                                get: {
-                                    return 100 - (standardPhraseWindowOverlayTransparency * 100)
-                                },
-                                set: { sliderValue in
-                                    standardPhraseWindowOverlayTransparency = (100 - sliderValue) / 100
-                                }
-                            ),
-                            in: 20...80,
-                            step: 10
-                        )
-                        Text("\(Int(round((1 - standardPhraseWindowOverlayTransparency) * 100)))%")
-                            .foregroundStyle(standardPhraseWindowIsOverlay ? .secondary : .tertiary)
-                    }
-                }
-                .disabled(!standardPhraseWindowIsOverlay)
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("番号を隠す")
-                        Text("各項目に表示される番号を非表示にします。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $hideNumbersInStandardPhrasesWindow) {
-                        Text("定型文ウィンドウの番号を隠す")
-                        Text("オンにすると、定型文ウィンドウの各項目に表示される番号を非表示にします。")
+                    Toggle(isOn: $quickPaste) {
+                        Text("クイックペースト")
+                        Text("オンにすると、定型文またはコピー履歴をメニューから選択したとき、またはショートカットキーでコピーしたときに、Command + Vキー操作を送信します。アクセシビリティの許可が必要です。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -466,166 +351,71 @@ struct GeneralSettingsView: View {
                 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("ダブルクリックでウィンドウを閉じる")
-                        Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                        Text("テキストに限定")
+                            .foregroundStyle(quickPaste ? .primary : .secondary)
+                        Text("履歴項目がテキストである場合のみクイックペーストを行うようにします。")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(quickPaste ? .secondary : .tertiary)
                     }
                     Spacer()
-                    Toggle(isOn: $closeWindowOnDoubleClickInStandardPhrasesWindow) {
-                        Text("ダブルクリックで定型文ウィンドウを閉じる")
-                        Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                    Toggle(isOn: $textOnlyQuickPaste) {
+                        Text("テキストに限定")
+                        Text("オンにすると、履歴項目がテキストである場合のみクイックペーストを行うようにします。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
+                    // quickPasteがオフの時にグレイアウトする
+                    .disabled(!quickPaste)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            } // End of Section: 定型文ウィンドウ
+                
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("直前のテキストフィールドにクイックペースト")
+                            .foregroundStyle(quickPaste ? .primary : .secondary)
+                        Text("履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。このオプションをオンにすると、新規コピーや変更してコピー機能でもクイックペーストが利用可能になります。アクセシビリティの許可が必要です。")
+                            .font(.caption)
+                            .foregroundStyle(quickPaste ? .secondary : .tertiary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $quickPasteToPreviousApp) {
+                        Text("直前のテキストフィールドにクイックペースト")
+                        Text("オンにすると、履歴と定型文ウィンドウからコピーしたときに、直前まで選択されていたテキストフィールドがあるアプリにフォーカスを戻してクイックペーストを実行します。このオプションをオンにすると、新規コピーや変更してコピー機能でもクイックペーストが利用可能になります。アクセシビリティの許可が必要です。")
+                    }
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                    .disabled(!quickPaste)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+            } // End of Section: クイックペースト
             
-            // MARK: - 履歴をウィンドウ
-            Section(header: Text("履歴ウィンドウ").font(.headline)) {
+            // MARK: - クイックオーバーレイ
+            Section(
+                header: Text("クイックオーバーレイ").font(.headline),
+                footer: HStack {
+                    Spacer()
+                    Button("スクリーンエッジ...") {
+                        showingScreenEdgeSettings = true
+                    }
+                    .offset(x: tutorialButtonOffset)
+                    
+                    Button("クイックオーバーレイの使い方...") {
+                        showingQuickOverlayTutorial = true
+                    }
+                    .offset(x: tutorialButtonOffset)
+                }
+            ) {
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("常に最前面に表示")
-                        Text("ウィンドウを常に最も手前に表示します。")
+                        Text("ショートカットキーで表示")
+                        Text("設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Toggle(isOn: $historyWindowAlwaysOnTop) {
-                        Text("履歴ウィンドウを常に最前面に表示")
-                        Text("オンにすると、履歴ウィンドウを常に最も手前に表示します。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("オーバーレイ表示")
-                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $historyWindowIsOverlay) {
-                        Text("オーバーレイ表示")
-                        Text("フォーカスが当たっていない時は、ウィンドウを半透明にします。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    Text("オーバーレイ時の透明度")
-                        .foregroundStyle(historyWindowIsOverlay ? .primary : .secondary)
-                    Spacer()
-                    HStack {
-                        Slider(
-                            value: .init(
-                                get: {
-                                    return 100 - (historyWindowOverlayTransparency * 100)
-                                },
-                                set: { sliderValue in
-                                    historyWindowOverlayTransparency = (100 - sliderValue) / 100
-                                }
-                            ),
-                            in: 20...80,
-                            step: 10
-                        )
-                        Text("\(Int(round((1 - historyWindowOverlayTransparency) * 100)))%")
-                            .foregroundStyle(historyWindowIsOverlay ? .secondary : .tertiary)
-                    }
-                }
-                .disabled(!historyWindowIsOverlay)
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("アプリアイコンを表示")
-                        Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $showAppIconOverlay) {
-                        Text("アプリアイコンを表示")
-                        Text("コピーしたときに最前面にあったアプリアイコンを各項目に表示します。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("日付と時刻の表示方法")
-                        
-                        let fiveMinutesAgo = Calendar.current.date(byAdding: .minute, value: -5, to: dateReloader.now)!
-                        let exampleText: String = {
-                            let absolutePart = fiveMinutesAgo.formattedAsAbsolute()
-                            let relativePart = RelativeDateTimeFormatter().localizedString(for: fiveMinutesAgo, relativeTo: dateReloader.now)
-                            
-                            switch dateDisplayFormatInHistoryWindow {
-                            case "absolute":
-                                return absolutePart
-                            case "relative":
-                                return relativePart
-                            case "both_abs_rel_paren":
-                                return "\(absolutePart) (\(relativePart))"
-                            case "both_abs_rel_hyphen":
-                                return "\(absolutePart) - \(relativePart)"
-                            case "both_rel_abs_paren":
-                                return "\(relativePart) (\(absolutePart))"
-                            case "both_rel_abs_hyphen":
-                                return "\(relativePart) - \(absolutePart)"
-                            default:
-                                return absolutePart
-                            }
-                        }()
-                        
-                        Text("コピーされた日付の表示方法を変更します。\n例: \(exampleText)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Picker("日付と時刻の表示方法", selection: $dateDisplayFormatInHistoryWindow) {
-                        Text("絶対的").tag("absolute")
-                        Text("相対的").tag("relative")
-                        Text("両方: 絶対的 (相対的)").tag("both_abs_rel_paren")
-                        Text("両方: 絶対的 - 相対的").tag("both_abs_rel_hyphen")
-                        Text("両方: 相対的 (絶対的)").tag("both_rel_abs_paren")
-                        Text("両方: 相対的 - 絶対的").tag("both_rel_abs_hyphen")
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("自動スクロール")
-                        Text("リストが更新されたとき、リストを自動的に最も上にスクロールします。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $scrollToTopOnUpdate) {
-                        Text("自動スクロール")
-                        Text("オンにすると、リストが更新されたとき、履歴リストを自動的に最も上にスクロールします。")
-                    }
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text("番号を隠す")
-                        Text("各項目に表示される番号を非表示にします。")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Toggle(isOn: $hideNumbersInHistoryWindow) {
-                        Text("履歴ウィンドウの番号を隠す")
-                        Text("オンにすると、履歴ウィンドウの各項目に表示される番号を非表示にします。")
+                    Toggle(isOn: $isQuickOverlayShortcutEnabled) {
+                        Text("ショートカットキーで表示")
+                        Text("オンにすると、設定されたショートカットキーを押し続けている間だけオーバーレイが表示され、コピーしたい項目にポインタを合わせてショートカットキーを離すことで簡単にコピーできます。この機能はVoiceOverでの操作に最適化されていないため、VoiceOverをご利用の方は、クイックオーバーレイの代わりに履歴ウィンドウや定型文ウィンドウをご利用ください。")
                     }
                     .toggleStyle(.switch)
                     .labelsHidden()
@@ -634,37 +424,65 @@ struct GeneralSettingsView: View {
                 
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("ダブルクリックでウィンドウを閉じる")
-                        Text("項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                        Text("表示までの時間")
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .primary : .secondary)
+                        Text("クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
                     }
                     Spacer()
-                    Toggle(isOn: $closeWindowOnDoubleClickInHistoryWindow) {
-                        Text("ダブルクリックで履歴ウィンドウを閉じる")
-                        Text("オンにすると、項目をダブルクリックしてコピーしたときにウィンドウを閉じるようにします。")
+                    Slider(value: $quickOverlayShortcutDelay, in: 0.0...2.0, step: 0.1) {
+                        Text("表示までの時間")
+                        Text("クイックオーバーレイが表示されるまでショートカットキーを押し続ける時間を指定します。")
                     }
-                    .toggleStyle(.switch)
+                    .frame(width: 150)
                     .labelsHidden()
+                    .disabled(!isQuickOverlayShortcutEnabled)
+                    
+                    Text("\(quickOverlayShortcutDelay, specifier: "%.1f")秒")
+                        .frame(width: 40, alignment: .trailing)
+                        .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("アプリの「自動」フィルタリングでClip Holdのウィンドウを除外")
-                        Text("アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。")
+                        Text("表示場所")
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .primary : .secondary)
+                        Text("クイックオーバーレイが表示される画面上の場所を選択します。")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(isQuickOverlayShortcutEnabled ? .secondary : .tertiary)
                     }
                     Spacer()
-                    Toggle(isOn: $excludeClipHoldWindowsFromAutoFilter) {
-                        Text("アプリの「自動」フィルタリングでClip Holdのウィンドウを除外")
-                        Text("アプリの「自動」フィルタリングが有効な状態でClip Holdのウィンドウ（履歴ウィンドウなど）をフォーカスしたときに、フィルタリングするアプリが切り替わらないようにします。")
+                    Picker("クイックオーバーレイの表示場所", selection: $quickOverlayShortcutPosition) {
+                        Label("ポインタ付近", systemImage: "contextualmenu.and.cursorarrow").tag("cursor")
+                        
+                        Divider()
+                        
+                        if #available(macOS 15.0, *) {
+                            Label("中央", systemImage: "inset.filled.center.rectangle").tag("center")
+                        } else {
+                            Label("中央", systemImage: "rectangle.center.inset.filled").tag("center")
+                        }
+                        Label("上", systemImage: "arrow.up").tag("top")
+                        Label("右上", systemImage: "arrow.up.right").tag("topRight")
+                        Label("右", systemImage: "arrow.right").tag("right")
+                        Label("右下", systemImage: "arrow.down.right").tag("bottomRight")
+                        Label("下", systemImage: "arrow.down").tag("bottom")
+                        Label("左下", systemImage: "arrow.down.left").tag("bottomLeft")
+                        Label("左", systemImage: "arrow.left").tag("left")
+                        Label("左上", systemImage: "arrow.up.left").tag("topLeft")
                     }
-                    .toggleStyle(.switch)
+                    .pickerStyle(.menu)
+                    .labelStyle(.titleAndIcon)
                     .labelsHidden()
+                    .disabled(!isQuickOverlayShortcutEnabled)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-            } // End of Section: 履歴ウィンドウ
+                
+                // 日付と時刻の表示方法
+                DateDisplayFormatPickerRow(selection: $dateDisplayFormatInQuickOverlay)
+            } // End of Section: クイックオーバーレイ
         } // End of Form
         .formStyle(.grouped)
         .onAppear {
@@ -687,7 +505,7 @@ struct GeneralSettingsView: View {
                 title: Text("メニューに表示する履歴の最大数を設定"),
                 description: nil,
                 currentValue: $tempCustomMenuHistoryValue,
-                onSave: { newValue in
+                onSave: { newValue -> Bool in
                     maxHistoryInMenu = newValue
                     customHistoryValueWasSaved = true // 保存されたことをマーク
                     
@@ -698,6 +516,7 @@ struct GeneralSettingsView: View {
                     } else {
                         tempSelectedMenuOption = .custom(newValue)
                     }
+                    return true
                 },
                 onCancel: {
                     // onDismissで処理するため、ここは空で良い
@@ -718,7 +537,7 @@ struct GeneralSettingsView: View {
                 title: Text("メニューに表示する定型文の最大数を設定"),
                 description: nil,
                 currentValue: $tempCustomPhrasesInMenuValue,
-                onSave: { newValue in
+                onSave: { newValue -> Bool in
                     maxPhrasesInMenu = newValue
                     customPhraseValueWasSaved = true // 保存されたことをマーク
                     
@@ -727,15 +546,31 @@ struct GeneralSettingsView: View {
                     } else {
                         tempSelectedPhraseMenuOption = .custom(newValue)
                     }
+                    return true
                 },
                 onCancel: {
                     // onDismissで処理するため、ここは空で良い
                 }
             )
         }
+        .sheet(isPresented: $showingQuickOverlayTutorial) {
+            QuickOverlayTutorialView()
+        }
+        .sheet(isPresented: $showingScreenEdgeSettings) {
+            ScreenEdgeSettingsView()
+        }
+    }
+    
+    private var tutorialButtonOffset: CGFloat {
+        if #available(macOS 26, *) {
+            return 10
+        } else {
+            return 0
+        }
     }
 }
 
 #Preview {
     GeneralSettingsView()
+        .environmentObject(DateReloader.shared)
 }

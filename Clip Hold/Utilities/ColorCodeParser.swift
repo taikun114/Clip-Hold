@@ -5,9 +5,9 @@ struct ColorCodeParser {
     /// カラーコードの正規表現パターン
     private static let hexPattern = #"^#?([A-Fa-f0-9]{3}|[A-Fa-f0-9]{4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"#
     // RGBA形式のパターン (カンマ区切りとスペース区切り、%表記(少数点含む)、アルファ値(%表記含む)に対応)
-    private static let rgbaPattern = #"^rgba?\(\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*(?:[, /]\s*(?:(0|1|0?\.\d+)|(\d{1,3}(?:\.\d+)?)%?)\s*)?\)$"#
+    private static let rgbaPattern = #"^rgba?\(\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*(?:[, /]\s*(?:(0|1|0?\.\d+)|(\d{1,3}(?:\.\d+)?)%)\s*)?\)$"#
     // HSLA形式のパターン (カンマ区切りとスペース区切り、deg/turn表記、%省略、アルファ値(%表記含む)に対応)
-    private static let hslaPattern = #"^hsla?\(\s*(\d{1,3}(?:\.\d+)?)((?:deg)|(?:turn))?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*(?:[, /]\s*(?:(0|1|0?\.\d+)|(\d{1,3}(?:\.\d+)?)%?)\s*)?\)$"#
+    private static let hslaPattern = #"^hsla?\(\s*(\d{1,3}(?:\.\d+)?)((?:deg)|(?:turn))?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*(?:[, /]\s*(?:(0|1|0?\.\d+)|(\d{1,3}(?:\.\d+)?)%)\s*)?\)$"#
     // RGB形式のパターン (カンマ区切りとスペース区切り、%表記(少数点含む)に対応)
     private static let rgbPattern = #"^rgb\(\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*[, ]\s*(?:(\d{1,3}(?:\.\d+)?)|(\d{1,3}(?:\.\d+)?)%)\s*\)$"#
     // HSL形式のパターン (カンマ区切りとスペース区切り、deg/turn表記、%省略に対応)
@@ -17,7 +17,10 @@ struct ColorCodeParser {
     /// - Parameter text: 解析する文字列
     /// - Returns: 解析されたColorオブジェクト。解析できない場合はnil
     static func parseColor(from text: String) -> Color? {
-        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        // テキストが異常に長い場合、パフォーマンス低下を防ぐために先頭の100文字のみを処理対象とする
+        // (カラーコードは100文字以上になることはないため安全)
+        let processedText = text.count > 100 ? String(text.prefix(100)) : text
+        let trimmedText = processedText.trimmingCharacters(in: .whitespacesAndNewlines)
         
         // HEX形式 (例: #FFFFFF, #FFFFFFFF, FFFFFF, FFFFFFFF)
         if let hexColor = parseHex(trimmedText) {

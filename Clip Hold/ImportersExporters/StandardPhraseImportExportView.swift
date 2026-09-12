@@ -132,8 +132,6 @@ struct StandardPhraseImportExportView: View {
         id?.uuidString == "00000000-0000-0000-0000-000000000000"
     }
     
-    
-    
     var body: some View {
         HStack {
             Text("定型文")
@@ -143,7 +141,7 @@ struct StandardPhraseImportExportView: View {
             } label: {
                 HStack {
                     Image(systemName: "square.and.arrow.down")
-                    Text("インポート")
+                    Text("インポート...")
                 }
             }
             .buttonStyle(.bordered)
@@ -154,7 +152,7 @@ struct StandardPhraseImportExportView: View {
             } label: {
                 HStack {
                     Image(systemName: "square.and.arrow.up")
-                    Text("エクスポート")
+                    Text("エクスポート...")
                 }
             }
             .buttonStyle(.bordered)
@@ -196,9 +194,10 @@ struct StandardPhraseImportExportView: View {
                 .pickerStyle(.menu)
                 .labelsHidden()
                 .labelStyle(.titleAndIcon)
+                .flexiblePickerSizing()
                 
                 Toggle("旧バージョンで使用できるようにする", isOn: $useLegacyFormat)
-                    .help("有効にすると、プリセット情報なしで定型文のみをエクスポートします。")
+                    .help("有効にすると、プリセット情報なしで定型文のみをエクスポートします。Clip Hold 1.2.1またはそれ以前のバージョンに復元するにはチェックを入れる必要があります。")
                 Spacer()
                 
                 HStack {
@@ -230,7 +229,11 @@ struct StandardPhraseImportExportView: View {
         ) { result in
             switch result {
             case .success(let url):
+#if DEBUG
                 print("Export successful: \(url)")
+#else
+                print("Export successful.")
+#endif
             case .failure(let error):
                 print("Export failed: \(error.localizedDescription)")
             }
@@ -290,7 +293,11 @@ struct StandardPhraseImportExportView: View {
                 }
             )
         }
-        .sheet(isPresented: $showingImportConflictSheet) {
+        .sheet(isPresented: $showingImportConflictSheet, onDismiss: {
+            // シートが完全に閉じた後に状態を安全にリセット
+            presetConflicts.removeAll()
+            currentPresetIndexForConflictResolution = 0
+        }) {
             ImportConflictSheet(
                 presetConflicts: $presetConflicts,
                 currentPresetIndex: $currentPresetIndexForConflictResolution
@@ -302,9 +309,6 @@ struct StandardPhraseImportExportView: View {
                         toPresetId: presetConflict.preset.id
                     )
                 }
-                // 状態をリセット
-                presetConflicts.removeAll()
-                currentPresetIndexForConflictResolution = 0
                 
                 restoreSelectionAfterImport()
             }
@@ -344,7 +348,6 @@ struct StandardPhraseImportExportView: View {
     private func restoreSelectionAfterImport() {
         if let presetId = presetIdBeforeImport, presetId.uuidString != "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
             presetManager.selectedPresetId = presetId
-            presetManager.saveSelectedPresetId()
         }
         presetIdBeforeImport = nil
     }

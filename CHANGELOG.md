@@ -2,7 +2,37 @@
 **English** | [日本語](docs/CHANGELOG-ja.md)
 
 <!--
-The order of listing is as follows.
+The order of listing is as follows (for 1.7.0 and later).
+- New Features
+  - General
+  - Copy History
+  - Standard Phrases
+  - History and Standard Phrases Windows
+  - Quick Overlay
+- Bug Fixes and Improvements
+  - General
+  - Copy History
+  - Standard Phrases
+  - History and Standard Phrases Windows
+  - Quick Overlay
+
+Each section is listed in the following order:
+
+- Notable Information
+- Support
+- Additions
+- Fixes
+- Improvements
+- Changes
+- Removals
+
+Notes
+- Make the first level of the list bold
+- Make links bold
+- When linking to Issues, Pull Requests, or Discussions, include the full URL
+
+For 1.6.3 and earlier, it is listed as follows:
+
 - New Features
   - Notable Information
   - Support
@@ -14,12 +44,103 @@ The order of listing is as follows.
   - Additions
   - Removals
 Only for versions 1.5.0 and later. Earlier versions may not follow this order.
-
-Notes
-- Make the first level of the list bold
-- Make links bold
-- When linking to Issues, Pull Requests, or Discussions, include the full URL
 -->
+
+## 1.7.0
+
+> [!NOTE]
+> In this version, to support Spotlight search and code detection, indexing will run in the background when launched after updating. Depending on the number of history items and standard phrases, indexing may take a long time.\
+> A high load may occur until indexing is complete, but this is normal behavior, so please rest assured. You can continue to use Clip Hold features as usual even while indexing is in progress.
+
+### New Features
+#### General
+- **Support for code detection**
+  - The app can now detect whether an item is code. While detection accuracy is not 100%, it is designed to determine code with high precision. If you notice any misclassifications, please send feedback.
+  - The supported code languages are as follows: `Swift`, `JavaScript`, `Python`, `HTML / XML`, `CSS`, `JSON`, `YAML`, `TOML`, `Markdown`, `GraphQL`, `Environment Variables (.env)`, `Rust`, `Go`, `C / C++`, `Java / Kotlin`, `SQL`, `Shell Script`
+- **Support for Spotlight search and Shortcuts actions**
+  - You can search and copy history and standard phrases from Spotlight, or use Shortcuts actions to copy specific history and standard phrases.
+- **Support for importing and exporting history including files**
+  - You can now export all history data, including files and folders saved in the save folder. You can still import history files exported from previous versions.
+- **Add the "Quick Overlay" feature**
+  - Added a Quick Overlay feature that allows you to easily copy history and standard phrases by appearing while holding down a shortcut key or touching the screen edge with the mouse cursor. When displayed while holding down a shortcut key, actions are executed simply by moving the mouse cursor and releasing the shortcut key, designed for effortless operation without having to click.
+  - You can enable Quick Overlay from the "Quick Overlay" section of the General settings. For detailed instructions on how to use it, click the "How to Use Quick Overlay..." button in the "Quick Overlay" section of the General settings.
+- **Add text replacement feature to "Change Item and Copy"**
+  - You can open the text replacement panel by clicking the "Text Replacement" button below the input field in "Change Item and Copy" or by pressing `⌘ (Command)` + `F` to search and replace recurring text or replace patterns using regular expressions.
+- **Add a "Quick Paste to Previous Text Field" option to the General settings**
+  - When this setting is used, when you copy, copy as plain text, or change and copy from the History or Standard Phrase window, the focus is returned to the previously focused app before executing Quick Paste. If you are focused on a text field, you can easily copy and paste into the previous text field.
+  - You can temporarily disable Quick Paste by holding down the `⌥ (Option)` key.
+- **Add "Show Whitespace and Newline Symbols" setting to Developer settings**
+  - When this setting is enabled, half-width spaces, full-width spaces, newlines, and tabs included in history and standard phrases will be displayed faintly with symbols.
+
+#### Copy History
+- **Add the New Copy feature**
+  - By default, you can press `⌥ (Option)` + `⌘ (Command)` + `A` to enter your favorite text and create a new copy. You no longer need to enter it into a note, etc. when you want to copy a specific string.
+- **Add a pin feature to the copy history**
+  - Only one item can be pinned at a time. By default, you can copy or Quick Paste the pinned item by pressing `⌥ (Option)` + `⌘ (Command)` + `P`.
+- **Add a feature to recalculate the total size of the saved folder in the Copy History settings**
+  - The size of all files and folders included in the saved folder is now recalculated to display the correct size.
+
+#### Standard Phrases
+- **Add a "Show Current Preset Icon" option to the "Menu" section of the General settings**
+  - When enabled, the currently selected preset icon will be displayed in the menu bar.
+
+#### History and Standard Phrases Windows
+- **Add a "Show Other History from This App" feature to the History window**
+  - You can now easily filter by app from the context menu of each history item.
+- **Add a "Clear All Filters" button to the filter menu in the History window**
+  - Displayed when any filter is applied, and clicking it will clear all filters.
+
+### Bug Fixes and Improvements
+#### General
+- **Fix issue where the app might crash during Quick Paste**
+- **Fix issue where some sheets were not displayed correctly on macOS Golden Gate**
+- **Fix issue where some history and standard phrase settings were not applied until the app was restarted**
+- **Fix issue where the menu bar icon could become transparent on older macOS versions**
+- **Fix issue where the height of history items became too large when copying text containing only newlines**
+- **Improve settings layout**
+  - The "Standard Phrases Window" section and "History Window" section in the General settings have been moved to the Standard Phrases and Copy History settings, respectively.
+- **Improve icon display on macOS Golden Gate**
+- **Improve the add apps to exclude screen**
+- **Improve the preset picker display on macOS Tahoe or later**
+- **Improve to display currently configured shortcut keys in the menu**
+
+#### Copy History
+- **Fix issue where the app might crash when detecting clipboard changes**
+- **Fix issue where processing stopped while the large file copy alert was displayed**
+  - With native alerts, all processing stopped while the alert was displayed due to OS constraints. To fix this, a custom alert was implemented. As a result, processing no longer stops even when the alert is displayed, and the alert is always displayed in the foreground.
+- **Fix issue where correct thumbnail images were not displayed when copying images from web browsers or other apps**
+- **Improve history addition performance when copying files**
+- **Improve file copying behavior**
+  - A progress bar indicating the progress is now displayed when copying large files, and the duplicate detection system has been enhanced. It is now also possible to cancel the copy midway during large file copies.
+- **Improve folder copying behavior**
+  - The size displayed in the alert when a folder is copied is now calculated correctly, and an alert is now displayed when the added size calculation timeout is exceeded. Furthermore, the progress of the folder copy is now displayed in the history list.
+- **Improve accuracy of detecting the source application of copied items**
+  - A more accurate app is now detected when copying from a background window (e.g., via right-click) while another app is focused. Note that due to system limitations, if you copy text from a context menu on the Clip Hold window (such as in an alert or sheet), another frontmost app will be detected. (Don't worry, copying from the copy history or standard phrases will be recognized correctly.)
+- **Improve to allow toggling clipboard monitoring from the menu**
+- **Improve to show an alert when attempting to change the maximum number of history to save to a value smaller than the currently saved history count**
+- **Change the default of “Size for Copy Alert” to 100 MB**
+  - To prevent the saved folder capacity from unexpectedly expanding, the capacity threshold before displaying the alert has been reduced.
+
+#### Standard Phrases
+- **Fix issue where the app might crash when completing import conflict resolution**
+- **Changes to the preset icon picker package**
+  - Icon names are now displayed, and you can filter by specific categories using the category picker.
+
+#### History and Standard Phrases Windows
+- **Fix issue where copying a history with extremely long text from the History window could cause freezes or increased memory usage**
+- **Fix issue where the copy notification would not disappear when copying from the menu in the Standard Phrase window**
+- **Fix issue where app icons might not display correctly in the filter menu of the History window on macOS Sonoma**
+- **Improve the performance of the History window**
+  - Implemented pagination, limiting the initial display to 100 items and loading additional history items as you scroll.
+- **Improve History window to allow removing only specific file history**
+  - If the history item is a file, you can now remove it from the list without affecting other related history by holding down the `⌥ (Option)` key and clicking "Remove Only This Item..." from the context menu.
+- **Improve the display of History and Standard Phrase windows on macOS Golden Gate**
+- **Improve operability of History and Standard Phrase windows**
+  - When you open the History or Standard Phrase window, the first item is now focused, making it easier to operate with just the keyboard. You can also type directly to search or return focus to the list.
+- **Improve the behavior of the search field in the History and Standard Phrase windows**
+  - Previously, pressing the Escape key closed the window immediately. Now, if there is any text in the search field, pressing Escape once will clear the text, and pressing it a second time will close the window.
+- **Remove "Show App Icons" setting**
+  - Previously, this setting toggled whether to display an app icon on history items. However, since the displayed app icon is very small and the setting added unnecessary complexity, it has been removed (app icons will now always be displayed).
 
 ## 1.6.3
 ### New Features

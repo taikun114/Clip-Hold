@@ -6,31 +6,35 @@ extension ClipboardManager {
     // MARK: - Large File Alert Handling
     // Method to directly display NSAlert
     func presentLargeFileConfirmationAlert() { // private から internal に変更
-        DispatchQueue.main.async { [weak self] in
+        Task { @MainActor [weak self] in
             guard let self = self else { return }
             
-            let alert = NSAlert()
+            // 保留中のファイルが何もない場合はアラートを出さない
+            guard !self.pendingLargeFileItemsWithSize.isEmpty || self.pendingLargeImageData != nil else { return }
             
             // 新しいプロパティがセットされている場合はそれを優先
-            let isMultipleFilesWithSize = self.pendingLargeFileItemsWithSize != nil && (self.pendingLargeFileItemsWithSize?.count ?? 0) > 1
-            // let isSingleFileWithSize = self.pendingLargeFileItemsWithSize != nil && (self.pendingLargeFileItemsWithSize?.count ?? 0) == 1
+            let isMultipleFilesWithSize = self.pendingLargeFileItemsWithSize.count > 1
+            // let isSingleFileWithSize = self.pendingLargeFileItemsWithSize.count == 1
             
             let alertTitle: String
-            if isMultipleFilesWithSize {
+            if self.pendingLargeFileIsTimeout {
+                alertTitle = NSLocalizedString("大容量フォルダの可能性があります", comment: "")
+            } else if isMultipleFilesWithSize {
                 alertTitle = NSLocalizedString("大容量ファイルの複数コピー", comment: "")
             } else {
                 // 単一ファイルまたは古いプロパティを使用する場合
                 alertTitle = NSLocalizedString("大容量ファイルのコピー", comment: "")
             }
-            alert.messageText = alertTitle
             
             var informativeText: String
             
             // Format the largeFileAlertThreshold for display
             let formattedThreshold = ByteCountFormatter.string(fromByteCount: Int64(self.largeFileAlertThreshold), countStyle: .file)
             
-            // 新しいプロパティ (pendingLargeFileItemsWithSize) を使用
-            if let pendingItemsWithSize = self.pendingLargeFileItemsWithSize {
+            if self.pendingLargeFileIsTimeout {
+                informativeText = NSLocalizedString("コピーされたフォルダの容量が時間内に計算できませんでした。細かいファイルが大量にあるか、大きなファイルを含むフォルダである可能性があります。履歴に保存してもよろしいですか？", comment: "")
+            } else if !self.pendingLargeFileItemsWithSize.isEmpty {
+                let pendingItemsWithSize = self.pendingLargeFileItemsWithSize
                 if pendingItemsWithSize.count > 1 {
                     // 複数ファイル用のメッセージ (新しいプロパティを使用)
                     var totalFileSize: UInt64 = 0
@@ -48,22 +52,6 @@ extension ClipboardManager {
                     // ファイルサイズが取得できない場合のフォールバック (新しいプロパティを使用)
                     informativeText = String(format: NSLocalizedString("%@を超えるファイルがコピーされました。履歴に保存してもよろしいですか？", comment: ""), formattedThreshold)
                 }
-            }
-            // 古いプロパティ (pendingLargeFileItems) を使用するフォールバック
-            else if let pendingItems = self.pendingLargeFileItems, pendingItems.count > 1 {
-                // 複数ファイル用のメッセージ (古いプロパティを使用)
-                var totalFileSize: UInt64 = 0
-                for item in pendingItems {
-                    let fileSize = self.getFileAttributes(item.fileURL).fileSize ?? 0
-                    totalFileSize += fileSize
-                }
-                let formattedTotalSize = ByteCountFormatter.string(fromByteCount: Int64(totalFileSize), countStyle: .file)
-                let fileCount = pendingItems.count
-                informativeText = String(format: NSLocalizedString("%1$@を超える%2$d個のファイル（合計%3$@）がコピーされました。履歴に保存してもよろしいですか？", comment: ""), formattedThreshold, fileCount, formattedTotalSize)
-            } else if let pendingItem = self.pendingLargeFileItem, let fileSize = self.getFileAttributes(pendingItem.fileURL).fileSize {
-                // 単一ファイル用のメッセージ（既存のロジック）
-                let actualFileSizeString = ByteCountFormatter.string(fromByteCount: Int64(fileSize), countStyle: .file)
-                informativeText = String(format: NSLocalizedString("%1$@を超えるファイル（%2$@）がコピーされました。履歴に保存してもよろしいですか？", comment: ""), formattedThreshold, actualFileSizeString)
             } else if let pendingImageData = self.pendingLargeImageData {
                 // 画像データ用のメッセージ（既存のロジック）
                 let actualFileSizeString = ByteCountFormatter.string(fromByteCount: Int64(pendingImageData.imageData.count), countStyle: .file)
@@ -73,78 +61,123 @@ extension ClipboardManager {
                 informativeText = String(format: NSLocalizedString("%@を超えるファイルがコピーされました。履歴に保存してもよろしいですか？", comment: ""), formattedThreshold)
             }
             
-            alert.informativeText = informativeText
-            
-            alert.alertStyle = .warning
-            alert.addButton(withTitle: NSLocalizedString("はい", comment: "")) // NSAlertFirstButtonReturn (1000)
-            alert.addButton(withTitle: NSLocalizedString("いいえ", comment: "")) // NSAlertSecondButtonReturn (1001)
-            
-            let response = alert.runModal()
-            print("DEBUG: presentLargeFileConfirmationAlert - Alert dismissed. Response: \(response.rawValue)")
-            
-            // NSAlertFirstButtonReturn corresponds to "Yes", NSAlertSecondButtonReturn to "No"
-            let shouldSave = (response == .alertFirstButtonReturn)
-            self.handleLargeFileAlertConfirmation(shouldSave: shouldSave)
+            LargeFileAlertWindowController.shared.showAlert(
+                title: alertTitle,
+                message: informativeText,
+                buttons: [
+                    LargeFileAlertButton(
+                        title: NSLocalizedString("いいえ", comment: ""),
+                        isProminent: false,
+                        keyboardShortcut: .cancelAction,
+                        action: { [weak self] in
+                            LargeFileAlertWindowController.shared.closeWindow()
+                            self?.handleLargeFileAlertConfirmation(shouldSave: false)
+                        }
+                    ),
+                    LargeFileAlertButton(
+                        title: NSLocalizedString("はい", comment: ""),
+                        isProminent: true,
+                        keyboardShortcut: .defaultAction,
+                        action: { [weak self] in
+                            LargeFileAlertWindowController.shared.closeWindow()
+                            self?.handleLargeFileAlertConfirmation(shouldSave: true)
+                        }
+                    )
+                ]
+            )
         }
     }
     
     func handleLargeFileAlertConfirmation(shouldSave: Bool) {
+#if DEBUG
         print("DEBUG: handleLargeFileAlertConfirmation - shouldSave: \(shouldSave)")
+#endif
         if shouldSave {
             Task.detached { [weak self] in
                 guard let self = self else { return }
                 
                 // 新しいプロパティ (pendingLargeFileItemsWithSize) を使用
-                if let pendingItemsWithSize = self.pendingLargeFileItemsWithSize {
-                    let sourceAppPath = self.pendingLargeFileItemsSourceAppPath // ソースアプリパスを取得
-                    print("DEBUG: handleLargeFileAlertConfirmation - Attempting to add \(pendingItemsWithSize.count) pending file items (new property).")
-                    var addedItems: [ClipboardItem] = []
-                    for item in pendingItemsWithSize {
-                        // 各ファイルを個別に処理 (ソースアプリパスを渡す)
-                        if let newItem = await self.createClipboardItemForFileURL(item.fileURL, qrCodeContent: item.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true) {
-                            addedItems.append(newItem)
+                if !self.pendingLargeFileItemsWithSize.isEmpty {
+                    let itemsToProcess = self.pendingLargeFileItemsWithSize // ローカルコピー
+#if DEBUG
+                    print("DEBUG: handleLargeFileAlertConfirmation - Attempting to process \(itemsToProcess.count) pending file items.")
+#endif
+                    
+                    var failedItemsCount = 0
+                    var successfulItemsCount = 0
+                    
+                    for item in itemsToProcess {
+                        // ユーザーによってコピーがキャンセルされた場合はスキップ
+                        if item.isCopyCancelled {
+#if DEBUG
+                            print("DEBUG: handleLargeFileAlertConfirmation - Item copy was cancelled. Skipping.")
+#endif
+                            continue
                         }
-                    }
-                    // まとめて履歴に追加
-                    if !addedItems.isEmpty {
-                        let itemsToAdd = addedItems // ローカルコピーを作成
-                        await MainActor.run {
-                            for newItem in itemsToAdd {
-                                self.addAndSaveItem(newItem)
+                        
+                        // ファイルの存在チェック
+                        if let url = item.sourceFileURL, FileManager.default.fileExists(atPath: url.path) {
+                            successfulItemsCount += 1
+                            // タイムアウトで不完全なサイズだった場合、フルサイズの計算をバックグラウンドで開始
+                            if item.isPartialSize {
+                                Task.detached(priority: .background) { [weak item, weak self] in
+                                    guard let self = self, let currentItem = item else { return }
+                                    // 制限なしで再帰的に計算
+                                    let sizeResult = await self.calculateSizeAsync(url: url, timeout: Double.infinity)
+                                    let fullSize = sizeResult.size
+                                        await MainActor.run {
+                                            currentItem.fileSize = fullSize
+                                            currentItem.isPartialSize = false
+                                        }
+                                        await ChunkedHistoryManager.shared.updateHistoryItem(currentItem)
+                                    }
+                            }
+                            
+                            // 実際のコピー処理を開始
+                            self.startFileProcessing(for: item, externalFileAttributes: self.getFileAttributes(url), originalItem: nil)
+                        } else {
+                            failedItemsCount += 1
+#if DEBUG
+                            print("DEBUG: handleLargeFileAlertConfirmation - File not found: \(item.sourceFileURL?.path ?? "Unknown")")
+#endif
+                            // 失敗した場合は履歴から削除
+                            await MainActor.run {
+                                self.deleteItem(id: item.id)
                             }
                         }
                     }
-                }
-                // 古いプロパティ (pendingLargeFileItems) を使用するフォールバック
-                else if let pendingItems = self.pendingLargeFileItems {
-                    let sourceAppPath = self.pendingLargeFileItemsSourceAppPath // ソースアプリパスを取得
-                    print("DEBUG: handleLargeFileAlertConfirmation - Attempting to add \(pendingItems.count) pending file items (old property).")
-                    var addedItems: [ClipboardItem] = []
-                    for item in pendingItems {
-                        // 各ファイルを個別に処理 (ソースアプリパスを渡す)
-                        if let newItem = await self.createClipboardItemForFileURL(item.fileURL, qrCodeContent: item.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true) {
-                            addedItems.append(newItem)
-                        }
-                    }
-                    // まとめて履歴に追加
-                    if !addedItems.isEmpty {
-                        let itemsToAdd = addedItems // ローカルコピーを作成
+                    
+                    // エラーのハンドリング
+                    if failedItemsCount > 0 {
+                        let isAddedItemsEmpty = (successfulItemsCount == 0)
                         await MainActor.run {
-                            for newItem in itemsToAdd {
-                                self.addAndSaveItem(newItem)
+                            let alertTitle: String
+                            let alertMessage: String
+                            
+                            if isAddedItemsEmpty {
+                                // 全て失敗
+                                alertTitle = NSLocalizedString("ファイルを保存できませんでした", comment: "")
+                                alertMessage = NSLocalizedString("ファイルが見つからなかったため、履歴に保存することができませんでした。", comment: "")
+                            } else {
+                                // 一部失敗
+                                alertTitle = NSLocalizedString("一部のファイルを保存できませんでした", comment: "")
+                                alertMessage = NSLocalizedString("一部のファイルが見つからなかったため、履歴に保存することができませんでした。", comment: "")
                             }
-                        }
-                    }
-                }
-                // 単一ファイルが保留されている場合（後方互換性維持）
-                else if let pendingItem = self.pendingLargeFileItem {
-                    // ユーザーが保存を許可した場合、ファイルをサンドボックスにコピーし、履歴に追加
-                    // ここで createClipboardItemForFileURL を呼び出すことで重複検知ロジックが適用される
-                    // アラート確認からの呼び出しであることを示すフラグをtrueにする
-                    print("DEBUG: handleLargeFileAlertConfirmation - Attempting to add pending file item.")
-                    if let newItem = await self.createClipboardItemForFileURL(pendingItem.fileURL, qrCodeContent: pendingItem.qrCodeContent, isFromAlertConfirmation: true) {
-                        await MainActor.run {
-                            self.addAndSaveItem(newItem)
+                            
+                            LargeFileAlertWindowController.shared.showAlert(
+                                title: alertTitle,
+                                message: alertMessage,
+                                buttons: [
+                                    LargeFileAlertButton(
+                                        title: NSLocalizedString("OK", comment: ""),
+                                        isProminent: true,
+                                        keyboardShortcut: .defaultAction,
+                                        action: {
+                                            LargeFileAlertWindowController.shared.closeWindow()
+                                        }
+                                    )
+                                ]
+                            )
                         }
                     }
                 }
@@ -153,7 +186,9 @@ extension ClipboardManager {
                     // ユーザーが画像の保存を許可した場合、画像をサンドボックスにコピーし、履歴に追加
                     // ここで createClipboardItemFromImageData を呼び出すことで重複検知ロジックが適用される
                     // アラート確認からの呼び出しであることを示すフラグをtrueにする
+#if DEBUG
                     print("DEBUG: handleLargeFileAlertConfirmation - Attempting to add pending image data.")
+#endif
                     let sourceAppPath = self.pendingLargeFileItemsSourceAppPath
                     if let newItem = await self.createClipboardItemFromImageData(pendingImageData.imageData, qrCodeContent: pendingImageData.qrCodeContent, sourceAppPath: sourceAppPath, isFromAlertConfirmation: true) {
                         await MainActor.run {
@@ -163,31 +198,40 @@ extension ClipboardManager {
                 }
                 // アラートの状態をリセット
                 await MainActor.run {
-                    self.pendingLargeFileItem = nil
-                    self.pendingLargeFileItems = nil
-                    self.pendingLargeFileItemsWithSize = nil // 新しいプロパティもリセット
-                    self.pendingLargeFileItemsSourceAppPath = nil // リセット
-                    self.pendingLargeImageData = nil
                     // showingLargeFileAlert を false に設定して、didSet が再度NSAlertをトリガーするのを防ぐ
                     if self.showingLargeFileAlert {
                         self.showingLargeFileAlert = false
+#if DEBUG
                         print("DEBUG: handleLargeFileAlertConfirmation - Reset showingLargeFileAlert to false.")
+#endif
                     }
+                    self.pendingLargeFileItemsWithSize.removeAll() // 新しいプロパティもリセット
+                    self.pendingLargeFileItemsSourceAppPath = nil // リセット
+                    self.pendingLargeImageData = nil
                 }
             }
         } else {
+#if DEBUG
             print("DEBUG: handleLargeFileAlertConfirmation - User chose NOT to save the large file/image(s).")
-            // アラートの状態をリセット
-            pendingLargeFileItem = nil
-            pendingLargeFileItems = nil
-            pendingLargeFileItemsWithSize = nil // 新しいプロパティもリセット
-            pendingLargeFileItemsSourceAppPath = nil // リセット
-            pendingLargeImageData = nil
+#endif
             // showingLargeFileAlert を false に設定して、didSet が再度NSAlertをトリガーするのを防ぐ
             if showingLargeFileAlert {
                 showingLargeFileAlert = false
+#if DEBUG
                 print("DEBUG: handleLargeFileAlertConfirmation - Reset showingLargeFileAlert to false.")
+#endif
             }
+            // キャンセルされたのでUIに追加されていた仮アイテムを削除
+            let itemsToDelete = pendingLargeFileItemsWithSize
+            for item in itemsToDelete {
+                deleteItem(id: item.id)
+            }
+            
+            // アラートの状態をリセット
+            pendingLargeFileItemsWithSize.removeAll() // 新しいプロパティもリセット
+            pendingLargeFileItemsSourceAppPath = nil // リセット
+            pendingLargeImageData = nil
+            pendingLargeFileIsTimeout = false
         }
     }
 }

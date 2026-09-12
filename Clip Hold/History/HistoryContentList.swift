@@ -11,15 +11,19 @@ struct HistoryContentList: View {
     
     @Binding var filteredHistory: [ClipboardItem]
     @Binding var isLoading: Bool
+    @Binding var isPaginating: Bool
     @Binding var showingDeleteConfirmation: Bool
     @Binding var itemToDelete: ClipboardItem?
+    @Binding var deleteOnlyThisItem: Bool
     @Binding var selectedItemID: UUID?
     @Binding var showCopyConfirmation: Bool
     @Binding var currentCopyConfirmationTask: Task<Void, Never>?
-    @Binding var showQRCodeSheet: Bool
     @Binding var selectedItemForQRCode: ClipboardItem?
     @Binding var itemForNewPhrase: ClipboardItem?
-    @Binding var previousClipboardHistoryCount: Int
+    @Binding var isChildSheetPresented: Bool
+    
+    @State private var previousNewestItemID: UUID?
+    @State private var previousPinnedItemID: UUID?
     
     // State variables for the exclude app alert
     @State private var showingExcludeAppAlert = false
@@ -30,11 +34,31 @@ struct HistoryContentList: View {
     @State private var appToDeleteFrom: String?
     
     // 各行のアイコンのNSView参照を保存するためのState
-    @State private var rowIconViews: [UUID: NSView] = [:]
+    @State private var rowIconStore = RowIconStore()
     
     // State variable for the edit sheet
     @State private var showingEditSheet = false
     @State private var itemToEdit: ClipboardItem?
+    
+    // ピン留め置き換えアラート用State
+    @State private var itemToReplacePin: ClipboardItem? = nil
+    @State private var showingReplacePinConfirmation = false
+    
+    private var pinnedItemToShow: ClipboardItem? {
+        guard let pinnedItem = clipboardManager.pinnedItem else { return nil }
+        if searchText.isEmpty {
+            return pinnedItem
+        } else {
+            return pinnedItem.text.localizedCaseInsensitiveContains(searchText) ? pinnedItem : nil
+        }
+    }
+    
+    private var unpinnedFilteredHistory: [ClipboardItem] {
+        if let pinnedID = clipboardManager.pinnedItemID {
+            return filteredHistory.filter { $0.id != pinnedID }
+        }
+        return filteredHistory
+    }
     
     let hideNumbersInHistoryWindow: Bool
     let closeWindowOnDoubleClickInHistoryWindow: Bool
@@ -43,11 +67,16 @@ struct HistoryContentList: View {
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
     let searchText: String
+    let searchTrigger: UUID
     @EnvironmentObject var dateReloader: DateReloader
     @AppStorage("dateDisplayFormatInHistoryWindow") var dateDisplayFormatInHistoryWindow: String = "absolute"
+    @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
+    @ObservedObject var modifierMonitor = ModifierKeyMonitor.shared
 
     
     var onCopyAction: (ClipboardItem) -> Void
+    var onLoadMore: () -> Void
     
     
     private func parseQRCode(from image: NSImage) -> String? {
@@ -64,17 +93,215 @@ struct HistoryContentList: View {
         return nil
     }
     
+    @ViewBuilder
+    private func historyMenuItems(for currentItem: ClipboardItem) -> some View {
+        if currentItem.isCopying {
+            Button(role: .destructive) {
+                currentItem.isCopyCancelled = true
+                clipboardManager.deleteItem(id: currentItem.id)
+            } label: {
+                Label("コピーをキャンセルして履歴から削除", systemImage: "xmark")
+            }
+            .disabled(clipboardManager.showingLargeFileAlert) // アラート表示中はキャンセル不可にする
+            Divider()
+        }
+        
+        let performCopy = { (preventQuickPaste: Bool) in
+            let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
+            let isNonText = currentItem.filePath != nil || currentItem.isImage
+            let finalPreventQuickPaste = preventQuickPaste || (textOnlyQuickPaste && isNonText)
+            
+            performSharedCopyRoutine(
+                preventQuickPaste: finalPreventQuickPaste,
+                quickPaste: quickPaste,
+                quickPasteToPreviousApp: quickPasteToPreviousApp,
+                showCopyConfirmation: $showCopyConfirmation,
+                currentCopyConfirmationTask: $currentCopyConfirmationTask
+            ) {
+                clipboardManager.isPerformingInternalCopy = true
+                onCopyAction(currentItem)
+            }
+        }
+        
+        SharedCopyMenuItem(
+            action: { performCopy(modifierMonitor.currentOptionKeyPressed) },
+            alternateAction: { performCopy(true) }
+        )
+        .disabled(currentItem.isCopying || clipboardManager.isExporting)
+        
+        if currentItem.richText != nil {
+            let plainTextCopyAction: (Bool) -> Void = { preventQuickPaste in
+                performSharedCopyRoutine(
+                    preventQuickPaste: preventQuickPaste,
+                    quickPaste: quickPaste,
+                    quickPasteToPreviousApp: quickPasteToPreviousApp,
+                    showCopyConfirmation: $showCopyConfirmation,
+                    currentCopyConfirmationTask: $currentCopyConfirmationTask
+                ) {
+                    let newItemToCopy = ClipboardItem(text: currentItem.text)
+                    onCopyAction(newItemToCopy)
+                }
+            }
+
+            Group {
+                if #available(macOS 15.0, *) {
+                    if quickPaste && quickPasteToPreviousApp {
+                        Button { plainTextCopyAction(false) } label: {
+                            Text("標準テキストとしてコピー")
+                        }
+                        .modifierKeyAlternate(.option) {
+                            Button { plainTextCopyAction(true) } label: {
+                                Text("クイックペーストせずに標準テキストとしてコピー")
+                            }
+                        }
+                    } else {
+                        Button { plainTextCopyAction(false) } label: {
+                            Text("標準テキストとしてコピー")
+                        }
+                    }
+                } else {
+                    Button { plainTextCopyAction(modifierMonitor.currentOptionKeyPressed) } label: {
+                        Text(quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed ? "クイックペーストせずに標準テキストとしてコピー" : "標準テキストとしてコピー")
+                    }
+                }
+            }
+            .disabled(currentItem.isCopying || clipboardManager.isExporting)
+        }
+        
+        SharedEditAndCopyMenuItem {
+            itemToEdit = currentItem
+            showingEditSheet = true
+        }
+        
+        if let qrContent = currentItem.qrCodeContent {
+            Button {
+                let newItemToCopy = ClipboardItem(text: qrContent)
+                clipboardManager.isPerformingInternalCopy = true
+                onCopyAction(newItemToCopy)
+                showCopyConfirmation = true
+                currentCopyConfirmationTask?.cancel()
+                currentCopyConfirmationTask = Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    guard !Task.isCancelled else { return }
+                    showCopyConfirmation = false
+                }
+            } label: {
+                Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
+            }
+            .disabled(currentItem.isCopying || clipboardManager.isExporting)
+        }
+        
+        if let filePath = currentItem.filePath {
+            Button {
+                NSWorkspace.shared.open(filePath)
+            } label: {
+                Label("開く", systemImage: "arrow.up.forward.app")
+            }
+            .disabled(currentItem.isCopying || clipboardManager.isExporting)
+        }
+        
+        if currentItem.isURL {
+            SharedOpenLinkMenuItem(urlString: currentItem.text)
+                .disabled(currentItem.isCopying || clipboardManager.isExporting)
+        }
+        
+        Divider()
+        
+        if let filePath = currentItem.filePath {
+            Button {
+                if let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController,
+                   let sourceView = rowIconStore.views[currentItem.id] {
+                    controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
+                }
+            } label: {
+                Label("クイックルック", systemImage: "eye")
+            }
+            .disabled(currentItem.isCopying || clipboardManager.isExporting)
+        }
+        
+        let targetID = currentItem.originalPinnedItemID ?? currentItem.id
+        if clipboardManager.pinnedItemID == targetID {
+            Button {
+                clipboardManager.unpinItem()
+            } label: {
+                Label("ピン留めを解除", systemImage: "pin.slash").forceIconOnMacOS27()
+            }
+            .disabled(clipboardManager.isExporting)
+        } else {
+            Button {
+                if clipboardManager.pinnedItemID != nil {
+                    itemToReplacePin = currentItem
+                    showingReplacePinConfirmation = true
+                } else {
+                    if let originalItem = clipboardManager.clipboardHistory.first(where: { $0.id == targetID }) {
+                        clipboardManager.pinItem(originalItem)
+                    } else {
+                        clipboardManager.pinItem(currentItem)
+                    }
+                }
+            } label: {
+                Label("ピン留め", systemImage: "pin").forceIconOnMacOS27()
+            }
+            .disabled(clipboardManager.isExporting)
+        }
+        
+        Button {
+            itemForNewPhrase = currentItem
+        } label: {
+            Label("項目から定型文を作成...", systemImage: "pencil")
+        }
+        .disabled(clipboardManager.isExporting)
+        
+        if currentItem.filePath == nil {
+            SharedShowQRCodeMenuItem {
+                selectedItemForQRCode = currentItem
+            }
+        }
+        
+        if let sourceAppPath = currentItem.sourceAppPath {
+            SharedFilterByAppMenuItem {
+                clipboardManager.historySelectedApp = sourceAppPath
+            }
+        }
+        
+        Divider()
+        
+        if let sourceAppPath = currentItem.sourceAppPath {
+            Button {
+                appToExclude = sourceAppPath
+                showingExcludeAppAlert = true
+            } label: {
+                Label("除外するアプリに追加...", systemImage: "hand.raised.circle")
+            }
+            .disabled(clipboardManager.isExporting)
+        }
+        
+        SharedDeleteMenuItem(action: {
+            itemToDelete = currentItem
+            deleteOnlyThisItem = false
+            showingDeleteConfirmation = true
+        }, alternateAction: currentItem.filePath != nil ? {
+            itemToDelete = currentItem
+            deleteOnlyThisItem = true
+            showingDeleteConfirmation = true
+        } : nil)
+        .disabled(currentItem.isCopying || clipboardManager.isExporting)
+        
+            if let sourceAppPath = currentItem.sourceAppPath {
+                Button(role: .destructive) {
+                    showingDeleteAllFromAppAlert = true
+                    appToDeleteFrom = sourceAppPath
+                } label: {
+                    Text("このアプリからのすべての履歴を削除...")
+                }
+                .disabled(currentItem.isCopying || clipboardManager.isExporting)
+            }
+    }
+    
     var body: some View {
         ZStack {
             if filteredHistory.isEmpty && !isLoading {
-                VStack {
-                    Spacer()
-                    Text("履歴はありません")
-                        .foregroundStyle(.secondary)
-                        .font(.title2)
-                        .padding(.bottom, 20)
-                    Spacer()
-                }
+                SharedEmptyListView(message: "履歴はありません")
             } else {
                 ScrollViewReader { scrollViewProxy in
                     Table(filteredHistory, selection: $selectedItemID) {
@@ -83,19 +310,19 @@ struct HistoryContentList: View {
                                 item: item,
                                 index: filteredHistory.firstIndex(where: { $0.id == item.id }) ?? 0,
                                 hideNumbers: hideNumbersInHistoryWindow,
-                                itemToDelete: $itemToDelete,
-                                showingDeleteConfirmation: $showingDeleteConfirmation,
-                                selectedItemID: $selectedItemID,
-                                dismissAction: { dismiss() },
-                                showCopyConfirmation: $showCopyConfirmation,
-                                showQRCodeSheet: $showQRCodeSheet,
-                                selectedItemForQRCode: $selectedItemForQRCode,
-                                itemForNewPhrase: $itemForNewPhrase,
+                                rowIconStore: rowIconStore,
+                                showCharacterCount: showCharacterCount,
                                 lineNumberTextWidth: lineNumberTextWidth,
                                 trailingPaddingForLineNumber: trailingPaddingForLineNumber,
-                                rowIconViews: $rowIconViews, // アイコンビュー辞書へのBindingを渡す
-                                showCharacterCount: showCharacterCount // showCharacterCountを渡す
+                                menuItems: {
+                                    historyMenuItems(for: item)
+                                }
                             )
+                            .onAppear {
+                                if let index = filteredHistory.firstIndex(where: { $0.id == item.id }), index == filteredHistory.count - 1 {
+                                    onLoadMore()
+                                }
+                            }
                             .environmentObject(clipboardManager)
                             .environmentObject(standardPhraseManager)
                             .environmentObject(presetManager)
@@ -106,7 +333,6 @@ struct HistoryContentList: View {
                     .tableColumnHeaders(.hidden)
                     .tableStyle(.inset)
                     .alternatingRowBackgrounds(.disabled)
-                    .animation(reduceMotion ? nil : .default, value: filteredHistory)
                     .onKeyPress(.space) {
                         guard let selectedID = selectedItemID,
                               let selectedItem = filteredHistory.first(where: { $0.id == selectedID }),
@@ -117,7 +343,7 @@ struct HistoryContentList: View {
                         
                         // 保存しておいたアイコンのビューをアニメーションの開始点として指定する
                         if let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController,
-                           let sourceView = rowIconViews[selectedID] {
+                           let sourceView = rowIconStore.views[selectedID] {
                             controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
                         }
                         
@@ -141,7 +367,7 @@ struct HistoryContentList: View {
                         
                         // 選択が変更された場合も、正しいアイコンビューから再表示する
                         if let filePath = selectedItem.filePath,
-                           let sourceView = rowIconViews[newID] {
+                           let sourceView = rowIconStore.views[newID] {
                             controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
                         } else {
                             controller.hideQuickLook()
@@ -153,194 +379,59 @@ struct HistoryContentList: View {
                         view.blur(radius: isLoading ? 5 : 0)
                     }
                     .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: isLoading)
+                    .animation(reduceMotion ? nil : .default, value: filteredHistory)
                     .contextMenu(forSelectionType: ClipboardItem.ID.self, menu: { selectedIDs in
                         if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
-                            Button {
+                            historyMenuItems(for: currentItem)
+                        }
+                    }, primaryAction: { selectedIDs in
+                        guard !clipboardManager.isExporting else { return }
+                        if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
+                            if currentItem.isCopying { return }
+                            let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
+                            let isNonText = currentItem.filePath != nil || currentItem.isImage
+                            let preventQuickPaste = modifierMonitor.currentOptionKeyPressed || (textOnlyQuickPaste && isNonText)
+                            
+                            performSharedCopyRoutine(
+                                preventQuickPaste: preventQuickPaste,
+                                quickPaste: quickPaste,
+                                quickPasteToPreviousApp: quickPasteToPreviousApp,
+                                showCopyConfirmation: $showCopyConfirmation,
+                                currentCopyConfirmationTask: $currentCopyConfirmationTask
+                            ) {
                                 // 内部コピーフラグをtrueに設定
                                 clipboardManager.isPerformingInternalCopy = true
                                 onCopyAction(currentItem)
-                                showCopyConfirmation = true
-                                currentCopyConfirmationTask?.cancel()
-                                currentCopyConfirmationTask = Task { @MainActor in
-                                    try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                    guard !Task.isCancelled else { return }
-                                    withAnimation {
-                                        showCopyConfirmation = false
-                                    }
-                                }
-                            } label: {
-                                Label("コピー", systemImage: "document.on.document")
-                            }
-                            if currentItem.richText != nil {
-                                Button {
-                                    // リッチテキストアイテムの場合、プレーンテキストとしてコピー
-                                    NSPasteboard.general.clearContents()
-                                    NSPasteboard.general.setString(currentItem.text, forType: .string)
-                                    showCopyConfirmation = true
-                                    currentCopyConfirmationTask?.cancel()
-                                    currentCopyConfirmationTask = Task { @MainActor in
-                                        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                        guard !Task.isCancelled else { return }
-                                        if reduceMotion {
-                                            showCopyConfirmation = false
-                                        } else {
-                                            withAnimation {
-                                                showCopyConfirmation = false
-                                            }
-                                        }
-                                    }
-                                } label: {
-                                    Text("標準テキストとしてコピー")
-                                }
                             }
                             
-                            Button {
-                                itemToEdit = currentItem
-                                showingEditSheet = true
-                            } label: {
-                                Text("変更してコピー...")
-                            }
-                            if let qrContent = currentItem.qrCodeContent {
-                                Button {
-                                    let newItemToCopy = ClipboardItem(text: qrContent) // 新しいClipboardItemを作成
-                                    // 内部コピーフラグをtrueに設定
-                                    clipboardManager.isPerformingInternalCopy = true
-                                    onCopyAction(newItemToCopy)
-                                    showCopyConfirmation = true
-                                    currentCopyConfirmationTask?.cancel()
-                                    currentCopyConfirmationTask = Task { @MainActor in
-                                        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                        guard !Task.isCancelled else { return }
-                                        if reduceMotion {
-                                            showCopyConfirmation = false
-                                        } else {
-                                            withAnimation {
-                                                showCopyConfirmation = false
-                                            }
-                                        }
-                                    }
-                                } label: {
-                                    Label("QRコードの内容をコピー", systemImage: "qrcode.viewfinder")
-                                }
-                            }
-                            if let filePath = currentItem.filePath {
-                                Button {
-                                    NSWorkspace.shared.open(filePath)
-                                } label: {
-                                    Label("開く", systemImage: "arrow.up.forward.app")
-                                }
-                            }
-                            if currentItem.isURL, let url = URL(string: currentItem.text) {
-                                Button {
-                                    NSWorkspace.shared.open(url)
-                                } label: {
-                                    Label("リンクを開く", systemImage: "paperclip")
-                                }
-                            }
-                            Divider()
-                            if let filePath = currentItem.filePath {
-                                Button {
-                                    // コンテキストメニューからも正しいアイコンビューを指定する
-                                    if let controller = NSApp.keyWindow?.windowController as? ClipHoldWindowController,
-                                       let sourceView = rowIconViews[id] {
-                                        controller.showQuickLook(for: filePath as QLPreviewItem, from: sourceView)
-                                    }
-                                } label: {
-                                    Label("クイックルック", systemImage: "eye")
-                                }
-                            }
-                            Button {
-                                itemForNewPhrase = currentItem
-                            } label: {
-                                Label("項目から定型文を作成...", systemImage: "pencil")
-                            }
-                            if currentItem.filePath == nil {
-                                Button {
-                                    showQRCodeSheet = true
-                                    selectedItemForQRCode = currentItem
-                                } label: {
-                                    Label("QRコードを表示...", systemImage: "qrcode")
-                                }
-                            }
-                            Divider()
-                            // "除外するアプリに追加..." menu item
-                            if let sourceAppPath = currentItem.sourceAppPath {
-                                Button {
-                                    appToExclude = sourceAppPath
-                                    showingExcludeAppAlert = true
-                                } label: {
-                                    Label("除外するアプリに追加...", systemImage: "hand.raised.circle")
-                                }
-                            }
-                            Button(role: .destructive) {
-                                itemToDelete = currentItem
-                                showingDeleteConfirmation = true
-                            } label: {
-                                Label("削除...", systemImage: "trash")
-                            }
-                            
-                            if let sourceAppPath = currentItem.sourceAppPath {
-                                Button(role: .destructive) {
-                                    // 選択された項目と同じアプリからの履歴をすべて削除するアラートを表示
-                                    showingDeleteAllFromAppAlert = true
-                                    appToDeleteFrom = sourceAppPath
-                                } label: {
-                                    Text("このアプリからのすべての履歴を削除...")
-                                }
-                            }
-                        }
-                    }, primaryAction: { selectedIDs in
-                        if let id = selectedIDs.first, let currentItem = filteredHistory.first(where: { $0.id == id }) {
-                            // 内部コピーフラグをtrueに設定
-                            clipboardManager.isPerformingInternalCopy = true
-                            onCopyAction(currentItem)
-                            showCopyConfirmation = true
-                            currentCopyConfirmationTask?.cancel()
-                            currentCopyConfirmationTask = Task { @MainActor in
-                                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                guard !Task.isCancelled else { return }
-                                if reduceMotion {
-                                    showCopyConfirmation = false
-                                } else {
-                                    withAnimation {
-                                        showCopyConfirmation = false
-                                    }
-                                }
-                            }
                             if closeWindowOnDoubleClickInHistoryWindow {
                                 dismiss()
                             }
                         }
                     })
-                    .sheet(isPresented: $showingEditSheet) {
-                        if let item = itemToEdit {
-                            EditHistoryItemView(content: item.text, onCopy: { editedContent in
+                    .sheet(item: $itemToEdit) { item in
+                        ChangeItemAndCopyView(content: item.text, onCopy: { editedContent in
+                            let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                            let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
+                            
+                            performSharedCopyRoutine(
+                                preventQuickPaste: ModifierKeyMonitor.shared.currentOptionKeyPressed,
+                                quickPaste: currentQuickPaste,
+                                quickPasteToPreviousApp: currentQuickPasteToPreviousApp,
+                                showCopyConfirmation: $showCopyConfirmation,
+                                currentCopyConfirmationTask: $currentCopyConfirmationTask
+                            ) {
                                 // コピー処理を実装
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(editedContent, forType: .string)
-                                
-                                // コピー確認を表示
-                                showCopyConfirmation = true
-                                currentCopyConfirmationTask?.cancel()
-                                currentCopyConfirmationTask = Task { @MainActor in
-                                    try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                    guard !Task.isCancelled else { return }
-                                    if reduceMotion {
-                                        showCopyConfirmation = false
-                                    } else {
-                                        withAnimation {
-                                            showCopyConfirmation = false
-                                        }
-                                    }
-                                }
-                            }, isSheet: true)
-                        }
+                                let newItemToCopy = ClipboardItem(text: editedContent)
+                                onCopyAction(newItemToCopy)
+                            }
+                        }, isSheet: true)
                     }
                     .onDrop(of: [.image], isTargeted: nil) { providers in
                         guard let itemProvider = providers.first else { return false }
                         let manager = clipboardManager
                         itemProvider.loadObject(ofClass: NSImage.self) { (image, error) in
-                            DispatchQueue.main.async {
+                            Task { @MainActor in
                                 if let nsImage = image as? NSImage {
                                     if let qrCodeContent = manager.decodeQRCode(from: nsImage) {
                                         manager.addTextItem(text: qrCodeContent)
@@ -354,13 +445,7 @@ struct HistoryContentList: View {
                                         currentCopyConfirmationTask = Task { @MainActor in
                                             try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒後に非表示
                                             guard !Task.isCancelled else { return }
-                                            if reduceMotion {
-                                                showCopyConfirmation = false
-                                            } else {
-                                                withAnimation {
-                                                    showCopyConfirmation = false
-                                                }
-                                            }
+                                            showCopyConfirmation = false
                                         }
                                     } else {
                                         print("QR code not found.")
@@ -372,29 +457,54 @@ struct HistoryContentList: View {
                         }
                         return true
                     }
+                    .onChange(of: searchTrigger) { _, _ in
+                        if let firstId = filteredHistory.first?.id {
+                            Task { @MainActor in
+                                try? await Task.sleep(nanoseconds: 100_000_000)
+                                scrollViewProxy.scrollTo(firstId)
+                            }
+                        }
+                    }
                     .onChange(of: filteredHistory) { _, newValue in
-                        // 不要になったrowIconViewsのエントリをクリーンアップする
-                        let newIDs = Set(newValue.map { $0.id })
-                        let oldIDs = Set(rowIconViews.keys)
-                        let unusedIDs = oldIDs.subtracting(newIDs)
-                        for id in unusedIDs {
-                            rowIconViews.removeValue(forKey: id)
+                        // 不要になったrowIconStore.viewsのエントリをクリーンアップする
+                        // 3万件などの全履歴を走査するとメインスレッドがブロックされるため、現在表示されているアイテム（newValue）のみを対象とする
+                        let currentIDs = Set(newValue.map { $0.id })
+                        let oldIDs = Set(rowIconStore.views.keys)
+                        let idsToRemove = oldIDs.subtracting(currentIDs)
+                        for id in idsToRemove {
+                            rowIconStore.views.removeValue(forKey: id)
                         }
                         
                         // filteredHistory が更新され、かつscrollToTopOnUpdateがtrue、かつ検索中でない場合
-                        // さらに、元の履歴の数が変わった場合のみに限定する
-                        if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && newValue.count > previousClipboardHistoryCount {
+                        // さらに、履歴内で一番新しいアイテムのIDが変わった場合（＝新しくコピーされた場合）、
+                        // またはピン留めされたアイテムが変わった場合に限定する
+                        let newestItem = clipboardManager.clipboardHistory.max { $0.date < $1.date }
+                        let pinnedItemChanged = clipboardManager.pinnedItemID != previousPinnedItemID
+                        
+                        if scrollToTopOnUpdate && searchText.isEmpty && !newValue.isEmpty && (newestItem?.id != previousNewestItemID || pinnedItemChanged) {
                             if let firstId = newValue.first?.id {
-                                if reduceMotion {
-                                    scrollViewProxy.scrollTo(firstId, anchor: .top)
-                                } else {
-                                    withAnimation {
-                                        scrollViewProxy.scrollTo(firstId, anchor: .top)
+                                Task { @MainActor in
+                                    try? await Task.sleep(nanoseconds: 100_000_000)
+                                    if reduceMotion {
+                                        scrollViewProxy.scrollTo(firstId)
+                                    } else {
+                                        withAnimation {
+                                            scrollViewProxy.scrollTo(firstId)
+                                        }
                                     }
                                 }
                             }
                         }
-                        previousClipboardHistoryCount = newValue.count // 現在の履歴数を保存
+                        
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 10_000_000)
+                            if selectedItemID == nil || !newValue.contains(where: { $0.id == selectedItemID }) {
+                                selectedItemID = newValue.first?.id
+                            }
+                        }
+                        
+                        previousNewestItemID = newestItem?.id // 現在の最新アイテムのIDを保存
+                        previousPinnedItemID = clipboardManager.pinnedItemID // 現在のピン留めアイテムのIDを保存
                     }
                     .alert(String(localized: "除外するアプリに追加"), isPresented: $showingExcludeAppAlert) {
                         Button("キャンセル", role: .cancel) { }
@@ -438,16 +548,42 @@ struct HistoryContentList: View {
                             Text("「\(appName)」からのすべての履歴を削除してもよろしいですか？\(count)個の履歴が削除されます。この操作は元に戻せません。")
                         }
                     }
+                    .alert("ピン留めを置き換え", isPresented: $showingReplacePinConfirmation) {
+                        Button("置き換え", role: .destructive) {
+                            if let itemToPin = itemToReplacePin {
+                                clipboardManager.pinItem(itemToPin)
+                            }
+                            itemToReplacePin = nil
+                        }
+                        Button("キャンセル", role: .cancel) {
+                            itemToReplacePin = nil
+                        }
+                    } message: {
+                        Text("この項目をピン留めすると、現在ピン留めされている項目が置き換えられます。よろしいですか？")
+                    }
                 } // ScrollViewReaderの終わり
             }
-            if isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .scaleEffect(1.5)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.clear)
+            // 初回読み込みや検索時のスピナー（中央）
+            if isLoading && !isPaginating {
+                SharedLoadingView()
+            }
+            
+            // ページネーション（追加読み込み）時のスピナー（下部）
+            if isPaginating {
+                VStack {
+                    Spacer()
+                    ProgressView()
+                        .controlSize(.regular)
+                        .padding(10)
+                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 8))
+                        .padding(.bottom, 20)
+                }
             }
         }
+        .onChange(of: showingExcludeAppAlert) { _, newValue in isChildSheetPresented = newValue }
+        .onChange(of: showingDeleteAllFromAppAlert) { _, newValue in isChildSheetPresented = newValue }
+        .onChange(of: itemToEdit) { _, newValue in isChildSheetPresented = (newValue != nil) }
+        .onChange(of: itemToReplacePin) { _, newValue in isChildSheetPresented = (newValue != nil) }
     }
 }
 

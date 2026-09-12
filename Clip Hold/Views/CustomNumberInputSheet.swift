@@ -6,7 +6,7 @@ struct CustomNumberInputSheet: View {
     @Binding var currentValue: Int
     @Binding var selectedUnit: DataSizeUnit? // オプション型に変更
     
-    var onSave: (Int) -> Void
+    var onSave: (Int) -> Bool
     var onCancel: () -> Void
     
     @Environment(\.dismiss) var dismiss
@@ -14,7 +14,7 @@ struct CustomNumberInputSheet: View {
     @State private var inputText: String = ""
     @State private var showAlert = false
     
-    init(title: Text, description: Text?, currentValue: Binding<Int>, selectedUnit: Binding<DataSizeUnit?> = .constant(nil), onSave: @escaping (Int) -> Void, onCancel: @escaping () -> Void) {
+    init(title: Text, description: Text?, currentValue: Binding<Int>, selectedUnit: Binding<DataSizeUnit?> = .constant(nil), onSave: @escaping (Int) -> Bool, onCancel: @escaping () -> Void) {
         self.title = title
         self.description = description
         self._currentValue = currentValue
@@ -121,8 +121,9 @@ struct CustomNumberInputSheet: View {
     private func performSave() {
         if let newInt = Int(inputText) {
             if newInt >= 1 {
-                onSave(newInt)
-                dismiss()
+                if onSave(newInt) {
+                    dismiss()
+                }
             } else {
                 showAlert = true
             }
@@ -158,7 +159,7 @@ func convertFullWidthToHalfWidthNumbers(_ input: String) -> String {
         description: Text("テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明テスト説明"),
         currentValue: .constant(10),
         selectedUnit: .constant(.megabytes),
-        onSave: { _ in },
+        onSave: { _ in true },
         onCancel: {}
     )
 }

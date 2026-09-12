@@ -16,46 +16,19 @@ private func truncateString(_ text: String?, maxLength: Int) -> String {
     return text
 }
 
-struct StandardPhraseItemRow: View {
-    @EnvironmentObject var standardPhraseManager: StandardPhraseManager
-    @EnvironmentObject var presetManager: StandardPhrasePresetManager
-    @EnvironmentObject var clipboardManager: ClipboardManager
-    @Environment(\.dismiss) var dismiss
-    
+struct StandardPhraseItemRow<MenuContent: View>: View {
     let phrase: StandardPhrase
     let index: Int
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
     @AppStorage("showColorCodeIcon") var showColorCodeIcon: Bool = false
-    @Binding var phraseToDelete: StandardPhrase?
-    @Binding var showingDeleteConfirmation: Bool
-    @Binding var selectedPhraseID: UUID?
-    @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
-    
-    @Environment(\.colorScheme) var colorScheme
-    
-    @Binding var showCopyConfirmation: Bool
-    @Binding var showQRCodeSheet: Bool
-    @Binding var selectedPhraseForQRCode: StandardPhrase?
-    @Binding var phraseToEdit: StandardPhrase?
-    @Binding var phraseToEditAndCopy: StandardPhrase?
-    @Binding var showingEditAndCopySheet: Bool
-    
-    @Binding var showingMoveSheet: Bool
-    @Binding var phraseToMove: StandardPhrase?
+    @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
     
     let lineNumberTextWidth: CGFloat?
     let trailingPaddingForLineNumber: CGFloat
     
+    @ViewBuilder let menuItems: () -> MenuContent
+    
     var body: some View {
-        // isURLをbodyのトップレベルで定義
-        let isURL: Bool = {
-            guard !phrase.content.isEmpty,
-                  let url = URL(string: phrase.content) else {
-                return false
-            }
-            return url.scheme == "http" || url.scheme == "https"
-        }()
-        
         HStack(spacing: 8) {
             if !hideNumbers {
                 Text("\(index + 1).")
@@ -68,8 +41,22 @@ struct StandardPhraseItemRow: View {
             // アイコン表示ロジック
             if showColorCodeIcon, let color = ColorCodeParser.parseColor(from: phrase.content) {
                 ColorCodeIconView(color: color)
+            } else if phrase.isURL {
+                Image(systemName: "paperclip")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(4)
+                    .frame(width: 30, height: 30)
+                    .foregroundStyle(.secondary)
+            } else if phrase.isCode {
+                Image(systemName: "chevron.left.forwardslash.chevron.right")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(4)
+                    .frame(width: 30, height: 30)
+                    .foregroundStyle(.secondary)
             } else {
-                Image(systemName: isURL ? "paperclip" : "list.bullet.rectangle.portrait")
+                Image(systemName: "list.bullet.rectangle.portrait")
                     .resizable()
                     .scaledToFit()
                     .padding(4)
@@ -78,73 +65,35 @@ struct StandardPhraseItemRow: View {
             }
             
             VStack(alignment: .leading) {
-                Text(phrase.title)
-                    .font(.body)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .foregroundStyle(.primary)
-                Text(phrase.content)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                if showInvisibleCharacters {
+                    Text(phrase.title.formatWithInvisibleSymbols(singleLine: true))
+                        .font(.body)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .foregroundStyle(.primary)
+                    Text(phrase.content.formatWithInvisibleSymbols(singleLine: true))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                } else {
+                    Text(phrase.title.firstNonEmptyLine())
+                        .font(.body)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .foregroundStyle(.primary)
+                    Text(phrase.content.firstNonEmptyLine())
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                }
             }
             
             Spacer()
             
             Menu {
-                Button {
-                    copyToClipboard(phrase.content, clipboardManager: clipboardManager)
-                    showCopyConfirmation = true
-                } label: {
-                    Label("コピー", systemImage: "document.on.document")
-                }
-                Button {
-                    phraseToEditAndCopy = phrase
-                    showingEditAndCopySheet = true
-                } label: {
-                    Text("変更してコピー...")
-                }
-                // 定型文がURLの場合、「リンクを開く」メニューを表示
-                if isURL, let url = URL(string: phrase.content) {
-                    Button {
-                        NSWorkspace.shared.open(url)
-                    } label: {
-                        Label("リンクを開く", systemImage: "paperclip")
-                    }
-                }
-                Divider()
-                Button {
-                    phraseToEdit = phrase // 編集対象のフレーズをセット
-                } label: {
-                    Label("編集...", systemImage: "pencil")
-                }
-                Button {
-                    phraseToMove = phrase
-                    showingMoveSheet = true
-                } label: {
-                    Label("別のプリセットに移動...", systemImage: "folder")
-                }
-                Button {
-                    if let selectedPreset = presetManager.selectedPreset {
-                        presetManager.duplicate(phrase: phrase, in: selectedPreset)
-                    }
-                } label: {
-                    Label("複製", systemImage: "plus.square.on.square")
-                }
-                Button {
-                    selectedPhraseForQRCode = phrase
-                    showQRCodeSheet = true
-                } label: {
-                    Label("QRコードを表示...", systemImage: "qrcode")
-                }
-                Divider()
-                Button(role: .destructive) {
-                    phraseToDelete = phrase
-                    showingDeleteConfirmation = true
-                } label: {
-                    Label("削除...", systemImage: "trash")
-                }
+                menuItems()
             } label: {
                 Image(systemName: "ellipsis.circle")
                     .imageScale(.large)
@@ -169,6 +118,69 @@ struct StandardPhraseWindowView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) var colorScheme
     
+    @ViewBuilder
+    private func standardPhraseMenuItems(for currentPhrase: StandardPhrase) -> some View {
+        let isURL: Bool = {
+            guard !currentPhrase.content.isEmpty,
+                  let url = URL(string: currentPhrase.content) else {
+                return false
+            }
+            return url.scheme == "http" || url.scheme == "https"
+        }()
+        
+        let performCopy = { (preventQuickPaste: Bool) in
+            performSharedCopyRoutine(
+                preventQuickPaste: preventQuickPaste,
+                quickPaste: quickPaste,
+                quickPasteToPreviousApp: quickPasteToPreviousApp,
+                showCopyConfirmation: $showCopyConfirmation,
+                currentCopyConfirmationTask: $currentCopyConfirmationTask
+            ) {
+                copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
+            }
+        }
+        
+        SharedCopyMenuItem(
+            action: { performCopy(modifierMonitor.currentOptionKeyPressed) },
+            alternateAction: { performCopy(true) }
+        )
+        
+        SharedEditAndCopyMenuItem {
+            phraseToEditAndCopy = currentPhrase
+        }
+        
+        if isURL {
+            SharedOpenLinkMenuItem(urlString: currentPhrase.content)
+        }
+        
+        Divider()
+        
+        SharedEditMenuItem {
+            phraseToEdit = currentPhrase
+        }
+        
+        SharedMoveMenuItem {
+            phraseToMove = currentPhrase
+        }
+        
+        SharedDuplicateMenuItem {
+            if let selectedPreset = presetManager.selectedPreset {
+                presetManager.duplicate(phrase: currentPhrase, in: selectedPreset)
+            }
+        }
+        
+        SharedShowQRCodeMenuItem {
+            selectedPhraseForQRCode = currentPhrase
+        }
+        
+        Divider()
+        
+        SharedDeleteMenuItem {
+            phraseToDelete = currentPhrase
+            showingDeleteConfirmation = true
+        }
+    }
+    
     @StateObject var iconGenerator = PresetIconGenerator.shared
     
     @State private var searchText: String = ""
@@ -180,25 +192,28 @@ struct StandardPhraseWindowView: View {
     @State private var searchTask: Task<Void, Never>? = nil
     @State private var showCopyConfirmation: Bool = false
     @State private var currentCopyConfirmationTask: Task<Void, Never>? = nil
-    @State private var showQRCodeSheet: Bool = false
     @State private var selectedPhraseForQRCode: StandardPhrase?
     @State private var phraseToEdit: StandardPhrase? = nil
     @State private var phraseToEditAndCopy: StandardPhrase?
-    @State private var showingEditAndCopySheet = false
-    @State private var showingMoveSheet = false
+
     @State private var phraseToMove: StandardPhrase?
     @State private var destinationPresetId: UUID?
     
     @AppStorage("hideNumbersInStandardPhrasesWindow") var hideNumbers: Bool = false
     @AppStorage("closeWindowOnDoubleClickInStandardPhrasesWindow") var closeWindowOnDoubleClickInStandardPhrasesWindow: Bool = false
+    @AppStorage("quickPaste") var quickPaste: Bool = false
+    @AppStorage("quickPasteToPreviousApp") var quickPasteToPreviousApp: Bool = false
+    @ObservedObject var modifierMonitor = ModifierKeyMonitor.shared
     
     @FocusState private var isSearchFieldFocused: Bool
+    @FocusState private var isListFocused: Bool
     
     // 新規プリセット追加シート用の状態変数
     @State private var showingAddPresetSheet = false
     @State private var newPresetName = ""
     
     @State private var presetChangedForScroll: Bool = false
+    @State private var searchTrigger: UUID = UUID()
     
     private var lineNumberTextWidth: CGFloat? {
         guard !hideNumbers, !filteredPhrases.isEmpty else { return nil }
@@ -238,6 +253,15 @@ struct StandardPhraseWindowView: View {
             }
         }
         self.filteredPhrases = newFilteredPhrases
+        
+        if selectedPhraseID == nil || !newFilteredPhrases.contains(where: { $0.id == selectedPhraseID }) {
+            selectedPhraseID = newFilteredPhrases.first?.id
+        }
+        
+        // 明示的にリストへフォーカスを移す（検索中でない場合）
+        if !isSearchFieldFocused {
+            isListFocused = true
+        }
     }
     
     private func movePhrases(from source: IndexSet, to destination: Int) {
@@ -255,90 +279,45 @@ struct StandardPhraseWindowView: View {
         }
     }
     
-    
+    private func handleSearchSubmit() {
+        isListFocused = true
+    }
     
     var body: some View {
         ZStack { // ZStackでコンテンツとメッセージを重ねる
-            if #available(macOS 26, *) {
-                Color.clear
-                    .glassEffect(in: .rect(cornerRadius: 16.0))
-                    .overlay(colorScheme == .dark ? Color.black.opacity(0.2) : Color.white.opacity(0.5))
-                    .ignoresSafeArea()
-            } else {
-                VisualEffectView(material: .menu, blendingMode: .behindWindow)
-                    .ignoresSafeArea()
-            }
+            SharedWindowBackground()
             
             ZStack { // メインコンテンツを囲むZStack
                 VStack(spacing: 0) {
                     HStack {
-                        TextField(
-                            "定型文を検索",
-                            text: $searchText
+                        SharedSearchField(
+                            placeholder: "定型文を検索",
+                            searchText: $searchText,
+                            isSearchFieldFocused: $isSearchFieldFocused
                         )
-                        .textFieldStyle(.plain)
-                        .font(.title3)
-                        .padding(.vertical, 8)
-                        .padding(.leading, 30)
-                        .padding(.trailing, 10)
-                        .background(Color.primary.opacity(colorSchemeContrast == .increased ? 0.05 : 0.1))
-                        .cornerRadius(10)
-                        .controlSize(.large)
-                        .focused($isSearchFieldFocused)
-                        .overlay(
-                            HStack {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundStyle(.secondary)
-                                    .padding(.leading, 8)
-                                    .offset(y: -1.0)
-                                Spacer()
-                                if !searchText.isEmpty {
-                                    Button(action: {
-                                        searchText = ""
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    .buttonStyle(BorderlessButtonStyle())
-                                    .padding(.trailing, 8)
-                                }
-                            }
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.primary, lineWidth: 1)
-                                .opacity(colorSchemeContrast == .increased ? 1 : 0)
-                        )
+                        .onSubmit(of: .text) {
+                            handleSearchSubmit()
+                        }
                         
                         // プリセット選択メニューを追加
                         Menu {
-                            Picker("プリセット", selection: $presetManager.selectedPresetId) {
-                                ForEach(presetManager.presets) { preset in
-                                    Label {
-                                        Text(preset.truncatedDisplayName(maxLength: 50))
-                                    } icon: {
-                                        if let iconImage = iconGenerator.iconCache[preset.id] {
-                                            Image(nsImage: iconImage)
-                                        } else {
-                                            Image(systemName: "star.fill") // Fallback
+                            SharedPresetMenuContent(
+                                title: "プリセット",
+                                selectedPresetId: Binding(
+                                    get: { presetManager.selectedPresetId },
+                                    set: { newValue in
+                                        if let newValue = newValue {
+                                            presetManager.selectedPresetId = newValue
                                         }
                                     }
-                                    .tag(preset.id as UUID?)
-                                }
-                                
-                                // プリセットがない場合の項目
-                                if presetManager.presets.isEmpty {
-                                    Text(String(localized: "プリセットがありません")).tag(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF") as UUID?)
-                                }
-                            }
-                            .pickerStyle(.inline)
-                            .labelStyle(.titleAndIcon)
-                            
-                            Divider()
-                            
-                            Button("新規プリセット...") {
-                                showingAddPresetSheet = true
-                            }
+                                ),
+                                onNewPresetAction: {
+                                    if !clipboardManager.isExporting {
+                                        showingAddPresetSheet = true
+                                    }
+                                },
+                                isExporting: clipboardManager.isExporting
+                            )
                         } label: {
                             if let selectedPreset = presetManager.selectedPreset,
                                let icon = iconGenerator.iconCache[selectedPreset.id] {
@@ -400,6 +379,7 @@ struct StandardPhraseWindowView: View {
                             
                             performSearch(searchTerm: newValue)
                             isLoading = false
+                            searchTrigger = UUID()
                         }
                     }
                     .onChange(of: standardPhraseManager.standardPhrases) { _, _ in
@@ -416,14 +396,7 @@ struct StandardPhraseWindowView: View {
                     
                     ZStack {
                         if filteredPhrases.isEmpty && !isLoading {
-                            VStack { // VStackで囲み、Spacerで中央に配置
-                                Spacer()
-                                Text("定型文はありません")
-                                    .foregroundStyle(.secondary)
-                                    .font(.title2)
-                                    .padding(.bottom, 20)
-                                Spacer()
-                            }
+                                SharedEmptyListView(message: "定型文はありません")
                         } else {
                             ScrollViewReader { proxy in
                                 List(selection: $selectedPhraseID) {
@@ -432,20 +405,11 @@ struct StandardPhraseWindowView: View {
                                             StandardPhraseItemRow(
                                                 phrase: phrase,
                                                 index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                                hideNumbers: hideNumbers,
-                                                phraseToDelete: $phraseToDelete,
-                                                showingDeleteConfirmation: $showingDeleteConfirmation,
-                                                selectedPhraseID: $selectedPhraseID,
-                                                showCopyConfirmation: $showCopyConfirmation,
-                                                showQRCodeSheet: $showQRCodeSheet,
-                                                selectedPhraseForQRCode: $selectedPhraseForQRCode,
-                                                phraseToEdit: $phraseToEdit,
-                                                phraseToEditAndCopy: $phraseToEditAndCopy,
-                                                showingEditAndCopySheet: $showingEditAndCopySheet,
-                                                showingMoveSheet: $showingMoveSheet,
-                                                phraseToMove: $phraseToMove,
                                                 lineNumberTextWidth: lineNumberTextWidth,
-                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber,
+                                                menuItems: {
+                                                    standardPhraseMenuItems(for: phrase)
+                                                }
                                             )
                                             .tag(phrase.id)
                                             .listRowBackground(Color.clear)
@@ -457,20 +421,11 @@ struct StandardPhraseWindowView: View {
                                             StandardPhraseItemRow(
                                                 phrase: phrase,
                                                 index: filteredPhrases.firstIndex(where: { $0.id == phrase.id }) ?? 0,
-                                                hideNumbers: hideNumbers,
-                                                phraseToDelete: $phraseToDelete,
-                                                showingDeleteConfirmation: $showingDeleteConfirmation,
-                                                selectedPhraseID: $selectedPhraseID,
-                                                showCopyConfirmation: $showCopyConfirmation,
-                                                showQRCodeSheet: $showQRCodeSheet,
-                                                selectedPhraseForQRCode: $selectedPhraseForQRCode,
-                                                phraseToEdit: $phraseToEdit,
-                                                phraseToEditAndCopy: $phraseToEditAndCopy,
-                                                showingEditAndCopySheet: $showingEditAndCopySheet,
-                                                showingMoveSheet: $showingMoveSheet,
-                                                phraseToMove: $phraseToMove,
                                                 lineNumberTextWidth: lineNumberTextWidth,
-                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber
+                                                trailingPaddingForLineNumber: trailingPaddingForLineNumber,
+                                                menuItems: {
+                                                    standardPhraseMenuItems(for: phrase)
+                                                }
                                             )
                                             .tag(phrase.id)
                                             .listRowBackground(Color.clear)
@@ -478,18 +433,30 @@ struct StandardPhraseWindowView: View {
                                         }
                                     }
                                 }
+                                .onChange(of: searchTrigger) { _, _ in
+                                    if let firstId = filteredPhrases.first?.id {
+                                        Task { @MainActor in
+                                            try? await Task.sleep(nanoseconds: 100_000_000)
+                                            proxy.scrollTo(firstId)
+                                        }
+                                    }
+                                }
                                 .onChange(of: filteredPhrases) { _, newValue in
                                     if presetChangedForScroll {
                                         if let firstId = newValue.first?.id {
-                                            if reduceMotion {
-                                                proxy.scrollTo(firstId, anchor: .top)
-                                            } else {
-                                                withAnimation {
-                                                    proxy.scrollTo(firstId, anchor: .top)
-                                                }
+                                            Task { @MainActor in
+                                                try? await Task.sleep(nanoseconds: 100_000_000)
+                                                proxy.scrollTo(firstId)
                                             }
                                         }
                                         presetChangedForScroll = false
+                                    }
+                                    
+                                    Task { @MainActor in
+                                        try? await Task.sleep(nanoseconds: 10_000_000)
+                                        if selectedPhraseID == nil || !newValue.contains(where: { $0.id == selectedPhraseID }) {
+                                            selectedPhraseID = newValue.first?.id
+                                        }
                                     }
                                 }
                             }
@@ -500,137 +467,115 @@ struct StandardPhraseWindowView: View {
                             .animation(.easeOut(duration: 0.1), value: isLoading)
                             .contextMenu(forSelectionType: StandardPhrase.ID.self, menu: { selectedIDs in
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
-                                    // 定型文がURLかどうかを判定
-                                    let isURL: Bool = {
-                                        guard !currentPhrase.content.isEmpty,
-                                              let url = URL(string: currentPhrase.content) else {
-                                            return false
-                                        }
-                                        // URLスキームがhttpまたはhttpsであることを確認
-                                        return url.scheme == "http" || url.scheme == "https"
-                                    }()
-                                    
-                                    Button {
-                                        copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
-                                        showCopyConfirmation = true
-                                        currentCopyConfirmationTask?.cancel()
-                                        currentCopyConfirmationTask = Task { @MainActor in
-                                            try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                            guard !Task.isCancelled else { return }
-                                            withAnimation {
-                                                showCopyConfirmation = false
-                                            }
-                                        }
-                                    } label: {
-                                        Label("コピー", systemImage: "document.on.document")
-                                    }
-                                    Button {
-                                        phraseToEditAndCopy = currentPhrase
-                                        showingEditAndCopySheet = true
-                                    } label: {
-                                        Text("変更してコピー...")
-                                    }
-                                    // 定型文がURLの場合、「リンクを開く」メニューを表示
-                                    if isURL, let url = URL(string: currentPhrase.content) {
-                                        Button {
-                                            NSWorkspace.shared.open(url)
-                                        } label: {
-                                            Label("リンクを開く", systemImage: "paperclip")
-                                        }
-                                    }
-                                    Divider()
-                                    Button {
-                                        phraseToEdit = currentPhrase // 編集対象のフレーズをセット
-                                    } label: {
-                                        Label("編集...", systemImage: "pencil")
-                                    }
-                                    Button {
-                                        phraseToMove = currentPhrase
-                                        showingMoveSheet = true
-                                    } label: {
-                                        Label("別のプリセットに移動...", systemImage: "folder")
-                                    }
-                                    Button {
-                                        if let selectedPreset = presetManager.selectedPreset {
-                                            presetManager.duplicate(phrase: currentPhrase, in: selectedPreset)
-                                        }
-                                    } label: {
-                                        Label("複製", systemImage: "plus.square.on.square")
-                                    }
-                                    Button {
-                                        selectedPhraseForQRCode = currentPhrase
-                                        showQRCodeSheet = true
-                                    } label: {
-                                        Label("QRコードを表示...", systemImage: "qrcode")
-                                    }
-                                    Divider()
-                                    Button(role: .destructive) {
-                                        phraseToDelete = currentPhrase
-                                        showingDeleteConfirmation = true
-                                    } label: {
-                                        Label("削除...", systemImage: "trash")
-                                    }
+                                    standardPhraseMenuItems(for: currentPhrase)
                                 }
                             }, primaryAction: { selectedIDs in
+                                guard !clipboardManager.isExporting else { return }
                                 if let id = selectedIDs.first, let currentPhrase = filteredPhrases.first(where: { $0.id == id }) {
-                                    copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
-                                    showCopyConfirmation = true
-                                    currentCopyConfirmationTask?.cancel()
-                                    currentCopyConfirmationTask = Task { @MainActor in
-                                        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2秒
-                                        guard !Task.isCancelled else { return }
-                                        withAnimation {
-                                            showCopyConfirmation = false
-                                        }
+                                    performSharedCopyRoutine(
+                                        preventQuickPaste: modifierMonitor.currentOptionKeyPressed,
+                                        quickPaste: quickPaste,
+                                        quickPasteToPreviousApp: quickPasteToPreviousApp,
+                                        showCopyConfirmation: $showCopyConfirmation,
+                                        currentCopyConfirmationTask: $currentCopyConfirmationTask
+                                    ) {
+                                        copyToClipboard(currentPhrase.content, clipboardManager: clipboardManager)
                                     }
+                                    
                                     if closeWindowOnDoubleClickInStandardPhrasesWindow {
                                         dismiss()
                                     }
                                 }
                             })
+                            .focused($isListFocused)
+                            .defaultFocus($isListFocused, true)
                         }
                         
                         if isLoading {
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                                .scaleEffect(1.5)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(Color.clear)
+                            SharedLoadingView()
                         }
                     }
                 }
             } // メインコンテンツを囲むZStackの終わり
             
             // コピー確認メッセージ (元の場所で、このZStackの直下に配置)
-            VStack {
-                Spacer() // 下部に寄せる
-                if showCopyConfirmation {
-                    ZStack { // グラデーションとテキストを重ねるZStack
-                        LinearGradient(gradient: Gradient(colors: [Color.black.opacity(0.0), Color.black.opacity(0.25)]), startPoint: .top, endPoint: .bottom)
-                            .frame(height: 60)
-                            .frame(maxWidth: .infinity) // 横幅を最大に
+            SharedCopyConfirmationView(showCopyConfirmation: showCopyConfirmation)
+        }
+        .onKeyPress { press in
+            // シートが開かれている（または開こうとしている）間は検索欄への入力を無視する
+            if showingDeleteConfirmation || selectedPhraseForQRCode != nil || showingAddPresetSheet || phraseToEdit != nil || phraseToEditAndCopy != nil || phraseToMove != nil {
+                #if DEBUG
+                print("Keyboard blocked by state flag in StandardPhrase. delConf:\(showingDeleteConfirmation), qr:\(selectedPhraseForQRCode != nil), addPreset:\(showingAddPresetSheet), toEdit:\(phraseToEdit != nil), toEditCopy:\(phraseToEditAndCopy != nil), toMove:\(phraseToMove != nil)")
+                #endif
+                return .ignored
+            }
+            if let window = NSApp.keyWindow, window.attachedSheet != nil {
+                #if DEBUG
+                print("Keyboard blocked by attachedSheet in StandardPhrase.")
+                #endif
+                return .ignored
+            }
+            
+            guard press.modifiers.isEmpty || press.modifiers == .shift else { return .ignored }
+            
+            // バックスペースキーの処理
+            if press.key == .delete || press.key == .deleteForward || press.characters == "\u{7F}" || press.characters == "\u{08}" {
+                if !isSearchFieldFocused {
+                    if !searchText.isEmpty {
+                        searchText.removeLast()
+                        isSearchFieldFocused = true
                         
-                        Text("コピーしました！")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .shadow(color: .black.opacity(0.5), radius: 4, x: 0, y: 0)
-                            .padding(.top, 15)
-                    }
-                    .frame(maxWidth: .infinity) // ZStack自体も横幅を最大に
-                    .offset(y: 1) // 下にぴったりとくっつくように微調整
-                    .transition(.opacity) // フェードイン/アウト
-                    .onAppear {
-                        // onAppearからはタイマー設定ロジックを削除。
-                        // ここは単にビューの出現アニメーションに使用
-                    }
-                    .onDisappear {
-                        // ビューが非表示になる際にタスクをキャンセル (念のため)
-                        currentCopyConfirmationTask?.cancel()
+                        Task { @MainActor in
+                            try? await Task.sleep(nanoseconds: 50_000_000)
+                            if let window = NSApp.keyWindow,
+                               let textView = window.firstResponder as? NSTextView {
+                                let length = textView.string.count
+                                textView.setSelectedRange(NSRange(location: length, length: 0))
+                            }
+                        }
+                        return .handled
                     }
                 }
+                return .ignored
             }
-            .animation(.easeOut(duration: 0.1), value: showCopyConfirmation)
-            .allowsHitTesting(false) // クリックイベントを透過させる
+            
+            if press.key == .escape {
+                if !searchText.isEmpty {
+                    searchText = ""
+                    return .handled
+                } else {
+                    return .ignored
+                }
+            }
+            
+            let ignoredKeys: Set<KeyEquivalent> = [.return, .tab, .space, .upArrow, .downArrow, .leftArrow, .rightArrow, .home, .end, .pageUp, .pageDown, .clear]
+            if ignoredKeys.contains(press.key) {
+                return .ignored
+            }
+            guard let char = press.characters.first, !press.characters.isEmpty else { return .ignored }
+            
+            // 制御文字の入力を無視
+            if let scalar = char.unicodeScalars.first, CharacterSet.controlCharacters.contains(scalar) {
+                return .ignored
+            }
+            
+            if !isSearchFieldFocused {
+                searchText.append(char)
+                isSearchFieldFocused = true
+                
+                // 検索欄にフォーカスが移った後、文字が全選択されるのを防ぐためカーソルを末尾に移動させる
+                Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                    if let window = NSApp.keyWindow,
+                       let textView = window.firstResponder as? NSTextView {
+                        let length = textView.string.count
+                        textView.setSelectedRange(NSRange(location: length, length: 0))
+                    }
+                }
+                
+                return .handled
+            }
+            return .ignored
         }
         .frame(minWidth: 300, idealWidth: 375, maxWidth: 900, minHeight: 300, idealHeight: 400, maxHeight: .infinity)
         .alert("定型文の削除", isPresented: $showingDeleteConfirmation) {
@@ -653,37 +598,35 @@ struct StandardPhraseWindowView: View {
         } message: {
             Text("「\(truncateString(phraseToDelete?.title, maxLength: 50))」を本当に削除しますか？")
         }
-        .sheet(isPresented: $showQRCodeSheet) {
-            if let phrase = selectedPhraseForQRCode {
-                QRCodeView(text: phrase.content)
-            }
+        .sheet(item: $selectedPhraseForQRCode) { phrase in
+            QRCodeView(text: phrase.content)
         }
         .sheet(item: $phraseToEdit) { phrase in
             AddEditPhraseView(mode: .edit(phrase), presetManager: presetManager, isSheet: true)
                 .environmentObject(standardPhraseManager)
                 .environmentObject(presetManager)
         }
-        .sheet(isPresented: $showingEditAndCopySheet) {
-            if let phrase = phraseToEditAndCopy {
-                EditHistoryItemView(content: phrase.content, onCopy: { editedContent in
+        .sheet(item: $phraseToEditAndCopy) { phrase in
+            ChangeItemAndCopyView(content: phrase.content, onCopy: { editedContent in
+                let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+                let currentQuickPasteToPreviousApp = UserDefaults.standard.bool(forKey: "quickPasteToPreviousApp")
+                
+                performSharedCopyRoutine(
+                    preventQuickPaste: ModifierKeyMonitor.shared.currentOptionKeyPressed,
+                    quickPaste: currentQuickPaste,
+                    quickPasteToPreviousApp: currentQuickPasteToPreviousApp,
+                    showCopyConfirmation: $showCopyConfirmation,
+                    currentCopyConfirmationTask: $currentCopyConfirmationTask
+                ) {
                     copyToClipboard(editedContent, clipboardManager: clipboardManager)
-                    showCopyConfirmation = true
-                    currentCopyConfirmationTask?.cancel()
-                    currentCopyConfirmationTask = Task { @MainActor in
-                        try? await Task.sleep(nanoseconds: 2_000_000_000)
-                        guard !Task.isCancelled else { return }
-                        withAnimation {
-                            showCopyConfirmation = false
-                        }
-                    }
-                }, isSheet: true)
-            }
+                }
+            }, isSheet: true)
         }
         .sheet(isPresented: $showingAddPresetSheet) {
             AddEditPresetView(isSheet: true, editingPreset: nil)
         }
-        .sheet(isPresented: $showingMoveSheet) {
-            if let phrase = phraseToMove, let sourceId = presetManager.selectedPresetId {
+        .sheet(item: $phraseToMove) { phrase in
+            if let sourceId = presetManager.selectedPresetId {
                 MovePhrasePresetSelectionSheet(presetManager: presetManager, sourcePresetId: sourceId, selectedPresetId: $destinationPresetId) {
                     if let destinationId = destinationPresetId {
                         presetManager.move(phrase: phrase, to: destinationId)
@@ -693,8 +636,11 @@ struct StandardPhraseWindowView: View {
         }
         .onAppear {
             performSearch(searchTerm: searchText)
-            DispatchQueue.main.async {
-                isSearchFieldFocused = true
+            
+            // ウインドウ表示時は必ずリストにフォーカスを当てる
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
+                isListFocused = true
             }
         }
         .onDisappear {

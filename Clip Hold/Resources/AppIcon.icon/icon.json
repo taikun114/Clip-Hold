@@ -1,4 +1,7 @@
 {
+  "features" : [
+    "refractivity"
+  ],
   "fill" : {
     "linear-gradient" : [
       "srgb:0.55907,0.67282,0.91445,1.00000",
@@ -21,6 +24,7 @@
       "layers" : [
         {
           "glass" : false,
+          "hidden" : false,
           "image-name" : "Shardow.png",
           "name" : "Shardow"
         }
@@ -71,21 +75,35 @@
             }
           ],
           "glass" : false,
+          "hidden" : false,
           "image-name" : "h_Top_Shadow.png",
-          "name" : "h_Top_Shadow"
+          "name" : "h_Top_Shadow",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              -16
+            ]
+          }
         },
         {
           "fill-specializations" : [
             {
               "appearance" : "dark",
-              "value" : {
-                "solid" : "srgb:0.80392,0.85882,0.94902,1.00000"
-              }
+              "value" : "automatic"
             }
           ],
           "glass" : true,
+          "hidden" : false,
           "image-name" : "h_Top.png",
-          "name" : "h_Top"
+          "name" : "h_Top",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              -16
+            ]
+          }
         }
       ],
       "position" : {
@@ -119,6 +137,9 @@
     {
       "blend-mode-specializations" : [
         {
+          "value" : "normal"
+        },
+        {
           "appearance" : "dark",
           "value" : "normal"
         },
@@ -127,10 +148,13 @@
           "value" : "normal"
         }
       ],
-      "blur-material" : 0.5,
+      "blur-material" : 0.2,
       "layers" : [
         {
           "fill-specializations" : [
+            {
+              "value" : "automatic"
+            },
             {
               "appearance" : "dark",
               "value" : {
@@ -141,10 +165,13 @@
               }
             }
           ],
+          "glass" : true,
+          "hidden" : false,
           "image-name" : "Clip.png",
           "name" : "Clip"
         }
       ],
+      "lighting" : "individual",
       "position" : {
         "scale" : 0.5,
         "translation-in-points" : [
@@ -152,11 +179,16 @@
           0
         ]
       },
+      "refractivity" : {
+        "depth" : 0,
+        "enabled" : true,
+        "strength" : 0.1
+      },
       "shadow-specializations" : [
         {
           "value" : {
             "kind" : "layer-color",
-            "opacity" : 0.5
+            "opacity" : 1
           }
         },
         {
@@ -167,6 +199,7 @@
           }
         }
       ],
+      "specular" : true,
       "translucency-specializations" : [
         {
           "value" : {
@@ -196,15 +229,14 @@
           "fill-specializations" : [
             {
               "appearance" : "dark",
-              "value" : {
-                "solid" : "srgb:0.80534,0.85861,0.94902,1.00000"
-              }
+              "value" : "automatic"
             },
             {
               "appearance" : "tinted",
               "value" : "automatic"
             }
           ],
+          "hidden" : false,
           "image-name" : "h_Bottom.png",
           "name" : "h_Bottom"
         }

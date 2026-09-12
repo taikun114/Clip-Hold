@@ -11,11 +11,14 @@ class StandardPhrasePresetManager: ObservableObject {
             // 「プリセットなし」が選択されている状態でプリセットが利用可能になった場合、最初のプリセットを選択
             if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" && !presets.isEmpty {
                 selectedPresetId = presets.first?.id
-                saveSelectedPresetId()
             }
         }
     }
-    @Published var selectedPresetId: UUID?
+    @Published var selectedPresetId: UUID? {
+        didSet {
+            saveSelectedPresetId()
+        }
+    }
     
     let presetAddedSubject = PassthroughSubject<Void, Never>()
     
@@ -27,6 +30,12 @@ class StandardPhrasePresetManager: ObservableObject {
     
     private init() {
         loadPresetsFromFileSystem()
+        
+        DistributedNotificationCenter.default().addObserver(forName: NSNotification.Name("ClipHoldDidUpdatePhrasesInBackground"), object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in
+                self?.loadPresetsFromFileSystem()
+            }
+        }
     }
     
     private func didUserDeleteDefaultPreset() -> Bool {
@@ -62,12 +71,11 @@ class StandardPhrasePresetManager: ObservableObject {
         selectedPresetId = defaultPreset.id
         savePresetToFile(defaultPreset)
         savePresetIndex()
-        saveSelectedPresetId()
         // アイコンを生成
         let _ = PresetIconGenerator.shared.generateIcon(for: defaultPreset)
     }
     
-    private func loadPresetsFromFileSystem() {
+    func loadPresetsFromFileSystem() {
         // アイコンキャッシュをクリア
         PresetIconGenerator.shared.clearCache()
         
@@ -98,6 +106,9 @@ class StandardPhrasePresetManager: ObservableObject {
             loadPresetPhrases(for: preset.id)
         }
         
+        // 読み込んだ全てのフレーズ間でIDの重複がないかチェックし、あれば解消する
+        resolveDuplicatePhraseIds()
+        
         // すべて読み込んだプリセットのアイコンを生成
         for preset in presets {
             let _ = PresetIconGenerator.shared.generateIcon(for: preset)
@@ -122,12 +133,10 @@ class StandardPhrasePresetManager: ObservableObject {
                 // デフォルトのプリセットが存在しない場合、利用可能な最初のプリセットを選択
                 selectedPresetId = presets.first?.id
             }
-            saveSelectedPresetId()
             selectedPresetWasUpdated = true
         } else if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" && !presets.isEmpty {
             // 「プリセットなし」が選択されている状態でプリセットが利用可能になった場合、最初のプリセットを選択
             selectedPresetId = presets.first?.id
-            saveSelectedPresetId()
             selectedPresetWasUpdated = true
         }
         
@@ -226,10 +235,70 @@ class StandardPhrasePresetManager: ObservableObject {
         
         do {
             let data = try Data(contentsOf: fileURL)
-            let phrases = try JSONDecoder().decode([StandardPhrase].self, from: data)
+            var phrases = try JSONDecoder().decode([StandardPhrase].self, from: data)
+            var needsSave = false
+            for i in 0..<phrases.count {
+                if phrases[i].codeDetectorVersion != CodeDetector.currentDetectorVersion {
+                    phrases[i].updateCodeDetection()
+                    needsSave = true
+                }
+            }
             presets[presetIndex].phrases = phrases
+            if needsSave {
+                savePresetToFile(presets[presetIndex])
+            }
         } catch {
             print("Error loading phrases for preset \(presetId): \(error.localizedDescription)")
+        }
+    }
+    
+    /// 全プリセットに含まれる定型文の総数を返します。
+    var totalPhrasesCount: Int {
+        let count = presets.reduce(0) { $0 + $1.phrases.count }
+        return count > 0 ? count : StandardPhraseManager.shared.standardPhrases.count
+    }
+    
+    /// 全プリセットの定型文のコード検出インデックスを更新します。
+    func updateCodeDetectionIndex(forceAll: Bool = false) {
+        for i in 0..<presets.count {
+            var presetNeedsSave = false
+            for j in 0..<presets[i].phrases.count {
+                if forceAll || presets[i].phrases[j].codeDetectorVersion != CodeDetector.currentDetectorVersion {
+                    presets[i].phrases[j].updateCodeDetection()
+                    presetNeedsSave = true
+                }
+            }
+            if presetNeedsSave {
+                savePresetToFile(presets[i])
+            }
+        }
+    }
+    
+    private func resolveDuplicatePhraseIds() {
+        var seenPhraseIds = Set<UUID>()
+        
+        for i in 0..<presets.count {
+            var presetNeedsSave = false
+            for j in 0..<presets[i].phrases.count {
+                let phraseId = presets[i].phrases[j].id
+                if seenPhraseIds.contains(phraseId) {
+                    // IDが既に存在する場合は新しく生成（順番は維持される）
+                    let newPhrase = StandardPhrase(
+                        id: UUID(),
+                        title: presets[i].phrases[j].title,
+                        content: presets[i].phrases[j].content
+                    )
+                    presets[i].phrases[j] = newPhrase
+                    presetNeedsSave = true
+#if DEBUG
+                    print("StandardPhrasePresetManager: Resolved duplicate phrase ID for '\(newPhrase.title)' in preset '\(presets[i].name)'.")
+#endif
+                }
+                seenPhraseIds.insert(presets[i].phrases[j].id)
+            }
+            if presetNeedsSave {
+                savePresetToFile(presets[i])
+            }
         }
     }
     
@@ -246,7 +315,9 @@ class StandardPhrasePresetManager: ObservableObject {
             encoder.outputFormatting = .prettyPrinted
             let data = try encoder.encode(preset.phrases)
             try data.write(to: fileURL)
+#if DEBUG
             print("Saved preset with \(preset.phrases.count) phrases for preset \(preset.id)")
+#endif
         } catch {
             print("Error saving preset to file: \(error.localizedDescription)")
         }
@@ -293,7 +364,7 @@ class StandardPhrasePresetManager: ObservableObject {
         }
     }
     
-    func saveSelectedPresetId() {
+    private func saveSelectedPresetId() {
         // FFFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF は保存しない
         if let selectedPresetId = selectedPresetId,
            selectedPresetId.uuidString != "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF",
@@ -306,7 +377,13 @@ class StandardPhrasePresetManager: ObservableObject {
     
     func addPreset(name: String, icon: String? = nil, color: String? = nil, customColor: PresetCustomColor? = nil) {
         let iconToUse = icon?.isEmpty ?? true ? "list.bullet.rectangle.portrait" : icon!
-        let newPreset = StandardPhrasePreset(name: name, icon: iconToUse, color: color, customColor: customColor)
+        
+        var newId = UUID()
+        while presets.contains(where: { $0.id == newId }) {
+            newId = UUID()
+        }
+        
+        let newPreset = StandardPhrasePreset(id: newId, name: name, icon: iconToUse, color: color, customColor: customColor)
         presets.append(newPreset)
         // 「プリセットなし」が選択されていた場合、新しいプリセットを選択
         if selectedPresetId?.uuidString == "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF" {
@@ -314,7 +391,6 @@ class StandardPhrasePresetManager: ObservableObject {
         }
         savePresetToFile(newPreset)
         savePresetIndex()
-        saveSelectedPresetId()
         let _ = PresetIconGenerator.shared.generateIcon(for: newPreset)
         presetAddedSubject.send()
     }
@@ -322,14 +398,21 @@ class StandardPhrasePresetManager: ObservableObject {
     func addPreset(preset: StandardPhrasePreset) {
         // アイコンが空文字列の場合、デフォルトアイコンに設定
         let iconToUse = preset.icon.isEmpty ? (preset.id.uuidString == "00000000-0000-0000-0000-000000000000" ? "star.fill" : "list.bullet.rectangle.portrait") : preset.icon
-        let presetWithValidIcon = StandardPhrasePreset(id: preset.id, name: preset.name, phrases: preset.phrases, icon: iconToUse, color: preset.color, customColor: preset.customColor)
+        
+        var finalId = preset.id
+        if finalId.uuidString != "00000000-0000-0000-0000-000000000000" {
+            while presets.contains(where: { $0.id == finalId }) {
+                finalId = UUID()
+            }
+        }
+        
+        let presetWithValidIcon = StandardPhrasePreset(id: finalId, name: preset.name, phrases: preset.phrases, icon: iconToUse, color: preset.color, customColor: preset.customColor)
         
         presets.append(presetWithValidIcon)
         // 新しく追加したプリセットを選択状態にする
         selectedPresetId = presetWithValidIcon.id
         savePresetToFile(presetWithValidIcon)
         savePresetIndex()
-        saveSelectedPresetId()
         let _ = PresetIconGenerator.shared.generateIcon(for: presetWithValidIcon)
         presetAddedSubject.send()
     }
@@ -348,7 +431,6 @@ class StandardPhrasePresetManager: ObservableObject {
         }
         savePresetToFile(newPreset)
         savePresetIndex()
-        saveSelectedPresetId()
         let _ = PresetIconGenerator.shared.generateIcon(for: newPreset)
         presetAddedSubject.send()
     }
@@ -369,7 +451,6 @@ class StandardPhrasePresetManager: ObservableObject {
         }
         
         savePresetIndex()
-        saveSelectedPresetId()
         
         // 他のプリセットにも影響がないか確認し、存在しないプリセットへの割り当てをクリーンアップ
         cleanupInvalidAssignments()
@@ -391,15 +472,31 @@ class StandardPhrasePresetManager: ObservableObject {
             savePresetIndex()
             presetAddedSubject.send()
             PresetIconGenerator.shared.updateIcon(for: presetWithValidIcon)
+            
+            // Spotlightのインデックス（画像キャッシュ）を更新するために再登録
+            for phrase in presetWithValidIcon.phrases {
+                SpotlightManager.shared.indexStandardPhrase(phrase, presetName: presetWithValidIcon.name)
+            }
         }
     }
     
     func duplicatePreset(_ preset: StandardPhrasePreset) {
         // 新しいIDで、ただし同じ内容の新しいプリセットを作成
+        
+        var newPresetId = UUID()
+        while presets.contains(where: { $0.id == newPresetId }) {
+            newPresetId = UUID()
+        }
+        
+        // 複製されたフレーズには新しい一意のIDを割り当てる
+        let newPhrases = preset.phrases.map { oldPhrase in
+            StandardPhrase(id: UUID(), title: oldPhrase.title, content: oldPhrase.content)
+        }
+        
         let newPreset = StandardPhrasePreset(
-            id: UUID(), // 新しいID
+            id: newPresetId, // 新しいID
             name: preset.name, // 同じ名前を維持
-            phrases: preset.phrases, // フレーズをコピー
+            phrases: newPhrases, // 新しいIDを持つフレーズをセット
             icon: preset.icon,
             color: preset.color,
             customColor: preset.customColor
@@ -493,7 +590,6 @@ class StandardPhrasePresetManager: ObservableObject {
         selectedPresetId = UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF")
         
         savePresetIndex()
-        saveSelectedPresetId()
         
         // デフォルトプリセットは再作成しない
         

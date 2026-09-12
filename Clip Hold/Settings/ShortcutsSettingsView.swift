@@ -6,9 +6,29 @@ struct ShortcutsSettingsView: View {
     @StateObject private var presetManager = StandardPhrasePresetManager.shared
     @EnvironmentObject var clipboardManager: ClipboardManager
     @AppStorage("useFilteredHistoryForShortcuts") private var useFilteredHistoryForShortcuts: Bool = false
+    @AppStorage("isQuickOverlayShortcutEnabled") private var isQuickOverlayShortcutEnabled: Bool = false
+    
+    @AppStorage("historyQuickOverlayModifiers") private var historyQuickOverlayModifiers: Int = 0
+    @AppStorage("standardPhraseQuickOverlayModifiers") private var standardPhraseQuickOverlayModifiers: Int = 0
     
     var body: some View {
         Form {
+            Section(header: Text("クイックオーバーレイ").font(.headline)) {
+                HStack {
+                    Text("定型文オーバーレイ")
+                        .foregroundColor(isQuickOverlayShortcutEnabled ? .primary : .secondary)
+                    Spacer()
+                    ModifierKeyPickerView(modifiers: $standardPhraseQuickOverlayModifiers)
+                }
+                HStack {
+                    Text("履歴オーバーレイ")
+                        .foregroundColor(isQuickOverlayShortcutEnabled ? .primary : .secondary)
+                    Spacer()
+                    ModifierKeyPickerView(modifiers: $historyQuickOverlayModifiers)
+                }
+            }
+            .disabled(!isQuickOverlayShortcutEnabled)
+            
             Section(header: Text("ウィンドウ操作").font(.headline)) {
                 HStack {
                     Text("定型文ウィンドウを開く")
@@ -195,6 +215,32 @@ struct ShortcutsSettingsView: View {
                         .labelsHidden()
                 }
                 
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("ピン留めされた項目をコピーする")
+                        if let pinnedItem = clipboardManager.pinnedItem {
+                            Text("「\(pinnedItem.text.firstNonEmptyLine())」")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        } else {
+                            Text("ピン留めされた項目はありません")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .copyPinnedHistoryItem)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.copyPinnedHistoryItem)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
+                }
+                
                 ForEach(0..<10, id: \.self) { index in
                     HStack {
                         Text("\(index + 1)\((index + 1).ordinalSuffixForHistory)履歴をコピーする")
@@ -226,6 +272,19 @@ struct ShortcutsSettingsView: View {
                         .buttonStyle(.borderless)
                         .help("デフォルトのショートカットに戻します。")
                     }
+                }
+                HStack {
+                    Text("新規コピー画面を開く")
+                    Spacer()
+                    KeyboardShortcuts.Recorder(for: .newCopy)
+                    Button(action: {
+                        KeyboardShortcuts.reset(.newCopy)
+                    }) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .imageScale(.small)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("デフォルトのショートカットに戻します。")
                 }
                 HStack {
                     Text("最新の履歴を変更してコピーする")
