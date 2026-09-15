@@ -37,13 +37,13 @@ struct LicenseInfoModalView: View {
     private let qwenCodeVersionString: String = "0.2.3"
     
     // UniversalSFSymbolsPickerの使用バージョン
-    private let universalSFSymbolsPickerVersionString: String = "1.0.1"
+    private let universalSFSymbolsPickerVersionString: String = "1.1.1"
     
     // HighlighterSwiftの使用バージョン
     private let highlighterVersionString: String = "3.1.0"
     
     // KeyboardShortcutsの使用バージョン
-    private let keyboardShortcutsVersionString: String = "3.0.1"
+    private let keyboardShortcutsVersionString: String = "3.1.0"
     
     // create-dmgの使用バージョン
     private let createDmgVersionString: String = "1.3.0"
