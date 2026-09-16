@@ -46,6 +46,12 @@ For 1.6.3 and earlier, it is listed as follows:
 Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 -->
 
+## 1.7.1
+
+### Bug Fixes and Improvements
+#### Quick Overlay
+- **Fix issue where tooltips were hidden when the screen edge was positioned on the left**
+
 ## 1.7.0
 
 > [!NOTE]

@@ -640,7 +640,30 @@ class QuickOverlayWindowController: NSWindowController {
     /// オーバーレイの視覚的な表示領域（シャドウのパディングを除いた500x500の領域）
     var visualFrame: NSRect? {
         guard let window = self.window, window.isVisible else { return nil }
-        return window.frame.insetBy(dx: 60, dy: 60)
+        let frame = window.frame
+        let mode = QuickOverlayManager.shared.presentationMode
+        
+        switch mode {
+        case .screenEdge(let edge, _, _, let edgeInset):
+            let visualWidth: CGFloat = 500
+            let visualHeight: CGFloat = 500
+            switch edge.edgeSide {
+            case .top:
+                // 上部に topInset (edgeInset) があり、メインコンテンツはその下
+                return NSRect(x: frame.minX + 60, y: frame.minY + 60, width: visualWidth, height: visualHeight)
+            case .bottom:
+                // 下部に bottomInset (edgeInset) があり、メインコンテンツはその上
+                return NSRect(x: frame.minX + 60, y: frame.minY + 60 + edgeInset, width: visualWidth, height: visualHeight)
+            case .left:
+                // 左部に leftInset (edgeInset) があり、メインコンテンツはその右
+                return NSRect(x: frame.minX + 60 + edgeInset, y: frame.minY + 60, width: visualWidth, height: visualHeight)
+            case .right:
+                // 右部に rightInset (edgeInset) があり、メインコンテンツはその左
+                return NSRect(x: frame.minX + 60, y: frame.minY + 60, width: visualWidth, height: visualHeight)
+            }
+        case .shortcut:
+            return frame.insetBy(dx: 60, dy: 60)
+        }
     }
     
     private func positionWindow(animated: Bool = false) {

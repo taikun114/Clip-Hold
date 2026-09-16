@@ -169,7 +169,6 @@ class QuickOverlayTooltipWindowController: NSWindowController {
               let screen = overlayWindow.screen ?? NSScreen.main else { return }
                
         let screenRect = screen.visibleFrame
-        let overlayFrame = overlayWindow.frame
         
         let maxVisualWidth: CGFloat = 500
         let shadowPadding: CGFloat = isCompact ? 20 : 60
@@ -238,73 +237,116 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             
             tooltipDirection = chosenDirection == .above ? .above : .below
         } else {
-            let visualMinX = overlayFrame.minX + 60
-            let visualMinY = overlayFrame.minY + 60
-            let visualMaxX = overlayFrame.maxX - 60
-            let visualMaxY = overlayFrame.maxY - 60
+            // QuickOverlayWindowControllerから正確な視覚矩形を取得する（見つからない場合はフォールバック）
+            let contentVisualFrame = QuickOverlayWindowController.shared.visualFrame ?? overlayWindow.frame.insetBy(dx: 60, dy: 60)
+            let visualMinX = contentVisualFrame.minX
+            let visualMinY = contentVisualFrame.minY
+            let visualMaxX = contentVisualFrame.maxX
+            let visualMaxY = contentVisualFrame.maxY
             
             let spaceAbove = safeMaxY - visualMaxY - gap
             let spaceBelow = visualMinY - safeMinY - gap
             let spaceLeft = visualMinX - safeMinX - gap
             let spaceRight = safeMaxX - visualMaxX - gap
             
-            let position = UserDefaults.standard.quickOverlayShortcutPosition
-            let preferAbove = ["bottom", "bottomLeft", "bottomRight"].contains(position)
+            var chosenDirection: Direction
             
-            var chosenDirection: Direction = preferAbove ? .above : .below
-            
-            // Try preferred vertical
-            if chosenDirection == .above && spaceAbove < 200 {
-                if spaceBelow >= 200 { chosenDirection = .below }
-            } else if chosenDirection == .below && spaceBelow < 200 {
-                if spaceAbove >= 200 { chosenDirection = .above }
-            }
-            
-            // If still doesn't fit, check horizontal
-            if (chosenDirection == .above && spaceAbove < 200) || (chosenDirection == .below && spaceBelow < 200) {
-                if spaceRight >= 300 {
-                    chosenDirection = .right
-                } else if spaceLeft >= 300 {
-                    chosenDirection = .left
-                } else {
-                    chosenDirection = spaceAbove > spaceBelow ? .above : .below
+            switch QuickOverlayManager.shared.presentationMode {
+            case .screenEdge(let edge, _, _, _):
+                switch edge.edgeSide {
+                case .left:
+                    // 左端配置時：下に余裕があれば下、なければ上、上下どちらも狭い場合は右
+                    if spaceBelow >= 150 {
+                        chosenDirection = .below
+                    } else if spaceAbove >= 150 {
+                        chosenDirection = .above
+                    } else if spaceRight >= 200 {
+                        chosenDirection = .right
+                    } else {
+                        chosenDirection = spaceBelow >= spaceAbove ? .below : .above
+                    }
+                case .right:
+                    // 右端配置時：下に余裕があれば下、なければ上、上下どちらも狭い場合は左
+                    if spaceBelow >= 150 {
+                        chosenDirection = .below
+                    } else if spaceAbove >= 150 {
+                        chosenDirection = .above
+                    } else if spaceLeft >= 200 {
+                        chosenDirection = .left
+                    } else {
+                        chosenDirection = spaceBelow >= spaceAbove ? .below : .above
+                    }
+                case .top:
+                    if spaceBelow >= 150 {
+                        chosenDirection = .below
+                    } else {
+                        chosenDirection = spaceRight > spaceLeft ? .right : .left
+                    }
+                case .bottom:
+                    if spaceAbove >= 150 {
+                        chosenDirection = .above
+                    } else {
+                        chosenDirection = spaceRight > spaceLeft ? .right : .left
+                    }
+                }
+                
+            case .shortcut:
+                let position = UserDefaults.standard.quickOverlayShortcutPosition
+                let preferAbove = ["bottom", "bottomLeft", "bottomRight"].contains(position)
+                chosenDirection = preferAbove ? .above : .below
+                
+                // 垂直方向の空きを優先判定
+                if chosenDirection == .above && spaceAbove < 200 {
+                    if spaceBelow >= 200 { chosenDirection = .below }
+                } else if chosenDirection == .below && spaceBelow < 200 {
+                    if spaceAbove >= 200 { chosenDirection = .above }
+                }
+                
+                // 上下に収まらない場合は水平方向を試す
+                if (chosenDirection == .above && spaceAbove < 200) || (chosenDirection == .below && spaceBelow < 200) {
+                    if spaceRight >= 300 {
+                        chosenDirection = .right
+                    } else if spaceLeft >= 300 {
+                        chosenDirection = .left
+                    } else {
+                        chosenDirection = spaceAbove > spaceBelow ? .above : .below
+                    }
                 }
             }
             
-            // 画面端との余白を確保し、ツールチップが反対側にずれないよう幅を狭める
+            // 画面端との余白を確保し、各方向でセーフエリア内に収まるよう初期計算
             switch chosenDirection {
             case .right:
                 let targetVisualMinX = visualMaxX + gap
                 let availableWidth = max(200, safeMaxX - targetVisualMinX)
                 effectiveVisualWidth = min(initialVisualWidth, availableWidth)
                 newOrigin.x = targetVisualMinX - shadowPadding
-                newOrigin.y = visualMinY - shadowPadding
-                finalVisualHeight = min(500, safeMaxY - visualMinY)
+                finalVisualHeight = min(500, max(50, safeMaxY - safeMinY))
                 
             case .left:
                 let targetVisualMaxX = visualMinX - gap
                 let availableWidth = max(200, targetVisualMaxX - safeMinX)
                 effectiveVisualWidth = min(initialVisualWidth, availableWidth)
-                newOrigin.x = targetVisualMaxX - effectiveVisualWidth - shadowPadding
-                newOrigin.y = visualMinY - shadowPadding
-                finalVisualHeight = min(500, safeMaxY - visualMinY)
+                let targetVisualMinX = targetVisualMaxX - effectiveVisualWidth
+                newOrigin.x = max(safeMinX, targetVisualMinX) - shadowPadding
+                finalVisualHeight = min(500, max(50, safeMaxY - safeMinY))
                 
             case .above:
-                let targetVisualMinX = visualMinX
-                if targetVisualMinX + initialVisualWidth > safeMaxX {
-                    effectiveVisualWidth = max(200, safeMaxX - targetVisualMinX)
-                }
+                let targetVisualMinX = max(safeMinX, visualMinX)
+                let maxAllowedVisualMaxX = min(safeMaxX, visualMaxX)
+                let availableWidth = max(200, maxAllowedVisualMaxX - targetVisualMinX)
+                effectiveVisualWidth = min(initialVisualWidth, availableWidth)
                 newOrigin.x = targetVisualMinX - shadowPadding
-                finalVisualHeight = min(500, spaceAbove)
+                finalVisualHeight = min(500, max(50, spaceAbove))
                 newOrigin.y = visualMaxY + gap - shadowPadding
                 
             case .below:
-                let targetVisualMinX = visualMinX
-                if targetVisualMinX + initialVisualWidth > safeMaxX {
-                    effectiveVisualWidth = max(200, safeMaxX - targetVisualMinX)
-                }
+                let targetVisualMinX = max(safeMinX, visualMinX)
+                let maxAllowedVisualMaxX = min(safeMaxX, visualMaxX)
+                let availableWidth = max(200, maxAllowedVisualMaxX - targetVisualMinX)
+                effectiveVisualWidth = min(initialVisualWidth, availableWidth)
                 newOrigin.x = targetVisualMinX - shadowPadding
-                finalVisualHeight = min(500, spaceBelow)
+                finalVisualHeight = min(500, max(50, spaceBelow))
                 newOrigin.y = visualMinY - gap - finalVisualHeight - shadowPadding
             }
 
@@ -337,14 +379,39 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         finalVisualHeight = min(finalVisualHeight, naturalVisualHeight)
         finalVisualHeight = max(finalVisualHeight, 50)
         
-        // 下配置（.below）の場合、高さ確定後にY原点を再調整
-        if anchorPoint == nil, tooltipDirection == .below {
-            let visualMinY = overlayFrame.minY + 60
-            newOrigin.y = visualMinY - gap - finalVisualHeight - shadowPadding
+        // 高さ確定後、オーバーレイとの相対位置およびY座標の再調整
+        if anchorPoint == nil {
+            let contentVisualFrame = QuickOverlayWindowController.shared.visualFrame ?? overlayWindow.frame.insetBy(dx: 60, dy: 60)
+            let visualMinY = contentVisualFrame.minY
+            let visualMaxY = contentVisualFrame.maxY
+            
+            switch tooltipDirection {
+            case .below:
+                let targetVisualMinY = visualMinY - gap - finalVisualHeight
+                newOrigin.y = max(safeMinY, targetVisualMinY) - shadowPadding
+            case .above:
+                let targetVisualMinY = visualMaxY + gap
+                newOrigin.y = targetVisualMinY - shadowPadding
+            case .left, .right:
+                // オーバーレイの上端にツールチップの上端を揃える
+                let targetVisualMaxY = visualMaxY
+                var targetVisualMinY = targetVisualMaxY - finalVisualHeight
+                if targetVisualMinY < safeMinY {
+                    targetVisualMinY = safeMinY
+                }
+                if targetVisualMinY + finalVisualHeight > safeMaxY {
+                    targetVisualMinY = safeMaxY - finalVisualHeight
+                }
+                newOrigin.y = targetVisualMinY - shadowPadding
+            }
         }
         
         let windowWidth = effectiveVisualWidth + windowPadding
         let finalWindowHeight = finalVisualHeight + windowPadding
+        
+        // ツールチップ全体が画面セーフエリア外にはみ出さないように最終クランプ
+        newOrigin.x = min(max(newOrigin.x, safeMinX - shadowPadding), safeMaxX - windowWidth + shadowPadding)
+        newOrigin.y = min(max(newOrigin.y, safeMinY - shadowPadding), safeMaxY - finalWindowHeight + shadowPadding)
         
         let calculatedTextHeight = ceil(textRect.height)
         let finalView = QuickOverlayTooltipView(
