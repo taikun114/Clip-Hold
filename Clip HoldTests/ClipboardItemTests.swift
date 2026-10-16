@@ -4,6 +4,47 @@ import Foundation
 
 struct ClipboardItemTests {
     
+    @Test("自動更新は未判定と旧バージョンだけを再判定する")
+    func testAutomaticCodeDetectionIndexUpdate() {
+        let versions: [Int?] = [nil, CodeDetector.currentDetectorVersion - 1, CodeDetector.currentDetectorVersion]
+        for version in versions {
+            let item = ClipboardItem(text: "let sampleCount: Int = 8")
+            item.codeDetectorVersion = version
+            item.detectedLanguage = .python
+
+            CodeDetectionIndexUpdateMode.outdatedOnly.updateCodeDetection(for: item)
+
+            #expect(item.codeDetectorVersion == CodeDetector.currentDetectorVersion)
+            #expect(item.detectedLanguage == (version == CodeDetector.currentDetectorVersion ? .python : .swift))
+        }
+    }
+
+    @Test("手動リセットは現在のバージョンも再判定する")
+    func testForcedCodeDetectionIndexUpdate() {
+        let item = ClipboardItem(text: "let sampleCount: Int = 8")
+        item.codeDetectorVersion = CodeDetector.currentDetectorVersion
+        item.detectedLanguage = .python
+
+        CodeDetectionIndexUpdateMode.all.updateCodeDetection(for: item)
+
+        #expect(item.codeDetectorVersion == CodeDetector.currentDetectorVersion)
+        #expect(item.detectedLanguage == .swift)
+    }
+
+    @Test("再判定では通常テキストの古いコード検出結果を解除する")
+    func testCodeDetectionIndexClearsStaleClassification() {
+        for mode in [CodeDetectionIndexUpdateMode.outdatedOnly, .all] {
+            let item = ClipboardItem(text: "これは架空の連絡事項です。")
+            item.codeDetectorVersion = CodeDetector.currentDetectorVersion - 1
+            item.detectedLanguage = .yaml
+
+            mode.updateCodeDetection(for: item)
+
+            #expect(item.detectedLanguage == nil)
+            #expect(item.codeDetectorVersion == CodeDetector.currentDetectorVersion)
+        }
+    }
+
     // MARK: - ピン留め複製の決定論的ロジック検証
     
     @Test
