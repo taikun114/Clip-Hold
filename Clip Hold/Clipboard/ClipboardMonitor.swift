@@ -17,6 +17,7 @@ extension ClipboardManager {
 #endif
         }
         
+        ClipboardSourceAppDetector.startMonitoring()
         lastChangeCount = NSPasteboard.general.changeCount
         print("ClipboardManager: Monitoring started. Initial pasteboard change count: \(lastChangeCount)")
         
@@ -45,6 +46,7 @@ extension ClipboardManager {
     }
     
     public func stopMonitoringPasteboard() {
+        ClipboardSourceAppDetector.stopMonitoring()
         if let timer = pasteboardMonitorTimer {
             timer.invalidate()
             self.pasteboardMonitorTimer = nil
@@ -88,6 +90,8 @@ extension ClipboardManager {
 #endif
             
             let wasStandardPhraseCopy = isCopyingStandardPhrase
+            let wasInternalCopyInitially = isPerformingInternalCopy || wasStandardPhraseCopy
+            let sourceApplication = ClipboardSourceAppDetector.consumeSourceApplication(isInternalCopy: wasInternalCopyInitially)
             // 定型文コピーのチェック
             if self.ignoreStandardPhrases && wasStandardPhraseCopy {
 #if DEBUG
@@ -101,9 +105,6 @@ extension ClipboardManager {
             }
 #endif
             
-            // 内部コピー操作中の場合は、この変更をスキップし、フラグをリセットする
-            let wasInternalCopyInitially = isPerformingInternalCopy || wasStandardPhraseCopy
-            
 #if DEBUG
             if wasInternalCopyInitially {
                 print("DEBUG: checkPasteboard: Internal copy in progress. Will process content and reset flag at the end.")
@@ -111,7 +112,7 @@ extension ClipboardManager {
 #endif
             
             // sourceAppPathをセットする処理と同様に、内部コピーの場合はClip Hold自身のBundle Identifierを除外判定の対象とする
-            let activeAppBundleIdentifier = wasInternalCopyInitially ? Bundle.main.bundleIdentifier : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleIdentifier
+            let activeAppBundleIdentifier = sourceApplication?.bundleIdentifier
             
             if let activeAppBundleIdentifier = activeAppBundleIdentifier {
                 guard !excludedAppIdentifiers.contains(activeAppBundleIdentifier) else {
@@ -122,7 +123,10 @@ extension ClipboardManager {
                 }
             }
             
-            let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : ClipboardSourceAppDetector.appOwningFrontmostWindow()?.bundleURL?.path
+            let sourceAppPath = wasInternalCopyInitially ? Bundle.main.bundleURL.path : sourceApplication?.bundleURL?.path
+#if DEBUG
+            print("DEBUG: [コピー元] 履歴作成へ引き渡し: changeCount=\(lastChangeCount), 保存予定パス=\(sourceAppPath ?? "なし")")
+#endif
             let copiedInternalItem = wasInternalCopyInitially ? lastCopiedInternalItem : nil
             
             // メインスレッドで安全にペーストボードからデータを抽出し、非同期で処理する

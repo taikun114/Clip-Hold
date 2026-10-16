@@ -46,6 +46,13 @@ For 1.6.3 and earlier, it is listed as follows:
 Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 -->
 
+## 1.7.2
+
+### Bug Fixes and Improvements
+#### Copy History
+- **Improve source application detection**
+  - The source application is now detected more accurately when copying files from the desktop or copying items using context menus, among other cases.
+
 ## 1.7.1
 
 ### Bug Fixes and Improvements

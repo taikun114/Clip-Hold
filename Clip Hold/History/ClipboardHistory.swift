@@ -90,6 +90,7 @@ extension ClipboardManager {
         clipboardHistory.append(newItem)
 #if DEBUG
         print("ClipboardManager: New item added to history: \(newItem.text.prefix(50))...")
+        print("DEBUG: [コピー元] 履歴追加: ID=\(newItem.id), sourceAppPath=\(newItem.sourceAppPath ?? "なし"), Bundle ID=\(newItem.sourceAppPath.flatMap { Bundle(path: $0)?.bundleIdentifier } ?? "なし")")
 #endif
         
         if let filePath = newItem.filePath {
