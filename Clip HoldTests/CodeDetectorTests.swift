@@ -1,7 +1,65 @@
+import Foundation
 import Testing
 @testable import Clip_Hold
 
 struct CodeDetectorTests {
+
+    @Test("単独のファイルパスはMarkdownやコードとして扱わない", arguments: [
+        #"/Users/sampleuser/Library/Mobile\ Documents/iCloud\~org\~example\~sketchbook/Documents/架空の展示会/ポスター素材"#,
+        #"~/Library/Mobile\ Documents/iCloud\~org\~example\~sketchbook/Documents/画像.png"#,
+        #"./Documents/画像\~下書き\~.png"#,
+        #"../Documents/画像\~下書き\~.png"#,
+        "/Users/sampleuser/Documents/画像.png"
+    ])
+    func testStandaloneFilePathIsNotCode(_ path: String) {
+        #expect(!CodeDetector.isCode(path))
+        #expect(CodeDetector.detectLanguage(path) == nil)
+    }
+
+    @Test("systemctlのターミナルコピーはシェルとして扱う")
+    func testSystemctlTerminalTranscript() {
+        let transcript = """
+        sampleuser@demo-node:~$ sudo systemctl status example-worker
+        ● example-worker.service - Example background task worker
+             Loaded: loaded (/usr/lib/systemd/system/example-worker.service; enabled; preset: enabled)
+             Active: active (running) since Tue 2025-04-08 10:20:30 JST; 3 days ago
+         Invocation: 0123456789abcdef0123456789abcdef
+            Process: 410 ExecStart=/usr/sbin/example-worker (code=exited, status=0/SUCCESS)
+           Main PID: 420 (example-worker)
+              Tasks: 2 (limit: 4096)
+             Memory: 18.2M (peak: 64M, swap: 2.0M, swap peak: 4.0M)
+                CPU: 2min 8.123s
+             CGroup: /system.slice/example-worker.service
+                     ├─   420 example-worker
+                     └─7301 example-worker
+
+        Notice: journal has been rotated since unit was started, output may be incomplete.
+        sampleuser@demo-node:~$ sudo journalctl | grep example-worker
+        sampleuser@demo-node:~$ ps aux | grep example-worker
+        root         420  0.0  0.0  24576  2048 ?        S    Apr08   0:12 example-worker
+        sampleuser    7312  0.0  0.1   4096  1024 pts/0    S+   11:45   0:00 grep example-worker
+        sampleuser@demo-node:~$
+        """
+        #expect(CodeDetector.isCode(transcript))
+        #expect(CodeDetector.detectLanguage(transcript) == .shell)
+    }
+
+    @Test("各種プロンプトに続く構造化出力もシェルとして扱う", arguments: [
+        "root@server:~# ", "sampleuser@DemoMac ~ % ", "[sampleuser@server ~]$ ", "$ ", "% ", "➜ "
+    ])
+    func testTerminalPromptWithStructuredOutput(_ prompt: String) {
+        let transcript = prompt + "status-check\n  status: running\n  memory: 18.2M"
+        #expect(CodeDetector.isCode(transcript))
+        #expect(CodeDetector.detectLanguage(transcript) == .shell)
+    }
+
+    @Test("YAML内のプロンプト例と明示されたコードブロックの言語を維持する")
+    func testEmbeddedTerminalPromptKeepsDocumentLanguage() {
+        let yaml = "example: |\n  sampleuser@server:~$ status-check\n  status: running\nname: example"
+        #expect(CodeDetector.detectLanguage(yaml) == .yaml)
+        #expect(CodeDetector.detectLanguage("```yaml\n" + yaml + "\n```") == .yaml)
+        #expect(CodeDetector.detectLanguage(#"/usr/bin/du -sh /Users/sampleuser/Library/Mobile\ Documents"#) == .shell)
+    }
     
     // MARK: - ソースコード判定（isCode: true）のテスト
     
@@ -2186,6 +2244,138 @@ struct CodeDetectorTests {
         #expect(CodeDetector.isCode(envContent))
         #expect(CodeDetector.detectLanguage(envContent) == .env)
     }
+
+    // MARK: - 長文とログ形式の回帰テスト
+
+    private static let serviceOutput = """
+    ● sample-agent.service - Fictional sample agent
+         Loaded: loaded (/usr/lib/systemd/system/sample-agent.service; enabled)
+         Active: active (running) since Wed 2025-05-14 09:12:00 UTC
+       Main PID: 1234 (sample-agent)
+          Tasks: 4 (limit: 8192)
+         Memory: 24.0M (peak: 48.0M)
+            CPU: 3min 12.000s
+         CGroup: /system.slice/sample-agent.service
+                 └─1234 /usr/bin/sample-agent
+    """
+
+    @Test("コマンドで始まる長いターミナル出力をYAMLや出力中の言語に分類しない", arguments: [
+        "sudo systemctl status sample-agent",
+        "sudo -u sampleuser /usr/bin/sample-agent --status",
+        "systemctl status sample-agent",
+        "docker inspect sample-container",
+        "curl https://example.invalid/status"
+    ])
+    func testLongCommandOutput(_ command: String) {
+        let output = (0..<80).map { index in
+            "  record_\(index): healthy\n    detail: fictional diagnostic entry \(index)"
+        }.joined(separator: "\n")
+        let transcript = command + "\nimport SwiftUI\nlet status = 1\n" + Self.serviceOutput + "\n" + output
+        #expect(transcript.count > 1000)
+        #expect(CodeDetector.isCode(transcript))
+        #expect(CodeDetector.detectLanguage(transcript) == .shell)
+    }
+
+    @Test("複数行のログ検索コマンドと長い出力の検出", arguments: [false, true])
+    func testMultilineLogCommand(_ includeOutput: Bool) {
+        let command = #"""
+        log show --last 45m --debug --style compact \
+          --predicate 'process == "sample-agent" OR process == "sample-helper"' \
+          2>/dev/null | grep -Ei \
+          'warning|retry|offline|volume|connection lost|operation stopped' \
+          | tail -n 75
+        """#
+        let output = (0..<90).map { index in
+            "2025-05-14 09:12:00 sample-agent[1234] warning: fictional retry \(index)\n  volume: SampleDisk\n  state: waiting"
+        }.joined(separator: "\n")
+        let transcript = includeOutput ? command + "\n" + output : command
+        #expect(CodeDetector.isCode(transcript))
+        #expect(CodeDetector.detectLanguage(transcript) == .shell)
+        #expect(CodeDetector.detectLanguage(command.replacingOccurrences(of: "\n", with: "\r\n")) == .shell)
+    }
+
+    @Test("長いコメントの後にあるコマンドも識別する")
+    func testCommandAfterLongComments() {
+        let comments = String(repeating: "# 架空の診断手順。稼働状況を読み取り、結果を表示する。\n", count: 50)
+        let transcript = comments + "sudo systemctl status sample-agent\n" + Self.serviceOutput
+        #expect(comments.count > 1000)
+        #expect(CodeDetector.detectLanguage(transcript) == .shell)
+    }
+
+    @Test("長いパニックレポートをその他のコードとして扱う", arguments: [
+        "panic(cpu 2 caller 0xfffffe001234abcd): fictional device watchdog timeout",
+        "panicString: panic(cpu 1 caller 0xffffff801234abcd): fictional controller failure",
+        "Debugger message: panic"
+    ])
+    func testLongPanicReport(_ opening: String) {
+        let report = opening + "\n" + """
+        Memory ID: 0xaa
+        OS release type: User
+        OS version: SAMPLE-OS
+        Kernel version: Darwin Kernel Version 25.0.0: fictional build
+        Kernel UUID: 11111111-2222-3333-4444-555555555555
+        Boot session UUID: AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE
+        Kernel slide: 0x0000000010000000
+        Panicked task: 0xfffffe0000001000: 321 threads: pid 0: kernel_task
+        Panicked thread: 0xfffffe0000002000, backtrace: 0xfffffe0000003000
+            lr: 0xfffffe001234abcd  fp: 0xfffffe0000003010
+            lr: 0xfffffe001234abce  fp: 0xfffffe0000003020
+        """ + "\n" + (0..<100).map { index in
+            "  frame_\(index): 0xfffffe001234abcd\n    module: org.example.driver.SampleDevice"
+        }.joined(separator: "\n")
+        #expect(report.count > 1000)
+        #expect(CodeDetector.isCode(report))
+        #expect(CodeDetector.detectLanguage(report) == .other)
+    }
+
+    @Test("パニック固有の記述が先頭のサンプル範囲を超えても検出する")
+    func testPanicMarkerAfterLongHeader() {
+        let header = String(repeating: "Sample diagnostic report header\n", count: 60)
+        let report = header + "panic(cpu 0 caller 0xfffffe009999abcd): fictional fault\nKernel version: Darwin sample kernel\n  state: stopped"
+        #expect(header.count > 1000)
+        #expect(CodeDetector.detectLanguage(report) == .other)
+    }
+
+    @Test("シェルやパニックの例を埋め込んだ長いYAMLの判定を維持する", arguments: ["sudo", "log", "panic"])
+    func testLongYamlWithEmbeddedDiagnostics(_ key: String) {
+        let yaml = """
+        # 架空の診断設定
+        \(key):
+          enabled: true
+          command: >-
+            sudo /usr/bin/log show --last 5m --style compact
+          example: |
+            sampleuser@demo-node:~$ sudo systemctl status sample-agent
+            panic(cpu 0 caller 0xfffffe001234abcd): fictional fault
+            Debugger message: panic
+            Kernel version: Darwin sample kernel
+            Panicked task: sample task
+        jobs:
+        """ + "\n" + (0..<70).map { index in
+            "  - name: sample_\(index)\n    command: sudo /usr/bin/sample-agent --status\n    interval: 60"
+        }.joined(separator: "\n")
+        #expect(yaml.count > 1000)
+        #expect(CodeDetector.isCode(yaml))
+        #expect(CodeDetector.detectLanguage(yaml) == .yaml)
+        #expect(CodeDetector.detectLanguage("```yaml\n" + yaml + "\n```") == .yaml)
+    }
+
+    @Test("logという名前の変数や設定キーをシェルコマンドと混同しない")
+    func testLogNameIsNotCommand() {
+        #expect(CodeDetector.detectLanguage("const log = { level: 'info' };\nconsole.log(log);") == .javascript)
+        #expect(CodeDetector.detectLanguage("log:\n  level: info\n  output: console") == .yaml)
+        #expect(CodeDetector.detectLanguage("open class SampleModel {\n  var value: Int = 1\n}") == .swift)
+        #expect(CodeDetector.detectLanguage("export function sample() {\n  return 1;\n}") == .javascript)
+    }
+
+    @Test("JSON形式のパニック情報はJSONとして扱う")
+    func testJsonPanicReport() throws {
+        let data = try JSONSerialization.data(withJSONObject: [
+            "panicString": "panic(cpu 0 caller 0xfffffe001234abcd): fictional fault\nKernel version: Darwin sample kernel",
+            "diagnostics": String(repeating: "Sample frame: 0xfffffe001234abcd\n", count: 90)
+        ], options: [.prettyPrinted, .sortedKeys])
+        let report = try #require(String(data: data, encoding: .utf8))
+        #expect(report.count > 1000)
+        #expect(CodeDetector.detectLanguage(report) == .json)
+    }
 }
-
-

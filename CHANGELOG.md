@@ -49,6 +49,10 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 ## 1.7.2
 
 ### Bug Fixes and Improvements
+#### General
+- **Improve code detection**
+  - Shell script detection is now more accurate, and false positives for non-code text have been reduced.
+
 #### Copy History
 - **Improve source application detection**
   - The source application is now detected more accurately when copying files from the desktop or copying items using context menus, among other cases.

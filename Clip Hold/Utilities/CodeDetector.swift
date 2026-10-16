@@ -102,9 +102,54 @@ public enum CodeLanguage: String, CaseIterable, Identifiable, Codable {
 public struct CodeDetector {
     
     /// コード検出エンジンの現在のバージョン番号（検出ロジック更新時にインクリメント）
-    public static let currentDetectorVersion: Int = 1
+    public static let currentDetectorVersion: Int = 2
     
     // MARK: - 安全な正規表現パターン（バックトラッキング防止）
+
+    /// 引数やシェル演算子を伴わない、単独のパス（空白などのエスケープを許容）
+    private static let standalonePathRegex = try? NSRegularExpression(
+        pattern: #"\A(?:/|~/|\./|\.\./)(?:\\[^\r\n]|[^\s\\;|&<>`\"'$(){}\[\]])+\z"#
+    )
+
+    /// 先頭行のシェルプロンプトを識別し、出力中のキーと値より優先する
+    private static let terminalPromptRegex = try? NSRegularExpression(
+        pattern: #"\A(?:[a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+[^\r\n#$%>]*[#$%>]|\[[a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+[^\]\r\n]*\][#$%]|[$%➜])(?:[ \t]+|\z)"#
+    )
+
+    private static func startsWithTerminalPrompt(_ text: String) -> Bool {
+        let firstLine = String(text.prefix { !$0.isNewline })
+        return terminalPromptRegex?.firstMatch(
+            in: firstLine, range: NSRange(firstLine.startIndex..., in: firstLine)
+        ) != nil
+    }
+
+    /// 出力に現れる言語構文ではなく、最初のコマンド行でセッションを判定する
+    private static func startsWithShellCommand(_ text: String) -> Bool {
+        for line in text.split(whereSeparator: \.isNewline) {
+            let candidate = line.trimmingCharacters(in: .whitespaces)
+            if candidate.isEmpty || candidate.hasPrefix("#") { continue }
+            let command = String(candidate.prefix { !$0.isWhitespace })
+            // 宣言や設定キーにも使われる語は、従来の言語別判定に任せる
+            if ["open", "export", "source", "env", "alias", "unalias", "host"].contains(command) {
+                return false
+            }
+            guard !command.contains(":"), candidate.count > command.count else { return false }
+            let range = NSRange(candidate.startIndex..., in: candidate)
+            return shellSpecificRegex?.firstMatch(in: candidate, range: range)?.range.location == 0
+        }
+        return false
+    }
+
+    /// インデントされていないパニック固有の行を検出し、YAML内のログ例と区別する
+    private static let panicReportRegex = try? NSRegularExpression(
+        pattern: #"(?m)^(?:panic\(cpu[ \t]+\d+[ \t]+caller[ \t]+0x[0-9a-fA-F]+\)|panicString:[ \t]*panic\(cpu[ \t]+\d+|Debugger message:[ \t]*panic[ \t]*$)"#
+    )
+
+    private static func isPanicReport(_ text: String) -> Bool {
+        let range = NSRange(text.startIndex..., in: text)
+        guard panicReportRegex?.firstMatch(in: text, range: range) != nil else { return false }
+        return text.contains("Kernel version:") || text.contains("Panicked task:") || text.contains("Debugger message: panic")
+    }
     
     /// HTML / XMLタグの判定パターン（HTMLコメント、タグ構造、改行を限定しバックトラッキングを防止）
     private static let htmlTagRegex = try? NSRegularExpression(
@@ -323,7 +368,7 @@ public struct CodeDetector {
     
     /// シェルコマンド・ターミナルセッション特有の構文パターン（フルパス実行、for/whileループ、環境変数設定、zshプロンプト等）
     private static let shellSpecificRegex = try? NSRegularExpression(
-        pattern: #"(^#!\s*/(bin|usr)/(bash|zsh|sh)|^Last login:\s+|(?m)^\s*([a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+[^#\$%\n]*[#\$%>]|(?:\$|➜|%))\s+|(?m)^\s*(/(opt|usr|bin|sbin|etc|Library|System)/[a-zA-Z0-9_./-]+)\s+|(?m)^\s*[A-Za-z_][A-Za-z0-9_]*=[^;\n]+\s*(&&|;)\s*|\bfor\s+[a-zA-Z_][a-zA-Z0-9_]*\s+in\s+[^;]+;\s*do\b|\bwhile\s+[^;]+;\s*do\b|\bif\s+\[\[?\s+[^;]+;\s*then\b|(?m)^\s*(sudo|chmod|chown|chgrp|mkdir|cd|pwd|ls|open|pbcopy|pbpaste|launchctl|plutil|codesign|security|softwareupdate|diskutil|mdfind|mdls|sw_vers|uname|hostname|env|history|head|tail|wc|diff|sort|uniq|tr|cut|make|cmake|ninja|gcc|g\+\+|clang|clang\+\+|rustc|javac|kotlinc|swiftc|nvm|pyenv|rbenv|nodenv|goenv|rustup|ping|traceroute|dig|nslookup|host|ifconfig|ip|tar|zip|unzip|gzip|gunzip|bzip2|xz|ssh-keygen|ssh-add|gh|glab|aws|gcloud|az|firebase|supabase|vercel|netlify|flyctl|fly|heroku|pipenv|poetry|uv|conda|mamba|bundle|gem|composer|dotnet|mvn|gradle|sbt|tmux|screen|neofetch|fastfetch|btop|pod|carthage|tuist|mint|grep|egrep|fgrep|cat|curl|wget|npm|npx|yarn|pnpm|bun|cargo|xcrun|simctl|xcodebuild|defaults|memtester|networksetup|scutil|systemctl|journalctl|service|ufw|iptables|brew|git|docker|docker-compose|kubectl|helm|terraform|ansible|lspci|lsof|netstat|ss|ps|kill|killall|pkill|ssh|scp|find|export|source|echo|uptime|whoami|clear|apt|apt-get|dnf|pacman|yum|pip|pip3|python|node|deno|sed|awk|df|du|top|htop|rsync|touch|cp|mv|rm|alias|unalias|which|whereis|less|more|tee|xargs|smartctl)\b|(?m)^\s*ip\s+(addr|route|link|neigh)\b|(?m)^\s*echo\s+.*?(>>|>|\|)\s*|\b\|\s*(grep|jq|awk|sed|cat|tee|xargs|tr|cut|sort|uniq|head|tail|wc|less)\b)"#,
+        pattern: #"(^#!\s*/(bin|usr)/(bash|zsh|sh)|^Last login:\s+|(?m)^\s*([a-zA-Z0-9_.-]+@[a-zA-Z0-9_.-]+[^#\$%\n]*[#\$%>]|(?:\$|➜|%))\s+|(?m)^\s*(/(opt|usr|bin|sbin|etc|Library|System)/[a-zA-Z0-9_./-]+)\s+|(?m)^\s*[A-Za-z_][A-Za-z0-9_]*=[^;\n]+\s*(&&|;)\s*|\bfor\s+[a-zA-Z_][a-zA-Z0-9_]*\s+in\s+[^;]+;\s*do\b|\bwhile\s+[^;]+;\s*do\b|\bif\s+\[\[?\s+[^;]+;\s*then\b|(?m)^\s*(log(?=[ \t]+(?:show|stream|collect|config|stats|erase)\b)|sudo|chmod|chown|chgrp|mkdir|cd|pwd|ls|open|pbcopy|pbpaste|launchctl|plutil|codesign|security|softwareupdate|diskutil|mdfind|mdls|sw_vers|uname|hostname|env|history|head|tail|wc|diff|sort|uniq|tr|cut|make|cmake|ninja|gcc|g\+\+|clang|clang\+\+|rustc|javac|kotlinc|swiftc|nvm|pyenv|rbenv|nodenv|goenv|rustup|ping|traceroute|dig|nslookup|host|ifconfig|ip|tar|zip|unzip|gzip|gunzip|bzip2|xz|ssh-keygen|ssh-add|gh|glab|aws|gcloud|az|firebase|supabase|vercel|netlify|flyctl|fly|heroku|pipenv|poetry|uv|conda|mamba|bundle|gem|composer|dotnet|mvn|gradle|sbt|tmux|screen|neofetch|fastfetch|btop|pod|carthage|tuist|mint|grep|egrep|fgrep|cat|curl|wget|npm|npx|yarn|pnpm|bun|cargo|xcrun|simctl|xcodebuild|defaults|memtester|networksetup|scutil|systemctl|journalctl|service|ufw|iptables|brew|git|docker|docker-compose|kubectl|helm|terraform|ansible|lspci|lsof|netstat|ss|ps|kill|killall|pkill|ssh|scp|find|export|source|echo|uptime|whoami|clear|apt|apt-get|dnf|pacman|yum|pip|pip3|python|node|deno|sed|awk|df|du|top|htop|rsync|touch|cp|mv|rm|alias|unalias|which|whereis|less|more|tee|xargs|smartctl)\b|(?m)^\s*ip\s+(addr|route|link|neigh)\b|(?m)^\s*echo\s+.*?(>>|>|\|)\s*|\b\|\s*(grep|jq|awk|sed|cat|tee|xargs|tr|cut|sort|uniq|head|tail|wc|less)\b)"#,
         options: []
     )
     
@@ -391,7 +436,17 @@ public struct CodeDetector {
         
         // 短すぎる文字列はコードとみなさない（2文字未満は除外）
         guard trimmed.count >= 2 else { return false }
+
+        if standalonePathRegex?.firstMatch(in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) != nil {
+            return false
+        }
+
+        if startsWithTerminalPrompt(trimmed) || startsWithShellCommand(trimmed) {
+            return true
+        }
         
+        if isPanicReport(trimmed) { return true }
+
         // 代表的な単独実行シェルコマンド（ls, pwd, whoami, uptime, clear, top, htop, df, du, id, uname, hostname, history等）は1単語でもコードとして扱う
         if standaloneShellCommands.contains(trimmed) {
             return true
@@ -590,7 +645,13 @@ public struct CodeDetector {
         if trimmed.hasPrefix("#!/") {
             return .shell
         }
+
+        if startsWithTerminalPrompt(trimmed) || startsWithShellCommand(trimmed) {
+            return .shell
+        }
         
+        if isPanicReport(trimmed) { return .other }
+
         // 3. Markdown（見出し、リスト、太字、引用、リンク等を含む構造化文書をコードより優先）
         if isMarkdown(trimmed) {
             return .markdown
@@ -641,16 +702,16 @@ public struct CodeDetector {
             return .yaml
         }
         
-        // 13. シェルスクリプト・ターミナルセッション（curl+出力、echoパイプ、ターミナルログ、コマンド列）
-        if let shellRegex = shellSpecificRegex, shellRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
-            return .shell
-        }
-        
-        // 14. JavaScript / TypeScript（ブラウザAPI、DOM、ESモジュール等）
+        // JavaScriptのexport宣言をシェルのexportコマンドと区別する
         if let jsRegex = javascriptSpecificRegex, jsRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
             return .javascript
         }
-        
+
+        // シェルスクリプト・ターミナルセッション（curl+出力、echoパイプ、ターミナルログ、コマンド列）
+        if let shellRegex = shellSpecificRegex, shellRegex.firstMatch(in: sample, options: [], range: sampleRange) != nil {
+            return .shell
+        }
+
         // 14. HTML / XML（純粋なHTMLタグ構造）
         if let htmlTagRegex = htmlTagRegex, htmlTagRegex.numberOfMatches(in: sample, options: [], range: sampleRange) >= 1 {
             return .html
