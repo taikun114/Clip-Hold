@@ -1,23 +1,6 @@
 import SwiftUI
 import QuickLookThumbnailing
 
-#Preview("長文コードのツールチップ") {
-    let source = String(repeating: "let sampleValue: Int = 42\n", count: 4000)
-    QuickOverlayTooltipView(
-        text: source.truncate(maxLength: 5000),
-        detectedLanguage: .swift,
-        maxVisualHeight: 400,
-        calculatedTextHeight: 3000,
-        sourceAppPath: nil,
-        filePath: nil,
-        fileSize: nil,
-        dateString: nil,
-        characterCount: source.count,
-        isCompact: false
-    )
-    .frame(width: 620, height: 520)
-}
-
 struct QuickOverlayTooltipView: View {
     let text: String
     let detectedLanguage: CodeLanguage?
@@ -291,4 +274,21 @@ struct QuickOverlayTooltipView: View {
             offset = -diff
         }
     }
+}
+
+#Preview("長文コードのツールチップ") {
+    let source = String(repeating: "let sampleValue: Int = 42\n", count: 4000)
+    QuickOverlayTooltipView(
+        text: source.truncate(maxLength: 5000),
+        detectedLanguage: .swift,
+        maxVisualHeight: 400,
+        calculatedTextHeight: 3000,
+        sourceAppPath: nil,
+        filePath: nil,
+        fileSize: nil,
+        dateString: nil,
+        characterCount: source.count,
+        isCompact: false
+    )
+    .frame(width: 620, height: 520)
 }

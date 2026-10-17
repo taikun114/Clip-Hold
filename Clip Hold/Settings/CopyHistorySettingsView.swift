@@ -1023,12 +1023,6 @@ extension Date {
     }
 }
 
-#Preview {
-    CopyHistorySettingsView()
-        .environmentObject(ClipboardManager.shared)
-}
-
-
 // MARK: - HistoryWindowSettingsSection
 private struct HistoryWindowSettingsSection: View {
     @EnvironmentObject var dateReloader: DateReloader
@@ -1375,4 +1369,9 @@ extension CopyHistorySettingsView {
         .padding()
         .frame(width: 350)
     }
+}
+
+#Preview {
+    CopyHistorySettingsView()
+        .environmentObject(ClipboardManager.shared)
 }
