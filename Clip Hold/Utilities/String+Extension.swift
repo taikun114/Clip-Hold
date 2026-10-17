@@ -3,10 +3,10 @@ import AppKit
 
 extension String {
     func truncate(maxLength: Int) -> String {
-        if self.count > maxLength {
-            return String(self.prefix(maxLength)) + "..."
+        guard let end = index(startIndex, offsetBy: maxLength, limitedBy: endIndex), end != endIndex else {
+            return self
         }
-        return self
+        return String(self[..<end]) + "..."
     }
     
     /// 改行文字（CRLF、CR、LF）を半角スペースに置換して1行表示用にする
@@ -21,25 +21,29 @@ extension String {
     /// 後続に有効な行が存在する場合は末尾に "..." を付与する。
     /// 改行や空白のみで構成されている場合は空文字列を返す。
     func firstNonEmptyLine(appendEllipsisIfMultiLine: Bool = true) -> String {
-        let lines = self.components(separatedBy: .newlines)
-        
-        guard let firstIndex = lines.firstIndex(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty }) else {
-            return ""
-        }
-        
-        let firstLine = lines[firstIndex]
-        
-        if appendEllipsisIfMultiLine {
-            let hasRemainingLines = lines[(firstIndex + 1)...].contains(where: { !$0.trimmingCharacters(in: .whitespaces).isEmpty })
-            if hasRemainingLines {
-                if firstLine.hasSuffix("...") || firstLine.hasSuffix("…") {
-                    return firstLine
+        var firstLine: String?
+        var hasRemainingLines = false
+        var cursor = startIndex
+        while cursor < endIndex {
+            let separator = rangeOfCharacter(from: .newlines, range: cursor..<endIndex)
+            let lineEnd = separator?.lowerBound ?? endIndex
+            let line = String(self[cursor..<lineEnd])
+            if !line.trimmingCharacters(in: .whitespaces).isEmpty {
+                if firstLine == nil {
+                    firstLine = line
+                    if !appendEllipsisIfMultiLine { break }
                 } else {
-                    return firstLine + "..."
+                    hasRemainingLines = true
+                    break
                 }
             }
+            guard let separator else { break }
+            cursor = separator.upperBound
         }
-        
+        guard let firstLine else { return "" }
+        if hasRemainingLines && !firstLine.hasSuffix("...") && !firstLine.hasSuffix("…") {
+            return firstLine + "..."
+        }
         return firstLine
     }
     
@@ -133,3 +137,19 @@ extension String {
     }
 }
 
+
+/// 本文を保持したまま、一覧とツールチップ用の短い表示データをまとめる
+struct ClipboardTextPresentation {
+    let firstLine: String
+    let singleLineSymbolsSource: String
+    let tooltip: String
+    let characterCount: Int
+
+    init(text: String, displayTitle: String? = nil) {
+        let displayText = displayTitle ?? text
+        firstLine = displayText.firstNonEmptyLine().truncate(maxLength: 1000)
+        singleLineSymbolsSource = displayText.truncate(maxLength: 1000)
+        tooltip = displayText.truncate(maxLength: 5000)
+        characterCount = text.count
+    }
+}

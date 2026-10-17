@@ -28,6 +28,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
     
     private struct TooltipIdentity: Equatable {
         let text: String
+        let language: CodeLanguage?
         let sourceAppPath: String?
         let filePath: String?
         let dateString: String?
@@ -69,7 +70,13 @@ class QuickOverlayTooltipWindowController: NSWindowController {
               let userInfo = notification.userInfo,
               let text = userInfo["text"] as? String else { return }
         
-        let rawText = (userInfo["rawText"] as? String) ?? text
+        let language: CodeLanguage?
+        if userInfo["hasCodeDetection"] as? Bool == true {
+            language = (userInfo["codeLanguage"] as? String).flatMap(CodeLanguage.init(rawValue:))
+        } else {
+            language = (userInfo["isCompact"] as? Bool == true || userInfo["filePath"] != nil)
+                ? nil : CodeDetector.detectLanguage(text)
+        }
         
         let sourceAppPath = userInfo["sourceAppPath"] as? String
         let filePath = userInfo["filePath"] as? String
@@ -88,7 +95,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         }
         
         let identity = TooltipIdentity(
-            text: rawText,
+            text: text,
+            language: language,
             sourceAppPath: sourceAppPath,
             filePath: filePath,
             dateString: dateString,
@@ -103,7 +111,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         }
         self.currentTooltipIdentity = identity
         
-        positionWindow(text: text, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize, dateString: dateString, characterCount: characterCount, anchorPoint: anchorPoint, isCompact: isCompact, buttonHeight: buttonHeight)
+        positionWindow(text: text, detectedLanguage: language, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize, dateString: dateString, characterCount: characterCount, anchorPoint: anchorPoint, isCompact: isCompact, buttonHeight: buttonHeight)
         
         guard let contentView = window.contentView else { return }
         contentView.wantsLayer = true
@@ -162,7 +170,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
     }
     
-    private func positionWindow(text: String, sourceAppPath: String?, filePath: String?, fileSize: UInt64?, dateString: String?, characterCount: Int?, anchorPoint: CGPoint?, isCompact: Bool = false, buttonHeight: CGFloat = 0) {
+    private func positionWindow(text: String, detectedLanguage: CodeLanguage?, sourceAppPath: String?, filePath: String?, fileSize: UInt64?, dateString: String?, characterCount: Int?, anchorPoint: CGPoint?, isCompact: Bool = false, buttonHeight: CGFloat = 0) {
         guard let window = self.window else { return }
         
         guard let overlayWindow = QuickOverlayWindowController.shared.window,
@@ -176,7 +184,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let textPadding: CGFloat = 32
         let showInvisible = UserDefaults.standard.bool(forKey: "showInvisibleCharacters")
         let layoutText = showInvisible ? text.formatWithInvisibleSymbolsPlain(singleLine: isCompact) : text
-        let isCode = (filePath == nil) && CodeDetector.isCode(text)
+        let isCode = filePath == nil && detectedLanguage != nil
         let font = isCode
             ? (NSFont(name: "Menlo", size: NSFont.systemFontSize) ?? NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular))
             : NSFont.systemFont(ofSize: NSFont.systemFontSize)
@@ -367,7 +375,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             context: nil
         )
         let hasHeader = sourceAppPath != nil
-        let hasFooter = dateString != nil || characterCount != nil || (isCode && CodeDetector.detectLanguage(text) != nil)
+        let hasFooter = dateString != nil || characterCount != nil || (isCode && detectedLanguage != nil)
         let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
         let headerHeight: CGFloat = hasHeader ? 20 : 0
         let footerHeight: CGFloat = hasFooter ? 14 : 0
@@ -416,6 +424,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let calculatedTextHeight = ceil(textRect.height)
         let finalView = QuickOverlayTooltipView(
             text: text,
+            detectedLanguage: detectedLanguage,
             maxVisualHeight: finalVisualHeight,
             calculatedTextHeight: calculatedTextHeight,
             sourceAppPath: sourceAppPath,

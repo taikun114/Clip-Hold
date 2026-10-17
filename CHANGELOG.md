@@ -57,6 +57,9 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 - **Improve source application detection**
   - The source application is now detected more accurately when copying files from the desktop or copying items using context menus, among other cases.
 
+#### Quick Overlay
+- **Improve Quick Overlay performance**
+
 ## 1.7.1
 
 ### Bug Fixes and Improvements

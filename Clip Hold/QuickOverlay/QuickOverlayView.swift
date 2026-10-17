@@ -434,6 +434,47 @@ struct QuickOverlayView: View {
         }
     }
     
+    @ViewBuilder
+    private var itemScrollContent: some View {
+        ScrollView {
+            if type == .history {
+                QuickOverlayItemTable(items: cachedHistoryItems) { item, index in
+                    historyItemRow(item, index: index)
+                        .environmentObject(clipboardManager)
+                        .environmentObject(standardPhraseManager)
+                        .environmentObject(presetManager)
+                        .environmentObject(dateReloader)
+                        .onAppear {
+                            if item.id == cachedHistoryItems.last?.id {
+                                loadMoreHistoryItems()
+                            }
+                        }
+                }
+            } else {
+                QuickOverlayItemTable(items: cachedPhraseItems) { phrase, index in
+                    standardPhraseItemRow(phrase, index: index)
+                        .environmentObject(clipboardManager)
+                        .environmentObject(standardPhraseManager)
+                        .environmentObject(presetManager)
+                        .environmentObject(dateReloader)
+                        .onAppear {
+                            if phrase.id == cachedPhraseItems.last?.id {
+                                loadMorePhraseItems()
+                            }
+                        }
+                }
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if isPaginating {
+                ProgressView()
+                    .controlSize(.small)
+                    .padding(8)
+                    .allowsHitTesting(false)
+            }
+        }
+    }
+
     private var scrollContent: some View {
         Group {
             if type == .history && cachedHistoryItems.isEmpty && !clipboardManager.isHistoryLoaded {
@@ -451,43 +492,7 @@ struct QuickOverlayView: View {
                 SharedEmptyListView(message: "定型文はありません")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 4) {
-                        if type == .history {
-                            ForEach(Array(cachedHistoryItems.enumerated()), id: \.element.id) { index, item in
-                                historyItemRow(item, index: index)
-                                    .onAppear {
-                                        if index == cachedHistoryItems.count - 1 {
-                                            loadMoreHistoryItems()
-                                        }
-                                    }
-                            }
-                            if isPaginating {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle())
-                                    .scaleEffect(0.8)
-                                    .padding(.vertical, 8)
-                            }
-                        } else {
-                            // Standard phrase items (Preview用に明示的なアイテムがあればそれを使用)
-                            ForEach(Array(cachedPhraseItems.enumerated()), id: \.element.id) { index, phrase in
-                                standardPhraseItemRow(phrase, index: index)
-                                    .onAppear {
-                                        if index == cachedPhraseItems.count - 1 {
-                                            loadMorePhraseItems()
-                                        }
-                                    }
-                            }
-                            if isPaginating {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle())
-                                    .scaleEffect(0.8)
-                                    .padding(.vertical, 8)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 12)
-                }
+                itemScrollContent
                 .background(
                     // セーフエリアバーのLiquid Glass背景更新を維持するためのダミーアニメーション（レイアウトに影響しない不透明度のみ）
                     Color.white
@@ -748,28 +753,27 @@ struct QuickOverlayView: View {
             },
             onItemTooltipShow: {
                 tooltipTask?.cancel()
-                let displayTitle = item.displayTitle
+                let presentation = item.textPresentation
+                let language = item.isCode ? item.detectedLanguage : nil
                 let formattedDate = item.date.formatted(for: dateDisplayFormatInQuickOverlay, currentDate: dateReloader.now)
                 let sourceAppPath = item.sourceAppPath
                 let filePath = item.filePath?.path
                 let fileSize = item.fileSize
-                let fullText = item.text
-                let needCharCount = showCharacterCount
+                let characterCount = showCharacterCount ? item.textPresentation.characterCount : nil
 
                 tooltipTask = Task.detached(priority: .userInitiated) {
-                    let characterCount = needCharCount ? fullText.count : nil
-                    let maxLength = 5000
-                    let truncatedText = displayTitle.count > maxLength ? String(displayTitle.prefix(maxLength)) + "..." : displayTitle
-
                     try? await Task.sleep(nanoseconds: 500_000_000)
                     guard !Task.isCancelled else { return }
 
                     await MainActor.run {
                         var userInfo: [String: Any] = [
-                            "text": truncatedText,
-                            "rawText": displayTitle,
+                            "text": presentation.tooltip,
+                            "hasCodeDetection": true,
                             "dateString": formattedDate
                         ]
+                        if let language {
+                            userInfo["codeLanguage"] = language.rawValue
+                        }
                         if let sourceAppPath {
                             userInfo["sourceAppPath"] = sourceAppPath
                         }
@@ -833,18 +837,19 @@ struct QuickOverlayView: View {
             onItemTooltipShow: {
                 tooltipTask?.cancel()
                 let phraseContent = phrase.content
+                let storedVersion = phrase.codeDetectorVersion
+                let storedLanguage = phrase.detectedLanguage
                 tooltipTask = Task.detached(priority: .userInitiated) {
-                    let maxLength = 5000
-                    let truncatedText = phraseContent.count > maxLength ? String(phraseContent.prefix(maxLength)) + "..." : phraseContent
-
                     try? await Task.sleep(nanoseconds: 500_000_000)
                     guard !Task.isCancelled else { return }
-
+                    let truncatedText = phraseContent.truncate(maxLength: 5000)
+                    let language = storedVersion == CodeDetector.currentDetectorVersion
+                        ? storedLanguage : CodeDetector.detectLanguage(phraseContent)
+                    guard !Task.isCancelled else { return }
                     await MainActor.run {
-                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
-                            "text": truncatedText,
-                            "rawText": phraseContent
-                        ])
+                        var userInfo: [String: Any] = ["text": truncatedText, "hasCodeDetection": true]
+                        if let language { userInfo["codeLanguage"] = language.rawValue }
+                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: userInfo)
                     }
                 }
             },
@@ -1108,11 +1113,9 @@ private struct QuickOverlayHistoryItemRow: View {
 
     private var itemDisplayText: Text {
         if showInvisibleCharacters {
-            let truncatedTitle = item.displayTitle.truncate(maxLength: 1000)
-            return Text(truncatedTitle.formatWithInvisibleSymbols(singleLine: true))
+            return Text(item.invisibleCharactersPreview)
         } else {
-            let line = item.displayTitle.firstNonEmptyLine()
-            let truncatedTitle = line.truncate(maxLength: 1000)
+            let truncatedTitle = item.textPresentation.firstLine
             return Text(verbatim: truncatedTitle)
         }
     }
@@ -1174,7 +1177,7 @@ private struct QuickOverlayHistoryItemRow: View {
 
                         if showCharacterCount {
                             Text("-")
-                            Text("\(item.text.count)文字")
+                            Text("\(item.textPresentation.characterCount)文字")
                                 .lineLimit(1)
                         }
 
@@ -1752,7 +1755,7 @@ private struct QuickOverlayStandardPhraseItemRow: View {
 
 #Preview("履歴オーバーレイ") {
     QuickOverlayView(type: .history, initialPresetMenuOpen: false, explicitHistoryItems: [
-        ClipboardItem(text: "議事録テンプレート\n【会議名】\n【日時】", date: Date().addingTimeInterval(-60), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil),
+        ClipboardItem(text: "議事録テンプレート\n【会議名】\n【日時】", date: Date().addingTimeInterval(-60), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: "/Applications/Sample.app"),
         ClipboardItem(text: "山田太郎\n株式会社サンプル\nxxx-xxxx-xxxx", date: Date().addingTimeInterval(-3600), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil),
         ClipboardItem(text: "https://www.apple.com/", date: Date().addingTimeInterval(-7200), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil),
         ClipboardItem(text: "承知いたしました。引き続きよろしくお願いいたします。", date: Date().addingTimeInterval(-86400), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil),

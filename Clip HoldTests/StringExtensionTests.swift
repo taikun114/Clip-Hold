@@ -4,6 +4,48 @@ import Foundation
 
 struct StringExtensionTests {
     
+    @Test("長文プレビューの上限と元の文字列を維持する", arguments: ["あ", "👨‍👩‍👧‍👦", "e\u{301}", "x"])
+    func testLongTextPresentation(_ character: String) {
+        let source = String(repeating: character, count: 60000)
+        let presentation = ClipboardTextPresentation(text: source)
+        #expect(presentation.firstLine == String(repeating: character, count: 1000) + "...")
+        #expect(presentation.tooltip == String(repeating: character, count: 5000) + "...")
+        #expect(presentation.characterCount == 60000)
+        #expect(source == String(repeating: character, count: 60000))
+    }
+
+    @Test("改行と空行を含むプレビューは従来の表示を維持する", arguments: ["\n", "\r\n", "\r", "\u{2028}", "\u{2029}", "\u{000B}", "\u{0085}"])
+    func testFirstLineSeparatorCompatibility(_ separator: String) {
+        let source = "  " + separator + "先頭行" + separator + " " + separator + "次の行"
+        #expect(source.firstNonEmptyLine() == "先頭行...")
+        #expect(source.firstNonEmptyLine(appendEllipsisIfMultiLine: false) == "先頭行")
+        #expect(("先頭行…" + separator + "次の行").firstNonEmptyLine() == "先頭行…")
+    }
+
+    @Test("一覧表示の反復処理時間を架空の長文で計測する")
+    func testLongTextPresentationPerformance() {
+        let source = String(repeating: "架空の長い本文と追加の説明です。\n", count: 20000)
+        let item = ClipboardItem(text: source)
+        _ = item.textPresentation
+        let clock = ContinuousClock()
+        var result = 0
+        let elapsed = clock.measure {
+            for _ in 0..<1000 {
+                result += item.textPresentation.characterCount
+                result += item.textPresentation.firstLine.utf8.count
+            }
+        }
+        let previousElapsed = clock.measure {
+            for _ in 0..<1000 {
+                let lines = source.components(separatedBy: .newlines)
+                result += lines.first?.utf8.count ?? 0
+                result += source.count
+            }
+        }
+        #expect(result > 0)
+        print("長文プレビュー1000回: キャッシュ参照 \(elapsed)、従来の全文分割と文字数計算 \(previousElapsed)")
+    }
+
     @Test
     func testTruncateLongString() {
         let text = "Clip Hold Clipboard Manager"

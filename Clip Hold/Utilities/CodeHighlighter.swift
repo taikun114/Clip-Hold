@@ -11,8 +11,16 @@ public final class CodeHighlighter {
     
     private let lightHighlighter: Highlighter?
     private let darkHighlighter: Highlighter?
+
+    private final class CachedHighlight {
+        let text: AttributedString
+        init(_ text: AttributedString) { self.text = text }
+    }
+    private let highlightCache = NSCache<NSString, CachedHighlight>()
     
     private init() {
+        highlightCache.countLimit = 32
+        highlightCache.totalCostLimit = 4 * 1024 * 1024
         let light = Highlighter()
         let dark = Highlighter()
         
@@ -43,6 +51,8 @@ public final class CodeHighlighter {
         isDark: Bool,
         fontSize: CGFloat = NSFont.systemFontSize
     ) -> AttributedString {
+        let cacheKey = "\(isDark):\(fontSize):\(language ?? "auto"):\(code)" as NSString
+        if let cached = highlightCache.object(forKey: cacheKey) { return cached.text }
         let highlighter = isDark ? darkHighlighter : lightHighlighter
         let monospacedFont = NSFont(name: "Menlo", size: fontSize)
             ?? NSFont.userFixedPitchFont(ofSize: fontSize)
@@ -56,6 +66,7 @@ public final class CodeHighlighter {
             // グラスエフェクト背景に調和させるため、ハイライターの単色背景色属性を削除
             mutable.removeAttribute(.backgroundColor, range: NSRange(location: 0, length: mutable.length))
             if let attrString = try? AttributedString(mutable, including: \.appKit) {
+                highlightCache.setObject(CachedHighlight(attrString), forKey: cacheKey, cost: code.utf16.count * 32)
                 return attrString
             }
         }
@@ -63,6 +74,7 @@ public final class CodeHighlighter {
         // フォールバック: 等幅フォントのプレーンテキスト
         var fallback = AttributedString(code)
         fallback.font = .system(size: fontSize, design: .monospaced)
+        highlightCache.setObject(CachedHighlight(fallback), forKey: cacheKey, cost: code.utf16.count * 32)
         return fallback
     }
 }

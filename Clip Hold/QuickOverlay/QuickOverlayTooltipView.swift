@@ -1,8 +1,26 @@
 import SwiftUI
 import QuickLookThumbnailing
 
+#Preview("長文コードのツールチップ") {
+    let source = String(repeating: "let sampleValue: Int = 42\n", count: 4000)
+    QuickOverlayTooltipView(
+        text: source.truncate(maxLength: 5000),
+        detectedLanguage: .swift,
+        maxVisualHeight: 400,
+        calculatedTextHeight: 3000,
+        sourceAppPath: nil,
+        filePath: nil,
+        fileSize: nil,
+        dateString: nil,
+        characterCount: source.count,
+        isCompact: false
+    )
+    .frame(width: 620, height: 520)
+}
+
 struct QuickOverlayTooltipView: View {
     let text: String
+    let detectedLanguage: CodeLanguage?
     let maxVisualHeight: CGFloat
     let calculatedTextHeight: CGFloat
     let sourceAppPath: String?
@@ -76,13 +94,12 @@ struct QuickOverlayTooltipView: View {
     @ViewBuilder
     private var appHeaderView: some View {
         if let sourceAppPath,
-           let appURL = URL(fileURLWithPath: sourceAppPath) as URL?,
-           FileManager.default.fileExists(atPath: appURL.path) {
+           let icon = SourceAppIconCache.shared.image(forApplicationAt: sourceAppPath) {
             HStack(spacing: 6) {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: appURL.path))
+                Image(nsImage: icon)
                     .resizable()
                     .frame(width: 20, height: 20)
-                Text(FileManager.default.displayName(atPath: appURL.path))
+                Text(FileManager.default.displayName(atPath: sourceAppPath))
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
@@ -92,11 +109,7 @@ struct QuickOverlayTooltipView: View {
     }
 
     private var isCode: Bool {
-        filePath == nil && CodeDetector.isCode(text)
-    }
-    
-    private var detectedLanguage: CodeLanguage? {
-        isCode ? CodeDetector.detectLanguage(text) : nil
+        filePath == nil && detectedLanguage != nil
     }
     
     private var hasHeader: Bool {
