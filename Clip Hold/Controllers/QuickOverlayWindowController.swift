@@ -18,6 +18,7 @@ class QuickOverlayWindowController: NSWindowController {
     
     private var isObserving = false
     private var animationGeneration = 0
+    private var pendingPasteRequest: QuickOverlayPasteRequest?
     private var currentPreparedType: QuickOverlayType? = nil
     private var showAnimationDelegate: AnimationCompletionDelegate?
     private var peekAnimationDelegate: AnimationCompletionDelegate?
@@ -46,7 +47,7 @@ class QuickOverlayWindowController: NSWindowController {
         NotificationCenter.default.addObserver(self, selector: #selector(showOverlay), name: NSNotification.Name("QuickOverlayShouldShow"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showPeekOverlay), name: NSNotification.Name("QuickOverlayShouldShowPeek"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(expandPeekOverlay(_:)), name: NSNotification.Name("QuickOverlayShouldExpandPeek"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(hideOverlay), name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(hideOverlay(_:)), name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -55,6 +56,7 @@ class QuickOverlayWindowController: NSWindowController {
     
     /// キー押下開始時（遅延時間待機中）に呼び出して、ビューの構築とレイアウト計算を事前に完了させておく
     func prepareOverlay(type: QuickOverlayType) {
+        cancelPendingPaste()
         guard let window = self.window else { return }
         
         // 連打された場合など、既に同じタイプでビューが準備されているなら何もしない
@@ -98,7 +100,7 @@ class QuickOverlayWindowController: NSWindowController {
     /// スクリーンエッジ接触時のピーク（24px覗き見）表示アニメーション
     @objc private func showPeekOverlay() {
         guard let window = self.window, let type = QuickOverlayManager.shared.currentOverlayType else { return }
-        animationGeneration += 1
+        beginAnimation()
         
         window.level = .floating // メニューバーの下に潜り込ませる
         
@@ -262,7 +264,7 @@ class QuickOverlayWindowController: NSWindowController {
         guard let window = self.window,
               let rootContainer = window.contentView,
               let animationContainerView = rootContainer.subviews.first(where: { $0.identifier?.rawValue == "AnimationContainer" }) else { return }
-        animationGeneration += 1
+        beginAnimation()
         
         // @Publishedプロパティ更新前に通知のuserInfoから取得する
         let mode: QuickOverlayPresentationMode
@@ -368,7 +370,7 @@ class QuickOverlayWindowController: NSWindowController {
     
     @objc private func showOverlay() {
         guard let window = self.window, let type = QuickOverlayManager.shared.currentOverlayType else { return }
-        animationGeneration += 1
+        beginAnimation()
         let currentGeneration = animationGeneration
         
         // 事前準備がまだ行われていない場合は準備する
@@ -511,13 +513,36 @@ class QuickOverlayWindowController: NSWindowController {
         }
     }
     
-    @objc private func hideOverlay() {
-        guard let window = self.window, 
-              let rootContainer = window.contentView,
-              let animationContainerView = rootContainer.subviews.first(where: { $0.identifier?.rawValue == "AnimationContainer" }) else { return }
+    private func cancelPendingPaste() {
+        pendingPasteRequest?.cancel()
+        pendingPasteRequest = nil
+    }
+
+    private func beginAnimation() {
         animationGeneration += 1
+        cancelPendingPaste()
+    }
+
+    private func finishHidingOverlay(_ window: NSWindow?) {
+        window?.orderOut(nil)
+        window?.contentView = nil
+        currentPreparedType = nil
+        hideAnimationDelegate = nil
+        pendingPasteRequest?.overlayDidClose()
+    }
+
+    @objc private func hideOverlay(_ notification: Notification) {
+        beginAnimation()
+        pendingPasteRequest = notification.userInfo?[QuickOverlayPasteRequest.notificationKey] as? QuickOverlayPasteRequest
         let currentGeneration = animationGeneration
-        
+        guard let window = self.window,
+              let rootContainer = window.contentView,
+              let animationContainerView = rootContainer.subviews.first(where: { $0.identifier?.rawValue == "AnimationContainer" }),
+              let animationLayer = animationContainerView.layer else {
+            finishHidingOverlay(self.window)
+            return
+        }
+
         // 中断時のガタつきを防ぐため、現在画面上に描画されている presentation レイヤーから進行状態を取得する
         let presentationLayer = animationContainerView.layer?.presentation()
         let currentScale = (presentationLayer?.value(forKeyPath: "transform.scale") as? CGFloat) ?? 1.0
@@ -626,15 +651,12 @@ class QuickOverlayWindowController: NSWindowController {
                 animationContainerView.layer?.removeAllAnimations()
             }
             
-            window?.orderOut(nil)
-            window?.contentView = nil
-            self.currentPreparedType = nil
-            self.hideAnimationDelegate = nil
+            self.finishHidingOverlay(window)
         }
         self.hideAnimationDelegate = hideDelegate
         group.delegate = hideDelegate
         
-        animationContainerView.layer?.add(group, forKey: "hideAnimation")
+        animationLayer.add(group, forKey: "hideAnimation")
     }
     
     /// オーバーレイの視覚的な表示領域（シャドウのパディングを除いた500x500の領域）

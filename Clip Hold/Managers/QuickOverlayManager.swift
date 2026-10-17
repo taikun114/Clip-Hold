@@ -236,13 +236,37 @@ class QuickOverlayManager: ObservableObject {
     }
     
     @MainActor
-    private func executeActionAndClose() {
+    private func closeOverlayForCopy() -> QuickOverlayPasteRequest {
         isOverlayVisible = false
         cancelDelayTask()
-        
-        // Hide window immediately
-        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
-        
+        let request = QuickOverlayPasteRequest {
+            ClipHoldApp.performPaste()
+        }
+        NotificationCenter.default.post(
+            name: NSNotification.Name("QuickOverlayShouldHide"),
+            object: nil,
+            userInfo: [QuickOverlayPasteRequest.notificationKey: request]
+        )
+        return request
+    }
+
+    @MainActor
+    private func copyItem(_ item: ClipboardItem, shouldPaste: Bool, request: QuickOverlayPasteRequest) {
+        if !shouldPaste {
+            request.cancel()
+        }
+        ClipboardManager.shared.copyItemToClipboard(item) {
+            guard shouldPaste else { return }
+            Task { @MainActor in
+                request.copyDidComplete()
+            }
+        }
+    }
+
+    @MainActor
+    private func executeActionAndClose() {
+        let pasteRequest = closeOverlayForCopy()
+
         // Execute copy/paste if an item is selected
         if let type = currentOverlayType {
             if let action = hoveredAction {
@@ -344,14 +368,7 @@ class QuickOverlayManager: ObservableObject {
                         itemToUse = item
                     }
                     
-                    ClipboardManager.shared.copyItemToClipboard(itemToUse) {
-                        guard shouldPaste else { return }
-                        Task { @MainActor in
-                            // オーバーレイが非表示になり、キーウインドウ状態が解除された後に送信する
-                            try? await Task.sleep(nanoseconds: 150_000_000)
-                            ClipHoldApp.performPaste()
-                        }
-                    }
+                    copyItem(itemToUse, shouldPaste: shouldPaste, request: pasteRequest)
                 }
             }
         }
@@ -385,20 +402,12 @@ class QuickOverlayManager: ObservableObject {
         
         let plainItem = ClipboardItem(text: item.text, date: item.date, qrCodeContent: item.qrCodeContent, sourceAppPath: item.sourceAppPath)
         
-        isOverlayVisible = false
-        cancelDelayTask()
-        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        let pasteRequest = closeOverlayForCopy()
         
         let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
         let shouldPaste = currentQuickPaste
         
-        ClipboardManager.shared.copyItemToClipboard(plainItem) {
-            guard shouldPaste else { return }
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 150_000_000)
-                ClipHoldApp.performPaste()
-            }
-        }
+        copyItem(plainItem, shouldPaste: shouldPaste, request: pasteRequest)
         
         resetSelectionState()
     }
@@ -461,21 +470,13 @@ class QuickOverlayManager: ObservableObject {
         }
         guard !item.isCopying else { return }
         
-        isOverlayVisible = false
-        cancelDelayTask()
-        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        let pasteRequest = closeOverlayForCopy()
         
         let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
         let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
         let shouldPaste = currentQuickPaste && !(textOnlyQuickPaste && item.filePath != nil)
         
-        ClipboardManager.shared.copyItemToClipboard(item) {
-            guard shouldPaste else { return }
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 150_000_000)
-                ClipHoldApp.performPaste()
-            }
-        }
+        copyItem(item, shouldPaste: shouldPaste, request: pasteRequest)
         
         resetSelectionState()
     }
@@ -500,20 +501,12 @@ class QuickOverlayManager: ObservableObject {
             return
         }
         
-        isOverlayVisible = false
-        cancelDelayTask()
-        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        let pasteRequest = closeOverlayForCopy()
         
         let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
         let shouldPaste = currentQuickPaste
         
-        ClipboardManager.shared.copyItemToClipboard(item) {
-            guard shouldPaste else { return }
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 150_000_000)
-                ClipHoldApp.performPaste()
-            }
-        }
+        copyItem(item, shouldPaste: shouldPaste, request: pasteRequest)
         
         resetSelectionState()
     }
