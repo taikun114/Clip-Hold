@@ -64,6 +64,7 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 
 #### Quick Overlay
 - **Improve Quick Overlay performance**
+- **Improve Quick Overlay usability**
 - **Improve tooltip performance**
 - **Improve Quick Paste processing from Quick Overlay**
 

@@ -195,6 +195,7 @@ struct QuickOverlayView: View {
                 
                 // メインコンテンツ（500x500固定）
                 mainLayout
+                    .environment(\.quickOverlayHoverEnabled, !isPresetMenuOpen && !quickOverlayManager.isPeeking)
                     .overlay(
                         Group {
                             if type == .standardPhrase {
@@ -233,11 +234,6 @@ struct QuickOverlayView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             Color.white.opacity(0.0001)
-                .onHover { hovering in
-                    if hovering {
-                        clearAllHoverStates()
-                    }
-                }
         )
         .allowsHitTesting(!quickOverlayManager.isPeeking)
             .onAppear {
@@ -304,13 +300,7 @@ struct QuickOverlayView: View {
     // MARK: - Subviews
     
     private func clearAllHoverStates() {
-        currentSelection = nil
-        QuickOverlayManager.shared.hoveredItemId = nil
-        QuickOverlayManager.shared.hoveredPhraseId = nil
-        QuickOverlayManager.shared.hoveredAction = nil
-        QuickOverlayManager.shared.hoveredCopyAsPlainText = false
-        QuickOverlayManager.shared.hoveredEditAndCopy = false
-        QuickOverlayManager.shared.hoveredCancelCopy = false
+        updateCurrentSelection(nil)
     }
     
     private func resetDisplayLimitAndReleaseMemory() {
@@ -612,37 +602,26 @@ struct QuickOverlayView: View {
         .padding(.leading, 18)
         .padding(.vertical, 12)
         .padding(.trailing, 12)
-        .onChange(of: currentSelection) { _, newValue in
-            QuickOverlayManager.shared.hoveredAction = nil
-            // 標準テキストコピー状態は、eraserボタンのホバー中のみ true に保たれる。
-            // 項目ホバーに移行した場合はここで解除する（nil への遷移時はボタンホバーと競合しないよう解除しない）。
-            if case .item = newValue {
-                QuickOverlayManager.shared.hoveredCopyAsPlainText = false
-                QuickOverlayManager.shared.hoveredEditAndCopy = false
-            } else if newValue == .add || newValue == .openWindow {
-                QuickOverlayManager.shared.hoveredCopyAsPlainText = false
-                QuickOverlayManager.shared.hoveredEditAndCopy = false
-            }
-            if case .item(let id) = newValue {
-                if type == .history {
-                    if let item = cachedHistoryItems.first(where: { $0.id == id }) {
-                        QuickOverlayManager.shared.hoveredItemId = item.originalPinnedItemID ?? item.id
-                    } else {
-                        QuickOverlayManager.shared.hoveredItemId = id
-                    }
-                    QuickOverlayManager.shared.hoveredPhraseId = nil
-                } else {
-                    QuickOverlayManager.shared.hoveredPhraseId = id
-                    QuickOverlayManager.shared.hoveredItemId = nil
-                }
-            } else if newValue == .add || newValue == .openWindow {
-                QuickOverlayManager.shared.hoveredAction = newValue
-                QuickOverlayManager.shared.hoveredItemId = nil
-                QuickOverlayManager.shared.hoveredPhraseId = nil
+    }
+
+    private func updateCurrentSelection(_ selection: QuickOverlaySelection?) {
+        currentSelection = selection
+        let manager = QuickOverlayManager.shared
+        manager.hoveredAction = nil
+        manager.hoveredCopyAsPlainText = false
+        manager.hoveredEditAndCopy = false
+        manager.hoveredCancelCopy = false
+        manager.hoveredItemId = nil
+        manager.hoveredPhraseId = nil
+        if case .item(let id) = selection {
+            if type == .history {
+                let item = cachedHistoryItems.first { $0.id == id }
+                manager.hoveredItemId = item?.originalPinnedItemID ?? id
             } else {
-                QuickOverlayManager.shared.hoveredItemId = nil
-                QuickOverlayManager.shared.hoveredPhraseId = nil
+                manager.hoveredPhraseId = id
             }
+        } else if selection == .add || selection == .openWindow {
+            manager.hoveredAction = selection
         }
     }
     
@@ -668,12 +647,12 @@ struct QuickOverlayView: View {
             .buttonStyle(PlainButtonStyle())
             .disabled(clipboardManager.isExporting)
             .opacity(clipboardManager.isExporting ? 0.4 : 1.0)
-            .onHover { hovering in
+            .onQuickOverlayHover { hovering in
                 guard !clipboardManager.isExporting else { return }
                 if hovering { 
-                    currentSelection = .add 
+                    updateCurrentSelection(.add)
                 } else if currentSelection == .add {
-                    currentSelection = nil
+                    updateCurrentSelection(nil)
                 }
             }
             
@@ -697,11 +676,11 @@ struct QuickOverlayView: View {
                 .clipShape(Capsule())
             }
             .buttonStyle(PlainButtonStyle())
-            .onHover { hovering in
+            .onQuickOverlayHover { hovering in
                 if hovering { 
-                    currentSelection = .openWindow 
+                    updateCurrentSelection(.openWindow)
                 } else if currentSelection == .openWindow {
-                    currentSelection = nil
+                    updateCurrentSelection(nil)
                 }
             }
         }
@@ -746,9 +725,9 @@ struct QuickOverlayView: View {
             dateReloader: dateReloader,
             onHoverItem: { hovering in
                 if hovering {
-                    currentSelection = .item(item.id)
+                    updateCurrentSelection(.item(item.id))
                 } else if currentSelection == .item(item.id) {
-                    currentSelection = nil
+                    updateCurrentSelection(nil)
                 }
             },
             onItemTooltipShow: {
@@ -832,9 +811,9 @@ struct QuickOverlayView: View {
             shortcut: shortcut,
             onHoverItem: { hovering in
                 if hovering {
-                    currentSelection = .item(phrase.id)
+                    updateCurrentSelection(.item(phrase.id))
                 } else if currentSelection == .item(phrase.id) {
-                    currentSelection = nil
+                    updateCurrentSelection(nil)
                 }
             },
             onItemTooltipShow: {
@@ -1221,7 +1200,7 @@ private struct QuickOverlayHistoryItemRow: View {
         .onDrag {
             return item.makeItemProvider()
         }
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             if !item.isCopying {
                 onHoverItem(hovering)
             }
@@ -1273,7 +1252,7 @@ private struct QuickOverlayHistoryItemRow: View {
         }
         .buttonStyle(PlainButtonStyle())
         .contentShape(Rectangle())
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             guard !clipboardManager.showingLargeFileAlert else { return }
             isCancelCopyButtonHovered = hovering
             if hovering {
@@ -1315,7 +1294,7 @@ private struct QuickOverlayHistoryItemRow: View {
             }
             return item.makeItemProvider(forcePlainText: true)
         }
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             guard !isPlainTextOnly, !item.isCopying else { return }
             isButtonHovered = hovering
             if hovering {
@@ -1349,7 +1328,7 @@ private struct QuickOverlayHistoryItemRow: View {
         .disabled(item.isCopying || ClipboardManager.shared.isExporting)
         .opacity((item.isCopying || ClipboardManager.shared.isExporting) ? 0.4 : 1)
         .contentShape(Rectangle())
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             isEditAndCopyButtonHovered = hovering
             if hovering {
                 setEditAndCopyHoverState(true)
@@ -1603,7 +1582,7 @@ private struct QuickOverlayStandardPhraseItemRow: View {
         .onDrag {
             return NSItemProvider(object: phrase.content as NSString)
         }
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             onHoverItem(hovering)
             if hovering {
                 onItemTooltipShow()
@@ -1650,7 +1629,7 @@ private struct QuickOverlayStandardPhraseItemRow: View {
         .disabled(ClipboardManager.shared.isExporting)
         .opacity(ClipboardManager.shared.isExporting ? 0.4 : 1)
         .contentShape(Rectangle())
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             isEditAndCopyButtonHovered = hovering
             if hovering {
                 setEditAndCopyHoverState(true)
