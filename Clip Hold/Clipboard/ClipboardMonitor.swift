@@ -92,6 +92,12 @@ extension ClipboardManager {
             let wasStandardPhraseCopy = isCopyingStandardPhrase
             let wasInternalCopyInitially = isPerformingInternalCopy || wasStandardPhraseCopy
             let sourceApplication = ClipboardSourceAppDetector.consumeSourceApplication(isInternalCopy: wasInternalCopyInitially)
+            if UniversalClipboardFilter.shouldIgnore(types: pasteboard.types, isEnabled: ignoreUniversalClipboard) {
+#if DEBUG
+                print("DEBUG: ユニバーサルクリップボードのコンテンツを検出したため、履歴への追加をスキップします。")
+#endif
+                return
+            }
             // 定型文コピーのチェック
             if self.ignoreStandardPhrases && wasStandardPhraseCopy {
 #if DEBUG
@@ -138,6 +144,12 @@ extension ClipboardManager {
                 var extractedContent: ExtractedPasteboardContent? = nil
                 
                 while attempt < maxAttempts {
+                    if UniversalClipboardFilter.shouldIgnore(types: pasteboard.types, isEnabled: self.ignoreUniversalClipboard) {
+#if DEBUG
+                        print("DEBUG: 読み取り中にユニバーサルクリップボードのコンテンツを検出したため、履歴への追加をスキップします。")
+#endif
+                        return
+                    }
                     attempt += 1
 #if DEBUG
                     print("DEBUG: checkPasteboard - Attempt \(attempt) to read pasteboard data.")

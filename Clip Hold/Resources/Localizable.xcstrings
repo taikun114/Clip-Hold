@@ -18128,6 +18128,74 @@
         }
       }
     },
+    "ユニバーサルクリップボードからのコンテンツを無視する" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inhalte aus der universellen Zwischenablage ignorieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignore Content from Universal Clipboard"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorar contenido del Portapapeles Universal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorer le contenu du presse-papiers universel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ユニバーサルクリップボードからのコンテンツを無視する"
+          }
+        }
+      }
+    },
+    "ユニバーサルクリップボードによって同期された、別のデバイスでコピーしたコンテンツを履歴に追加しないようにします。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verhindert, dass Inhalte, die auf einem anderen Gerät kopiert und über die universelle Zwischenablage synchronisiert wurden, zum Verlauf hinzugefügt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prevents content copied on another device and synced via Universal Clipboard from being added to the history."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evita que el contenido copiado en otro dispositivo y sincronizado mediante el Portapapeles Universal se añada al historial."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empêche l’ajout à l’historique du contenu copié sur un autre appareil et synchronisé via le presse-papiers universel."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ユニバーサルクリップボードによって同期された、別のデバイスでコピーしたコンテンツを履歴に追加しないようにします。"
+          }
+        }
+      }
+    },
     "ライセンス情報" : {
       "comment" : "ライセンス情報を表示するためのボタン。",
       "localizations" : {

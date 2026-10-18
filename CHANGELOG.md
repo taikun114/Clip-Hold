@@ -48,6 +48,11 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 
 ## 1.7.2
 
+### New Features
+#### Copy History
+- **Add the "Ignore Content from Universal Clipboard" setting**
+  - Prevents content copied on another device and synced via Universal Clipboard from being added to the history.
+
 ### Bug Fixes and Improvements
 #### General
 - **Improve code detection**

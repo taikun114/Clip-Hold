@@ -20,6 +20,7 @@ struct CopyHistorySettingsView: View {
     @State private var initialAlertOption: DataSizeAlertOption
     @State private var showingCustomAlertSheet = false
     
+    @AppStorage("ignoreUniversalClipboard") var ignoreUniversalClipboard: Bool = false
     @AppStorage("ignoreStandardPhrases") var ignoreStandardPhrases: Bool = false
     @AppStorage("folderCalculationTimeout") var folderCalculationTimeout: Double = 3.0
     
@@ -338,6 +339,23 @@ struct CopyHistorySettingsView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("ユニバーサルクリップボードからのコンテンツを無視する")
+                        Text("ユニバーサルクリップボードによって同期された、別のデバイスでコピーしたコンテンツを履歴に追加しないようにします。")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Toggle(isOn: $ignoreUniversalClipboard) {
+                        Text("ユニバーサルクリップボードからのコンテンツを無視する")
+                        Text("ユニバーサルクリップボードによって同期された、別のデバイスでコピーしたコンテンツを履歴に追加しないようにします。")
+                    }
+                    .labelsHidden()
+                    .help("ユニバーサルクリップボードによって同期された、別のデバイスでコピーしたコンテンツを履歴に追加しないようにします。")
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+
                 HStack {
                     VStack(alignment: .leading) {
                         Text("定型文を無視する")
