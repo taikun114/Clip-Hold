@@ -12,9 +12,8 @@ struct QuickOverlayTooltipView: View {
     let dateString: String?
     let characterCount: Int?
     let isCompact: Bool
+    var textModel: QuickOverlayTooltipTextModel? = nil
     
-    @Environment(\.colorScheme) private var colorScheme
-    @AppStorage("showInvisibleCharacters") var showInvisibleCharacters: Bool = false
     @State private var offset: CGFloat = 0
     @State private var hasStartedMarquee = false
     @State private var marqueeStartTask: Task<Void, Never>?
@@ -53,7 +52,7 @@ struct QuickOverlayTooltipView: View {
             if let filePath {
                 loadThumbnail(for: filePath)
             }
-            if filePath == nil {
+            if filePath == nil && textModel == nil {
                 marqueeStartTask?.cancel()
                 marqueeStartTask = Task { @MainActor in
                     do {
@@ -91,10 +90,6 @@ struct QuickOverlayTooltipView: View {
         }
     }
 
-    private var isCode: Bool {
-        filePath == nil && detectedLanguage != nil
-    }
-    
     private var hasHeader: Bool {
         sourceAppPath != nil
     }
@@ -147,25 +142,19 @@ struct QuickOverlayTooltipView: View {
         let contentPaddingH: CGFloat = 32
         let visibleHeight = maxVisualHeight - contentPaddingH - headerH - footerH - spacingH
 
-        let displayText: Text = {
-            if showInvisibleCharacters {
-                return Text(text.formatWithInvisibleSymbols(singleLine: false))
-            } else if isCode {
-                let highlighted = CodeHighlighter.shared.highlight(text, as: detectedLanguage?.highlighterLanguageName, isDark: colorScheme == .dark)
-                return Text(highlighted)
+        return Group {
+            if let textModel {
+                QuickOverlayTooltipAsyncText(model: textModel, visibleHeight: max(visibleHeight, 20))
             } else {
-                return Text(text)
+                Text(text)
+                    .font(.body)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .offset(y: offset)
+                    .frame(height: max(visibleHeight, 20), alignment: .top)
+                    .clipped()
             }
-        }()
-
-        return displayText
-            .font(isCode ? .system(.body, design: .monospaced) : .body)
-            .lineLimit(nil)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .offset(y: offset)
-            .frame(height: max(visibleHeight, 20), alignment: .top)
-            .clipped()
+        }
     }
 
     private func fileTooltip(filePath: String) -> some View {
@@ -278,6 +267,10 @@ struct QuickOverlayTooltipView: View {
 
 #Preview("長文コードのツールチップ") {
     let source = String(repeating: "let sampleValue: Int = 42\n", count: 4000)
+    let model = QuickOverlayTooltipTextModel(request: QuickOverlayTooltipTextRequest(
+        text: source.truncate(maxLength: 5000), language: "swift", isCode: true, width: 468,
+        fontSize: NSFont.systemFontSize, isDark: true, showsInvisibleCharacters: false
+    ))
     QuickOverlayTooltipView(
         text: source.truncate(maxLength: 5000),
         detectedLanguage: .swift,
@@ -288,7 +281,9 @@ struct QuickOverlayTooltipView: View {
         fileSize: nil,
         dateString: nil,
         characterCount: source.count,
-        isCompact: false
+        isCompact: false,
+        textModel: model
     )
     .frame(width: 620, height: 520)
+    .preferredColorScheme(.dark)
 }

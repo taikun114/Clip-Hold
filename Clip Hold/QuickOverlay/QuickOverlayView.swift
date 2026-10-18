@@ -752,6 +752,7 @@ struct QuickOverlayView: View {
                 }
             },
             onItemTooltipShow: {
+                let hoverStartedAt = ProcessInfo.processInfo.systemUptime
                 tooltipTask?.cancel()
                 let presentation = item.textPresentation
                 let language = item.isCode ? item.detectedLanguage : nil
@@ -766,8 +767,10 @@ struct QuickOverlayView: View {
                     guard !Task.isCancelled else { return }
 
                     await MainActor.run {
+                        guard !Task.isCancelled else { return }
                         var userInfo: [String: Any] = [
                             "text": presentation.tooltip,
+                            "hoverStartedAt": hoverStartedAt,
                             "hasCodeDetection": true,
                             "dateString": formattedDate
                         ]
@@ -835,6 +838,7 @@ struct QuickOverlayView: View {
                 }
             },
             onItemTooltipShow: {
+                let hoverStartedAt = ProcessInfo.processInfo.systemUptime
                 tooltipTask?.cancel()
                 let phraseContent = phrase.content
                 let storedVersion = phrase.codeDetectorVersion
@@ -847,7 +851,8 @@ struct QuickOverlayView: View {
                         ? storedLanguage : CodeDetector.detectLanguage(phraseContent)
                     guard !Task.isCancelled else { return }
                     await MainActor.run {
-                        var userInfo: [String: Any] = ["text": truncatedText, "hasCodeDetection": true]
+                        guard !Task.isCancelled else { return }
+                        var userInfo: [String: Any] = ["text": truncatedText, "hasCodeDetection": true, "hoverStartedAt": hoverStartedAt]
                         if let language { userInfo["codeLanguage"] = language.rawValue }
                         NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: userInfo)
                     }
@@ -1220,12 +1225,9 @@ private struct QuickOverlayHistoryItemRow: View {
             if !item.isCopying {
                 onHoverItem(hovering)
             }
-        }
-        .onContinuousHover(coordinateSpace: .global) { phase in
-            switch phase {
-            case .active(_):
+            if hovering {
                 onItemTooltipShow()
-            case .ended:
+            } else {
                 onItemTooltipHide()
             }
         }
@@ -1603,12 +1605,9 @@ private struct QuickOverlayStandardPhraseItemRow: View {
         }
         .onHover { hovering in
             onHoverItem(hovering)
-        }
-        .onContinuousHover(coordinateSpace: .global) { phase in
-            switch phase {
-            case .active(_):
+            if hovering {
                 onItemTooltipShow()
-            case .ended:
+            } else {
                 onItemTooltipHide()
             }
         }
