@@ -13,6 +13,20 @@ final class QuickOverlayPasteRequest {
         self.paste = paste
     }
 
+    static func prepareForCopy(
+        shouldPaste: Bool,
+        prepareOverlay: (QuickOverlayPasteRequest) -> Void,
+        paste: @escaping () -> Void
+    ) -> QuickOverlayPasteRequest {
+        let request = QuickOverlayPasteRequest(paste: paste)
+        if shouldPaste {
+            prepareOverlay(request)
+        } else {
+            request.cancel()
+        }
+        return request
+    }
+
     func copyDidComplete() {
         isCopyComplete = true
         performPasteIfReady()

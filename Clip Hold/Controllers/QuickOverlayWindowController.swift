@@ -513,7 +513,7 @@ class QuickOverlayWindowController: NSWindowController {
         }
     }
     
-    private func cancelPendingPaste() {
+    func cancelPendingPaste() {
         pendingPasteRequest?.cancel()
         pendingPasteRequest = nil
     }
@@ -521,6 +521,7 @@ class QuickOverlayWindowController: NSWindowController {
     private func beginAnimation() {
         animationGeneration += 1
         cancelPendingPaste()
+        QuickOverlayManager.shared.cancelShortcutPasteRequest()
     }
 
     private func finishHidingOverlay(_ window: NSWindow?) {

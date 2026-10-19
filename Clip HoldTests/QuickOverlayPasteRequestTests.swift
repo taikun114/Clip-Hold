@@ -11,7 +11,13 @@ struct QuickOverlayPasteRequestTests {
     @Test("コピーと閉じるアニメーションの両方が完了するまで貼り付けない", arguments: CompletionOrder.allCases)
     func waitsForBothCompletions(order: CompletionOrder) {
         var pasteCount = 0
-        let request = QuickOverlayPasteRequest { pasteCount += 1 }
+        var closeCount = 0
+        let request = QuickOverlayPasteRequest.prepareForCopy(
+            shouldPaste: true,
+            prepareOverlay: { _ in closeCount += 1 },
+            paste: { pasteCount += 1 }
+        )
+        #expect(closeCount == 1)
 
         switch order {
         case .copyFirst:
@@ -82,5 +88,54 @@ struct QuickOverlayPasteRequestTests {
 
         current.overlayDidClose()
         #expect(pastedItems == ["新しい架空の項目"])
+    }
+
+    @Test("オーバーレイ非表示時もコピー完了を受けてから貼り付ける")
+    func shortcutWithoutOverlay() {
+        var pasteCount = 0
+        let request = QuickOverlayPasteRequest.prepareForCopy(
+            shouldPaste: true,
+            prepareOverlay: { $0.overlayDidClose() },
+            paste: { pasteCount += 1 }
+        )
+        #expect(pasteCount == 0)
+        request.copyDidComplete()
+        #expect(pasteCount == 1)
+    }
+
+    @Test("コピーのみの場合はオーバーレイを閉じず貼り付けも行わない")
+    func copyOnlyDoesNotPrepareOverlay() {
+        var closeCount = 0
+        var pasteCount = 0
+        let request = QuickOverlayPasteRequest.prepareForCopy(
+            shouldPaste: false,
+            prepareOverlay: { _ in closeCount += 1 },
+            paste: { pasteCount += 1 }
+        )
+        request.copyDidComplete()
+        request.overlayDidClose()
+        #expect(closeCount == 0)
+        #expect(pasteCount == 0)
+    }
+
+    @Test("閉じている途中のショートカット置き換えでは新しいコピーと終了を待つ")
+    func replacingShortcutDuringClose() {
+        var pastedItems: [String] = []
+        let previous = QuickOverlayPasteRequest.prepareForCopy(
+            shouldPaste: true,
+            prepareOverlay: { _ in },
+            paste: { pastedItems.append("前の架空の項目") }
+        )
+        previous.copyDidComplete()
+        let current = QuickOverlayPasteRequest.prepareForCopy(
+            shouldPaste: true,
+            prepareOverlay: { _ in previous.cancel() },
+            paste: { pastedItems.append("次の架空の項目") }
+        )
+        previous.overlayDidClose()
+        current.copyDidComplete()
+        #expect(pastedItems.isEmpty)
+        current.overlayDidClose()
+        #expect(pastedItems == ["次の架空の項目"])
     }
 }

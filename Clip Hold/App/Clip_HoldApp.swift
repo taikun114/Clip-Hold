@@ -666,19 +666,20 @@ struct ClipHoldApp: App {
                 if let selectedPreset = presetManager.selectedPreset, selectedPreset.phrases.indices.contains(i) {
                     let phrase = selectedPreset.phrases[i]
                     let clipboardManager = ClipboardManager.shared
+                    let request = QuickOverlayManager.shared.preparePasteForShortcutCopy(
+                        shouldPaste: UserDefaults.standard.bool(forKey: "quickPaste")
+                    )
                     clipboardManager.isCopyingStandardPhrase = true
                     NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(phrase.content, forType: .string)
+                    if NSPasteboard.general.setString(phrase.content, forType: .string) {
+                        request.copyDidComplete()
 #if DEBUG
-                    print("Standard phrase '\(phrase.title)' copied via shortcut.")
+                        print("定型文をショートカットでコピーしました。")
 #endif
-                    
-                    let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
-                    if currentQuickPaste {
-                        ClipHoldApp.performPasteWithOverlayCheck()
-#if DEBUG
-                        print("performPasteWithOverlayCheck")
-#endif
+                    } else {
+                        request.cancel()
+                        clipboardManager.isCopyingStandardPhrase = false
+                        print("定型文のショートカットによるコピーに失敗しました。")
                     }
                 } else {
                     // 通知のタイトルと本文を構築
@@ -707,21 +708,7 @@ struct ClipHoldApp: App {
             let clipboardManager = ClipboardManager.shared
             if let pinnedItem = clipboardManager.pinnedItem {
                 if pinnedItem.isCopying { return }
-                clipboardManager.isPerformingInternalCopy = true
-                clipboardManager.copyItemToClipboard(pinnedItem)
-                
-                let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
-                let currentTextOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
-                
-                if currentQuickPaste {
-                    if currentTextOnlyQuickPaste {
-                        if pinnedItem.filePath == nil && !pinnedItem.isImage {
-                            ClipHoldApp.performPasteWithOverlayCheck()
-                        }
-                    } else {
-                        ClipHoldApp.performPasteWithOverlayCheck()
-                    }
-                }
+                ClipHoldApp.copyHistoryItemFromShortcut(pinnedItem)
             } else {
                 let title = String(localized: "履歴はピン留めされていません")
                 let body = String(localized: "ピン留めされた履歴をコピーするショートカットキーが押されましたが、現在何もピン留めされていません。")
@@ -762,34 +749,7 @@ struct ClipHoldApp: App {
                     
                     if historyItem.isCopying { return }
                     
-                    // 内部コピーフラグをtrueに設定
-                    clipboardManager.isPerformingInternalCopy = true
-                    clipboardManager.copyItemToClipboard(historyItem)
-                    
-                    // quickPaste と textOnlyQuickPaste の最新の値を取得
-                    let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
-                    let currentTextOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
-                    
-                    // quickPaste がオンの場合、かつ textOnlyQuickPaste がオンの場合は、ファイルパスがなく、かつ画像でもない場合にのみペースト
-                    if currentQuickPaste {
-                        if currentTextOnlyQuickPaste {
-                            if historyItem.filePath == nil && !historyItem.isImage {
-                                ClipHoldApp.performPasteWithOverlayCheck()
-#if DEBUG
-                                print("performPasteWithOverlayCheck")
-#endif
-                            } else {
-#if DEBUG
-                                print("textOnlyQuickPaste is on, so non-text content will not be pasted.")
-#endif
-                            }
-                        } else {
-                            ClipHoldApp.performPasteWithOverlayCheck()
-#if DEBUG
-                            print("performPasteWithOverlayCheck")
-#endif
-                        }
-                    }
+                    ClipHoldApp.copyHistoryItemFromShortcut(historyItem)
                 } else {
 #if DEBUG
                     print("History shortcut \(i+1) was pressed, but no corresponding history item (UI position \(i+1)) exists.")
@@ -835,17 +795,17 @@ struct ClipHoldApp: App {
         }
     }
     
-    static func performPasteWithOverlayCheck() {
-        guard !ClipboardManager.shared.isExporting else { return }
-        Task { @MainActor in
-            if QuickOverlayManager.shared.isOverlayVisible {
-                QuickOverlayManager.shared.isOverlayVisible = false
-                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
-                try? await Task.sleep(nanoseconds: 150_000_000)
-                performPaste()
-            } else {
-                try? await Task.sleep(nanoseconds: 50_000_000)
-                performPaste()
+    @MainActor
+    private static func copyHistoryItemFromShortcut(_ item: ClipboardItem) {
+        let clipboardManager = ClipboardManager.shared
+        let quickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
+        let textOnly = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
+        let shouldPaste = quickPaste && (!textOnly || (item.filePath == nil && !item.isImage))
+        let request = QuickOverlayManager.shared.preparePasteForShortcutCopy(shouldPaste: shouldPaste)
+        clipboardManager.isPerformingInternalCopy = true
+        clipboardManager.copyItemToClipboard(item) {
+            Task { @MainActor in
+                request.copyDidComplete()
             }
         }
     }

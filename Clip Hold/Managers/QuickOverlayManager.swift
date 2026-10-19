@@ -31,6 +31,7 @@ class QuickOverlayManager: ObservableObject {
     private var localEventMonitor: Any?
     
     private var delayTask: Task<Void, Never>?
+    private var shortcutPasteRequest: QuickOverlayPasteRequest?
     
     private init() {
         setupMonitors()
@@ -237,17 +238,49 @@ class QuickOverlayManager: ObservableObject {
     
     @MainActor
     private func closeOverlayForCopy() -> QuickOverlayPasteRequest {
+        QuickOverlayPasteRequest.prepareForCopy(
+            shouldPaste: true,
+            prepareOverlay: { self.closeOverlayForCopy($0) },
+            paste: { ClipHoldApp.performPaste() }
+        )
+    }
+
+    @MainActor
+    private func closeOverlayForCopy(_ request: QuickOverlayPasteRequest) {
         isOverlayVisible = false
         cancelDelayTask()
-        let request = QuickOverlayPasteRequest {
-            ClipHoldApp.performPaste()
-        }
         NotificationCenter.default.post(
             name: NSNotification.Name("QuickOverlayShouldHide"),
             object: nil,
             userInfo: [QuickOverlayPasteRequest.notificationKey: request]
         )
+    }
+
+    @MainActor
+    func preparePasteForShortcutCopy(shouldPaste: Bool) -> QuickOverlayPasteRequest {
+        cancelShortcutPasteRequest()
+        let controller = QuickOverlayWindowController.shared
+        controller.cancelPendingPaste()
+        let request = QuickOverlayPasteRequest.prepareForCopy(
+            shouldPaste: shouldPaste,
+            prepareOverlay: { request in
+                if self.isOverlayVisible || controller.window?.isVisible == true {
+                    self.closeOverlayForCopy(request)
+                    self.resetSelectionState()
+                } else {
+                    request.overlayDidClose()
+                }
+            },
+            paste: { ClipHoldApp.performPaste() }
+        )
+        shortcutPasteRequest = request
         return request
+    }
+
+    @MainActor
+    func cancelShortcutPasteRequest() {
+        shortcutPasteRequest?.cancel()
+        shortcutPasteRequest = nil
     }
 
     @MainActor
