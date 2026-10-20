@@ -382,6 +382,7 @@ class QuickOverlayWindowController: NSWindowController {
               let animationContainerView = rootContainer.subviews.first(where: { $0.identifier?.rawValue == "AnimationContainer" }) else { return }
         
         positionWindow()
+        guard QuickOverlayManager.shared.validateShortcutOverlayVisibility() else { return }
         
         animationContainerView.layer?.anchorPoint = CGPoint(x: 0.0, y: 0.0)
         animationContainerView.layer?.position = CGPoint(x: 0.0, y: 0.0)
@@ -502,6 +503,7 @@ class QuickOverlayWindowController: NSWindowController {
                 CATransaction.commit()
                 animationContainerView.layer?.removeAllAnimations()
                 self.showAnimationDelegate = nil
+                QuickOverlayManager.shared.validateShortcutOverlayVisibility()
             }
             self.showAnimationDelegate = animDelegate
             group.delegate = animDelegate

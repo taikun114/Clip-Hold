@@ -63,6 +63,7 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
   - The source application is now detected more accurately when copying files from the desktop or copying items using context menus, among other cases.
 
 #### Quick Overlay
+- **Fix issue where Quick Overlay could remain visible when shortcut keys were released quickly**
 - **Improve Quick Overlay performance**
 - **Improve Quick Overlay usability**
 - **Improve tooltip performance**
