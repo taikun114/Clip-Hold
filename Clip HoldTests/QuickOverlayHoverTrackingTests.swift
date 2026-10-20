@@ -108,4 +108,67 @@ struct QuickOverlayHoverTrackingTests {
         harness.coordinator.update(at: cursor)
         #expect(harness.changes == ["first:true", "first:false"])
     }
+    @Test("バーに隠れた行に移動するとホバーとコピー対象を解除する")
+    func coveredRowDoesNotRemainHovered() {
+        let harness = Harness()
+        defer { harness.close() }
+        harness.coordinator.update(at: harness.point(in: harness.first, y: 5))
+        let bar = QuickOverlayHoverRegionView(frame: NSRect(x: 0, y: 10, width: 100, height: 30))
+        bar.kind = .blocker
+        bar.priority = 1
+        harness.panel.contentView?.addSubview(bar)
+        harness.coordinator.add(bar)
+        harness.coordinator.update(at: harness.point(in: harness.first, y: 20))
+        #expect(harness.changes == ["first:true", "first:false"])
+    }
+
+    @Test("バー内の操作ボタンは背後の行を選ばず通常どおりホバーする")
+    func footerButtonRemainsUsable() {
+        let harness = Harness()
+        defer { harness.close() }
+        let bar = QuickOverlayHoverRegionView(frame: NSRect(x: 0, y: 0, width: 100, height: 50))
+        bar.kind = .blocker
+        bar.priority = 1
+        let button = QuickOverlayHoverRegionView(frame: NSRect(x: 10, y: 10, width: 30, height: 30))
+        button.priority = 1
+        button.onChange = { [weak harness] inside in harness?.changes.append("button:\(inside)") }
+        harness.panel.contentView?.addSubview(bar)
+        bar.addSubview(button)
+        harness.coordinator.add(bar)
+        harness.coordinator.add(button)
+        harness.coordinator.update(at: harness.point(in: button))
+        harness.coordinator.update(at: harness.point(in: bar, x: 80))
+        #expect(harness.changes == ["button:true", "button:false"])
+    }
+
+    @Test("行が外にはみ出していてもオーバーレイ本体の外では解除する")
+    func overlayBoundaryClipsRows() {
+        let harness = Harness()
+        defer { harness.close() }
+        let boundary = QuickOverlayHoverRegionView(frame: NSRect(x: 0, y: 10, width: 100, height: 30))
+        boundary.kind = .boundary
+        harness.panel.contentView?.addSubview(boundary)
+        harness.coordinator.add(boundary)
+        harness.coordinator.update(at: harness.point(in: harness.first, y: 20))
+        harness.coordinator.update(at: harness.point(in: harness.first, y: 45))
+        #expect(harness.changes == ["first:true", "first:false"])
+    }
+
+    @Test("範囲外への移動通知で現在のカーソル位置を再取得して解除する")
+    func queuedPointerUpdateClearsOutsideHover() async {
+        let harness = Harness()
+        defer { harness.close() }
+        var cursor = harness.point(in: harness.first)
+        let coordinator = QuickOverlayHoverCoordinator(cursorLocation: { cursor })
+        coordinator.add(harness.first)
+        coordinator.update(at: cursor)
+        cursor = NSPoint(x: -10000, y: -10000)
+        coordinator.scheduleUpdate()
+        for _ in 0..<20 {
+            if harness.changes.last == "first:false" { break }
+            await Task.yield()
+        }
+        #expect(harness.changes == ["first:true", "first:false"])
+    }
+
 }

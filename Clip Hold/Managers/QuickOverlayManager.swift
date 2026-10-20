@@ -298,6 +298,7 @@ class QuickOverlayManager: ObservableObject {
 
     @MainActor
     private func executeActionAndClose() {
+        QuickOverlayHoverCoordinator.shared.update(at: NSEvent.mouseLocation)
         let pasteRequest = closeOverlayForCopy()
 
         // Execute copy/paste if an item is selected

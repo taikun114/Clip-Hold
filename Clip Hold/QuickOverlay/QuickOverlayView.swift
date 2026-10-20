@@ -123,19 +123,24 @@ struct QuickOverlayView: View {
                 scrollContent
                     .adaptiveScrollEdgeEffect()
                     .safeAreaBar(edge: .top, spacing: 0) {
-                        headerView
+                        headerView.blocksUnderlyingQuickOverlayHover()
                     }
                     .safeAreaBar(edge: .bottom, spacing: 0) {
                         footerView
+                            .blocksUnderlyingQuickOverlayHover()
+                            .environment(\.quickOverlayHoverPriority, 1)
                     }
             } else {
                 VStack(spacing: 0) {
-                    headerView
+                    headerView.blocksUnderlyingQuickOverlayHover()
                     scrollContent
                     footerView
+                        .blocksUnderlyingQuickOverlayHover()
+                        .environment(\.quickOverlayHoverPriority, 1)
                 }
             }
         }
+        .quickOverlayHoverBoundary()
     }
     
     @ViewBuilder
