@@ -321,6 +321,7 @@ class QuickOverlayWindowController: NSWindowController {
                 CATransaction.commit()
                 animationContainerView.layer?.removeAllAnimations()
                 self.expandAnimationDelegate = nil
+                ScreenEdgeManager.shared.overlayDidFinishOpening()
             }
             self.expandAnimationDelegate = animDelegate
             fadeIn.delegate = animDelegate
@@ -343,6 +344,7 @@ class QuickOverlayWindowController: NSWindowController {
             CATransaction.commit()
             animationContainerView.layer?.removeAllAnimations()
             self.expandAnimationDelegate = nil
+            ScreenEdgeManager.shared.overlayDidFinishOpening()
         }
         self.expandAnimationDelegate = animDelegate
         anim.group.delegate = animDelegate
@@ -435,6 +437,7 @@ class QuickOverlayWindowController: NSWindowController {
                 CATransaction.commit()
                 animationContainerView.layer?.removeAllAnimations()
                 self.showAnimationDelegate = nil
+                ScreenEdgeManager.shared.overlayDidFinishOpening()
             }
             self.showAnimationDelegate = animDelegate
             anim.group.delegate = animDelegate

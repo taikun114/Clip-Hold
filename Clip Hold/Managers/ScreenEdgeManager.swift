@@ -12,6 +12,8 @@ final class ScreenEdgeManager {
     private var triggerTask: Task<Void, Never>?
     private var outsideCloseTask: Task<Void, Never>?
     
+    private var dismissState = ScreenEdgeDismissState()
+
     private var isPeeking: Bool = false
     private var isFullyTriggered: Bool = false
     private var currentTouchingPosition: ScreenEdgePosition?
@@ -74,9 +76,18 @@ final class ScreenEdgeManager {
         pollingTimer = nil
         
         cancelTrigger()
+        dismissState = ScreenEdgeDismissState()
+    }
+
+    /// ウィンドウ側のアニメーション完了後にのみ、再接触による終了を有効にする。
+    func overlayDidFinishOpening() {
+        guard isFullyTriggered, QuickOverlayManager.shared.isOverlayVisible,
+              case .screenEdge(_, _, false, _) = QuickOverlayManager.shared.presentationMode else { return }
+        dismissState.didFinishOpening()
     }
     
     private func cancelTrigger() {
+        dismissState.cancel()
         triggerTask?.cancel()
         triggerTask = nil
         outsideCloseTask?.cancel()
@@ -99,9 +110,22 @@ final class ScreenEdgeManager {
         }
         
         let mouseLocation = NSEvent.mouseLocation
+        if dismissState.blocksTrigger(at: mouseLocation) { return }
         
         // フルオープン状態で表示されている場合：オーバーレイ全領域または画面エッジへの接触を判定
         if QuickOverlayManager.shared.isOverlayVisible && isFullyTriggered {
+            if dismissState.shouldDismiss(at: mouseLocation) {
+                cancelTrigger()
+                let mode = QuickOverlayManager.shared.presentationMode
+                Task { @MainActor in
+                    guard QuickOverlayManager.shared.presentationMode == mode else { return }
+                    QuickOverlayManager.shared.hideOverlayWithoutAction()
+                }
+                #if DEBUG
+                print("[ScreenEdge] 同じ画面端への再接触でオーバーレイを閉じました")
+                #endif
+                return
+            }
             if let visualFrame = QuickOverlayWindowController.shared.visualFrame {
                 let activeRect = visualFrame.insetBy(dx: -4, dy: -4)
                 let isInVisualFrame = activeRect.contains(mouseLocation)
@@ -137,6 +161,7 @@ final class ScreenEdgeManager {
         
         // クイックオーバーレイが非表示になった場合の状態リセット
         if !QuickOverlayManager.shared.isOverlayVisible && isFullyTriggered {
+            dismissState.cancel()
             isFullyTriggered = false
             currentTouchingPosition = nil
             outsideCloseTask?.cancel()
@@ -190,6 +215,9 @@ final class ScreenEdgeManager {
         guard target != .none else { return }
         let overlayType: QuickOverlayType = (target == .standardPhrase) ? .standardPhrase : .history
         
+        if let screen = NSScreen.screens.first(where: { NSMouseInRect(mouseLocation, $0.frame, false) }) ?? NSScreen.main {
+            dismissState.begin(edge: position.edgeSide, screenFrame: screen.frame)
+        }
         let delay = UserDefaults.standard.screenEdgeDelay
         
         if delay <= 0.0 {

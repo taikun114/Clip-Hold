@@ -68,6 +68,8 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 - **Improve Quick Overlay usability**
 - **Improve tooltip performance**
 - **Improve Quick Paste processing from Quick Overlay**
+- **Improve Quick Overlay to close when touching the screen edge again after opening it from that edge**
+  - Quick Overlay can now be closed with minimal cursor movement, even when opened unintentionally.
 
 ## 1.7.1
 

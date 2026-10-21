@@ -110,3 +110,78 @@ enum ScreenEdgeTarget: String, CaseIterable, Identifiable {
         }
     }
 }
+
+/// 表示完了後の端への再接触と、閉じた直後の再表示抑止を管理する。
+struct ScreenEdgeDismissState {
+    private enum Phase {
+        case opening, waitingForDeparture, waitingForReturn, suppressed
+    }
+
+    private var phase: Phase = .opening
+    private var edge: ScreenEdgeSide?
+    private var screenFrame: CGRect = .zero
+
+    mutating func begin(edge: ScreenEdgeSide, screenFrame: CGRect) {
+        self.edge = edge
+        self.screenFrame = screenFrame
+        phase = .opening
+    }
+
+    mutating func didFinishOpening() {
+        guard edge != nil, phase == .opening else { return }
+        phase = .waitingForDeparture
+    }
+
+    mutating func cancel() {
+        guard phase != .suppressed else { return }
+        edge = nil
+        phase = .opening
+    }
+
+    mutating func shouldDismiss(at point: CGPoint) -> Bool {
+        guard edge != nil else { return false }
+        switch phase {
+        case .waitingForDeparture:
+            if !isNearEdge(point, allowance: 16) {
+                phase = .waitingForReturn
+            }
+        case .waitingForReturn:
+            if isNearEdge(point, allowance: 2) {
+                phase = .suppressed
+                return true
+            }
+        case .opening, .suppressed:
+            break
+        }
+        return false
+    }
+
+    mutating func blocksTrigger(at point: CGPoint) -> Bool {
+        guard phase == .suppressed else { return false }
+        if isNearEdge(point, allowance: 16) {
+            return true
+        }
+        edge = nil
+        phase = .opening
+        return false
+    }
+
+    private func isNearEdge(_ point: CGPoint, allowance: CGFloat) -> Bool {
+        switch edge {
+        case .top:
+            return (screenFrame.minX...screenFrame.maxX).contains(point.x)
+                && abs(point.y - screenFrame.maxY) <= allowance
+        case .bottom:
+            return (screenFrame.minX...screenFrame.maxX).contains(point.x)
+                && abs(point.y - screenFrame.minY) <= allowance
+        case .left:
+            return (screenFrame.minY...screenFrame.maxY).contains(point.y)
+                && abs(point.x - screenFrame.minX) <= allowance
+        case .right:
+            return (screenFrame.minY...screenFrame.maxY).contains(point.y)
+                && abs(point.x - screenFrame.maxX) <= allowance
+        case nil:
+            return false
+        }
+    }
+}
