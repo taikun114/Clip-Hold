@@ -19899,6 +19899,40 @@
         }
       }
     },
+    "内容が変更されています。破棄してもよろしいですか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Inhalt wurde geändert. Möchten Sie die Änderungen wirklich verwerfen? Diese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The content has been changed. Are you sure you want to discard the changes? This action cannot be undone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El contenido ha cambiado. ¿Seguro que quieres descartar los cambios? Esta acción no se puede deshacer."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le contenu a été modifié. Voulez-vous vraiment abandonner les modifications ? Cette action est irréversible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内容が変更されています。破棄してもよろしいですか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
     "再計算" : {
       "localizations" : {
         "de" : {
@@ -19998,6 +20032,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再開"
+          }
+        }
+      }
+    },
+    "変更を破棄しますか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Änderungen verwerfen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard changes?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Descartar los cambios?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandonner les modifications ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "変更を破棄しますか？"
           }
         }
       }
@@ -25881,6 +25949,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "相対的"
+          }
+        }
+      }
+    },
+    "破棄" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwerfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandonner"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "破棄"
           }
         }
       }

@@ -57,6 +57,8 @@ Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 #### General
 - **Improve code detection**
   - Shell script detection is now more accurate, and false positives for non-code text have been reduced.
+- **Improve usability of the "Change Item and Copy" screen**
+  - When you try to cancel after changing the content, an alert now asks whether you want to discard your changes. You can also activate the Discard button in the alert by pressing `⌘ (Command)` + `D`.
 
 #### Copy History
 - **Improve source application detection**
