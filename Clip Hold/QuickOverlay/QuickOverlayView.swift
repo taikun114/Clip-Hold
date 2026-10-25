@@ -123,19 +123,24 @@ struct QuickOverlayView: View {
                 scrollContent
                     .adaptiveScrollEdgeEffect()
                     .safeAreaBar(edge: .top, spacing: 0) {
-                        headerView
+                        headerView.blocksUnderlyingQuickOverlayHover()
                     }
                     .safeAreaBar(edge: .bottom, spacing: 0) {
                         footerView
+                            .blocksUnderlyingQuickOverlayHover()
+                            .environment(\.quickOverlayHoverPriority, 1)
                     }
             } else {
                 VStack(spacing: 0) {
-                    headerView
+                    headerView.blocksUnderlyingQuickOverlayHover()
                     scrollContent
                     footerView
+                        .blocksUnderlyingQuickOverlayHover()
+                        .environment(\.quickOverlayHoverPriority, 1)
                 }
             }
         }
+        .quickOverlayHoverBoundary()
     }
     
     @ViewBuilder
@@ -195,6 +200,7 @@ struct QuickOverlayView: View {
                 
                 // メインコンテンツ（500x500固定）
                 mainLayout
+                    .environment(\.quickOverlayHoverEnabled, !isPresetMenuOpen && !quickOverlayManager.isPeeking)
                     .overlay(
                         Group {
                             if type == .standardPhrase {
@@ -233,11 +239,6 @@ struct QuickOverlayView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             Color.white.opacity(0.0001)
-                .onHover { hovering in
-                    if hovering {
-                        clearAllHoverStates()
-                    }
-                }
         )
         .allowsHitTesting(!quickOverlayManager.isPeeking)
             .onAppear {
@@ -304,13 +305,7 @@ struct QuickOverlayView: View {
     // MARK: - Subviews
     
     private func clearAllHoverStates() {
-        currentSelection = nil
-        QuickOverlayManager.shared.hoveredItemId = nil
-        QuickOverlayManager.shared.hoveredPhraseId = nil
-        QuickOverlayManager.shared.hoveredAction = nil
-        QuickOverlayManager.shared.hoveredCopyAsPlainText = false
-        QuickOverlayManager.shared.hoveredEditAndCopy = false
-        QuickOverlayManager.shared.hoveredCancelCopy = false
+        updateCurrentSelection(nil)
     }
     
     private func resetDisplayLimitAndReleaseMemory() {
@@ -434,6 +429,47 @@ struct QuickOverlayView: View {
         }
     }
     
+    @ViewBuilder
+    private var itemScrollContent: some View {
+        ScrollView {
+            if type == .history {
+                QuickOverlayItemTable(items: cachedHistoryItems) { item, index in
+                    historyItemRow(item, index: index)
+                        .environmentObject(clipboardManager)
+                        .environmentObject(standardPhraseManager)
+                        .environmentObject(presetManager)
+                        .environmentObject(dateReloader)
+                        .onAppear {
+                            if item.id == cachedHistoryItems.last?.id {
+                                loadMoreHistoryItems()
+                            }
+                        }
+                }
+            } else {
+                QuickOverlayItemTable(items: cachedPhraseItems) { phrase, index in
+                    standardPhraseItemRow(phrase, index: index)
+                        .environmentObject(clipboardManager)
+                        .environmentObject(standardPhraseManager)
+                        .environmentObject(presetManager)
+                        .environmentObject(dateReloader)
+                        .onAppear {
+                            if phrase.id == cachedPhraseItems.last?.id {
+                                loadMorePhraseItems()
+                            }
+                        }
+                }
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if isPaginating {
+                ProgressView()
+                    .controlSize(.small)
+                    .padding(8)
+                    .allowsHitTesting(false)
+            }
+        }
+    }
+
     private var scrollContent: some View {
         Group {
             if type == .history && cachedHistoryItems.isEmpty && !clipboardManager.isHistoryLoaded {
@@ -451,43 +487,7 @@ struct QuickOverlayView: View {
                 SharedEmptyListView(message: "定型文はありません")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 4) {
-                        if type == .history {
-                            ForEach(Array(cachedHistoryItems.enumerated()), id: \.element.id) { index, item in
-                                historyItemRow(item, index: index)
-                                    .onAppear {
-                                        if index == cachedHistoryItems.count - 1 {
-                                            loadMoreHistoryItems()
-                                        }
-                                    }
-                            }
-                            if isPaginating {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle())
-                                    .scaleEffect(0.8)
-                                    .padding(.vertical, 8)
-                            }
-                        } else {
-                            // Standard phrase items (Preview用に明示的なアイテムがあればそれを使用)
-                            ForEach(Array(cachedPhraseItems.enumerated()), id: \.element.id) { index, phrase in
-                                standardPhraseItemRow(phrase, index: index)
-                                    .onAppear {
-                                        if index == cachedPhraseItems.count - 1 {
-                                            loadMorePhraseItems()
-                                        }
-                                    }
-                            }
-                            if isPaginating {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle())
-                                    .scaleEffect(0.8)
-                                    .padding(.vertical, 8)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 12)
-                }
+                itemScrollContent
                 .background(
                     // セーフエリアバーのLiquid Glass背景更新を維持するためのダミーアニメーション（レイアウトに影響しない不透明度のみ）
                     Color.white
@@ -607,37 +607,26 @@ struct QuickOverlayView: View {
         .padding(.leading, 18)
         .padding(.vertical, 12)
         .padding(.trailing, 12)
-        .onChange(of: currentSelection) { _, newValue in
-            QuickOverlayManager.shared.hoveredAction = nil
-            // 標準テキストコピー状態は、eraserボタンのホバー中のみ true に保たれる。
-            // 項目ホバーに移行した場合はここで解除する（nil への遷移時はボタンホバーと競合しないよう解除しない）。
-            if case .item = newValue {
-                QuickOverlayManager.shared.hoveredCopyAsPlainText = false
-                QuickOverlayManager.shared.hoveredEditAndCopy = false
-            } else if newValue == .add || newValue == .openWindow {
-                QuickOverlayManager.shared.hoveredCopyAsPlainText = false
-                QuickOverlayManager.shared.hoveredEditAndCopy = false
-            }
-            if case .item(let id) = newValue {
-                if type == .history {
-                    if let item = cachedHistoryItems.first(where: { $0.id == id }) {
-                        QuickOverlayManager.shared.hoveredItemId = item.originalPinnedItemID ?? item.id
-                    } else {
-                        QuickOverlayManager.shared.hoveredItemId = id
-                    }
-                    QuickOverlayManager.shared.hoveredPhraseId = nil
-                } else {
-                    QuickOverlayManager.shared.hoveredPhraseId = id
-                    QuickOverlayManager.shared.hoveredItemId = nil
-                }
-            } else if newValue == .add || newValue == .openWindow {
-                QuickOverlayManager.shared.hoveredAction = newValue
-                QuickOverlayManager.shared.hoveredItemId = nil
-                QuickOverlayManager.shared.hoveredPhraseId = nil
+    }
+
+    private func updateCurrentSelection(_ selection: QuickOverlaySelection?) {
+        currentSelection = selection
+        let manager = QuickOverlayManager.shared
+        manager.hoveredAction = nil
+        manager.hoveredCopyAsPlainText = false
+        manager.hoveredEditAndCopy = false
+        manager.hoveredCancelCopy = false
+        manager.hoveredItemId = nil
+        manager.hoveredPhraseId = nil
+        if case .item(let id) = selection {
+            if type == .history {
+                let item = cachedHistoryItems.first { $0.id == id }
+                manager.hoveredItemId = item?.originalPinnedItemID ?? id
             } else {
-                QuickOverlayManager.shared.hoveredItemId = nil
-                QuickOverlayManager.shared.hoveredPhraseId = nil
+                manager.hoveredPhraseId = id
             }
+        } else if selection == .add || selection == .openWindow {
+            manager.hoveredAction = selection
         }
     }
     
@@ -663,12 +652,12 @@ struct QuickOverlayView: View {
             .buttonStyle(PlainButtonStyle())
             .disabled(clipboardManager.isExporting)
             .opacity(clipboardManager.isExporting ? 0.4 : 1.0)
-            .onHover { hovering in
+            .onQuickOverlayHover { hovering in
                 guard !clipboardManager.isExporting else { return }
                 if hovering { 
-                    currentSelection = .add 
+                    updateCurrentSelection(.add)
                 } else if currentSelection == .add {
-                    currentSelection = nil
+                    updateCurrentSelection(nil)
                 }
             }
             
@@ -692,11 +681,11 @@ struct QuickOverlayView: View {
                 .clipShape(Capsule())
             }
             .buttonStyle(PlainButtonStyle())
-            .onHover { hovering in
+            .onQuickOverlayHover { hovering in
                 if hovering { 
-                    currentSelection = .openWindow 
+                    updateCurrentSelection(.openWindow)
                 } else if currentSelection == .openWindow {
-                    currentSelection = nil
+                    updateCurrentSelection(nil)
                 }
             }
         }
@@ -741,35 +730,37 @@ struct QuickOverlayView: View {
             dateReloader: dateReloader,
             onHoverItem: { hovering in
                 if hovering {
-                    currentSelection = .item(item.id)
+                    updateCurrentSelection(.item(item.id))
                 } else if currentSelection == .item(item.id) {
-                    currentSelection = nil
+                    updateCurrentSelection(nil)
                 }
             },
             onItemTooltipShow: {
+                let hoverStartedAt = ProcessInfo.processInfo.systemUptime
                 tooltipTask?.cancel()
-                let displayTitle = item.displayTitle
+                let presentation = item.textPresentation
+                let language = item.isCode ? item.detectedLanguage : nil
                 let formattedDate = item.date.formatted(for: dateDisplayFormatInQuickOverlay, currentDate: dateReloader.now)
                 let sourceAppPath = item.sourceAppPath
                 let filePath = item.filePath?.path
                 let fileSize = item.fileSize
-                let fullText = item.text
-                let needCharCount = showCharacterCount
+                let characterCount = showCharacterCount ? item.textPresentation.characterCount : nil
 
                 tooltipTask = Task.detached(priority: .userInitiated) {
-                    let characterCount = needCharCount ? fullText.count : nil
-                    let maxLength = 5000
-                    let truncatedText = displayTitle.count > maxLength ? String(displayTitle.prefix(maxLength)) + "..." : displayTitle
-
                     try? await Task.sleep(nanoseconds: 500_000_000)
                     guard !Task.isCancelled else { return }
 
                     await MainActor.run {
+                        guard !Task.isCancelled else { return }
                         var userInfo: [String: Any] = [
-                            "text": truncatedText,
-                            "rawText": displayTitle,
+                            "text": presentation.tooltip,
+                            "hoverStartedAt": hoverStartedAt,
+                            "hasCodeDetection": true,
                             "dateString": formattedDate
                         ]
+                        if let language {
+                            userInfo["codeLanguage"] = language.rawValue
+                        }
                         if let sourceAppPath {
                             userInfo["sourceAppPath"] = sourceAppPath
                         }
@@ -825,26 +816,29 @@ struct QuickOverlayView: View {
             shortcut: shortcut,
             onHoverItem: { hovering in
                 if hovering {
-                    currentSelection = .item(phrase.id)
+                    updateCurrentSelection(.item(phrase.id))
                 } else if currentSelection == .item(phrase.id) {
-                    currentSelection = nil
+                    updateCurrentSelection(nil)
                 }
             },
             onItemTooltipShow: {
+                let hoverStartedAt = ProcessInfo.processInfo.systemUptime
                 tooltipTask?.cancel()
                 let phraseContent = phrase.content
+                let storedVersion = phrase.codeDetectorVersion
+                let storedLanguage = phrase.detectedLanguage
                 tooltipTask = Task.detached(priority: .userInitiated) {
-                    let maxLength = 5000
-                    let truncatedText = phraseContent.count > maxLength ? String(phraseContent.prefix(maxLength)) + "..." : phraseContent
-
                     try? await Task.sleep(nanoseconds: 500_000_000)
                     guard !Task.isCancelled else { return }
-
+                    let truncatedText = phraseContent.truncate(maxLength: 5000)
+                    let language = storedVersion == CodeDetector.currentDetectorVersion
+                        ? storedLanguage : CodeDetector.detectLanguage(phraseContent)
+                    guard !Task.isCancelled else { return }
                     await MainActor.run {
-                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: [
-                            "text": truncatedText,
-                            "rawText": phraseContent
-                        ])
+                        guard !Task.isCancelled else { return }
+                        var userInfo: [String: Any] = ["text": truncatedText, "hasCodeDetection": true, "hoverStartedAt": hoverStartedAt]
+                        if let language { userInfo["codeLanguage"] = language.rawValue }
+                        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayTooltipShouldShow"), object: nil, userInfo: userInfo)
                     }
                 }
             },
@@ -1108,11 +1102,9 @@ private struct QuickOverlayHistoryItemRow: View {
 
     private var itemDisplayText: Text {
         if showInvisibleCharacters {
-            let truncatedTitle = item.displayTitle.truncate(maxLength: 1000)
-            return Text(truncatedTitle.formatWithInvisibleSymbols(singleLine: true))
+            return Text(item.invisibleCharactersPreview)
         } else {
-            let line = item.displayTitle.firstNonEmptyLine()
-            let truncatedTitle = line.truncate(maxLength: 1000)
+            let truncatedTitle = item.textPresentation.firstLine
             return Text(verbatim: truncatedTitle)
         }
     }
@@ -1174,7 +1166,7 @@ private struct QuickOverlayHistoryItemRow: View {
 
                         if showCharacterCount {
                             Text("-")
-                            Text("\(item.text.count)文字")
+                            Text("\(item.textPresentation.characterCount)文字")
                                 .lineLimit(1)
                         }
 
@@ -1213,16 +1205,13 @@ private struct QuickOverlayHistoryItemRow: View {
         .onDrag {
             return item.makeItemProvider()
         }
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             if !item.isCopying {
                 onHoverItem(hovering)
             }
-        }
-        .onContinuousHover(coordinateSpace: .global) { phase in
-            switch phase {
-            case .active(_):
+            if hovering {
                 onItemTooltipShow()
-            case .ended:
+            } else {
                 onItemTooltipHide()
             }
         }
@@ -1268,7 +1257,7 @@ private struct QuickOverlayHistoryItemRow: View {
         }
         .buttonStyle(PlainButtonStyle())
         .contentShape(Rectangle())
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             guard !clipboardManager.showingLargeFileAlert else { return }
             isCancelCopyButtonHovered = hovering
             if hovering {
@@ -1310,7 +1299,7 @@ private struct QuickOverlayHistoryItemRow: View {
             }
             return item.makeItemProvider(forcePlainText: true)
         }
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             guard !isPlainTextOnly, !item.isCopying else { return }
             isButtonHovered = hovering
             if hovering {
@@ -1344,7 +1333,7 @@ private struct QuickOverlayHistoryItemRow: View {
         .disabled(item.isCopying || ClipboardManager.shared.isExporting)
         .opacity((item.isCopying || ClipboardManager.shared.isExporting) ? 0.4 : 1)
         .contentShape(Rectangle())
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             isEditAndCopyButtonHovered = hovering
             if hovering {
                 setEditAndCopyHoverState(true)
@@ -1598,14 +1587,11 @@ private struct QuickOverlayStandardPhraseItemRow: View {
         .onDrag {
             return NSItemProvider(object: phrase.content as NSString)
         }
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             onHoverItem(hovering)
-        }
-        .onContinuousHover(coordinateSpace: .global) { phase in
-            switch phase {
-            case .active(_):
+            if hovering {
                 onItemTooltipShow()
-            case .ended:
+            } else {
                 onItemTooltipHide()
             }
         }
@@ -1648,7 +1634,7 @@ private struct QuickOverlayStandardPhraseItemRow: View {
         .disabled(ClipboardManager.shared.isExporting)
         .opacity(ClipboardManager.shared.isExporting ? 0.4 : 1)
         .contentShape(Rectangle())
-        .onHover { hovering in
+        .onQuickOverlayHover { hovering in
             isEditAndCopyButtonHovered = hovering
             if hovering {
                 setEditAndCopyHoverState(true)
@@ -1752,7 +1738,7 @@ private struct QuickOverlayStandardPhraseItemRow: View {
 
 #Preview("履歴オーバーレイ") {
     QuickOverlayView(type: .history, initialPresetMenuOpen: false, explicitHistoryItems: [
-        ClipboardItem(text: "議事録テンプレート\n【会議名】\n【日時】", date: Date().addingTimeInterval(-60), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil),
+        ClipboardItem(text: "議事録テンプレート\n【会議名】\n【日時】", date: Date().addingTimeInterval(-60), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: "/Applications/Sample.app"),
         ClipboardItem(text: "山田太郎\n株式会社サンプル\nxxx-xxxx-xxxx", date: Date().addingTimeInterval(-3600), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil),
         ClipboardItem(text: "https://www.apple.com/", date: Date().addingTimeInterval(-7200), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil),
         ClipboardItem(text: "承知いたしました。引き続きよろしくお願いいたします。", date: Date().addingTimeInterval(-86400), filePath: nil, fileSize: nil, fileHash: nil, qrCodeContent: nil, sourceAppPath: nil),

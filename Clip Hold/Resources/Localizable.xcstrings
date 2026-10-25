@@ -18128,6 +18128,74 @@
         }
       }
     },
+    "ユニバーサルクリップボードからのコンテンツを無視する" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inhalte aus der universellen Zwischenablage ignorieren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignore Content from Universal Clipboard"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorar contenido del Portapapeles Universal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorer le contenu du presse-papiers universel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ユニバーサルクリップボードからのコンテンツを無視する"
+          }
+        }
+      }
+    },
+    "ユニバーサルクリップボードによって同期された、別のデバイスでコピーしたコンテンツを履歴に追加しないようにします。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verhindert, dass Inhalte, die auf einem anderen Gerät kopiert und über die universelle Zwischenablage synchronisiert wurden, zum Verlauf hinzugefügt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prevents content copied on another device and synced via Universal Clipboard from being added to the history."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evita que el contenido copiado en otro dispositivo y sincronizado mediante el Portapapeles Universal se añada al historial."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empêche l’ajout à l’historique du contenu copié sur un autre appareil et synchronisé via le presse-papiers universel."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ユニバーサルクリップボードによって同期された、別のデバイスでコピーしたコンテンツを履歴に追加しないようにします。"
+          }
+        }
+      }
+    },
     "ライセンス情報" : {
       "comment" : "ライセンス情報を表示するためのボタン。",
       "localizations" : {
@@ -19831,6 +19899,40 @@
         }
       }
     },
+    "内容が変更されています。破棄してもよろしいですか？この操作は元に戻せません。" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Inhalt wurde geändert. Möchten Sie die Änderungen wirklich verwerfen? Diese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The content has been changed. Are you sure you want to discard the changes? This action cannot be undone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El contenido ha cambiado. ¿Seguro que quieres descartar los cambios? Esta acción no se puede deshacer."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le contenu a été modifié. Voulez-vous vraiment abandonner les modifications ? Cette action est irréversible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内容が変更されています。破棄してもよろしいですか？この操作は元に戻せません。"
+          }
+        }
+      }
+    },
     "再計算" : {
       "localizations" : {
         "de" : {
@@ -19930,6 +20032,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再開"
+          }
+        }
+      }
+    },
+    "変更を破棄しますか？" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Änderungen verwerfen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard changes?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Descartar los cambios?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandonner les modifications ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "変更を破棄しますか？"
           }
         }
       }
@@ -25813,6 +25949,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "相対的"
+          }
+        }
+      }
+    },
+    "破棄" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwerfen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discard"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandonner"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "破棄"
           }
         }
       }

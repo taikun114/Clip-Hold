@@ -31,6 +31,8 @@ class QuickOverlayManager: ObservableObject {
     private var localEventMonitor: Any?
     
     private var delayTask: Task<Void, Never>?
+    private var shortcutRequestState = QuickOverlayShortcutRequestState()
+    private var shortcutPasteRequest: QuickOverlayPasteRequest?
     
     private init() {
         setupMonitors()
@@ -42,14 +44,14 @@ class QuickOverlayManager: ObservableObject {
     
     private func setupMonitors() {
         let mask: NSEvent.EventTypeMask = .flagsChanged
-        globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] event in
+        globalEventMonitor = NSEvent.addGlobalMonitorForEvents(matching: mask) { [weak self] _ in
             Task { @MainActor in
-                self?.handleFlagsChanged(event: event)
+                self?.handleFlagsChanged()
             }
         }
         localEventMonitor = NSEvent.addLocalMonitorForEvents(matching: mask) { [weak self] event in
             Task { @MainActor in
-                self?.handleFlagsChanged(event: event)
+                self?.handleFlagsChanged()
             }
             return event
         }
@@ -72,39 +74,37 @@ class QuickOverlayManager: ObservableObject {
         return event
     }
     @MainActor
-    private func handleFlagsChanged(event: NSEvent) {
-        guard UserDefaults.standard.isQuickOverlayShortcutEnabled else { return }
-        
-        let flags = event.modifierFlags.intersection([.command, .option, .control, .shift])
-        let rawFlags = Int(flags.rawValue)
-        
+    private var currentShortcutModifiers: Int {
+        Int(NSEvent.modifierFlags.intersection([.command, .option, .control, .shift]).rawValue)
+    }
+
+    @MainActor
+    private func handleFlagsChanged() {
+        guard UserDefaults.standard.isQuickOverlayShortcutEnabled else {
+            cancelDelayTask()
+            _ = validateShortcutOverlayVisibility()
+            return
+        }
+        // 通知の到着順に左右されないよう、処理する時点のキー状態を使う。
+        let rawFlags = currentShortcutModifiers
         let historyMods = UserDefaults.standard.historyQuickOverlayModifiers
         let phraseMods = UserDefaults.standard.standardPhraseQuickOverlayModifiers
-        
-        // Check if modifiers are released or changed
         if isOverlayVisible {
-            // ショートカットキーで表示されている場合のみキーの離脱でアクションを実行して閉じる
             guard presentationMode == .shortcut else { return }
-            
             let matchesCurrent = (currentOverlayType == .history && rawFlags == historyMods) ||
-                                 (currentOverlayType == .standardPhrase && rawFlags == phraseMods)
-            
-            if !matchesCurrent {
-                // Key released or changed -> Close and perform action
-                executeActionAndClose()
-            }
+                (currentOverlayType == .standardPhrase && rawFlags == phraseMods)
+            guard !matchesCurrent else { return }
+            executeActionAndClose()
+        }
+        if rawFlags == historyMods && historyMods != 0 {
+            startDelayTask(for: .history)
+        } else if rawFlags == phraseMods && phraseMods != 0 {
+            startDelayTask(for: .standardPhrase)
         } else {
-            // Check if we should start the timer
-            if rawFlags == historyMods && historyMods != 0 {
-                startDelayTask(for: .history)
-            } else if rawFlags == phraseMods && phraseMods != 0 {
-                startDelayTask(for: .standardPhrase)
-            } else {
-                cancelDelayTask()
-            }
+            cancelDelayTask()
         }
     }
-    
+
     /// スクリーンエッジ接触時のエッジインセット（メニューバーやDockの隙間幅）を計算する
     func calculateEdgeInset(for position: ScreenEdgePosition, mouseLocation: NSPoint) -> CGFloat {
         let screen = NSScreen.screens.first(where: { NSMouseInRect(mouseLocation, $0.frame.insetBy(dx: -10, dy: -10), false) }) ?? NSScreen.main
@@ -191,58 +191,145 @@ class QuickOverlayManager: ObservableObject {
         resetSelectionState()
     }
     
+    @MainActor
     private func startDelayTask(for type: QuickOverlayType) {
-        cancelDelayTask() // Ensure no existing task
-        
-        self.presentationMode = .shortcut
-        
-        // キーが押された待機時間の間にビューを先行構築・レイアウト完了させておく
+        cancelDelayTask()
+        let modifiers = type == .history
+            ? UserDefaults.standard.historyQuickOverlayModifiers
+            : UserDefaults.standard.standardPhraseQuickOverlayModifiers
+        let request = shortcutRequestState.begin(modifiers: modifiers)
+        presentationMode = .shortcut
+        guard isCurrentShortcutRequest(request) else {
+            cancelDelayTask()
+            return
+        }
         QuickOverlayWindowController.shared.prepareOverlay(type: type)
-        
+        guard isCurrentShortcutRequest(request) else {
+            cancelDelayTask()
+            return
+        }
         let delay = UserDefaults.standard.quickOverlayShortcutDelay
         let nanoseconds = UInt64(delay * 1_000_000_000)
-        
-        delayTask = Task {
+        delayTask = Task { @MainActor [weak self] in
             do {
                 if nanoseconds > 0 {
                     try await Task.sleep(nanoseconds: nanoseconds)
                 }
-                
-                guard !Task.isCancelled else { return }
-                
-                await MainActor.run {
-                    self.presentationMode = .shortcut
-                    self.currentOverlayType = type
-                    self.hoveredItemId = nil
-                    self.hoveredPhraseId = nil
-                    self.hoveredAction = nil
-                    self.hoveredCopyAsPlainText = false
-                    self.hoveredEditAndCopy = false
-                    self.hoveredCancelCopy = false
-                    self.isOverlayVisible = true
-                    
-                    // Tell WindowController to show
-                    NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldShow"), object: nil)
-                }
+                guard let self, !Task.isCancelled, self.isCurrentShortcutRequest(request) else { return }
+                self.presentationMode = .shortcut
+                self.currentOverlayType = type
+                self.hoveredItemId = nil
+                self.hoveredPhraseId = nil
+                self.hoveredAction = nil
+                self.hoveredCopyAsPlainText = false
+                self.hoveredEditAndCopy = false
+                self.hoveredCancelCopy = false
+                self.isOverlayVisible = true
+                NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldShow"), object: nil)
+                _ = self.validateShortcutOverlayVisibility()
+            } catch is CancellationError {
+                return
             } catch {
-                // Cancelled
+                print("クイックオーバーレイの表示待ちに失敗しました: \(error)")
             }
         }
     }
-    
+
+    @MainActor
+    private func isCurrentShortcutRequest(_ request: QuickOverlayShortcutRequestState.Request) -> Bool {
+        shortcutRequestState.canPresent(
+            request, currentModifiers: currentShortcutModifiers,
+            isEnabled: UserDefaults.standard.isQuickOverlayShortcutEnabled
+        )
+    }
+
+    @MainActor
+    @discardableResult
+    func validateShortcutOverlayVisibility() -> Bool {
+        guard presentationMode == .shortcut else { return true }
+        guard isOverlayVisible else { return false }
+        if let request = shortcutRequestState.current, isCurrentShortcutRequest(request) {
+            return true
+        }
+#if DEBUG
+        print("DEBUG: 表示完了前に修飾キーが離されたか表示要求が取り消されたため、オーバーレイを閉じます。")
+#endif
+        hideOverlayWithoutAction()
+        return false
+    }
+
+    @MainActor
     private func cancelDelayTask() {
         delayTask?.cancel()
         delayTask = nil
+        shortcutRequestState.cancel()
     }
     
     @MainActor
-    private func executeActionAndClose() {
+    private func closeOverlayForCopy() -> QuickOverlayPasteRequest {
+        QuickOverlayPasteRequest.prepareForCopy(
+            shouldPaste: true,
+            prepareOverlay: { self.closeOverlayForCopy($0) },
+            paste: { ClipHoldApp.performPaste() }
+        )
+    }
+
+    @MainActor
+    private func closeOverlayForCopy(_ request: QuickOverlayPasteRequest) {
         isOverlayVisible = false
         cancelDelayTask()
-        
-        // Hide window immediately
-        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
-        
+        NotificationCenter.default.post(
+            name: NSNotification.Name("QuickOverlayShouldHide"),
+            object: nil,
+            userInfo: [QuickOverlayPasteRequest.notificationKey: request]
+        )
+    }
+
+    @MainActor
+    func preparePasteForShortcutCopy(shouldPaste: Bool) -> QuickOverlayPasteRequest {
+        cancelShortcutPasteRequest()
+        let controller = QuickOverlayWindowController.shared
+        controller.cancelPendingPaste()
+        let request = QuickOverlayPasteRequest.prepareForCopy(
+            shouldPaste: shouldPaste,
+            prepareOverlay: { request in
+                if self.isOverlayVisible || controller.window?.isVisible == true {
+                    self.closeOverlayForCopy(request)
+                    self.resetSelectionState()
+                } else {
+                    request.overlayDidClose()
+                }
+            },
+            paste: { ClipHoldApp.performPaste() }
+        )
+        shortcutPasteRequest = request
+        return request
+    }
+
+    @MainActor
+    func cancelShortcutPasteRequest() {
+        shortcutPasteRequest?.cancel()
+        shortcutPasteRequest = nil
+    }
+
+    @MainActor
+    private func copyItem(_ item: ClipboardItem, shouldPaste: Bool, request: QuickOverlayPasteRequest) {
+        if !shouldPaste {
+            request.cancel()
+        }
+        ClipboardManager.shared.copyItemToClipboard(item) {
+            guard shouldPaste else { return }
+            Task { @MainActor in
+                request.copyDidComplete()
+            }
+        }
+    }
+
+    @MainActor
+    private func executeActionAndClose() {
+        QuickOverlayHoverCoordinator.shared.update(at: NSEvent.mouseLocation)
+        let pasteRequest = closeOverlayForCopy()
+
         // Execute copy/paste if an item is selected
         if let type = currentOverlayType {
             if let action = hoveredAction {
@@ -344,14 +431,7 @@ class QuickOverlayManager: ObservableObject {
                         itemToUse = item
                     }
                     
-                    ClipboardManager.shared.copyItemToClipboard(itemToUse) {
-                        guard shouldPaste else { return }
-                        Task { @MainActor in
-                            // オーバーレイが非表示になり、キーウインドウ状態が解除された後に送信する
-                            try? await Task.sleep(nanoseconds: 150_000_000)
-                            ClipHoldApp.performPaste()
-                        }
-                    }
+                    copyItem(itemToUse, shouldPaste: shouldPaste, request: pasteRequest)
                 }
             }
         }
@@ -385,20 +465,12 @@ class QuickOverlayManager: ObservableObject {
         
         let plainItem = ClipboardItem(text: item.text, date: item.date, qrCodeContent: item.qrCodeContent, sourceAppPath: item.sourceAppPath)
         
-        isOverlayVisible = false
-        cancelDelayTask()
-        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        let pasteRequest = closeOverlayForCopy()
         
         let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
         let shouldPaste = currentQuickPaste
         
-        ClipboardManager.shared.copyItemToClipboard(plainItem) {
-            guard shouldPaste else { return }
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 150_000_000)
-                ClipHoldApp.performPaste()
-            }
-        }
+        copyItem(plainItem, shouldPaste: shouldPaste, request: pasteRequest)
         
         resetSelectionState()
     }
@@ -461,21 +533,13 @@ class QuickOverlayManager: ObservableObject {
         }
         guard !item.isCopying else { return }
         
-        isOverlayVisible = false
-        cancelDelayTask()
-        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        let pasteRequest = closeOverlayForCopy()
         
         let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
         let textOnlyQuickPaste = UserDefaults.standard.bool(forKey: "textOnlyQuickPaste")
         let shouldPaste = currentQuickPaste && !(textOnlyQuickPaste && item.filePath != nil)
         
-        ClipboardManager.shared.copyItemToClipboard(item) {
-            guard shouldPaste else { return }
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 150_000_000)
-                ClipHoldApp.performPaste()
-            }
-        }
+        copyItem(item, shouldPaste: shouldPaste, request: pasteRequest)
         
         resetSelectionState()
     }
@@ -500,20 +564,12 @@ class QuickOverlayManager: ObservableObject {
             return
         }
         
-        isOverlayVisible = false
-        cancelDelayTask()
-        NotificationCenter.default.post(name: NSNotification.Name("QuickOverlayShouldHide"), object: nil)
+        let pasteRequest = closeOverlayForCopy()
         
         let currentQuickPaste = UserDefaults.standard.bool(forKey: "quickPaste")
         let shouldPaste = currentQuickPaste
         
-        ClipboardManager.shared.copyItemToClipboard(item) {
-            guard shouldPaste else { return }
-            Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 150_000_000)
-                ClipHoldApp.performPaste()
-            }
-        }
+        copyItem(item, shouldPaste: shouldPaste, request: pasteRequest)
         
         resetSelectionState()
     }

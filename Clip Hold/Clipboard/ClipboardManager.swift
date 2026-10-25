@@ -240,6 +240,9 @@ class ClipboardManager: ObservableObject {
         let val = UserDefaults.standard.object(forKey: "folderCalculationTimeout") as? Double
         return val ?? 3.0
     }
+    var ignoreUniversalClipboard: Bool {
+        UserDefaults.standard.bool(forKey: "ignoreUniversalClipboard")
+    }
     var ignoreStandardPhrases: Bool {
         UserDefaults.standard.bool(forKey: "ignoreStandardPhrases")
     }

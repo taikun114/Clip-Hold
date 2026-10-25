@@ -135,6 +135,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
     }
     
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        EditorTerminationCoordinator.shared.requestTermination { [weak sender] allowed in
+            sender?.reply(toApplicationShouldTerminate: allowed)
+        }
+    }
+
     func applicationWillTerminate(_ notification: Notification) {
         print("AppDelegate: will terminate.")
         historyWindowAlwaysOnTopObserver?.invalidate()

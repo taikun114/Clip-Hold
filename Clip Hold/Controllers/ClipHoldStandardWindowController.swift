@@ -13,6 +13,7 @@ class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
     
     // ウィンドウの種類
     private var windowType: WindowType
+    var shouldCloseHandler: (() -> Bool)?
     
     // MARK: - Initializers
     override init(window: NSWindow?) {
@@ -73,6 +74,7 @@ class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
     
     // MARK: - NSWindowDelegate
     func windowWillClose(_ notification: Notification) {
+        shouldCloseHandler = nil
         // ウィンドウが閉じられるときにコントローラーを解放する
         self.window?.contentViewController = nil
 #if DEBUG
@@ -86,6 +88,6 @@ class ClipHoldStandardWindowController: NSWindowController, NSWindowDelegate {
     }
     
     func windowShouldClose(_ sender: NSWindow) -> Bool {
-        return true
+        shouldCloseHandler?() ?? true
     }
 }

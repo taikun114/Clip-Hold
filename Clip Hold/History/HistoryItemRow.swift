@@ -74,11 +74,9 @@ struct HistoryItemRow<MenuContent: View>: View {
     
     private var itemDisplayText: Text {
         if showInvisibleCharacters {
-            let truncatedTitle = item.displayTitle.truncate(maxLength: 1000)
-            return Text(truncatedTitle.formatWithInvisibleSymbols(singleLine: true))
+            return Text(item.invisibleCharactersPreview)
         } else {
-            let line = item.displayTitle.firstNonEmptyLine()
-            let truncatedTitle = line.truncate(maxLength: 1000)
+            let truncatedTitle = item.textPresentation.firstLine
             return Text(verbatim: truncatedTitle)
         }
     }
@@ -145,7 +143,7 @@ struct HistoryItemRow<MenuContent: View>: View {
                         
                         if showCharacterCount {
                             Text("-")
-                            Text("\(item.text.count)文字")
+                            Text("\(item.textPresentation.characterCount)文字")
                         }
                         
                         if let fileSize = item.fileSize, item.filePath != nil, (!item.isFolder || item.isSizeCalculated) {

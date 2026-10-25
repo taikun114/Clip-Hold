@@ -1112,11 +1112,6 @@ private struct AppSelectionPopoverView: View {
     }
 }
 
-#Preview {
-    StandardPhraseSettingsView()
-        .environmentObject(StandardPhraseManager.shared)
-}
-
 // MARK: - Reusable Components
 struct PresetNameSheet: View {
     @Binding var name: String
@@ -1374,22 +1369,6 @@ struct PresetNameSheet: View {
     }
 }
 
-#Preview {
-    PresetNameSheet(
-        name: .constant("Preview Preset"),
-        icon: .constant("star.fill"),
-        color: .constant("accent"),
-        title: "プレビュータイトル",
-        onSave: { _ in },
-        onCancel: { }
-    )
-    .environmentObject(StandardPhraseManager.shared)
-    .environmentObject(StandardPhrasePresetManager.shared)
-    .environmentObject(PresetAppAssignmentManager.shared)
-    .environmentObject(PresetIconGenerator.shared)
-}
-
-
 // MARK: - StandardPhraseWindowSettingsSection
 private struct StandardPhraseWindowSettingsSection: View {
     @AppStorage("standardPhraseWindowAlwaysOnTop") var standardPhraseWindowAlwaysOnTop: Bool = false
@@ -1490,4 +1469,24 @@ private struct StandardPhraseWindowSettingsSection: View {
             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         }
     }
+}
+
+#Preview {
+    StandardPhraseSettingsView()
+        .environmentObject(StandardPhraseManager.shared)
+}
+
+#Preview {
+    PresetNameSheet(
+        name: .constant("Preview Preset"),
+        icon: .constant("star.fill"),
+        color: .constant("accent"),
+        title: "プレビュータイトル",
+        onSave: { _ in },
+        onCancel: { }
+    )
+    .environmentObject(StandardPhraseManager.shared)
+    .environmentObject(StandardPhrasePresetManager.shared)
+    .environmentObject(PresetAppAssignmentManager.shared)
+    .environmentObject(PresetIconGenerator.shared)
 }

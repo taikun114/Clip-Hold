@@ -4,7 +4,32 @@ import UniformTypeIdentifiers
 
 class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     var id: UUID
-    @Published var text: String
+    @Published var text: String {
+        didSet {
+            cachedTextPresentation = nil
+            cachedInvisibleCharactersPreview = nil
+            cachedIsURL = nil
+            codeDetectorVersion = nil
+            detectedLanguage = nil
+        }
+    }
+    private var cachedTextPresentation: ClipboardTextPresentation?
+    private var cachedInvisibleCharactersPreview: AttributedString?
+    private var cachedIsURL: Bool?
+
+    var textPresentation: ClipboardTextPresentation {
+        if let cachedTextPresentation { return cachedTextPresentation }
+        let presentation = ClipboardTextPresentation(text: text, displayTitle: displayTitle)
+        cachedTextPresentation = presentation
+        return presentation
+    }
+
+    var invisibleCharactersPreview: AttributedString {
+        if let cachedInvisibleCharactersPreview { return cachedInvisibleCharactersPreview }
+        let preview = textPresentation.singleLineSymbolsSource.formatWithInvisibleSymbols(singleLine: true)
+        cachedInvisibleCharactersPreview = preview
+        return preview
+    }
     @Published var richText: String? // リッチテキストを保持する新しいプロパティ
     @Published var date: Date
     @Published var filePath: URL?
@@ -111,12 +136,15 @@ class ClipboardItem: ObservableObject, Identifiable, Codable, Equatable {
     
     // テキストが有効なURLであるかどうかを判断するヘルパープロパティ
     var isURL: Bool {
-        guard !text.isEmpty,
-              let url = URL(string: text) else {
+        if let cachedIsURL { return cachedIsURL }
+        guard text.hasPrefix("http:") || text.hasPrefix("https:") else {
+            cachedIsURL = false
             return false
         }
-        // URLスキームがhttpまたはhttpsであることを確認
-        return url.scheme == "http" || url.scheme == "https"
+        let url = URL(string: text)
+        let result = url?.scheme == "http" || url?.scheme == "https"
+        cachedIsURL = result
+        return result
     }
     
     // テキストがソースコードであるかどうかを判断するヘルパープロパティ

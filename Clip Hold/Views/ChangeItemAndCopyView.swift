@@ -1,9 +1,26 @@
 import SwiftUI
 
+struct ChangeItemAndCopyDraft {
+    let originalContent: String
+    var content: String
+
+    init(content: String) {
+        originalContent = content
+        self.content = content
+    }
+
+    var hasChanges: Bool {
+        content != originalContent
+    }
+}
+
 struct ChangeItemAndCopyView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
-    @State var content: String
+    @State private var draft: ChangeItemAndCopyDraft
+    @State private var showDiscardConfirmation = false
+    @State private var terminationEditorID = UUID()
+    @State private var terminationReply: ((Bool) -> Void)?
     var title: String = String(localized: "項目を変更してコピー")
     var onCopy: (String) -> Void
     var isSheet: Bool = false
@@ -21,6 +38,13 @@ struct ChangeItemAndCopyView: View {
     @State private var matches: [NSRange] = []
     @State private var currentMatchIndex: Int = 0
     @State private var hostWindow: NSWindow?
+
+    init(content: String, title: String = String(localized: "項目を変更してコピー"), onCopy: @escaping (String) -> Void, isSheet: Bool = false) {
+        _draft = State(initialValue: ChangeItemAndCopyDraft(content: content))
+        self.title = title
+        self.onCopy = onCopy
+        self.isSheet = isSheet
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -32,7 +56,7 @@ struct ChangeItemAndCopyView: View {
             }
             
             HighlightableTextEditor(
-                text: $content,
+                text: $draft.content,
                 matches: matches,
                 currentMatchIndex: matches.isEmpty ? nil : currentMatchIndex,
                 controller: editorController,
@@ -53,7 +77,7 @@ struct ChangeItemAndCopyView: View {
             
             // テキスト置換セクション
             TextReplacementSectionView(
-                content: $content,
+                content: $draft.content,
                 isExpanded: $isReplacementSectionExpanded,
                 matches: $matches,
                 currentMatchIndex: $currentMatchIndex,
@@ -63,27 +87,19 @@ struct ChangeItemAndCopyView: View {
             
             HStack {
                 Button("キャンセル") {
-                    if isSheet {
-                        dismiss()
-                    } else {
-                        NSApp.sendAction(#selector(NSWindow.performClose(_:)), to: nil, from: nil)
-                    }
+                    requestCancel()
                 }
                 .controlSize(.large)
                 .keyboardShortcut(.cancelAction)
                 
                 Spacer()
                 Button(quickPaste && quickPasteToPreviousApp && modifierMonitor.isOptionKeyPressed ? "クイックペーストせずにコピー" : "コピー") {
-                    onCopy(content)
-                    if isSheet {
-                        dismiss()
-                    } else {
-                        NSApp.sendAction(#selector(NSWindow.performClose(_:)), to: nil, from: nil)
-                    }
+                    onCopy(draft.content)
+                    closeEditor()
                 }
                 .buttonStyle(.borderedProminent)
                 .keyboardShortcut("s", modifiers: .command)
-                .disabled(content.isEmpty)
+                .disabled(draft.content.isEmpty)
                 .controlSize(.large)
             }
             .padding(.top, 4)
@@ -94,6 +110,11 @@ struct ChangeItemAndCopyView: View {
             // ウィンドウ参照の取得
             WindowAccessorView { window in
                 self.hostWindow = window
+                if !isSheet, let controller = window.windowController as? ClipHoldStandardWindowController {
+                    controller.shouldCloseHandler = {
+                        canCloseEditor()
+                    }
+                }
             }
             
             // グローバルな ⌘F ショートカットハンドラー
@@ -106,6 +127,63 @@ struct ChangeItemAndCopyView: View {
         }
         .onChange(of: isReplacementSectionExpanded) { _, expanded in
             adjustWindowSize(expanded: expanded)
+        }
+        .onAppear {
+            EditorTerminationCoordinator.shared.register(id: terminationEditorID, hasChanges: {
+                draft.hasChanges
+            }, confirmDiscard: { reply in
+                terminationReply = reply
+                let window = hostWindow?.sheetParent ?? hostWindow
+                window?.deminiaturize(nil)
+                window?.makeKeyAndOrderFront(nil)
+                NSApp.activate(ignoringOtherApps: true)
+                showDiscardConfirmation = true
+            })
+        }
+        .onDisappear {
+            replyToTermination(allowed: false)
+            EditorTerminationCoordinator.shared.unregister(id: terminationEditorID)
+        }
+        .alert("変更を破棄しますか？", isPresented: $showDiscardConfirmation) {
+            Button("キャンセル", role: .cancel) {
+                replyToTermination(allowed: false)
+            }
+            Button("破棄", role: .destructive) {
+                replyToTermination(allowed: true)
+                closeEditor()
+            }
+            .keyboardShortcut("d", modifiers: .command)
+        } message: {
+            Text("内容が変更されています。破棄してもよろしいですか？この操作は元に戻せません。")
+        }
+    }
+
+    private func requestCancel() {
+        if canCloseEditor() {
+            closeEditor()
+        }
+    }
+
+    private func replyToTermination(allowed: Bool) {
+        let reply = terminationReply
+        terminationReply = nil
+        reply?(allowed)
+    }
+
+    private func canCloseEditor() -> Bool {
+        if draft.hasChanges {
+            showDiscardConfirmation = true
+            return false
+        }
+        return true
+    }
+
+    private func closeEditor() {
+        if isSheet {
+            dismiss()
+        } else {
+            // アラートの終了処理中は閉じるボタンが無効なため、対象ウィンドウを直接閉じる。
+            hostWindow?.close()
         }
     }
     

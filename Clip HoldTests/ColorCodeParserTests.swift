@@ -13,6 +13,21 @@ struct ColorCodeParserTests {
     
     // MARK: - HEX形式のテスト
     
+    @Test("色判定の正規表現を並行利用しても結果を維持する")
+    func testConcurrentColorParsing() async {
+        let samples = ["#ABC", "#11223344", "RGB(20, 40, 60)", "rgba(20 40 60 / 50%)", "HSL(120, 50%, 40%)", "hsla(120 50 40 / 0.5)"]
+        await withTaskGroup(of: Bool.self) { group in
+            for sample in samples {
+                group.addTask {
+                    (0..<50).allSatisfy { _ in
+                        ColorCodeParser.parseColor(from: sample) != nil && ColorCodeParser.parseColor(from: "架空の通常文章") == nil
+                    }
+                }
+            }
+            for await matches in group { #expect(matches) }
+        }
+    }
+
     @Test
     func testHex6Digits() {
         // #FFFFFF（白）

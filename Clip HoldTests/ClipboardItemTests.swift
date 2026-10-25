@@ -4,6 +4,82 @@ import Foundation
 
 struct ClipboardItemTests {
     
+    @Test("本文変更後は表示キャッシュと検出結果を更新する")
+    func testTextPresentationInvalidation() {
+        let item = ClipboardItem(text: String(repeating: "架空の文章\n", count: 20000))
+        let originalText = item.text
+        let oldSymbols = item.invisibleCharactersPreview
+        #expect(item.textPresentation.characterCount == originalText.count)
+        item.codeDetectorVersion = CodeDetector.currentDetectorVersion
+        item.detectedLanguage = .yaml
+        #expect(!item.isURL)
+
+        item.text = "https://example.invalid/sample"
+        #expect(item.textPresentation.tooltip == item.text)
+        #expect(String(item.invisibleCharactersPreview.characters) == item.text)
+        #expect(item.invisibleCharactersPreview != oldSymbols)
+        #expect(item.textPresentation.characterCount == item.text.count)
+        #expect(item.isURL)
+        #expect(item.codeDetectorVersion == nil)
+        #expect(item.detectedLanguage == nil)
+
+        item.text = "短い架空の文章"
+        #expect(!item.isURL)
+        #expect(item.textPresentation.firstLine == item.text)
+    }
+
+    @Test("表示キャッシュは本文の保存内容に影響しない")
+    func testPresentationKeepsEncodedContent() throws {
+        let source = String(repeating: "架空の記録です。\n", count: 10000)
+        let item = ClipboardItem(text: source)
+        _ = item.textPresentation
+        let restored = try JSONDecoder().decode(ClipboardItem.self, from: JSONEncoder().encode(item))
+        #expect(restored.text == source)
+        #expect(restored.textPresentation.characterCount == source.count)
+        #expect(restored.textPresentation.tooltip == source.truncate(maxLength: 5000))
+    }
+
+    @Test("自動更新は未判定と旧バージョンだけを再判定する")
+    func testAutomaticCodeDetectionIndexUpdate() {
+        let versions: [Int?] = [nil, CodeDetector.currentDetectorVersion - 1, CodeDetector.currentDetectorVersion]
+        for version in versions {
+            let item = ClipboardItem(text: "let sampleCount: Int = 8")
+            item.codeDetectorVersion = version
+            item.detectedLanguage = .python
+
+            CodeDetectionIndexUpdateMode.outdatedOnly.updateCodeDetection(for: item)
+
+            #expect(item.codeDetectorVersion == CodeDetector.currentDetectorVersion)
+            #expect(item.detectedLanguage == (version == CodeDetector.currentDetectorVersion ? .python : .swift))
+        }
+    }
+
+    @Test("手動リセットは現在のバージョンも再判定する")
+    func testForcedCodeDetectionIndexUpdate() {
+        let item = ClipboardItem(text: "let sampleCount: Int = 8")
+        item.codeDetectorVersion = CodeDetector.currentDetectorVersion
+        item.detectedLanguage = .python
+
+        CodeDetectionIndexUpdateMode.all.updateCodeDetection(for: item)
+
+        #expect(item.codeDetectorVersion == CodeDetector.currentDetectorVersion)
+        #expect(item.detectedLanguage == .swift)
+    }
+
+    @Test("再判定では通常テキストの古いコード検出結果を解除する")
+    func testCodeDetectionIndexClearsStaleClassification() {
+        for mode in [CodeDetectionIndexUpdateMode.outdatedOnly, .all] {
+            let item = ClipboardItem(text: "これは架空の連絡事項です。")
+            item.codeDetectorVersion = CodeDetector.currentDetectorVersion - 1
+            item.detectedLanguage = .yaml
+
+            mode.updateCodeDetection(for: item)
+
+            #expect(item.detectedLanguage == nil)
+            #expect(item.codeDetectorVersion == CodeDetector.currentDetectorVersion)
+        }
+    }
+
     // MARK: - ピン留め複製の決定論的ロジック検証
     
     @Test

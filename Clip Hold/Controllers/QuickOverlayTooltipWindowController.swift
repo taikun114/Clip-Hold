@@ -25,9 +25,11 @@ class QuickOverlayTooltipWindowController: NSWindowController {
 
     private var tooltipDirection: TooltipDirection = .below
     private var currentTooltipIdentity: TooltipIdentity?
+    private var presentationID = UUID()
     
     private struct TooltipIdentity: Equatable {
         let text: String
+        let language: CodeLanguage?
         let sourceAppPath: String?
         let filePath: String?
         let dateString: String?
@@ -69,7 +71,13 @@ class QuickOverlayTooltipWindowController: NSWindowController {
               let userInfo = notification.userInfo,
               let text = userInfo["text"] as? String else { return }
         
-        let rawText = (userInfo["rawText"] as? String) ?? text
+        let language: CodeLanguage?
+        if userInfo["hasCodeDetection"] as? Bool == true {
+            language = (userInfo["codeLanguage"] as? String).flatMap(CodeLanguage.init(rawValue:))
+        } else {
+            language = (userInfo["isCompact"] as? Bool == true || userInfo["filePath"] != nil)
+                ? nil : CodeDetector.detectLanguage(text)
+        }
         
         let sourceAppPath = userInfo["sourceAppPath"] as? String
         let filePath = userInfo["filePath"] as? String
@@ -88,7 +96,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         }
         
         let identity = TooltipIdentity(
-            text: rawText,
+            text: text,
+            language: language,
             sourceAppPath: sourceAppPath,
             filePath: filePath,
             dateString: dateString,
@@ -102,8 +111,11 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             return
         }
         self.currentTooltipIdentity = identity
+        presentationID = UUID()
         
-        positionWindow(text: text, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize, dateString: dateString, characterCount: characterCount, anchorPoint: anchorPoint, isCompact: isCompact, buttonHeight: buttonHeight)
+        window.alphaValue = 0
+        window.disableScreenUpdatesUntilFlush()
+        positionWindow(text: text, detectedLanguage: language, sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize, dateString: dateString, characterCount: characterCount, anchorPoint: anchorPoint, isCompact: isCompact, buttonHeight: buttonHeight)
         
         guard let contentView = window.contentView else { return }
         contentView.wantsLayer = true
@@ -134,6 +146,12 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             contentView.layer?.transform = CATransform3DIdentity
         }
         window.orderFront(nil)
+#if DEBUG
+        if let hoverStartedAt = userInfo["hoverStartedAt"] as? Double {
+            let elapsed = ProcessInfo.processInfo.systemUptime - hoverStartedAt
+            print("DEBUG: [ツールチップ計測] 表示要求完了: ホバーから=\(elapsed)秒, 表示文字数=\(text.count)")
+        }
+#endif
         
         NSAnimationContext.runAnimationGroup { context in
             context.duration = 0.15
@@ -147,12 +165,15 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         contentView.wantsLayer = true
         
         self.currentTooltipIdentity = nil
+        presentationID = UUID()
+        let hidingID = presentationID
         
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = 0.15
             context.timingFunction = CAMediaTimingFunction(name: .easeIn)
             window.animator().alphaValue = 0
-        }, completionHandler: {
+        }, completionHandler: { [weak self] in
+            guard self?.presentationID == hidingID else { return }
             window.orderOut(nil)
             window.contentView = nil // 追加: ウインドウを隠した後にViewを破棄し、アニメーションループを完全に停止させる
             window.alphaValue = 1
@@ -162,7 +183,7 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         
     }
     
-    private func positionWindow(text: String, sourceAppPath: String?, filePath: String?, fileSize: UInt64?, dateString: String?, characterCount: Int?, anchorPoint: CGPoint?, isCompact: Bool = false, buttonHeight: CGFloat = 0) {
+    private func positionWindow(text: String, detectedLanguage: CodeLanguage?, sourceAppPath: String?, filePath: String?, fileSize: UInt64?, dateString: String?, characterCount: Int?, anchorPoint: CGPoint?, isCompact: Bool = false, buttonHeight: CGFloat = 0) {
         guard let window = self.window else { return }
         
         guard let overlayWindow = QuickOverlayWindowController.shared.window,
@@ -175,8 +196,8 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         let windowPadding: CGFloat = shadowPadding * 2
         let textPadding: CGFloat = 32
         let showInvisible = UserDefaults.standard.bool(forKey: "showInvisibleCharacters")
-        let layoutText = showInvisible ? text.formatWithInvisibleSymbolsPlain(singleLine: isCompact) : text
-        let isCode = (filePath == nil) && CodeDetector.isCode(text)
+        let layoutText = isCompact && showInvisible ? text.formatWithInvisibleSymbolsPlain(singleLine: true) : text
+        let isCode = filePath == nil && detectedLanguage != nil
         let font = isCode
             ? (NSFont(name: "Menlo", size: NSFont.systemFontSize) ?? NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular))
             : NSFont.systemFont(ofSize: NSFont.systemFontSize)
@@ -358,25 +379,49 @@ class QuickOverlayTooltipWindowController: NSWindowController {
             }
         }
         
-        // 確定した effectiveVisualWidth に基づいてテキストの高さを正確に計算
-        let textWidth = effectiveVisualWidth - textPadding
-        let textRect = (layoutText as NSString).boundingRect(
-            with: NSSize(width: textWidth, height: .greatestFiniteMagnitude),
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: [.font: font],
-            context: nil
-        )
+        let textWidth = max(1, effectiveVisualWidth - textPadding)
+        let textModel: QuickOverlayTooltipTextModel?
+        if filePath == nil && !isCompact {
+            let appearance = window.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua])
+            let request = QuickOverlayTooltipTextRequest(
+                text: text,
+                language: detectedLanguage?.highlighterLanguageName,
+                isCode: detectedLanguage != nil,
+                width: textWidth,
+                fontSize: NSFont.systemFontSize,
+                isDark: appearance == .darkAqua,
+                showsInvisibleCharacters: showInvisible
+            )
+            textModel = QuickOverlayTooltipTextModel(request: request)
+        } else {
+            textModel = nil
+        }
+        let measuredTextHeight: CGFloat
+        if let textModel {
+            // 本文の組版を待たず、初回はスピナー用の領域を確保する。
+            measuredTextHeight = textModel.bodyHeight
+        } else if filePath != nil {
+            measuredTextHeight = 256
+        } else {
+            measuredTextHeight = ceil((layoutText as NSString).boundingRect(
+                with: NSSize(width: textWidth, height: .greatestFiniteMagnitude),
+                options: [.usesLineFragmentOrigin, .usesFontLeading],
+                attributes: [.font: font], context: nil
+            ).height)
+        }
         let hasHeader = sourceAppPath != nil
-        let hasFooter = dateString != nil || characterCount != nil || (isCode && CodeDetector.detectLanguage(text) != nil)
+        let hasFooter = dateString != nil || characterCount != nil || (isCode && detectedLanguage != nil)
         let spacingCount: CGFloat = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0)
         let headerHeight: CGFloat = hasHeader ? 20 : 0
         let footerHeight: CGFloat = hasFooter ? 14 : 0
         let spacingHeight: CGFloat = spacingCount * 16
         let paddingHeight: CGFloat = 32
-        let contentHeight: CGFloat = filePath != nil ? 256 : ceil(textRect.height)
+        let contentHeight = measuredTextHeight
         let naturalVisualHeight: CGFloat = contentHeight + paddingHeight + headerHeight + footerHeight + spacingHeight
         
-        finalVisualHeight = min(finalVisualHeight, naturalVisualHeight)
+        if textModel == nil {
+            finalVisualHeight = min(finalVisualHeight, naturalVisualHeight)
+        }
         finalVisualHeight = max(finalVisualHeight, 50)
         
         // 高さ確定後、オーバーレイとの相対位置およびY座標の再調整
@@ -413,21 +458,36 @@ class QuickOverlayTooltipWindowController: NSWindowController {
         newOrigin.x = min(max(newOrigin.x, safeMinX - shadowPadding), safeMaxX - windowWidth + shadowPadding)
         newOrigin.y = min(max(newOrigin.y, safeMinY - shadowPadding), safeMaxY - finalWindowHeight + shadowPadding)
         
-        let calculatedTextHeight = ceil(textRect.height)
-        let finalView = QuickOverlayTooltipView(
-            text: text,
-            maxVisualHeight: finalVisualHeight,
-            calculatedTextHeight: calculatedTextHeight,
-            sourceAppPath: sourceAppPath,
-            filePath: filePath,
-            fileSize: fileSize,
-            dateString: dateString,
-            characterCount: characterCount,
-            isCompact: isCompact
-        )
-        let finalHosting = NSHostingView(rootView: finalView)
-        window.contentView = finalHosting
-        
-        window.setFrame(NSRect(x: newOrigin.x, y: newOrigin.y, width: windowWidth, height: finalWindowHeight), display: true)
+        let content: AnyView
+        if let textModel {
+            let alignment: Alignment = tooltipDirection == .above ? .bottom : .top
+            content = AnyView(QuickOverlayTooltipSizedContent(
+                model: textModel,
+                maximumHeight: finalVisualHeight,
+                chromeHeight: paddingHeight + headerHeight + footerHeight + spacingHeight,
+                alignment: alignment
+            ) { visualHeight in
+                QuickOverlayTooltipView(
+                    text: text, detectedLanguage: detectedLanguage,
+                    maxVisualHeight: visualHeight,
+                    calculatedTextHeight: textModel.bodyHeight,
+                    sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize,
+                    dateString: dateString, characterCount: characterCount,
+                    isCompact: isCompact, textModel: textModel
+                )
+            }.id(presentationID))
+        } else {
+            content = AnyView(QuickOverlayTooltipView(
+                text: text, detectedLanguage: detectedLanguage,
+                maxVisualHeight: finalVisualHeight, calculatedTextHeight: measuredTextHeight,
+                sourceAppPath: sourceAppPath, filePath: filePath, fileSize: fileSize,
+                dateString: dateString, characterCount: characterCount, isCompact: isCompact
+            ).id(presentationID))
+        }
+        // 前の項目の寸法で新しい内容を描画しないよう、先に領域を更新する。
+        window.contentView = nil
+        window.setFrame(NSRect(x: newOrigin.x, y: newOrigin.y, width: windowWidth, height: finalWindowHeight), display: false)
+        window.contentView = NSHostingView(rootView: content)
+        window.contentView?.layoutSubtreeIfNeeded()
     }
 }

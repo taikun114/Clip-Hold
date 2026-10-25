@@ -163,19 +163,6 @@ struct LargeFileAlertView: View {
     }
 }
 
-#Preview {
-    LargeFileAlertView(
-        viewModel: LargeFileAlertViewModel(
-            title: "大容量ファイルのコピー",
-            message: "100 MBを超えるファイル（124.6 MB）がコピーされました。履歴に保存してもよろしいですか？",
-            buttons: [
-                LargeFileAlertButton(title: "いいえ", action: {}),
-                LargeFileAlertButton(title: "はい", isProminent: true, action: {})
-            ]
-        )
-    )
-}
-
 struct LegacyAlertButtonStyle: ButtonStyle {
     var isProminent: Bool
     @Environment(\.controlActiveState) var controlActiveState
@@ -274,4 +261,17 @@ class DraggingView: NSView {
         initialMouse = nil
         initialOrigin = nil
     }
+}
+
+#Preview {
+    LargeFileAlertView(
+        viewModel: LargeFileAlertViewModel(
+            title: "大容量ファイルのコピー",
+            message: "100 MBを超えるファイル（124.6 MB）がコピーされました。履歴に保存してもよろしいですか？",
+            buttons: [
+                LargeFileAlertButton(title: "いいえ", action: {}),
+                LargeFileAlertButton(title: "はい", isProminent: true, action: {})
+            ]
+        )
+    )
 }

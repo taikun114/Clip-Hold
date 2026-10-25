@@ -150,6 +150,9 @@ actor ChunkedHistoryManager {
                 try self.saveChunk(updatedItems, at: chunkIndex)
             }
             
+#if DEBUG
+            print("DEBUG: [コピー元] 履歴保存処理完了: ID=\(item.id), チャンク=\(chunkIndex), sourceAppPath=\(item.sourceAppPath ?? "なし")")
+#endif
             // Spotlightのインデックスに追加
             SpotlightManager.shared.indexHistoryItem(item)
         } catch {

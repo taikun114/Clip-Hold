@@ -117,8 +117,8 @@ struct ClipboardItemIconView: View {
     @ViewBuilder
     private func appIconOverlay(for sourceAppPath: String) -> some View {
         Group {
-            if FileManager.default.fileExists(atPath: sourceAppPath) {
-                Image(nsImage: NSWorkspace.shared.icon(forFile: sourceAppPath))
+            if let icon = SourceAppIconCache.shared.image(forApplicationAt: sourceAppPath) {
+                Image(nsImage: icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 15, height: 15)

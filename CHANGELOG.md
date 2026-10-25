@@ -46,6 +46,33 @@ For 1.6.3 and earlier, it is listed as follows:
 Only for versions 1.5.0 and later. Earlier versions may not follow this order.
 -->
 
+## 1.7.2
+
+### New Features
+#### Copy History
+- **Add the "Ignore Content from Universal Clipboard" setting**
+  - Prevents content copied on another device and synced via Universal Clipboard from being added to the history.
+
+### Bug Fixes and Improvements
+#### General
+- **Improve code detection**
+  - Shell script detection is now more accurate, and false positives for non-code text have been reduced.
+- **Improve usability of the "Change Item and Copy" screen**
+  - When you try to cancel after changing the content, an alert now asks whether you want to discard your changes. You can also activate the Discard button in the alert by pressing `⌘ (Command)` + `D`.
+
+#### Copy History
+- **Improve source application detection**
+  - The source application is now detected more accurately when copying files from the desktop or copying items using context menus, among other cases.
+
+#### Quick Overlay
+- **Fix issue where Quick Overlay could remain visible when shortcut keys were released quickly**
+- **Improve Quick Overlay performance**
+- **Improve Quick Overlay usability**
+- **Improve tooltip performance**
+- **Improve Quick Paste processing from Quick Overlay**
+- **Improve Quick Overlay to close when touching the screen edge again after opening it from that edge**
+  - Quick Overlay can now be closed with minimal cursor movement, even when opened unintentionally.
+
 ## 1.7.1
 
 ### Bug Fixes and Improvements

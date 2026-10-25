@@ -92,3 +92,90 @@ struct ScreenEdgeModelsTests {
         #expect(ScreenEdgeTarget.allCases.count == 3)
     }
 }
+
+struct ScreenEdgeDismissStateTests {
+    private let frame = CGRect(x: -1000, y: 100, width: 800, height: 600)
+
+    @Test(arguments: [ScreenEdgeSide.top, .bottom, .left, .right])
+    func waitsForCompletionAndDeparture(edge: ScreenEdgeSide) {
+        var state = ScreenEdgeDismissState()
+        state.begin(edge: edge, screenFrame: frame)
+        let contact = point(edge: edge, distance: 0)
+        let away = point(edge: edge, distance: 17)
+        let result1 = state.shouldDismiss(at: away)
+        #expect(!result1)
+        let result2 = state.shouldDismiss(at: contact)
+        #expect(!result2)
+        state.didFinishOpening()
+        let result3 = state.shouldDismiss(at: contact)
+        #expect(!result3)
+        let result4 = state.shouldDismiss(at: point(edge: edge, distance: 16))
+        #expect(!result4)
+        let result5 = state.shouldDismiss(at: contact)
+        #expect(!result5)
+        let result6 = state.shouldDismiss(at: away)
+        #expect(!result6)
+        let result7 = state.shouldDismiss(at: point(edge: edge, distance: 3))
+        #expect(!result7)
+        let result8 = state.shouldDismiss(at: point(edge: edge, distance: 2))
+        #expect(result8)
+        let result9 = state.shouldDismiss(at: contact)
+        #expect(!result9)
+        state.cancel()
+        let result10 = state.blocksTrigger(at: contact)
+        #expect(result10)
+        let result11 = state.blocksTrigger(at: point(edge: edge, distance: 16))
+        #expect(result11)
+        let result12 = state.blocksTrigger(at: away)
+        #expect(!result12)
+        let result13 = state.blocksTrigger(at: contact)
+        #expect(!result13)
+    }
+
+    @Test
+    func ignoresOtherScreensAndCancelledOpening() {
+        var state = ScreenEdgeDismissState()
+        state.begin(edge: .top, screenFrame: frame)
+        state.didFinishOpening()
+        let result14 = state.shouldDismiss(at: CGPoint(x: 100, y: frame.maxY))
+        #expect(!result14)
+        let result15 = state.shouldDismiss(at: CGPoint(x: 200, y: frame.maxY))
+        #expect(!result15)
+        state.cancel()
+        state.didFinishOpening()
+        let result16 = state.shouldDismiss(at: point(edge: .top, distance: 0))
+        #expect(!result16)
+        let result17 = state.shouldDismiss(at: point(edge: .top, distance: 30))
+        #expect(!result17)
+        let result18 = state.shouldDismiss(at: point(edge: .top, distance: 0))
+        #expect(!result18)
+    }
+
+    @Test
+    func newOpeningResetsPreviousDeparture() {
+        var state = ScreenEdgeDismissState()
+        state.begin(edge: .top, screenFrame: frame)
+        state.didFinishOpening()
+        let result19 = state.shouldDismiss(at: point(edge: .top, distance: 30))
+        #expect(!result19)
+        state.begin(edge: .bottom, screenFrame: frame)
+        let result20 = state.shouldDismiss(at: point(edge: .bottom, distance: 30))
+        #expect(!result20)
+        state.didFinishOpening()
+        let result21 = state.shouldDismiss(at: point(edge: .bottom, distance: 0))
+        #expect(!result21)
+        let result22 = state.shouldDismiss(at: point(edge: .bottom, distance: 30))
+        #expect(!result22)
+        let result23 = state.shouldDismiss(at: point(edge: .bottom, distance: 0))
+        #expect(result23)
+    }
+
+    private func point(edge: ScreenEdgeSide, distance: CGFloat) -> CGPoint {
+        switch edge {
+        case .top: return CGPoint(x: frame.midX, y: frame.maxY - distance)
+        case .bottom: return CGPoint(x: frame.midX, y: frame.minY + distance)
+        case .left: return CGPoint(x: frame.minX + distance, y: frame.midY)
+        case .right: return CGPoint(x: frame.maxX - distance, y: frame.midY)
+        }
+    }
+}

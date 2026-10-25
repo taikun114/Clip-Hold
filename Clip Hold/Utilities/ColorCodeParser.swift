@@ -13,46 +13,44 @@ struct ColorCodeParser {
     // HSL形式のパターン (カンマ区切りとスペース区切り、deg/turn表記、%省略に対応)
     private static let hslPattern = #"^hsl\(\s*(\d{1,3}(?:\.\d+)?)((?:deg)|(?:turn))?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*[, ]\s*(\d{1,3}(?:\.\d+)?)%?\s*\)$"#
     
+    private static let hexRegex = makeRegex(hexPattern)
+    private static let rgbRegex = makeRegex(rgbPattern, options: .caseInsensitive)
+    private static let rgbaRegex = makeRegex(rgbaPattern, options: .caseInsensitive)
+    private static let hslRegex = makeRegex(hslPattern, options: .caseInsensitive)
+    private static let hslaRegex = makeRegex(hslaPattern, options: .caseInsensitive)
+
+    private static func makeRegex(_ pattern: String, options: NSRegularExpression.Options = []) -> NSRegularExpression? {
+        do {
+            return try NSRegularExpression(pattern: pattern, options: options)
+        } catch {
+            print("ColorCodeParser: 正規表現を作成できませんでした: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
     /// カラーコードを解析して、対応するColorオブジェクトを返す
     /// - Parameter text: 解析する文字列
     /// - Returns: 解析されたColorオブジェクト。解析できない場合はnil
     static func parseColor(from text: String) -> Color? {
         // テキストが異常に長い場合、パフォーマンス低下を防ぐために先頭の100文字のみを処理対象とする
         // (カラーコードは100文字以上になることはないため安全)
-        let processedText = text.count > 100 ? String(text.prefix(100)) : text
+        let processedText = String(text.prefix(100))
         let trimmedText = processedText.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // HEX形式 (例: #FFFFFF, #FFFFFFFF, FFFFFF, FFFFFFFF)
-        if let hexColor = parseHex(trimmedText) {
-            return hexColor
+        // 形式に対応する正規表現だけを評価し、通常の文章への不要な照合を避ける
+        let prefix = trimmedText.prefix(4).lowercased()
+        if prefix.hasPrefix("rgb") {
+            return parseRgba(trimmedText) ?? parseRgb(trimmedText)
         }
-        
-        // RGBA形式 (例: rgba(255, 0, 0, 1), rgba(255 0 0 / 1), rgba(255,0,0,1))
-        if let rgbaColor = parseRgba(trimmedText) {
-            return rgbaColor
+        if prefix.hasPrefix("hsl") {
+            return parseHsla(trimmedText) ?? parseHsl(trimmedText)
         }
-        
-        // HSLA形式 (例: hsla(0, 100%, 50%, 1), hsla(0 100% 50% / 1))
-        if let hslaColor = parseHsla(trimmedText) {
-            return hslaColor
-        }
-        
-        // RGB形式 (例: rgb(255, 0, 0), rgb(255 0 0), rgb(255,0,0))
-        if let rgbColor = parseRgb(trimmedText) {
-            return rgbColor
-        }
-        
-        // HSL形式 (例: hsl(0, 100%, 50%), hsl(0 100% 50%))
-        if let hslColor = parseHsl(trimmedText) {
-            return hslColor
-        }
-        
-        return nil
+        return parseHex(trimmedText)
     }
     
     /// HEXカラーコードを解析
     private static func parseHex(_ text: String) -> Color? {
-        let regex = try! NSRegularExpression(pattern: hexPattern, options: [])
+        guard let regex = hexRegex else { return nil }
         let nsRange = NSRange(text.startIndex..., in: text)
         
         guard let match = regex.firstMatch(in: text, options: [], range: nsRange) else { return nil }
@@ -111,7 +109,7 @@ struct ColorCodeParser {
     
     /// RGBカラーコードを解析
     private static func parseRgb(_ text: String) -> Color? {
-        let regex = try! NSRegularExpression(pattern: rgbPattern, options: .caseInsensitive)
+        guard let regex = rgbRegex else { return nil }
         let nsRange = NSRange(text.startIndex..., in: text)
         
         guard let match = regex.firstMatch(in: text, options: [], range: nsRange) else { return nil }
@@ -165,7 +163,7 @@ struct ColorCodeParser {
     
     /// RGBAカラーコードを解析
     private static func parseRgba(_ text: String) -> Color? {
-        let regex = try! NSRegularExpression(pattern: rgbaPattern, options: .caseInsensitive)
+        guard let regex = rgbaRegex else { return nil }
         let nsRange = NSRange(text.startIndex..., in: text)
         
         guard let match = regex.firstMatch(in: text, options: [], range: nsRange) else { return nil }
@@ -234,7 +232,7 @@ struct ColorCodeParser {
     
     /// HSLカラーコードを解析
     private static func parseHsl(_ text: String) -> Color? {
-        let regex = try! NSRegularExpression(pattern: hslPattern, options: .caseInsensitive)
+        guard let regex = hslRegex else { return nil }
         let nsRange = NSRange(text.startIndex..., in: text)
         
         guard let match = regex.firstMatch(in: text, options: [], range: nsRange) else { return nil }
@@ -269,7 +267,7 @@ struct ColorCodeParser {
     
     /// HSLAカラーコードを解析
     private static func parseHsla(_ text: String) -> Color? {
-        let regex = try! NSRegularExpression(pattern: hslaPattern, options: .caseInsensitive)
+        guard let regex = hslaRegex else { return nil }
         let nsRange = NSRange(text.startIndex..., in: text)
         
         guard let match = regex.firstMatch(in: text, options: [], range: nsRange) else { return nil }
